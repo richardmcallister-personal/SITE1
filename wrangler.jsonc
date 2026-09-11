@@ -1,0 +1,10 @@
+{
+  "name": "site1",
+  "compatibility_date": "2026-09-11",
+  "assets": {
+    "directory": "./public"
+  },
+  "observability": {
+    "enabled": true
+  }
+}
