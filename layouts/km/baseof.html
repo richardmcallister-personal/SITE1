@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {{/* These are rebuilds of someone else's pages. They must never be
+       indexed, or a search engine could rank them as the brand's own. */}}
+  <meta name="robots" content="noindex, nofollow">
+
+  <title>{{ .Title }} — rebuild</title>
+  <meta name="description" content="{{ .Params.summary | default "A static rebuild, for study." }}">
+
+  <link rel="stylesheet" href="{{ "km.css" | relURL }}">
+</head>
+<body class="km">
+
+  <div class="km-promo">
+    <ul>
+      {{ range site.Data.km.shell.promo }}<li>{{ . }}</li>{{ end }}
+    </ul>
+  </div>
+
+  <header class="km-masthead">
+    <div class="km-wrap">
+      <div class="km-icons">
+        <span class="km-icon" aria-hidden="true">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M1 4h16M1 9h16M1 14h16"/>
+          </svg>
+        </span>
+        <span class="km-icon" aria-hidden="true">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2">
+            <circle cx="8" cy="8" r="6"/><path d="M12.5 12.5 17 17"/>
+          </svg>
+        </span>
+      </div>
+
+      <a class="km-wordmark" href="{{ "km/" | relURL }}">KEVIN.MURPHY</a>
+
+      <div class="km-icons km-icons--end">
+        <span class="km-icon" aria-hidden="true">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2">
+            <circle cx="9" cy="6" r="3.2"/><path d="M2.5 16c0-3.3 2.9-5.2 6.5-5.2s6.5 1.9 6.5 5.2"/>
+          </svg>
+        </span>
+        <span class="km-icon" aria-hidden="true">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M9 15.5S2 11.4 2 6.9A3.9 3.9 0 0 1 9 4.6a3.9 3.9 0 0 1 7 2.3c0 4.5-7 8.6-7 8.6Z"/>
+          </svg>
+        </span>
+        <span class="km-icon" aria-hidden="true">
+          <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.2">
+            <path d="M3.5 5.5h11l-1 10h-9l-1-10Z"/><path d="M6.5 5.5a2.5 2.5 0 0 1 5 0"/>
+          </svg>
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    {{ block "main" . }}{{ end }}
+  </main>
+
+  <footer class="km-footer">
+    <div class="km-wrap">
+      <p class="km-ack">{{ site.Data.km.shell.acknowledgement }}</p>
+
+      <div class="km-footcols">
+        {{ range site.Data.km.shell.footer }}
+          <div>
+            <h2>{{ .heading }}</h2>
+            <ul>{{ range .links }}<li>{{ . }}</li>{{ end }}</ul>
+          </div>
+        {{ end }}
+      </div>
+
+      <div class="km-colophon">
+        <p><strong>This is not the KEVIN.MURPHY website.</strong> It is a hand-built
+        static rebuild by {{ site.Params.author }}, made to study how the pages are put
+        together. No affiliation, no endorsement, nothing for sale. Product names,
+        copy and trade marks belong to their owner. The real site is at
+        kevinmurphy.com.au.</p>
+        <p>Photography is not reproduced here; the coloured blocks stand in for it.
+        <a href="{{ "/" | relURL }}">Back to {{ site.Title }}</a></p>
+      </div>
+    </div>
+  </footer>
+
+  <div class="km-origin">
+    <div class="km-wrap">
+      <p>Rebuild — {{ .Title }}</p>
+      <a href="{{ "/" | relURL }}">{{ site.Title }}</a>
+    </div>
+  </div>
+
+</body>
+</html>

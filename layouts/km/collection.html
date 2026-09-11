@@ -1,0 +1,50 @@
+{{ define "main" }}
+
+<div class="km-wrap km-colhead">
+  <div class="km-colhead-top">
+    <p class="km-crumb"><span>{{ .Title }}</span> — {{ .Params.count }} items</p>
+    <button class="km-filters" type="button">
+      Filters
+      <svg viewBox="0 0 12 12" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+        <path d="M6 1v10M1 6h10"/>
+      </svg>
+    </button>
+  </div>
+
+  <h1>{{ .Title }}</h1>
+  {{ with .Params.intro }}<p class="km-intro">{{ . }} <a class="km-link" href="#about">Read more</a></p>{{ end }}
+
+  {{ with .Params.subcats }}
+    <ul class="km-subcats">
+      {{ range . }}<li><a href="#">{{ . }}</a></li>{{ end }}
+    </ul>
+  {{ end }}
+</div>
+
+<section class="km-section">
+  <div class="km-wrap">
+    <h2 class="km-h2 km-visually-hidden">Products</h2>
+    <ul class="km-grid">
+      {{ range .Params.products }}{{ partial "km-card.html" . }}{{ end }}
+    </ul>
+  </div>
+</section>
+
+{{ with .Params.about }}
+<section class="km-section km-section--faint" id="about">
+  <div class="km-wrap">
+    <p class="km-eyebrow">{{ .eyebrow }}</p>
+    <div class="km-about">
+      <div>
+        <h2 class="km-about-title">{{ .title }}</h2>
+        <p>{{ .body }}</p>
+      </div>
+      <ul class="km-pillars">
+        {{ range .pillars }}<li>{{ . }}</li>{{ end }}
+      </ul>
+    </div>
+  </div>
+</section>
+{{ end }}
+
+{{ end }}

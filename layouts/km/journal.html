@@ -1,0 +1,40 @@
+{{ define "main" }}
+
+<div class="km-wrap km-colhead">
+  <p class="km-crumb"><span>Blog</span></p>
+  <h1>{{ .Title }}</h1>
+  {{ with .Params.intro }}<p class="km-intro">{{ . }}</p>{{ end }}
+</div>
+
+<section class="km-section">
+  <div class="km-wrap">
+
+    {{ $posts := .Params.posts }}
+    {{ with index $posts 0 }}
+      <article class="km-feature">
+        <div class="km-tile {{ .tone }}"></div>
+        <div>
+          <p class="km-eyebrow">Latest</p>
+          <h2>{{ .title }}</h2>
+          <p>{{ .standfirst }}</p>
+          <a class="km-btn km-btn--ghost" href="#">Read the blog post</a>
+        </div>
+      </article>
+    {{ end }}
+
+    <ul class="km-journal">
+      {{ range after 1 $posts }}
+        <li>
+          <a href="#">
+            <div class="km-tile {{ .tone }}"></div>
+            <h2>{{ .title }}</h2>
+            <p>{{ .standfirst }}</p>
+          </a>
+        </li>
+      {{ end }}
+    </ul>
+
+  </div>
+</section>
+
+{{ end }}

@@ -1,0 +1,35 @@
+# Shell furniture shared by every /km/ rebuild page.
+# Transcribed from the live site so the structure matches.
+
+promo:
+  - "Buy FLAWLESS, get a brush for FREE"
+  - "Buy FLAWLESS, get a brush for FREE"
+  - "Buy FLAWLESS, get a brush for FREE"
+
+acknowledgement: >-
+  We acknowledge all Traditional Custodians of the lands, seas & waterways
+  throughout Australia, and pay our respects to Elders past, present and
+  emerging.
+
+footer:
+  - heading: "Customer service"
+    links:
+      - "Help center"
+      - "Contact us"
+      - "Shipping & delivery"
+      - "Returns & cancellations"
+      - "Log in"
+  - heading: "About"
+    links:
+      - "About KEVIN.MURPHY"
+      - "Choices we make"
+      - "Salon locator"
+      - "Blog"
+  - heading: "Professional & salon"
+    links:
+      - "Professional site"
+  - heading: "Legal & compliance"
+    links:
+      - "Privacy policy"
+      - "Terms & conditions"
+      - "Accessibility statement"

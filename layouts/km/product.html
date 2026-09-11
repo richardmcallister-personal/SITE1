@@ -1,0 +1,177 @@
+{{ define "main" }}
+{{ $p := .Params }}
+
+<div class="km-wrap">
+  <div class="km-pdp">
+
+    <div class="km-pdp-info">
+      <h1>{{ .Title }}</h1>
+
+      <p class="km-rating">
+        <span class="km-stars" aria-hidden="true">{{ $p.rating.stars }}</span>
+        <span>{{ $p.rating.score }} out of 5 customer rating</span>
+        <span>{{ $p.rating.count }} reviews</span>
+      </p>
+
+      <p class="km-desc">{{ $p.description }}</p>
+      {{ with $p.footnote }}<p class="km-foot">{{ . }}</p>{{ end }}
+
+      {{ with $p.flag }}<p class="km-field"><span class="km-flag km-flag--static">{{ . }}</span></p>{{ end }}
+
+      <div class="km-field">
+        <span class="km-micro">Size</span>
+        <span class="km-swatch">{{ $p.size }}</span>
+        <span class="km-micro km-selected">Selected</span>
+      </div>
+
+      {{ with $p.price }}<p class="km-pdp-price">{{ . }}</p>{{ end }}
+
+      <a class="km-btn km-btn--block" href="#">{{ $p.cta }}</a>
+    </div>
+
+    <div class="km-gallery">
+      <div class="km-tile km-tile--square {{ $p.tone }}">
+        <div class="km-pack"><span>K.M</span></div>
+      </div>
+      <div class="km-thumbs">
+        {{ range $p.thumbs }}
+          <div class="km-tile {{ . }}"><div class="km-pack"><span>K.M</span></div></div>
+        {{ end }}
+      </div>
+    </div>
+
+    <div class="km-pdp-panels">
+      <div class="km-panel">
+        <h2>Benefits</h2>
+        <ul class="km-pilllist">
+          {{ range $p.benefits }}<li>{{ . }}</li>{{ end }}
+        </ul>
+        <a class="km-link" href="#ingredients">Read more</a>
+      </div>
+
+      <div class="km-panel">
+        <h2>Fragrance</h2>
+        <p>{{ $p.fragrance }}</p>
+      </div>
+
+      <div class="km-panel">
+        <h2>How to apply</h2>
+        <a class="km-link" href="#">Get full guidance</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+{{ with $p.ingredients }}
+<section class="km-section km-section--faint" id="ingredients">
+  <div class="km-wrap">
+    <h2 class="km-h2">Hero ingredients</h2>
+    <p class="km-intro">{{ .intro }}</p>
+    <ul class="km-ingredients">
+      {{ range .items }}
+        <li>
+          <h3>{{ .name }}</h3>
+          {{ with .body }}<p>{{ . }}</p>{{ end }}
+        </li>
+      {{ end }}
+    </ul>
+    <p class="km-field"><a class="km-link" href="#">View full ingredient list</a></p>
+  </div>
+</section>
+{{ end }}
+
+{{ with $p.regimen }}
+<section class="km-section">
+  <div class="km-wrap">
+    <h2 class="km-h2">{{ .heading }}</h2>
+    <div class="km-regimen">
+      <div class="km-tile km-tile--square {{ .tone }}">
+        <div class="km-pack"><span>K.M</span></div>
+      </div>
+      <div>
+        <h3 class="km-name">{{ .name }}</h3>
+        <p class="km-size">{{ .size }}</p>
+        <p class="km-desc">{{ .body }}</p>
+        <p class="km-micro km-muted">Benefits</p>
+        <p class="km-tags">{{ range .benefits }}<span class="km-tag">{{ . }}</span>{{ end }}</p>
+        <p class="km-micro km-muted">Regimen</p>
+        <p class="km-tags"><span class="km-tag">{{ .label }}</span></p>
+        <a class="km-btn km-btn--ghost" href="#">Go to product</a>
+      </div>
+    </div>
+  </div>
+</section>
+{{ end }}
+
+{{ with $p.campaign }}
+<section class="km-split">
+  <div class="km-tile {{ .tone }}"><div class="km-pack"><span>FLAWLESS</span></div></div>
+  <div class="km-split-copy">
+    <div>
+      <h2>{{ .title }}</h2>
+      <p>{{ .body }}</p>
+      <a class="km-btn km-btn--ghost" href="#">Read the blog post</a>
+    </div>
+  </div>
+</section>
+{{ end }}
+
+{{ with $p.alsobought }}
+<section class="km-section">
+  <div class="km-wrap">
+    <h2 class="km-h2">Frequently bought together with</h2>
+    <ul class="km-grid km-grid--rail">
+      {{ range . }}{{ partial "km-card.html" . }}{{ end }}
+    </ul>
+  </div>
+</section>
+{{ end }}
+
+{{ with $p.elsewhere }}
+<section class="km-section km-section--tight">
+  <div class="km-wrap">
+    <h2 class="km-h2">Looking for something else?</h2>
+    <ul class="km-strip">
+      {{ range . }}<li><a href="#">{{ . }}</a></li>{{ end }}
+    </ul>
+  </div>
+</section>
+{{ end }}
+
+{{ with $p.reviews }}
+<section class="km-section km-section--faint">
+  <div class="km-wrap">
+    <h2 class="km-h2">Reviews</h2>
+
+    <div class="km-reviews-top">
+      <span class="km-score">{{ $p.rating.score }}</span>
+      <span class="km-stars" aria-hidden="true">{{ $p.rating.stars }}</span>
+      <span class="km-micro">{{ $p.rating.count }} reviews</span>
+      <a class="km-btn km-btn--ghost" href="#">Write a review</a>
+    </div>
+
+    {{ with .summary }}
+      <div class="km-summary">
+        <h3>Customers say</h3>
+        <p>{{ . }}</p>
+        <p class="km-micro">AI-generated from customer reviews.</p>
+      </div>
+    {{ end }}
+
+    <ul class="km-reviews">
+      {{ range .items }}
+        <li class="km-review">
+          <p class="km-micro">{{ .author }} — verified reviewer</p>
+          <span class="km-stars" aria-hidden="true">{{ .stars }}</span>
+          <h3>{{ .title }}</h3>
+          <p>{{ .body }}</p>
+          <p class="km-micro">Published {{ .date }}</p>
+        </li>
+      {{ end }}
+    </ul>
+  </div>
+</section>
+{{ end }}
+
+{{ end }}

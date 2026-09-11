@@ -1,0 +1,155 @@
+{{ define "main" }}
+{{ $h := .Params.hero }}
+
+<section class="km-hero {{ $h.tone }}">
+  <div class="km-wrap">
+    <div class="km-hero-copy">
+      {{ with $h.eyebrow }}<p class="km-eyebrow">{{ . }}</p>{{ end }}
+      <h1>{{ $h.title }}</h1>
+      {{ with $h.body }}<p>{{ . }}</p>{{ end }}
+      <div class="km-btnrow">
+        {{ range $h.buttons }}
+          <a class="km-btn km-btn--{{ .style }}" href="{{ .url | default "#" }}">{{ .label }}</a>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+  {{ with $h.stamp }}<span class="km-stamp">{{ . }}</span>{{ end }}
+</section>
+
+{{ with .Params.campaign }}
+<section class="km-split">
+  <div class="km-tile km-tile--wide {{ .tone }}">
+    <div class="km-pack"><span>FLAWLESS</span></div>
+  </div>
+  <div class="km-split-copy">
+    <div>
+      {{ with .eyebrow }}<p class="km-eyebrow">{{ . }}</p>{{ end }}
+      <h2>{{ .title }}</h2>
+      <p>{{ .body }}</p>
+      <a class="km-btn km-btn--ghost" href="{{ .url | default "#" }}">{{ .cta }}</a>
+    </div>
+  </div>
+</section>
+{{ end }}
+
+{{ with .Params.tote }}
+<section class="km-split">
+  <div class="km-split-copy">
+    <div>
+      <h2>{{ .title }}</h2>
+      <p>{{ .body }}</p>
+      <a class="km-btn" href="{{ .url | default "#" }}">{{ .cta }}</a>
+    </div>
+  </div>
+  <div class="km-tile km-tile--wide {{ .tone }}">
+    <div class="km-pack"><span>Tote</span></div>
+  </div>
+</section>
+{{ end }}
+
+<section class="km-section">
+  <div class="km-wrap">
+    <h2 class="km-h2">See our product range</h2>
+    <ul class="km-strip">
+      {{ range .Params.categories }}
+        <li><a href="{{ .url | default "#" }}">{{ .label }}</a></li>
+      {{ end }}
+    </ul>
+  </div>
+</section>
+
+{{ with .Params.philosophy }}
+<section class="km-section km-section--faint">
+  <div class="km-wrap">
+    <p class="km-intro-wide">{{ . }}</p>
+  </div>
+</section>
+{{ end }}
+
+{{ with .Params.founder }}
+<section class="km-split km-split--invert">
+  <div class="km-split-copy">
+    <div>
+      <p class="km-eyebrow">{{ .eyebrow }}</p>
+      <h2>{{ .title }}</h2>
+      <p>{{ .body }}</p>
+      <div class="km-btnrow">
+        {{ range .buttons }}
+          <a class="km-btn km-btn--outline-light" href="{{ .url | default "#" }}">{{ .label }}</a>
+        {{ end }}
+      </div>
+    </div>
+  </div>
+  <div class="km-tile km-tile--wide {{ .tone }}">
+    <div class="km-pack"><span>Kevin Murphy</span></div>
+  </div>
+</section>
+{{ end }}
+
+<section class="km-section">
+  <div class="km-wrap">
+    <h2 class="km-h2">Explore by benefit</h2>
+    <ul class="km-benefits">
+      {{ range .Params.benefits }}
+        <li><a href="{{ .url | default "#" }}">{{ .label }}</a></li>
+      {{ end }}
+    </ul>
+  </div>
+</section>
+
+{{ with .Params.sustainability }}
+<section class="km-split">
+  <div class="km-tile km-tile--wide {{ .tone }}">
+    <div class="km-pack"><span>Choices</span></div>
+  </div>
+  <div class="km-split-copy">
+    <div>
+      <h2>{{ .title }}</h2>
+      <a class="km-btn km-btn--ghost" href="{{ .url | default "#" }}">{{ .cta }}</a>
+    </div>
+  </div>
+</section>
+{{ end }}
+
+<section class="km-section">
+  <div class="km-wrap">
+    <div class="km-head">
+      <h2 class="km-h2">Trending products</h2>
+      <a class="km-link" href="{{ "km/shampoo/" | relURL }}">View the range</a>
+    </div>
+    <ul class="km-grid km-grid--rail">
+      {{ range .Params.trending }}{{ partial "km-card.html" . }}{{ end }}
+    </ul>
+  </div>
+</section>
+
+<section class="km-section km-section--faint">
+  <div class="km-wrap">
+    <div class="km-head">
+      <h2 class="km-h2">Explore the blog</h2>
+      <a class="km-link" href="{{ "km/journal/" | relURL }}">View all blog posts</a>
+    </div>
+    <ul class="km-journal">
+      {{ range first 6 .Params.journal }}
+        <li>
+          <a href="{{ "km/journal/" | relURL }}">
+            <div class="km-tile {{ .tone }}"></div>
+            <h3>{{ .title }}</h3>
+            <p>{{ .standfirst }}</p>
+          </a>
+        </li>
+      {{ end }}
+    </ul>
+  </div>
+</section>
+
+{{ with .Params.closing }}
+<section class="km-section km-section--tight">
+  <div class="km-wrap">
+    <p class="km-intro-wide">{{ . }}</p>
+  </div>
+</section>
+{{ end }}
+
+{{ end }}
