@@ -1,0 +1,59 @@
+baseURL = "https://example.com/"
+languageCode = "en-gb"
+title = "Richard McAllister"
+enableRobotsTXT = true
+enableEmoji = false
+
+# Dates on posts are British-style; see layouts/partials/date.html
+timeZone = "Europe/Stockholm"
+
+# Hide drafts and future-dated posts from the build. Cloudflare Pages runs
+# plain `hugo`, so anything with draft = true stays private until you flip it.
+buildDrafts = false
+buildFuture = false
+buildExpired = false
+
+summaryLength = 30
+
+[params]
+  description = "Notes on digital, technology and operations."
+  tagline = "Notes on digital, technology and operations."
+  intro = "I write up what I learn running a global consumer brand's digital and technology function — method, teardowns, and the occasional post-mortem."
+  author = "Richard McAllister"
+  email = ""
+  linkedin = ""
+  # Shown in small print at the foot of every post.
+  disclaimer = "Views my own."
+
+[menu]
+  [[menu.main]]
+    name = "Writing"
+    url = "/posts/"
+    weight = 1
+  [[menu.main]]
+    name = "About"
+    url = "/about/"
+    weight = 2
+
+[markup]
+  [markup.goldmark.renderer]
+    # Allow raw HTML in markdown — needed for tables with wrappers, figures,
+    # and anything pasted in from elsewhere.
+    unsafe = true
+  [markup.tableOfContents]
+    startLevel = 2
+    endLevel = 3
+  [markup.highlight]
+    noClasses = false
+    style = "github"
+
+[taxonomies]
+  tag = "tags"
+
+[services]
+  [services.rss]
+    limit = 30
+
+[outputs]
+  home = ["HTML", "RSS"]
+  section = ["HTML", "RSS"]

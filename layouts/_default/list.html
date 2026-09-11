@@ -1,0 +1,34 @@
+{{ define "main" }}
+
+<section class="section section-top">
+  <div class="wrap">
+    <h1 class="page-title">{{ .Title }}</h1>
+    {{ with .Content }}<div class="column intro-copy">{{ . }}</div>{{ end }}
+
+    {{ $pages := .RegularPagesRecursive }}
+    {{ if $pages }}
+      {{ range $y, $group := $pages.GroupByDate "2006" }}
+        <h2 class="year">{{ $group.Key }}</h2>
+        <ul class="postlist">
+          {{ range $group.Pages }}
+            <li>
+              <a href="{{ .RelPermalink }}">
+                <span class="postlist-date">
+                  <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2 Jan" }}</time>
+                </span>
+                <span class="postlist-body">
+                  <span class="postlist-title">{{ .Title }}</span>
+                  {{ with .Params.summary }}<span class="postlist-sum">{{ . }}</span>{{ end }}
+                </span>
+              </a>
+            </li>
+          {{ end }}
+        </ul>
+      {{ end }}
+    {{ else }}
+      <p class="section-note">Nothing here yet.</p>
+    {{ end }}
+  </div>
+</section>
+
+{{ end }}

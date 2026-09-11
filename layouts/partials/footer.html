@@ -1,0 +1,10 @@
+<footer class="foot">
+  <div class="wrap">
+    <span>&copy; {{ now.Format "2006" }} {{ site.Params.author | default site.Title }}</span>
+    <span class="foot-links">
+      {{ with site.Params.email }}<a href="mailto:{{ . }}">Email</a>{{ end }}
+      {{ with site.Params.linkedin }}<a href="{{ . }}">LinkedIn</a>{{ end }}
+      {{ with site.Home.OutputFormats.Get "rss" }}<a href="{{ .Permalink }}">RSS</a>{{ end }}
+    </span>
+  </div>
+</footer>

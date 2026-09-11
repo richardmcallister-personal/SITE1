@@ -1,0 +1,10 @@
+<header class="masthead">
+  <div class="wrap">
+    <a class="wordmark" href="{{ "/" | relURL }}">{{ site.Title }}</a>
+    <nav>
+      {{ range site.Menus.main }}
+        <a href="{{ .URL | relURL }}"{{ if $.IsMenuCurrent "main" . }} aria-current="page"{{ end }}>{{ .Name }}</a>
+      {{ end }}
+    </nav>
+  </div>
+</header>

@@ -1,0 +1,26 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+{{- $title := cond .IsHome site.Title (printf "%s — %s" .Title site.Title) -}}
+{{- $desc := "" -}}
+{{- with .Description }}{{ $desc = . }}
+{{- else }}{{ if .IsPage }}{{ $desc = .Summary | plainify | truncate 155 }}{{ else }}{{ $desc = site.Params.description }}{{ end }}{{ end -}}
+
+<title>{{ $title }}</title>
+<meta name="description" content="{{ $desc }}">
+<link rel="canonical" href="{{ .Permalink }}">
+
+<meta property="og:site_name" content="{{ site.Title }}">
+<meta property="og:title" content="{{ cond .IsHome site.Title .Title }}">
+<meta property="og:description" content="{{ $desc }}">
+<meta property="og:type" content="{{ cond .IsPage "article" "website" }}">
+<meta property="og:url" content="{{ .Permalink }}">
+{{- if .IsPage }}
+<meta property="article:published_time" content="{{ .Date.Format "2006-01-02" }}">
+{{- end }}
+<meta name="twitter:card" content="summary">
+
+<link rel="stylesheet" href="{{ "style.css" | relURL }}">
+{{ with .OutputFormats.Get "rss" -}}
+  <link rel="{{ .Rel }}" type="{{ .MediaType.Type }}" href="{{ .Permalink }}" title="{{ site.Title }}">
+{{- end }}

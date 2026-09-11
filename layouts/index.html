@@ -1,0 +1,39 @@
+{{ define "main" }}
+
+<section class="hero">
+  <div class="wrap">
+    <h1>{{ site.Params.tagline }}</h1>
+    {{ with site.Params.intro }}<p class="lede">{{ . }}</p>{{ end }}
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <h2>Recent</h2>
+    {{ $posts := where site.RegularPages "Section" "posts" }}
+    {{ if $posts }}
+      <ul class="postlist">
+        {{ range first 8 $posts }}
+          <li>
+            <a href="{{ .RelPermalink }}">
+              <span class="postlist-date">
+                <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2 Jan 2006" }}</time>
+              </span>
+              <span class="postlist-body">
+                <span class="postlist-title">{{ .Title }}</span>
+                {{ with .Params.summary }}<span class="postlist-sum">{{ . }}</span>{{ end }}
+              </span>
+            </a>
+          </li>
+        {{ end }}
+      </ul>
+      {{ if gt (len $posts) 8 }}
+        <p class="more"><a href="{{ "/posts/" | relURL }}">All writing &rarr;</a></p>
+      {{ end }}
+    {{ else }}
+      <p class="section-note">Nothing published yet.</p>
+    {{ end }}
+  </div>
+</section>
+
+{{ end }}
