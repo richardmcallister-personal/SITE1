@@ -45,21 +45,29 @@ hugo server -D     # -D includes drafts; http://localhost:1313
 hugo --gc --minify # production build into public/
 ```
 
-## Deploying on Cloudflare Pages
+## Deploying on Cloudflare
 
-Workers & Pages → Create → Pages → Connect to Git → pick this repo.
+The project deploys as a Worker with static assets (Cloudflare's current
+default for new projects), not a classic Pages project. `wrangler.jsonc` in
+this repo holds the deploy config so nothing is auto-guessed.
+
+Dashboard: Workers & Pages -> site1 -> Settings -> Build
 
 | Setting | Value |
 | --- | --- |
-| Framework preset | Hugo |
 | Build command | `hugo --gc --minify` |
-| Build output directory | `public` |
-| Environment variable | `HUGO_VERSION` = `0.140.2` |
+| Deploy command | `npx wrangler deploy` |
+| Build variable | `HUGO_VERSION` = `0.147.7` |
 
-Pin `HUGO_VERSION`. Without it Pages picks its own default, and a version drift
-six months from now will break a build you did not touch.
+Do **not** leave the build command as `npx hugo`. Hugo is a binary in the
+build image, not an npm package, so npx cannot run it — that is what the
+first failed build was.
 
-Custom domain: Pages project → Custom domains. TLS is automatic.
+`0.147.7` is the build image's own default and this site is tested against
+it. Pin it anyway: an unpinned version will change under you eventually.
+
+Custom domain: Workers & Pages -> site1 -> Settings -> Domains & Routes.
+TLS is automatic.
 
 ## Before the domain goes live
 

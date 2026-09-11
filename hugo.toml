@@ -1,4 +1,4 @@
-baseURL = "https://example.com/"
+baseURL = "https://site1.richardmcallister.workers.dev/"
 languageCode = "en-gb"
 title = "Richard McAllister"
 enableRobotsTXT = true

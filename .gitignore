@@ -3,6 +3,10 @@ resources/
 .hugo_build.lock
 .DS_Store
 
+# wrangler
+.wrangler/
+.dev.vars
+
 # local only
 _old_scaffold/
 *.zip
