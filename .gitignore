@@ -10,4 +10,3 @@ resources/
 # local only
 _old_scaffold/
 *.zip
-.claude/
