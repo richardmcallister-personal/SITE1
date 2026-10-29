@@ -1,0 +1,14 @@
+{
+  "name": "should-i-go-refresh",
+  "private": true,
+  "type": "module",
+  "description": "Refresh Old Trafford seat availability in the Should I Go? page and push to GitHub",
+  "scripts": {
+    "login": "node refresh.mjs --login",
+    "refresh": "node refresh.mjs",
+    "dry": "node refresh.mjs --no-push"
+  },
+  "dependencies": {
+    "playwright": "1.49.1"
+  }
+}
