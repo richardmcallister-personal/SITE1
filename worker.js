@@ -43,11 +43,20 @@ export default {
     const hit = await cache.match(cacheKey);
     if (hit) return hit;
 
-    const upstream = await fetch(API + route(url), {
+    // Keys from dashboard.api-football.com use the api-sports host; keys from RapidAPI use theirs.
+    // Try the direct host first and fall back to RapidAPI if the key is rejected.
+    let upstream = await fetch(API + route(url), {
       headers: { "x-apisports-key": env.API_FOOTBALL_KEY },
       cf: { cacheTtl: 0 },
     });
-    const body = await upstream.text();
+    let body = await upstream.text();
+    if (/Invalid API key/i.test(body)) {
+      upstream = await fetch("https://api-football-v1.p.rapidapi.com/v3" + route(url), {
+        headers: { "x-rapidapi-key": env.API_FOOTBALL_KEY, "x-rapidapi-host": "api-football-v1.p.rapidapi.com" },
+        cf: { cacheTtl: 0 },
+      });
+      body = await upstream.text();
+    }
     const res = new Response(body, {
       status: upstream.status,
       headers: {
@@ -57,7 +66,7 @@ export default {
         "x-source": "api-football",
       },
     });
-    if (upstream.ok) ctx.waitUntil(cache.put(cacheKey, res.clone()));
+    if (upstream.ok && !/Invalid API key|"message"\s*:\s*"You are not subscribed/i.test(body)) ctx.waitUntil(cache.put(cacheKey, res.clone()));
     return res;
   },
 };
