@@ -1,6 +1,6 @@
 # Should I Go? — seat refresh
 
-Refreshes block availability and sale status in `static/should-i-go/index.html` from
+Refreshes block availability and sale status in `static/manutd/trips/index.html` from
 tickets.manutd.com, using a dedicated Chrome profile where you are signed in, then
 commits and pushes so Cloudflare republishes.
 

@@ -1,0 +1,64 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · Season</title>
+<link rel="icon" href="/manutd/assets/devil.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>.two{display:grid;grid-template-columns:1fr 1fr;gap:26px}@media (max-width:820px){.two{grid-template-columns:1fr}} .logo{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-right:6px}</style>
+</head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Season 2026/27</small>Manchester<br>United</h1></a>
+  <div class="from">Season<span>Table · Champions League · results · fixtures</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+
+<div class="ticker" id="ticker"><span><span class="k">Last season</span><span class="v">3rd · 71 pts</span></span><span><span class="k">Manager</span><span class="v">Michael Carrick</span></span><span><span class="k">Europe</span><span class="v">Champions League</span></span></div>
+
+<div class="sheet">
+  <h2>Premier League table</h2>
+  <div id="pl"></div>
+</div>
+<div class="sheet">
+  <h2>Champions League · league phase</h2>
+  <div id="ucl"></div>
+</div>
+<div class="sheet">
+  <div class="two">
+    <div><h2>Results</h2><ul class="fxlist" id="results"></ul></div>
+    <div><h2>Remaining fixtures</h2><ul class="fxlist" id="fixtures"></ul></div>
+  </div>
+</div>
+<footer class="mu">Tables and results from API-Football (hourly cache on this site's Worker). Last season's figures from the club's 2025/26 record: 3rd on 71 points, 20–11–7, Šeško and Mbeumo top scorers on 12.</footer>
+</div>
+<script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script>
+<script>
+(function(){
+  MU.nav("Season");
+  function table(rows,opts){
+    return '<table class="mu"><thead><tr><th>#</th><th>Team</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th class="n">GD</th><th class="n">Pts</th><th>Form</th></tr></thead><tbody>'+
+      rows.map(function(r){var cls=r.team.id===MU.TEAM?"us":""; var d=(r.description||"").toLowerCase(); if(/champions league/.test(d)&&!/qualif/.test(d))cls+=" ucl"; else if(/europa|conference/.test(d))cls+=" uel"; else if(/relegation/.test(d))cls+=" rel";
+        return '<tr class="'+cls+'"><td>'+r.rank+'</td><td><img class="logo" src="'+r.team.logo+'" alt="">'+MU.esc(r.team.name)+'</td><td class="n">'+r.all.played+'</td><td class="n">'+r.all.win+'</td><td class="n">'+r.all.draw+'</td><td class="n">'+r.all.lose+'</td><td class="n">'+(r.goalsDiff>0?"+":"")+r.goalsDiff+'</td><td class="n"><b>'+r.points+'</b></td><td>'+MU.form(r.form)+'</td></tr>'}).join("")+'</tbody></table>'+
+      (opts&&opts.note?'<p class="sub">'+opts.note+'</p>':'');
+  }
+  MU.api("standings").then(function(j){
+    document.getElementById("pl").innerHTML=table(j.response[0].league.standings[0],{note:"Black bar: Champions League places · grey: Europa / Conference · red: relegation."});
+  }).catch(function(e){MU.apiDown(document.getElementById("pl"),e)});
+  MU.api("ucl").then(function(j){
+    var groups=j.response[0].league.standings; var rows=groups.length===1?groups[0]:[].concat.apply([],groups);
+    document.getElementById("ucl").innerHTML=table(rows,{note:"Top 8 go straight to the round of 16; 9th–24th play a knockout round."});
+  }).catch(function(e){MU.apiDown(document.getElementById("ucl"),e)});
+  function li(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, st=m.fixture.status.short, done=st==="FT"||st==="AET"||st==="PEN";
+    var gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home, res=done?(gf>ga?"W":gf<ga?"L":"D"):"";
+    return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'<br>'+(done?"":MU.fmtUK(m.fixture.date)+" UK")+'</span><span class="o"><img class="logo" src="'+opp.logo+'" alt="">'+MU.esc(opp.name)+' <small>· '+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r">'+(done?gf+'–'+ga+' '+MU.form(res):'')+'</span></li>'}
+  MU.api("fixtures").then(function(j){
+    var all=j.response.slice().sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp});
+    var done=all.filter(function(m){return /FT|AET|PEN/.test(m.fixture.status.short)}).reverse();
+    var todo=all.filter(function(m){return !/FT|AET|PEN|CANC|PST/.test(m.fixture.status.short)});
+    document.getElementById("results").innerHTML=done.map(li).join("")||'<li>No results yet</li>';
+    document.getElementById("fixtures").innerHTML=todo.map(li).join("");
+  }).catch(function(e){
+    MU.apiDown(document.getElementById("results"),e);
+    var now=new Date();
+    document.getElementById("fixtures").innerHTML=window.MU_FIXTURES.filter(function(f){return new Date(f.ko)>now}).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK</span><span class="o">'+MU.esc(f.opp)+' <small>· '+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("")+'<li><span class="d"></span><span class="o"><small>To end of January from the trip planner; the full season list arrives with the API.</small></span><span></span></li>';
+  });
+})();
+</script></body></html>

@@ -1,0 +1,57 @@
+/* Manchester United hub — Stretford End theme shared across pages */
+:root{--bg:#da020e;--paper:#fff;--ink:#111;--muted:#5a5a5a;--rule:#dcdcdc;--red:#da020e;--black:#111;--tint:#f2f2f2;--gold:#ffe500;
+ --display:Anton,Impact,"Arial Narrow",sans-serif;--body:Archivo,"Segoe UI",Helvetica,Arial,sans-serif}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;margin:0;padding:0 max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+.wrap{max-width:1080px;margin:0 auto}
+header.mu{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;padding:26px 0 14px;color:#fff}
+.brand{display:flex;align-items:center;gap:18px;min-width:0;color:#fff;text-decoration:none}
+.brand img{width:96px;height:auto;flex:0 0 auto}
+@media (max-width:480px){.brand img{width:64px}}
+h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,7.5vw,84px);line-height:.9;margin:0;letter-spacing:.01em;text-transform:uppercase;color:#fff}
+h1 small{display:block;font-size:.26em;letter-spacing:.2em;opacity:.85;margin-bottom:4px}
+.from{font-family:var(--display);font-size:20px;line-height:1.15;text-transform:uppercase;color:#fff;text-align:right}
+.from span{display:block;font-family:var(--body);font-size:13px;text-transform:none;opacity:.9;margin-top:6px}
+nav.munav{display:flex;gap:0;background:var(--black);overflow-x:auto;margin:0 0 0}
+nav.munav a{flex:1 0 auto;font-family:var(--display);font-size:18px;letter-spacing:.08em;text-transform:uppercase;color:#fff;text-decoration:none;padding:12px 18px;border-right:1px solid #333;white-space:nowrap;text-align:center}
+nav.munav a:hover{background:#222} nav.munav a[aria-current="page"]{background:#fff;color:var(--ink)}
+.sheet{background:var(--paper);padding:22px 26px}
+.sheet+.sheet{margin-top:4px}
+h2{font-family:var(--display);font-weight:400;font-size:18px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);margin:0 0 10px;border-bottom:4px solid var(--ink);padding-bottom:4px;display:inline-block}
+h3{font-family:var(--display);font-weight:400;font-size:16px;letter-spacing:.06em;text-transform:uppercase;margin:18px 0 6px}
+.sub{font-size:13px;color:var(--muted);margin:6px 0 0}
+table.mu{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;font-size:15px}
+table.mu th{font-family:var(--display);font-weight:400;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 8px;border-bottom:2px solid var(--ink)}
+table.mu td{padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:middle}
+table.mu td.n,table.mu th.n{text-align:right}
+table.mu tr.us td{background:#fff3f3;font-weight:700}
+table.mu tr.ucl td:first-child{box-shadow:inset 4px 0 0 var(--ink)}
+table.mu tr.uel td:first-child{box-shadow:inset 4px 0 0 #888}
+table.mu tr.rel td:first-child{box-shadow:inset 4px 0 0 var(--red)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.stat{background:var(--tint);padding:14px 16px}
+.stat .k{font-family:var(--display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.stat .v{font-family:var(--display);font-size:44px;line-height:1;margin-top:4px}
+.stat .s{font-size:13px;color:var(--muted);margin-top:4px}
+.form{display:inline-flex;gap:4px;vertical-align:middle}
+.form b{display:inline-block;width:22px;height:22px;line-height:22px;text-align:center;font-family:var(--display);font-weight:400;font-size:13px;color:#fff;background:#888}
+.form b.W{background:#111} .form b.L{background:var(--red)} .form b.D{background:#999}
+.btn{display:inline-block;background:var(--black);color:#fff;text-decoration:none;font-family:var(--display);font-size:16px;letter-spacing:.08em;text-transform:uppercase;padding:10px 16px}
+.btn:hover{background:#333} .btn.red{background:var(--red)}
+.empty{background:var(--tint);padding:14px 16px;font-size:14px;color:var(--muted)}
+.flag{width:22px;height:15px;object-fit:cover;vertical-align:-2px;margin-right:6px;border:1px solid #ddd}
+footer.mu{margin-top:28px;font-size:13px;color:#fff;opacity:.9;max-width:80ch}
+footer.mu a{color:#fff}
+.ticker{background:var(--black);color:#fff;padding:12px 18px;display:flex;flex-wrap:wrap;gap:8px 24px;align-items:baseline;font-variant-numeric:tabular-nums}
+.ticker .k{font-family:var(--display);font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#bbb;margin-right:6px}
+.ticker .v{font-family:var(--display);font-size:22px}
+.fxlist{list-style:none;margin:0;padding:0}
+.fxlist li{display:grid;grid-template-columns:120px 1fr auto;gap:12px;padding:8px 0;border-bottom:1px solid var(--rule);align-items:center}
+.fxlist .d{font-family:var(--display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.fxlist .o{font-weight:600} .fxlist .o small{font-weight:400;color:var(--muted)}
+.fxlist .r{font-family:var(--display);font-size:20px;min-width:64px;text-align:right}
+.fxlist li.away .o:before{content:"A";display:inline-block;font-family:var(--display);font-size:11px;background:var(--ink);color:#fff;padding:1px 5px;margin-right:8px}
+.fxlist li.home .o:before{content:"H";display:inline-block;font-family:var(--display);font-size:11px;background:var(--red);color:#fff;padding:1px 5px;margin-right:8px}
+.chip{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;background:var(--tint);color:var(--ink);margin-left:6px}
+.chip.red{background:var(--red);color:#fff}
+@media (max-width:640px){.fxlist li{grid-template-columns:90px 1fr auto}.sheet{padding:16px}}

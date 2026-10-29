@@ -1,0 +1,96 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · Hub</title>
+<link rel="icon" href="/manutd/assets/devil.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:4px;margin-top:10px}
+@media (max-width:760px){.hero{grid-template-columns:1fr}}
+.next{background:#fff;padding:22px 26px}
+.next .opp{font-family:var(--display);font-size:clamp(34px,5vw,56px);line-height:.95;text-transform:uppercase;margin:6px 0 4px}
+.next .meta{font-size:15px;color:var(--muted)}
+.count{display:flex;gap:18px;margin-top:14px}
+.count div{text-align:center} .count b{display:block;font-family:var(--display);font-size:40px;line-height:1;font-weight:400}
+.count span{font-family:var(--display);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.pos{background:var(--black);color:#fff;padding:22px 26px;display:flex;flex-direction:column;justify-content:space-between}
+.pos .big{font-family:var(--display);font-size:clamp(64px,10vw,120px);line-height:.85}
+.pos .big small{font-size:.3em;vertical-align:top;margin-left:4px}
+.pos .k{font-family:var(--display);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#bbb}
+.pos table{color:#fff} .pos .sub{color:#bbb}
+.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:4px;margin-top:4px}
+.links a{display:block;background:#fff;color:var(--ink);text-decoration:none;padding:18px 22px}
+.links a:hover{background:var(--tint)} .links a b{display:block;font-family:var(--display);font-weight:400;font-size:22px;text-transform:uppercase;letter-spacing:.04em}
+.links a span{font-size:14px;color:var(--muted)}
+</style></head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Richard's club hub</small>Manchester<br>United</h1></a>
+  <div class="from">Season 2026/27<span>Premier League · Champions League · FA Cup · EFL Cup</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+
+<div class="hero">
+  <div class="next" id="next"><div class="k" style="font-family:var(--display);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Next match</div><div class="opp">—</div></div>
+  <div class="pos" id="pos"><div><div class="k">Premier League</div><div class="big">—</div></div><p class="sub">Live position, points and form arrive once the API key is active.</p></div>
+</div>
+
+<div class="links">
+  <a href="/manutd/trips/"><b>Trips</b><span>Tickets, flights and hotels for every fixture, home and away, with real prices.</span></a>
+  <a href="/manutd/season/"><b>Season</b><span>League table, Champions League phase, every result and what's left.</span></a>
+  <a href="/manutd/squad/"><b>Squad & team picker</b><span>Who's fit, who's out, stats this season and for United, pick your XI.</span></a>
+  <a href="/manutd/history/"><b>History</b><span>Every honour, the managers who won them, and the matches that decided them.</span></a>
+</div>
+
+<div class="sheet" style="margin-top:4px">
+  <h2>Last five</h2>
+  <div id="last"></div>
+  <h2 style="margin-top:22px">Coming up</h2>
+  <ul class="fxlist" id="upcoming"></ul>
+</div>
+
+<footer class="mu">Fixture dates from tickets.manutd.com (home) and the TV-selected lists (away) on 29 Oct 2026. Live table, results and form from API-Football via this site's own Worker; nothing is fetched from the user's browser except this site and flag images.</footer>
+</div>
+<script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script>
+<script>
+(function(){
+  MU.nav("Hub");
+  var now=new Date(), fx=window.MU_FIXTURES, next=null;
+  for(var i=0;i<fx.length;i++){if(new Date(fx[i].ko)>now){next=fx[i];break}}
+  function renderNext(f){
+    if(!f)return;
+    var el=document.getElementById("next");
+    el.innerHTML='<div style="font-family:var(--display);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Next match · '+(f.home?"Old Trafford":"Away · "+MU.esc(f.venue))+'</div>'+
+      '<div class="opp">'+(f.home?"United v "+MU.esc(f.opp):MU.esc(f.opp)+" v United")+'</div>'+
+      '<div class="meta">'+MU.fmtDate(f.ko)+' · '+MU.fmtUK(f.ko)+' UK / '+MU.fmtSE(f.ko)+' SE · '+MU.esc(f.comp)+(f.tbc?' · TBC':'')+'</div>'+
+      '<div class="count" id="count"></div><p style="margin:14px 0 0"><a class="btn red" href="/manutd/trips/">Plan the trip</a></p>';
+    function tick(){var ms=new Date(f.ko)-new Date(); if(ms<0){document.getElementById("count").innerHTML="<div><b>Live</b></div>";return}
+      var d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4);
+      document.getElementById("count").innerHTML='<div><b>'+d+'</b><span>days</span></div><div><b>'+h+'</b><span>hours</span></div><div><b>'+m+'</b><span>min</span></div>'}
+    tick(); setInterval(tick,30000);
+  }
+  renderNext(next);
+  var up=document.getElementById("upcoming");
+  up.innerHTML=fx.filter(function(f){return new Date(f.ko)>now}).slice(0,8).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK</span><span class="o">'+MU.esc(f.opp)+' <small>· '+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("");
+
+  // Live bits
+  MU.api("standings").then(function(j){
+    var rows=j.response[0].league.standings[0], me=rows.filter(function(r){return r.team.id===MU.TEAM})[0];
+    if(!me)return;
+    var pos=document.getElementById("pos");
+    var ord=["th","st","nd","rd"][me.rank%10>3||Math.floor(me.rank%100/10)===1?0:me.rank%10];
+    pos.innerHTML='<div><div class="k">Premier League · after '+me.all.played+' games</div><div class="big">'+me.rank+'<small>'+ord+'</small></div></div>'+
+      '<table class="mu" style="margin-top:10px"><tr><td>Points</td><td class="n">'+me.points+'</td></tr><tr><td>W–D–L</td><td class="n">'+me.all.win+'–'+me.all.draw+'–'+me.all.lose+'</td></tr><tr><td>Goal difference</td><td class="n">'+(me.goalsDiff>0?"+":"")+me.goalsDiff+'</td></tr><tr><td>Form</td><td class="n">'+MU.form(me.form)+'</td></tr></table>'+
+      '<p class="sub" style="color:#bbb">'+MU.esc(me.description||"")+' · <a href="/manutd/season/" style="color:#fff">Full table</a></p>';
+  }).catch(function(e){ /* keep placeholder */ });
+  MU.api("fixtures").then(function(j){
+    var played=j.response.filter(function(m){return m.fixture.status.short==="FT"||m.fixture.status.short==="AET"||m.fixture.status.short==="PEN"}).sort(function(a,b){return b.fixture.timestamp-a.fixture.timestamp}).slice(0,5);
+    document.getElementById("last").innerHTML='<ul class="fxlist">'+played.map(function(m){
+      var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home;
+      var res=gf>ga?"W":gf<ga?"L":"D";
+      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'</span><span class="o">'+MU.esc(opp.name)+' <small>· '+MU.esc(m.league.name)+'</small></span><span class="r">'+gf+'–'+ga+' '+MU.form(res)+'</span></li>'}).join("")+'</ul>';
+    // upcoming from live data too (replaces the static list when available)
+    var next=j.response.filter(function(m){return m.fixture.status.short==="NS"||m.fixture.status.short==="TBD"}).sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp}).slice(0,8);
+    if(next.length){document.getElementById("upcoming").innerHTML=next.map(function(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home;
+      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'<br>'+MU.fmtUK(m.fixture.date)+' UK'+(m.fixture.status.short==="TBD"?" (TBC)":"")+'</span><span class="o">'+MU.esc(opp.name)+' <small>· '+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r"></span></li>'}).join("")}
+  }).catch(function(e){MU.apiDown(document.getElementById("last"),e)});
+})();
+</script></body></html>

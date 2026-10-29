@@ -19,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repo = path.resolve(here, '..');
-const pageFile = path.join(repo, 'static', 'should-i-go', 'index.html');
+const pageFile = path.join(repo, 'static', 'manutd', 'trips', 'index.html');
 const profileDir = path.join(homedir(), '.should-i-go-chrome');
 const args = new Set(process.argv.slice(2));
 const LOGIN = args.has('--login');
@@ -139,7 +139,7 @@ async function main() {
   if (NO_PUSH) return;
   if (!changed) { log('Nothing changed; not committing.'); return; }
   const run = cmd => execSync(cmd, { cwd: repo, stdio: 'inherit' });
-  run('git add static/should-i-go/index.html');
+  run('git add static/manutd/trips/index.html');
   run(`git commit -m "should-i-go: seat refresh ${today()}"`);
   run('git push origin main');
   log('Pushed. Cloudflare will republish in a minute or two.');

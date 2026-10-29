@@ -1,0 +1,70 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · History</title>
+<link rel="icon" href="/manutd/assets/devil.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>
+.honours{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px}
+.honours div{background:var(--black);color:#fff;padding:14px 16px}
+.honours b{display:block;font-family:var(--display);font-weight:400;font-size:48px;line-height:1}
+.honours span{font-family:var(--display);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#bbb}
+.years{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}
+.years a,.years span{font-family:var(--display);font-size:15px;letter-spacing:.04em;padding:4px 9px;background:var(--tint);color:var(--ink);text-decoration:none}
+.years a:hover{background:var(--ink);color:#fff}
+.match{display:grid;grid-template-columns:110px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.match .score{font-family:var(--display);font-size:34px;line-height:1} .match .score small{display:block;font-size:12px;letter-spacing:.1em;color:var(--muted)}
+.match h3{margin:0 0 2px} .match p{margin:2px 0;font-size:14px} .match .sub a{color:var(--ink)}
+@media (max-width:520px){.match{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Honours &amp; the matches that won them</small>Manchester<br>United</h1></a>
+  <div class="from">History<span>Newton Heath 1878 · Manchester United 1902</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+
+<div class="honours">
+  <div><b>20</b><span>League titles</span></div><div><b>13</b><span>FA Cups</span></div><div><b>6</b><span>League Cups</span></div><div><b>3</b><span>European Cups</span></div><div><b>1</b><span>Europa League</span></div><div><b>1</b><span>Cup Winners' Cup</span></div><div><b>2</b><span>World titles</span></div><div><b>21</b><span>Community Shields</span></div>
+</div>
+
+<div class="sheet">
+  <h2>League titles · 20</h2>
+  <h3>Ernest Mangnall · 2</h3><div class="years"><span>1907–08</span><span>1910–11</span></div>
+  <h3>Sir Matt Busby · 5</h3><div class="years"><span>1951–52</span><span>1955–56</span><span>1956–57</span><span>1964–65</span><span>1966–67</span></div>
+  <h3>Sir Alex Ferguson · 13</h3><div class="years"><span>1992–93</span><span>1993–94</span><span>1995–96</span><span>1996–97</span><span>1998–99</span><span>1999–2000</span><span>2000–01</span><span>2002–03</span><span>2006–07</span><span>2007–08</span><span>2008–09</span><span>2010–11</span><span>2012–13</span></div>
+
+  <h2 style="margin-top:18px">FA Cups · 13</h2>
+  <div class="years"><span>1909</span><span>1948</span><span>1963</span><span>1977</span><span>1983</span><span>1985</span><span>1990</span><span>1994</span><span>1996</span><span>1999</span><span>2004</span><span>2016</span><span>2024</span></div>
+  <h2>League Cups · 6</h2>
+  <div class="years"><span>1992</span><span>2006</span><span>2009</span><span>2010</span><span>2017</span><span>2023</span></div>
+  <h2>Europe and the world</h2>
+  <div class="years"><span>European Cup 1968</span><span>Cup Winners' Cup 1991</span><span>Super Cup 1991</span><span>Champions League 1999</span><span>Intercontinental Cup 1999</span><span>Champions League 2008</span><span>Club World Cup 2008</span><span>Europa League 2017</span></div>
+  <p class="sub">The treble season, 1998–99, is the only time an English club has won the league, FA Cup and European Cup in one year. Last trophy: the 2024 FA Cup. 2025–26: 3rd in the Premier League on 71 points, back in the Champions League.</p>
+</div>
+
+<div class="sheet">
+  <h2>The matches that decided them</h2>
+  <p class="sub" style="margin:0 0 6px">Highlight links open the club's official YouTube channel search for that match. Full match statistics for each of these games are the next thing to be added.</p>
+  <div id="matches"></div>
+</div>
+
+<footer class="mu">Honours as recognised by the club. Scorers and dates from the club's and competitions' records.</footer>
+</div>
+<script src="/manutd/mu.js"></script>
+<script>
+(function(){
+  MU.nav("History");
+  var M=[
+   {t:"European Cup final 1968",d:"29 May 1968 · Wembley",s:"4–1",o:"Benfica (aet)",g:"Charlton 2, Best, Kidd",m:"Sir Matt Busby",w:"First English club to win the European Cup, ten years after Munich. 1–1 after 90; three goals in the first eight minutes of extra time.",q:"1968 European Cup final Benfica"},
+   {t:"Cup Winners' Cup final 1991",d:"15 May 1991 · Rotterdam",s:"2–1",o:"Barcelona",g:"Hughes 2",m:"Alex Ferguson",w:"United's first European trophy under Ferguson, the season English clubs returned to Europe.",q:"1991 Cup Winners Cup final Barcelona"},
+   {t:"Premier League 1992–93 · the Bruce header",d:"10 April 1993 · Old Trafford",s:"2–1",o:"Sheffield Wednesday",g:"Bruce 86, 90+6",m:"Alex Ferguson",w:"Two late Steve Bruce headers; the title that ended a 26-year wait and started the Ferguson run.",q:"Bruce Sheffield Wednesday 1993"},
+   {t:"FA Cup semi-final replay 1999",d:"14 April 1999 · Villa Park",s:"2–1",o:"Arsenal (aet)",g:"Beckham, Giggs",m:"Alex Ferguson",w:"Schmeichel's penalty save from Bergkamp, then Giggs through the Arsenal defence in extra time. The treble stayed alive.",q:"Giggs Arsenal 1999 semi final"},
+   {t:"Champions League final 1999",d:"26 May 1999 · Camp Nou",s:"2–1",o:"Bayern München",g:"Sheringham 90+1, Solskjær 90+3",m:"Alex Ferguson",w:"Behind from the sixth minute until injury time; two goals from two corners and the treble was complete.",q:"1999 Champions League final Bayern"},
+   {t:"Champions League final 2008",d:"21 May 2008 · Moscow",s:"1–1",o:"Chelsea (6–5 pens)",g:"Ronaldo 26",m:"Sir Alex Ferguson",w:"Terry slipped, van der Sar saved from Anelka. Third European Cup, fifty years after Munich.",q:"2008 Champions League final Chelsea Moscow"},
+   {t:"Premier League 2012–13 · the 20th title",d:"22 April 2013 · Old Trafford",s:"3–0",o:"Aston Villa",g:"van Persie 2, 13, 33",m:"Sir Alex Ferguson",w:"A van Persie hat-trick, the second a volley from a Rooney pass, clinched the title with four games to spare; Ferguson's last.",q:"van Persie Aston Villa hat trick 2013"},
+   {t:"Europa League final 2017",d:"24 May 2017 · Stockholm",s:"2–0",o:"Ajax",g:"Pogba 18, Mkhitaryan 48",m:"José Mourinho",w:"The one major European trophy United had never won, two days after the Manchester Arena attack.",q:"2017 Europa League final Ajax"},
+   {t:"League Cup final 2023",d:"26 February 2023 · Wembley",s:"2–0",o:"Newcastle United",g:"Casemiro 33, Botman og 39",m:"Erik ten Hag",w:"First trophy in six years.",q:"2023 Carabao Cup final Newcastle"},
+   {t:"FA Cup final 2024",d:"25 May 2024 · Wembley",s:"2–1",o:"Manchester City",g:"Garnacho 30, Mainoo 39",m:"Erik ten Hag",w:"Two academy graduates scored against the champions; United's 13th FA Cup and the most recent trophy.",q:"2024 FA Cup final Manchester City"}
+  ];
+  document.getElementById("matches").innerHTML=M.map(function(x){return '<div class="match"><div class="score">'+x.s+'<small>'+MU.esc(x.d)+'</small></div><div><h3>'+MU.esc(x.t)+'</h3><p><b>United '+x.s+' '+MU.esc(x.o)+'</b> · '+MU.esc(x.g)+' · manager '+MU.esc(x.m)+'</p><p>'+MU.esc(x.w)+'</p><p class="sub"><a href="https://www.youtube.com/@manutd/search?query='+encodeURIComponent(x.q)+'" target="_blank" rel="noopener">Highlights on the club\'s channel</a></p></div></div>'}).join("");
+})();
+</script></body></html>
