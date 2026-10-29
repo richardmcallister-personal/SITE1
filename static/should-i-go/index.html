@@ -73,6 +73,13 @@ input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid 
 button.btn{font:inherit;font-weight:600;background:var(--ink);color:var(--bg);border:0;border-radius:6px;padding:9px 14px;cursor:pointer}
 button.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule)}
 .note{font-size:13px;color:var(--muted);margin:14px 0 0;max-width:70ch}
+.pick{display:flex;gap:8px;align-items:center;min-width:0}
+.pick select{flex:1 1 auto;min-width:0}
+a.book{flex:0 0 auto;font-weight:600;font-size:14px;color:var(--red-ink);background:var(--red);text-decoration:none;border-radius:5px;padding:7px 12px;white-space:nowrap}
+a.book[aria-disabled="true"]{opacity:.4;pointer-events:none}
+.booknow{margin-top:18px;padding-top:14px;border-top:2px solid var(--ink)}
+.bookrow{display:flex;flex-wrap:wrap;gap:8px}
+.bookrow a.btn{text-decoration:none;display:inline-block}
 .filters{display:flex;flex-wrap:wrap;gap:12px 18px;font-size:14px;margin-bottom:6px}
 .filters label{display:flex;align-items:center;gap:6px}
 .filters input{width:auto}
@@ -98,8 +105,8 @@ footer{margin-top:36px;font-size:13px;color:var(--muted);border-top:1px solid va
     <h2>Your trip</h2>
     <div class="card">
       <dl class="plan" id="plan"></dl>
-      <div class="row"><label for="flight">Flight<span id="flightSub">Direct CPH–MAN, 1 adult, economy</span></label><select id="flight"></select></div>
-      <div class="row"><label for="hotel">Hotel<span id="hotelSub">Per night, cheapest room</span></label><select id="hotel"></select></div>
+      <div class="row"><label for="flight">Flight<span id="flightSub">Direct CPH–MAN, 1 adult, economy</span></label><div class="pick"><select id="flight"></select><a class="book" id="bookFlight" href="#" target="_blank" rel="noopener">Book</a></div></div>
+      <div class="row"><label for="hotel">Hotel<span id="hotelSub">Per night, cheapest room</span></label><div class="pick"><select id="hotel"></select><a class="book" id="bookHotel" href="#" target="_blank" rel="noopener">Book</a></div></div>
       <div class="row narrow"><label for="nights">Nights<span>Set by the plan; change it if you like</span></label><input id="nights" type="number" min="0" max="4" step="1" value="1"></div>
       <p class="sub" id="priceNote"></p>
     </div>
@@ -129,7 +136,7 @@ footer{margin-top:36px;font-size:13px;color:var(--muted);border-top:1px solid va
         <label><input type="checkbox" id="fSide" checked> Side stands only (not behind a goal)</label>
         <label><input type="checkbox" id="fCheap"> Under £102 (unpadded)</label>
       </div>
-      <div class="row"><label for="block">Block<span id="blockCount"></span></label><select id="block"></select></div>
+      <div class="row"><label for="block">Block<span id="blockCount"></span></label><div class="pick"><select id="block"></select><a class="book" id="bookTicket" href="#" target="_blank" rel="noopener">Buy</a></div></div>
       <dl class="plan" id="seatInfo"></dl>
       <div class="viewer">
         <iframe id="view3d" title="3D view from the selected block" loading="lazy" allow="fullscreen" referrerpolicy="no-referrer"></iframe>
@@ -157,6 +164,11 @@ footer{margin-top:36px;font-size:13px;color:var(--muted);border-top:1px solid va
       <h2 style="margin-bottom:6px">Factors</h2>
       <ul class="factors" id="factors"></ul>
       <div class="wx" id="wx"></div>
+      <div class="booknow" id="booknow">
+        <h2 style="margin-bottom:8px">Book this trip</h2>
+        <div class="bookrow"><a id="bn1" href="#" target="_blank" rel="noopener" class="btn">1 · Ticket</a><a id="bn2" href="#" target="_blank" rel="noopener" class="btn">2 · Flights</a><a id="bn3" href="#" target="_blank" rel="noopener" class="btn">3 · Hotel</a></div>
+        <p class="sub" id="bookNote"></p>
+      </div>
       <div class="tools">
         <button class="btn" id="copy">Copy verdict</button>
         <button class="btn ghost" id="reset">Reset</button>
@@ -217,6 +229,7 @@ var HOTELS=[
  {n:"Copthorne Salford Quays",tier:"Upmarket",p:{"2026-11-03":404,"2026-12-08":250}},
  {n:"Old Trafford Stadium Hotel (5 min walk)",tier:"Near ground",p:{"2026-12-08":299}}
 ];
+var EVENTS={"Roma": "manchester%20united%20v%20roma/2026-11-3_20.00", "Aston Villa": "manchester%20united%20v%20aston%20villa/2026-11-8_16.30", "Brentford": "manchester%20united%20v%20brentford/2026-11-28_15.00", "Coventry City": "manchester%20united%20v%20coventry%20city/2026-12-5_15.00", "RB Leipzig": "manchester%20united%20v%20rb%20leipzig/2026-12-8_20.00", "Nottingham Forest": "manchester%20united%20v%20nottingham%20forest/2026-12-27_16.30", "Sunderland": "manchester%20united%20v%20sunderland/2026-12-30_19.30", "Newcastle United": "manchester%20united%20v%20newcastle%20united/2027-1-7_20.00", "Bayern München": "manchester%20united%20v%20bayern%20m%C3%BCnchen/2027-1-20_20.00", "Liverpool": "manchester%20united%20v%20liverpool/2027-1-23_15.00"};
 var AVAIL={
  "Roma":"N2403:84 N2409:90 N3401:78 N3403:79 N3404:79 N3405:79 N3406:79 N3408:90 N4402:66 NE3417:78 NE3419:78 NE3420:78 NE3421:78 NE3422:78 NE3424:78 NW3427:99 NW3429:90 NW3430:78 NW3431:78 NW3432:78 NW3434:78 E331:71 E332:71 E334:175 E335:71 S121:84 S122:199 S124:199 S125:199 S127:90 S226:190 NE3418:90 NE3423:90 NE3425:90 NE3426:90 NW3428:99 NW3436:78 S221:199",
  "Aston Villa":"N1405:215 N2402:81 N2403:94 N2404:101 N2411:94 N3401:87 N3402:88 N3403:88 N3404:88 N3405:88 N3406:88 N3407:88 N3408:155 N4401:74 N4404:74 N4406:74 N4407:74 NE3417:87 NE3419:87 NE3420:199 NE3421:87 NE3422:87 NE3424:87 NW3427:87 NW3430:87 NW3431:87 NW3432:87 NW3434:87 E236:80 E237:80 E331:80 E332:80 E333:199 E334:185 E335:80 E336:80 S121:94 S122:101 S124:185 S125:199 S127:101 S128:94 S226:215 S227:215 S228:101 W203:80 W3106:80 N3415:199 NE3418:199 NE3423:125 NE3425:125 NE3426:125 NW3428:87 NW3433:87 NW3436:87 S221:215",
@@ -245,6 +258,11 @@ function blockInfo(code){
 }
 function viewUrl(code){return "https://preview.3ddigitalvenue.com/manutd?view_id="+encodeURIComponent(btoa("S_"+code))}
 function availFor(f){var raw=AVAIL[f.opp]||""; if(!raw)return []; return raw.split(" ").map(function(t){var p=t.split(":");return {code:p[0],price:parseFloat(p[1]),info:blockInfo(p[0])}}).filter(function(b){return b.info})}
+function addDays(iso,n){var d=new Date(iso+"T12:00:00Z"); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10)}
+function tripDates(f,nights){var ko=new Date(f.ko), day=ko.toISOString().slice(0,10), plan=planFor(f); var dep=plan.kind==="before"?addDays(day,-1):day; var ret=addDays(dep,Math.max(nights,0)); return {dep:dep,ret:ret}}
+function flightLink(f,nights){var t=tripDates(f,nights); return "https://slicktrip.com/flights?key="+encodeURIComponent("CPH;MAN;economy;1;"+t.dep+";"+t.ret)+"&stops=0"}
+function hotelLink(f,nights){var t=tripDates(f,nights); return "https://slicktrip.com/hotels?key="+encodeURIComponent("Old-Trafford,-Manchester,-UK;"+t.dep+";"+t.ret+";1;0")}
+function ticketLink(f){return "https://tickets.manutd.com/en-GB/events/"+(EVENTS[f.opp]||"")+"/old%20trafford?hallmap"}
 var NORMALS={10:{t:13,rain:.45},11:{t:9,rain:.5},0:{t:7,rain:.5},1:{t:8,rain:.45},2:{t:10,rain:.4},3:{t:13,rain:.4},4:{t:16,rain:.4},5:{t:19,rain:.4},6:{t:21,rain:.4},7:{t:20,rain:.4},8:{t:18,rain:.4},9:{t:14,rain:.45}};
 var DEF={ground:45,food:60,fx:0.76};
 var $=function(id){return document.getElementById(id)};
@@ -326,6 +344,12 @@ function render(){
   $("hotelCost").textContent=gbp(hotelG);
   $("priceNote").textContent=(hp.checked===f.hotelDate?"Hotel price checked for this night.":"Hotel price is for the night of "+fmtDate(new Date(hp.checked))+", the nearest night checked; match nights near the ground run higher.")+" Flights checked 29 Oct 2026.";
   $("total").textContent=gbp(total);
+  var fL=flightLink(f,nights), hL=hotelLink(f,nights), tL=ticketLink(f);
+  $("bookFlight").href=fL; $("bn2").href=fL;
+  $("bookHotel").href=hL; $("bn3").href=hL; $("bookHotel").setAttribute("aria-disabled",nights?"false":"true"); $("bn3").style.display=nights?"":"none";
+  $("bookTicket").href=tL; $("bn1").href=tL; $("bookTicket").textContent=blk?"Buy":(f.sale&&/ballot/i.test(f.sale)?"Apply":"Open");
+  var td=tripDates(f,nights);
+  $("bookNote").textContent="Ticket first (seats go), then flights, then the bed. Flights and hotel open SlickTrip pre-set to CPH–MAN, "+td.dep+(nights?" to "+td.ret:" day return")+", 1 adult; pick the seller and pay on their site. The ticket link opens this fixture's seating plan on tickets.manutd.com under your members' login; choose block "+(blk?blk.code:"")+" there to see exact rows.";
   $("cpg").textContent=goals>0?gbp(total/goals):"∞";
   $("cpug").textContent=ug>0?gbp(total/ug):"∞";
   $("cpm").textContent="£"+(total/90).toFixed(2);
