@@ -280,7 +280,7 @@ function buildRail(){
 }
 
 // ---- weather ----------------------------------------------------------
-function loadWeather(f){ return; 
+function loadWeather(f){ render(); return; 
   var d=new Date(f.ko), days=(d-new Date())/864e5, key=f.ko;
   if(wxCache[key]){wx=wxCache[key];render();return}
   var n=NORMALS[d.getUTCMonth()];
