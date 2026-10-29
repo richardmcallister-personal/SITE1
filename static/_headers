@@ -8,3 +8,9 @@
 
 /style.css
   Cache-Control: public, max-age=3600
+
+# /should-i-go/ is a standalone app (inline JS/CSS, Google Fonts, Open-Meteo weather, 3D Digital Venue seat view).
+# It needs a looser policy than the rest of the site; scoped to this path only.
+/should-i-go/*
+  ! Content-Security-Policy
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.open-meteo.com; frame-src https://preview.3ddigitalvenue.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'

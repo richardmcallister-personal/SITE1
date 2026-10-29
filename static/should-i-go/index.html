@@ -1,0 +1,441 @@
+<title>Should I Go?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;700&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+/* Layout: a matchday programme — one fixture rail on top, then a two-column decision sheet (your trip and costs | the oracle's reading). */
+:root{
+  --bg:#f6f3ee; --paper:#fffdf9; --ink:#1d1b1a; --muted:#6b645e; --rule:#dcd5cc;
+  --red:#b8162a; --red-ink:#ffffff; --good:#1f7a4d; --warn:#b26a00; --bad:#9c1b2f; --tint:#f1e4e0;
+  --display:"Oswald",Impact,"Arial Narrow",sans-serif; --body:"Source Sans 3","Segoe UI",Helvetica,Arial,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#161514; --paper:#1f1d1c; --ink:#f1ece6; --muted:#a39b93; --rule:#3a3532;
+  --red:#d8243b; --red-ink:#ffffff; --good:#4fc083; --warn:#e3a33a; --bad:#ff6b7d; --tint:#2d2224; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#161514; --paper:#1f1d1c; --ink:#f1ece6; --muted:#a39b93; --rule:#3a3532;
+  --red:#d8243b; --red-ink:#ffffff; --good:#4fc083; --warn:#e3a33a; --bad:#ff6b7d; --tint:#2d2224; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;margin:0;
+  padding-block:0 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;padding-block:28px 18px;border-bottom:3px solid var(--red)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(40px,7vw,64px);line-height:.95;margin:0;letter-spacing:.01em;text-transform:uppercase;text-wrap:balance}
+h1 small{display:block;font-size:.3em;letter-spacing:.18em;color:var(--red);font-weight:500}
+.from{font-size:14px;color:var(--muted);text-align:right}
+h2{font-family:var(--display);font-weight:500;font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.rail{display:flex;gap:10px;overflow-x:auto;padding-block:18px 6px;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch}
+.fx{flex:0 0 172px;scroll-snap-align:start;text-align:left;background:var(--paper);border:1px solid var(--rule);border-radius:6px;padding:12px 12px 10px;cursor:pointer;color:var(--ink);font:inherit}
+.fx:hover{border-color:var(--red)} .fx[aria-pressed="true"]{border-color:var(--red);box-shadow:inset 0 0 0 2px var(--red)}
+.fx:focus-visible{outline:3px solid var(--red);outline-offset:2px}
+.fx .d{font-family:var(--display);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.fx .o{font-family:var(--display);font-size:22px;font-weight:700;line-height:1.1;margin:4px 0 2px}
+.fx .k{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.fx .c{display:inline-block;margin-top:6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:3px;background:var(--tint);color:var(--red)}
+.fx.past{opacity:.45}
+.sheet{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px;margin-top:22px}
+@media (max-width:820px){.sheet{grid-template-columns:1fr}}
+.panel{min-width:0}
+.card{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:18px}
+.card+.card,.card+h2{margin-top:22px}
+.plan{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:15px;margin-bottom:12px}
+.plan dt{font-family:var(--display);font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding-top:3px}
+.plan dd{margin:0}
+.plan .flag{color:var(--bad);font-weight:600}
+.row{display:grid;grid-template-columns:1fr minmax(120px,1.4fr);gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule)}
+.row.narrow{grid-template-columns:1fr 128px}
+.row:last-child{border-bottom:0}
+.row label{font-weight:600} .row label span{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+input,select{font:inherit;font-variant-numeric:tabular-nums;color:var(--ink);background:var(--bg);border:1px solid var(--rule);border-radius:5px;padding:7px 9px;width:100%;min-width:0}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid var(--red);outline-offset:1px}
+.sub{font-size:13px;color:var(--muted);margin:6px 0 0}
+.total{display:flex;justify-content:space-between;align-items:baseline;margin-top:14px;padding-top:12px;border-top:2px solid var(--ink)}
+.total b{font-family:var(--display);font-size:30px;font-variant-numeric:tabular-nums}
+.verdict{background:var(--red);color:var(--red-ink);border-radius:8px;padding:22px 22px 20px;margin-bottom:18px}
+.verdict .eyebrow{font-family:var(--display);font-size:13px;letter-spacing:.18em;text-transform:uppercase;opacity:.85}
+.verdict .v{font-family:var(--display);font-weight:700;font-size:clamp(34px,5vw,50px);line-height:1;margin:6px 0 10px;text-wrap:balance}
+.verdict p{margin:0;font-size:17px;max-width:60ch}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px}
+@media (max-width:480px){.stats{grid-template-columns:1fr 1fr}}
+.stat{background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;min-width:0}
+.stat .l{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.stat .n{font-family:var(--display);font-size:30px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums;margin-top:2px}
+.stat .s{font-size:13px;color:var(--muted)}
+.factors{list-style:none;margin:0;padding:0}
+.factors li{display:grid;grid-template-columns:14px 1fr auto;gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--rule)}
+.factors li:last-child{border-bottom:0}
+.dot{width:12px;height:12px;border-radius:50%;margin-top:5px;background:var(--muted)}
+.dot.good{background:var(--good)} .dot.warn{background:var(--warn)} .dot.bad{background:var(--bad)}
+.factors .t{font-weight:600} .factors .x{font-size:14px;color:var(--muted)}
+.factors .pts{font-family:var(--display);font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.wx{display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-size:14px;color:var(--muted);margin:6px 0 0}
+.wx b{color:var(--ink);font-variant-numeric:tabular-nums}
+.tools{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;align-items:center}
+button.btn{font:inherit;font-weight:600;background:var(--ink);color:var(--bg);border:0;border-radius:6px;padding:9px 14px;cursor:pointer}
+button.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--rule)}
+.note{font-size:13px;color:var(--muted);margin:14px 0 0;max-width:70ch}
+.filters{display:flex;flex-wrap:wrap;gap:12px 18px;font-size:14px;margin-bottom:6px}
+.filters label{display:flex;align-items:center;gap:6px}
+.filters input{width:auto}
+.viewer{position:relative;aspect-ratio:16/9;max-width:100%;background:var(--bg);border:1px solid var(--rule);border-radius:6px;overflow:hidden;margin-top:12px}
+.viewer iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.viewer-fallback{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:18px;text-align:center;font-size:14px;color:var(--muted)}
+.viewer.failed .viewer-fallback{display:flex}
+.viewer.failed iframe{visibility:hidden}
+footer{margin-top:36px;font-size:13px;color:var(--muted);border-top:1px solid var(--rule);padding-top:12px;max-width:80ch}
+</style>
+
+<div class="wrap">
+<header>
+  <h1><small>Old Trafford ticket oracle</small>Should I go?</h1>
+  <div class="from">Vellinge → CPH → MAN → Old Trafford<br>Prices in GBP. Kick-offs in UK and Swedish time.</div>
+</header>
+
+<h2 style="margin-top:22px">Pick a home fixture</h2>
+<div class="rail" id="rail" role="listbox" aria-label="Upcoming home fixtures"></div>
+
+<div class="sheet">
+  <section class="panel">
+    <h2>Your trip</h2>
+    <div class="card">
+      <dl class="plan" id="plan"></dl>
+      <div class="row"><label for="flight">Flight<span id="flightSub">Direct CPH–MAN, 1 adult, economy</span></label><select id="flight"></select></div>
+      <div class="row"><label for="hotel">Hotel<span id="hotelSub">Per night, cheapest room</span></label><select id="hotel"></select></div>
+      <div class="row narrow"><label for="nights">Nights<span>Set by the plan; change it if you like</span></label><input id="nights" type="number" min="0" max="4" step="1" value="1"></div>
+      <p class="sub" id="priceNote"></p>
+    </div>
+
+    <h2>What it costs you</h2>
+    <div class="card">
+      <div class="row narrow"><label>Ticket<span id="ticketLine">Pick a block below</span></label><b id="ticketCost" style="text-align:right;font-variant-numeric:tabular-nums">£—</b></div>
+      <div class="row narrow"><label>Flights<span id="flightLine">—</span></label><b id="flightCost" style="text-align:right;font-variant-numeric:tabular-nums">£—</b></div>
+      <div class="row narrow"><label>Hotel<span id="hotelLine">—</span></label><b id="hotelCost" style="text-align:right;font-variant-numeric:tabular-nums">£—</b></div>
+      <div class="row narrow"><label for="ground">Trains, trams, taxis<span>Vellinge–CPH, MAN airport–town, to the ground</span></label><input id="ground" type="number" min="0" step="5" value="45"></div>
+      <div class="row narrow"><label for="food">Food and drink<span>Pre-match pint tax included</span></label><input id="food" type="number" min="0" step="5" value="60"></div>
+      <div class="row narrow"><label for="fx">USD → GBP<span>Fares were quoted in dollars</span></label><input id="fx" type="number" min="0.5" max="1" step="0.01" value="0.76"></div>
+      <div class="total"><span>All-in</span><b id="total">£—</b></div>
+    </div>
+
+    <h2>What you expect to see</h2>
+    <div class="card">
+      <div class="row narrow"><label for="ug">United goals<span>Expected, this fixture</span></label><input id="ug" type="number" min="0" step="0.1" value="1.6"></div>
+      <div class="row narrow"><label for="og">Opponent goals<span>Expected, this fixture</span></label><input id="og" type="number" min="0" step="0.1" value="1.1"></div>
+    </div>
+
+    <h2>Where you'd sit</h2>
+    <div class="card">
+      <p class="sub" id="saleLine" style="margin:0 0 10px"></p>
+      <div class="filters">
+        <label><input type="checkbox" id="fLower" checked> Lower tier only</label>
+        <label><input type="checkbox" id="fSide" checked> Side stands only (not behind a goal)</label>
+        <label><input type="checkbox" id="fCheap"> Under £102 (unpadded)</label>
+      </div>
+      <div class="row"><label for="block">Block<span id="blockCount"></span></label><select id="block"></select></div>
+      <dl class="plan" id="seatInfo"></dl>
+      <div class="viewer">
+        <iframe id="view3d" title="3D view from the selected block" loading="lazy" allow="fullscreen" referrerpolicy="no-referrer"></iframe>
+        <div class="viewer-fallback" id="viewFallback">
+          <div><b>3D view can't load in this viewer.</b><br>Open the hosted copy on your own domain for the live 360° view, or <a id="viewLink" href="#" target="_blank" rel="noopener">Open this block's view</a></div>
+        </div>
+      </div>
+      <p class="sub" id="seatNote"></p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>The oracle's reading</h2>
+    <div class="verdict" id="verdict">
+      <div class="eyebrow" id="vEyebrow">Verdict</div>
+      <div class="v" id="vText">Pick a fixture</div>
+      <p id="vWhy"></p>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="l">Cost per goal</div><div class="n" id="cpg">£—</div><div class="s">all goals, both teams</div></div>
+      <div class="stat"><div class="l">Per United goal</div><div class="n" id="cpug">£—</div><div class="s">the ones you'd cheer</div></div>
+      <div class="stat"><div class="l">Per minute</div><div class="n" id="cpm">£—</div><div class="s">90 min, stoppage time free</div></div>
+    </div>
+    <div class="card">
+      <h2 style="margin-bottom:6px">Factors</h2>
+      <ul class="factors" id="factors"></ul>
+      <div class="wx" id="wx"></div>
+      <div class="tools">
+        <button class="btn" id="copy">Copy verdict</button>
+        <button class="btn ghost" id="reset">Reset</button>
+        <span id="copied" style="font-size:14px;color:var(--muted)"></span>
+      </div>
+    </div>
+    <p class="note" id="wxNote"></p>
+  </section>
+</div>
+
+<footer>Fixtures, kick-offs and seat availability read from tickets.manutd.com on 29 Oct 2026 (1 adult, logged in as an Official Member); blocks sell out and get released, so check before booking. Flight and hotel prices were checked on SlickTrip on 29 Oct 2026 for 1 adult and will have moved; round-trip fares are "from" prices pairing the named outbound with its cheapest return. Hotel prices are for the night of the checked fixture; where a fixture wasn't checked, the nearest checked night is shown and labelled. Weather is the Open-Meteo forecast inside 16 days, otherwise Manchester's seasonal averages. Hosted versions of this page fetch live weather; some embedded viewers block it.</footer>
+</div>
+
+<script>
+(function(){
+// ---- data -------------------------------------------------------------
+// Travel rules: kick-off before 14:00 UK → fly in the night before (1 night).
+// 14:00–16:00 → fly in and out the same day (0 nights) if there is an evening flight home.
+// 16:00 or later → fly in on the day, stay that night (1 night).
+// Flights: USD, 1 adult, direct CPH→MAN only. rt = round-trip "from" price with cheapest return; ow = one-way.
+// If sameDay is false for a 15:00 game, the last direct MAN→CPH that day leaves before kick-off, so the plan falls back to one night.
+var FIX=[
+ {opp:"Roma",comp:"Champions League",ko:"2026-11-03T20:00:00Z",ug:1.7,og:1.1,glam:2,hotelDate:"2026-11-03",sale:"On sale to all account holders — Category B",
+  flights:[{l:"Ryanair FR6880 · out 06:55, home next day",usd:149},{l:"Ryanair FR6968 · out 15:55→17:00 (tight), home next day",usd:169}]},
+ {opp:"Aston Villa",comp:"Premier League",ko:"2026-11-08T16:30:00Z",ug:1.5,og:1.3,glam:2,hotelDate:"2026-11-08",sale:"General sale — Category A",
+  flights:[{l:"easyJet U22238 · out 10:25, home next day",usd:305},{l:"Ryanair UK RK6880 · out 12:35, home next day",usd:333}]},
+ {opp:"Brentford",sale:"Members' sale, open — Category B",comp:"Premier League",ko:"2026-11-28T15:00:00Z",ug:1.7,og:1.2,glam:1,hotelDate:"2026-11-28",sameDay:false,
+  flights:[{l:"Ryanair FR6880 · out 06:10, home Sun morning",usd:121},{l:"easyJet U22236 · out 10:35, home Sun morning",usd:267}]},
+ {opp:"Coventry City",sale:"Members' sale, open — Category C",comp:"Premier League",ko:"2026-12-05T15:00:00Z",ug:2.0,og:0.9,glam:1,hotelDate:"2026-12-05",sameDay:false,
+  flights:[{l:"Ryanair FR6880 · out 06:10, home Sun morning",usd:95},{l:"easyJet U22236 · out 10:35, home Sun morning",usd:153}]},
+ {opp:"RB Leipzig",sale:"Members' sale, open — Category C",comp:"Champions League",ko:"2026-12-08T20:00:00Z",ug:1.6,og:1.3,glam:2,hotelDate:"2026-12-08",
+  flights:[{l:"Ryanair FR6880 · out 06:55, home next day",usd:133},{l:"Ryanair FR6968 · out 15:55→17:00 (tight), home next day",usd:166},{l:"easyJet U22236 · out 10:05, home next day",usd:196}]},
+ {opp:"Nottingham Forest",sale:"Members' sale, open — Category B",comp:"Premier League",ko:"2026-12-27T16:30:00Z",ug:1.6,og:1.1,glam:1,hotelDate:"2026-12-27",
+  flights:[{l:"easyJet U22238 · out 10:25, home next day",usd:183},{l:"Ryanair UK RK6880 · out 12:35, home next day",usd:188}]},
+ {opp:"Sunderland",sale:"Members' sale, open — Category B",comp:"Premier League",ko:"2026-12-30T19:30:00Z",ug:1.9,og:0.9,glam:1,hotelDate:"2026-12-30",
+  flights:[{l:"Ryanair FR6880 · out 06:55, home next day",usd:85},{l:"easyJet U22236 · out 10:35, home next day",usd:104}]},
+ {opp:"Newcastle United",comp:"Premier League",ko:"2027-01-07T20:00:00Z",ug:1.4,og:1.4,glam:2,hotelDate:"2027-01-07",sale:"Members' sale, open",
+  flights:[{l:"easyJet U22236 · out 16:25→17:30 (tight), home next day",usd:77},{l:"Ryanair FR6880 · out 10:30, home next day",usd:92}]},
+ {opp:"Bayern München",comp:"Champions League",ko:"2027-01-20T20:00:00Z",ug:1.2,og:1.8,glam:3,hotelDate:"2027-01-20",sale:"Members' sale, open — Category A",
+  flights:[{l:"Ryanair FR6880 · out 06:55, home next day",usd:175}]},
+ {opp:"Liverpool",comp:"Premier League",ko:"2027-01-23T15:00:00Z",tbc:true,ug:1.3,og:1.6,glam:3,hotelDate:"2027-01-23",sameDay:false,sale:"Members' ballot — apply by 8am Wed 11 Nov",
+  flights:[{l:"Ryanair FR6880 · out 06:10, home Sun morning",usd:53}]}
+];
+// Hotels: per-night USD for 1 adult on the nights checked (3 Nov, 8 Nov, 8 Dec 2026). Other fixtures use the nearest checked night.
+var HOTELS=[
+ {n:"YHA Manchester (private room), Castlefield",tier:"Budget",p:{"2026-11-08":33,"2026-12-08":37}},
+ {n:"Malacuna Manchester, city centre",tier:"Budget",p:{"2026-12-08":49}},
+ {n:"Britannia Sachas, Piccadilly",tier:"Budget",p:{"2026-11-08":47}},
+ {n:"Old Trafford Guest House (shared bath)",tier:"Budget",p:{"2026-11-03":52}},
+ {n:"Aloft Manchester City Centre",tier:"Mid",p:{"2026-11-08":104}},
+ {n:"Mollie's Manchester",tier:"Mid",p:{"2026-11-08":118}},
+ {n:"Premier Inn City Centre, Princess St",tier:"Mid",p:{"2026-12-08":145}},
+ {n:"Hilton Garden Inn, Emirates Old Trafford (tram 2 min)",tier:"Near ground",p:{"2026-11-08":159}},
+ {n:"AC Hotel Salford Quays",tier:"Near ground",p:{"2026-11-08":175}},
+ {n:"Hyatt Regency Manchester",tier:"Upmarket",p:{"2026-11-08":157,"2026-12-08":244}},
+ {n:"Hotel Football, Old Trafford (stadium views)",tier:"Near ground",p:{"2026-11-08":202,"2026-12-08":504}},
+ {n:"Premier Inn Old Trafford (7 min walk)",tier:"Near ground",p:{"2026-11-08":232}},
+ {n:"Copthorne Salford Quays",tier:"Upmarket",p:{"2026-11-03":404,"2026-12-08":250}},
+ {n:"Old Trafford Stadium Hotel (5 min walk)",tier:"Near ground",p:{"2026-12-08":299}}
+];
+var AVAIL={
+ "Roma":"N2403:84 N2409:90 N3401:78 N3403:79 N3404:79 N3405:79 N3406:79 N3408:90 N4402:66 NE3417:78 NE3419:78 NE3420:78 NE3421:78 NE3422:78 NE3424:78 NW3427:99 NW3429:90 NW3430:78 NW3431:78 NW3432:78 NW3434:78 E331:71 E332:71 E334:175 E335:71 S121:84 S122:199 S124:199 S125:199 S127:90 S226:190 NE3418:90 NE3423:90 NE3425:90 NE3426:90 NW3428:99 NW3436:78 S221:199",
+ "Aston Villa":"N1405:215 N2402:81 N2403:94 N2404:101 N2411:94 N3401:87 N3402:88 N3403:88 N3404:88 N3405:88 N3406:88 N3407:88 N3408:155 N4401:74 N4404:74 N4406:74 N4407:74 NE3417:87 NE3419:87 NE3420:199 NE3421:87 NE3422:87 NE3424:87 NW3427:87 NW3430:87 NW3431:87 NW3432:87 NW3434:87 E236:80 E237:80 E331:80 E332:80 E333:199 E334:185 E335:80 E336:80 S121:94 S122:101 S124:185 S125:199 S127:101 S128:94 S226:215 S227:215 S228:101 W203:80 W3106:80 N3415:199 NE3418:199 NE3423:125 NE3425:125 NE3426:125 NW3428:87 NW3433:87 NW3436:87 S221:215",
+ "Brentford":"N1403:249 N1404:249 N1406:90 N1409:79 N1411:78 N1413:73 N2401:73 N2402:73 N2404:90 N2405:90 N2409:90 N2410:90 N2411:84 N2412:73 N2413:73 N3401:215 N3402:215 N3403:79 N3404:79 N3406:79 N3407:79 N3408:159 N4402:66 N4403:66 N4404:66 N4405:66 N4406:66 N4407:66 N4408:66 NE3417:215 NE3419:78 NE3421:78 NE3422:78 NE3424:78 NW3427:78 NW3429:78 NW3431:78 E132:73 E234:71 E235:71 E236:71 E237:71 E238:71 E239:71 E331:71 E332:71 E333:71 E334:205 E335:71 E336:71 S121:78 S122:249 S123:90 S124:205 S125:249 S127:90 S226:249 S227:249 W202:71 W209:73 W210:73 W211:73 W212:73 W3101:71 W3102:71 W3103:71 W3104:71 W3105:71 W3106:71 N3415:215 NE3418:215 NE3423:149 NE3425:149 NE3426:149 S221:249 S222:249",
+ "Coventry City":"N1403:239 N1404:239 N2402:58 N2403:67 N2404:72 N2411:67 N2412:58 N2413:58 N3401:62 N3402:63 N3403:63 N3404:63 N3406:63 N3407:199 N3408:199 N4401:53 N4402:53 N4403:53 N4404:53 N4405:53 N4406:53 N4407:53 N4408:53 NE3417:62 NE3419:199 NE3420:62 NE3421:62 NE3424:62 NW3429:62 NW3430:62 NW3431:62 E235:57 E237:57 E239:57 E331:57 E332:57 E333:199 E334:215 E335:57 E336:57 S122:239 S123:72 S125:239 S127:72 S226:239 S227:399 W210:58 W3101:57 W3102:57 W3104:57 W3105:57 W3106:57 N3415:129 NE3418:129 NE3423:199 NE3425:199 NE3426:199 S221:239",
+ "RB Leipzig":"N3401:235 N3402:63 N3403:63 N3408:149 N4408:53 NE3417:235 NE3419:62 NE3420:62 NE3421:62 NW3427:62 NW3429:62 NW3430:62 NW3431:62 NW3432:62 NW3434:62 E333:235 E334:215 S124:275 S125:275 NE3418:235 NE3423:149 NE3425:149 NE3426:149 NW3428:149 NW3433:149 S221:275 S222:275",
+ "Nottingham Forest":"N1403:375 N1405:375 N1411:78 N2401:73 N2403:84 N2404:90 N2411:84 N2412:73 N2413:73 N3401:315 N3402:315 N3403:79 N3404:79 N3405:79 N3407:79 N3408:275 N4401:66 N4402:66 N4403:66 N4404:66 N4405:66 N4406:66 N4407:66 N4408:66 NE3417:350 NE3419:350 NE3420:350 NE3421:350 NE3422:78 NW3429:78 NW3431:78 NW3432:78 E132:73 E234:71 E235:71 E237:71 E238:71 E239:71 E331:71 E332:71 E333:350 E334:365 E335:71 E336:71 S121:84 S122:375 S123:90 S124:399 S125:350 S127:90 S226:375 S227:375 S228:90 W3101:71 W3103:71 W3104:71 W3105:71 W3106:71 N3415:299 NE3418:299 NE3423:315 NE3425:315 NE3426:315 S221:699 S222:375",
+ "Sunderland":"N1403:375 N1404:375 N1405:375 N1408:90 N1411:78 N1413:73 N2404:90 N2405:90 N2411:84 N2412:73 N2413:73 N3401:315 N3402:315 N3403:79 N3404:79 N3405:79 N3406:79 N3407:315 N3408:275 N4401:66 N4402:66 N4403:66 N4404:66 N4405:66 N4406:66 N4407:66 N4408:66 NE3417:78 NE3419:350 NE3420:350 NE3421:350 NE3422:78 NE3424:78 NW3431:78 NW3432:78 NW3434:78 E132:73 E237:71 E238:71 E239:71 E331:71 E332:71 E333:350 E334:365 E335:71 E336:71 S122:90 S123:90 S124:399 S125:350 S126:90 S127:90 S226:375 S227:375 W202:71 W203:71 W3101:71 W3102:71 W3103:71 W3104:71 W3105:71 W3106:71 N3415:299 NE3418:299 NE3423:315 NE3425:315 NE3426:315 S221:375 S222:375",
+ "Newcastle United":"N1403:375 N1404:375 N1405:375 N1406:90 N1408:90 N1410:79 N1411:78 N2401:73 N2402:73 N2403:84 N2404:90 N2409:90 N2411:84 N2412:73 N2413:73 N3401:315 N3402:315 N3403:79 N3404:79 N3405:79 N3406:79 N3407:315 N3408:275 N4401:66 N4402:66 N4403:66 N4404:66 N4405:66 N4406:66 N4407:66 N4408:66 NE3417:78 NE3419:78 NE3420:78 NE3421:78 NE3422:78 NE3424:78 NW3427:78 NW3429:78 NW3430:78 NW3431:78 NW3432:78 NW3434:78 E136:55 E235:71 E236:71 E237:71 E238:71 E239:71 E331:71 E332:71 E333:71 E334:365 E335:71 E336:71 S121:84 S122:299 S124:299 S125:399 S126:90 S128:78 S226:375 S227:375 S228:90 W211:73 W212:73 W3101:71 W3102:71 W3103:71 W3104:71 W3105:71 W3106:71 N3415:315 NE3418:315 NE3423:315 NE3425:315 NE3426:315 S221:699 S222:375",
+ "Bayern München":"N1404:599 N1405:599 N3408:399 NE3417:399 NE3419:399 E333:399 E334:399 S124:425 S125:649 S226:599 S227:599 NE3418:399 NE3423:399 NE3425:399 NE3426:399 S221:599 S222:599",
+ "Liverpool":""
+};
+// Block geometry: stand, tier, where along the stand. Tier 1 is pitch level.
+function blockInfo(code){
+  var m=code.match(/^(NE|NW|SE|SW|N|S|E|W)(\d)(\d+)$/); if(!m)return null;
+  var q=m[1], tier=parseInt(m[2],10), n=parseInt(m[3],10);
+  var stand={N:"Sir Alex Ferguson Stand",S:"Sir Bobby Charlton Stand",E:"East Stand",W:"Stretford End",NE:"North-east quadrant",NW:"North-west quadrant",SE:"South-east quadrant",SW:"South-west quadrant"}[q];
+  var side=(q==="N"||q==="S"), goal=(q==="E"||q==="W"), corner=q.length===2;
+  var pos;
+  if(q==="N"){var k=n%100; if(tier<=2)pos=k<=4?"east end":k<=9?"around halfway":"west end"; else pos=k<=2?"east end":k<=6?"around halfway":"west end"}
+  else if(q==="S"){var k2=n%100; pos=k2<=22?"east of halfway":k2<=24?"halfway":"west of halfway"}
+  else if(goal)pos="behind the goal"; else pos="corner";
+  var tierName=tier===1?"Lower tier":tier===2?"Second tier":tier===3?"Third tier":"Top tier";
+  var near=tier===1?"pitch level":tier===2?"one up, still close":"high up, full view of the pitch";
+  return {stand:stand,tier:tier,tierName:tierName,pos:pos,side:side,goal:goal,corner:corner,near:near};
+}
+function viewUrl(code){return "https://preview.3ddigitalvenue.com/manutd?view_id="+encodeURIComponent(btoa("S_"+code))}
+function availFor(f){var raw=AVAIL[f.opp]||""; if(!raw)return []; return raw.split(" ").map(function(t){var p=t.split(":");return {code:p[0],price:parseFloat(p[1]),info:blockInfo(p[0])}}).filter(function(b){return b.info})}
+var NORMALS={10:{t:13,rain:.45},11:{t:9,rain:.5},0:{t:7,rain:.5},1:{t:8,rain:.45},2:{t:10,rain:.4},3:{t:13,rain:.4},4:{t:16,rain:.4},5:{t:19,rain:.4},6:{t:21,rain:.4},7:{t:20,rain:.4},8:{t:18,rain:.4},9:{t:14,rain:.45}};
+var DEF={ground:45,food:60,fx:0.76};
+var $=function(id){return document.getElementById(id)};
+var sel=0, wx=null, wxCache={};
+
+// ---- helpers ----------------------------------------------------------
+function fmtDate(d){return d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",timeZone:"Europe/London"})}
+function fmtUK(d){return d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/London"})}
+function fmtSE(d){return d.toLocaleTimeString("sv-SE",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Stockholm"})}
+function gbp(n){return "£"+(Math.round(n)).toLocaleString("en-GB")}
+function num(id){var v=parseFloat($(id).value);return isFinite(v)?v:0}
+function ukHour(d){return parseInt(d.toLocaleTimeString("en-GB",{hour:"2-digit",hour12:false,timeZone:"Europe/London"}),10)}
+function ukDow(d){return d.toLocaleDateString("en-GB",{weekday:"short",timeZone:"Europe/London"})}
+function fx(){return num("fx")||0.76}
+function planFor(f){
+  var h=ukHour(new Date(f.ko));
+  if(h<14)return {kind:"before",label:"Fly in the night before, home after the game",nights:1};
+  if(h<16){ if(f.sameDay===false)return {kind:"sameday-fail",label:"Fly in and out the same day",nights:1}; return {kind:"sameday",label:"Fly in and out the same day",nights:0} }
+  return {kind:"evening",label:"Fly in on the day, stay the night",nights:1};
+}
+function hotelPrice(h,date){
+  if(h.p[date]!=null)return {usd:h.p[date],checked:date};
+  var best=null,bd=1e18,t=new Date(date).getTime();
+  Object.keys(h.p).forEach(function(k){var dd=Math.abs(new Date(k).getTime()-t);if(dd<bd){bd=dd;best=k}});
+  return {usd:h.p[best],checked:best};
+}
+
+// ---- fixture rail -----------------------------------------------------
+function buildRail(){
+  var rail=$("rail"); rail.innerHTML="";
+  var now=new Date();
+  FIX.forEach(function(f,i){
+    var d=new Date(f.ko), b=document.createElement("button");
+    b.className="fx"+(d<now?" past":""); b.setAttribute("role","option"); b.setAttribute("aria-pressed",i===sel?"true":"false");
+    b.innerHTML='<div class="d">'+fmtDate(d)+'</div><div class="o">'+f.opp+'</div><div class="k">'+(f.tbc?"TBC · ":"")+fmtUK(d)+' UK · '+fmtSE(d)+' SE</div><span class="c">'+f.comp+'</span>';
+    b.addEventListener("click",function(){sel=i;buildRail();pick()});
+    rail.appendChild(b);
+  });
+}
+
+// ---- weather ----------------------------------------------------------
+function loadWeather(f){
+  var d=new Date(f.ko), days=(d-new Date())/864e5, key=f.ko;
+  if(wxCache[key]){wx=wxCache[key];render();return}
+  var n=NORMALS[d.getUTCMonth()];
+  wx={src:"normals",temp:n.t,rain:n.rain}; render();
+  if(days<0||days>15)return;
+  var day=d.toISOString().slice(0,10), h=ukHour(d);
+  var url="https://api.open-meteo.com/v1/forecast?latitude=53.4631&longitude=-2.2913&hourly=temperature_2m,precipitation_probability,wind_speed_10m&timezone=Europe%2FLondon&start_date="+day+"&end_date="+day;
+  fetch(url).then(function(r){return r.json()}).then(function(j){
+    var i=Math.min(h,23);
+    wx={src:"forecast",temp:j.hourly.temperature_2m[i],rain:(j.hourly.precipitation_probability[i]||0)/100,wind:j.hourly.wind_speed_10m[i]}; wxCache[key]=wx; render();
+  }).catch(function(){});
+}
+
+// ---- the oracle -------------------------------------------------------
+function render(){
+  var f=FIX[sel], d=new Date(f.ko), plan=planFor(f);
+  var fl=f.flights[parseInt($("flight").value,10)||0];
+  var h=HOTELS[parseInt($("hotel").value,10)||0], hp=hotelPrice(h,f.hotelDate);
+  var nights=Math.max(0,Math.round(num("nights")));
+  var flightG=fl.usd*fx(), hotelG=nights*hp.usd*fx();
+  var blk=currentBlock(f);
+  var ticket=blk?blk.price:0;
+  $("ticketCost").textContent=blk?gbp(ticket):"—";
+  $("ticketLine").textContent=blk?blk.code+" · "+blk.info.stand+", "+blk.info.tierName.toLowerCase():(f.sale||"No tickets on sale");
+  var total=ticket+flightG+hotelG+num("ground")+num("food");
+  var ug=num("ug"), og=num("og"), goals=ug+og;
+
+  // plan block
+  var dl=$("plan"), planHtml='<dt>Plan</dt><dd>'+plan.label+(plan.kind==="sameday-fail"?' <span class="flag">— not possible: the last direct flight home that day leaves at 07:40, before kick-off. Falling back to one night.</span>':'')+'</dd>';
+  planHtml+='<dt>Kick-off</dt><dd>'+fmtDate(d)+' · '+fmtUK(d)+' UK / '+fmtSE(d)+' Swedish'+(f.tbc?' <span class="flag">(TBC)</span>':'')+'</dd>';
+  planHtml+='<dt>Nights</dt><dd>'+nights+(nights!==plan.nights?' (plan says '+plan.nights+')':'')+'</dd>';
+  dl.innerHTML=planHtml;
+
+  $("flightLine").textContent=fl.l+" · from $"+fl.usd;
+  $("flightCost").textContent=gbp(flightG);
+  $("hotelLine").textContent=nights?h.n+" · $"+hp.usd+"/night × "+nights:"No hotel (day trip)";
+  $("hotelCost").textContent=gbp(hotelG);
+  $("priceNote").textContent=(hp.checked===f.hotelDate?"Hotel price checked for this night.":"Hotel price is for the night of "+fmtDate(new Date(hp.checked))+", the nearest night checked; match nights near the ground run higher.")+" Flights checked 29 Oct 2026.";
+  $("total").textContent=gbp(total);
+  $("cpg").textContent=goals>0?gbp(total/goals):"∞";
+  $("cpug").textContent=ug>0?gbp(total/ug):"∞";
+  $("cpm").textContent="£"+(total/90).toFixed(2);
+
+  var score=0, F=[];
+  function add(t,x,pts,cls){score+=pts;F.push({t:t,x:x,pts:pts,cls:cls})}
+  var cpg=goals>0?total/goals:1e9;
+  if(cpg<180)add("Decent value","Under £180 a goal, all in",2,"good");
+  else if(cpg<300)add("Fair value","£180–300 a goal",1,"warn");
+  else add("Steep","Over £300 a goal. Hope for a thriller",-1,"bad");
+  if(f.glam>=3)add("Big one","You'd regret the sofa",2,"good");
+  else if(f.glam===2)add("Proper fixture","Worth the trip in itself",1,"good");
+  else add("Routine fixture","Fine, but it won't be in the retrospectives",0,"");
+  var hr=ukHour(d), dow=ukDow(d), weekend=(dow==="Sat"||dow==="Sun");
+  if(plan.kind==="sameday")add("Day trip works","Out in the morning, home the same night",2,"good");
+  else if(plan.kind==="sameday-fail")add("Day trip doesn't work","No evening flight home; it's a night in Manchester whether you like it or not",-1,"warn");
+  else if(plan.kind==="evening"&&!weekend)add("Midweek night game","Finishes ~22:00 UK; you're not at your desk before Thursday lunch",-2,"bad");
+  else if(plan.kind==="evening")add("Late kick-off","Stay the night; the Sunday flight home is civilised",0,"warn");
+  else add("Early kick-off","Night before in Manchester, which is no hardship",0,"");
+  if(f.tbc)add("Kick-off not confirmed","TV picks can move it to a Friday night or a Monday",-1,"warn");
+  if(wx){
+    var cold=wx.temp<=4, wet=wx.rain>=.6, wind=wx.wind&&wx.wind>35;
+    if(wet&&cold)add("Wet and cold","Ask whether the seat is under the roof",-2,"bad");
+    else if(wet)add("Likely rain","Bring the coat you'd wear to a Munster game",-1,"warn");
+    else if(cold)add("Cold","Dry but biting. Layers",-1,"warn");
+    else add("Weather fine","By Manchester standards",1,"good");
+    if(wind)add("Windy","Long balls will be a lottery",0,"warn");
+  }
+  if(ug-og>=0.6)add("United should win","Expected margin "+(ug-og).toFixed(1),1,"good");
+  else if(og-ug>=0.3)add("Could get beaten","Expected margin "+(ug-og).toFixed(1),-1,"bad");
+  else add("Toss-up","Expected margin "+(ug-og).toFixed(1),0,"");
+  if(!blk)add("No ticket","Nothing on sale for you yet (ballot or not released)",-3,"bad");
+  else if(blk.info.tier===1&&blk.info.side)add("Lower tier, side-on","Pitch level on the touchline. The seat you actually want",2,"good");
+  else if(blk.info.tier===1)add("Lower tier","Close, but "+blk.info.pos,1,"good");
+  else if(blk.info.tier===2&&blk.info.side)add("Second tier, side-on","Arguably the best view in the ground",1,"good");
+  else if(blk.info.tier>=3)add("Up in the gods","Full-pitch view, long way from the noise",0,"");
+  else add("Second tier","Fine",0,"");
+  if(blk&&blk.price>102)add("Padded seat price","Over £102 means padded seat or hospitality band",-1,"warn");
+
+  var v,why;
+  if(score>=5){v="Go. Obviously.";why="The numbers, the fixture and the calendar all line up. Book it before you think about it."}
+  else if(score>=2){v="Go, but pack a coat.";why="Good enough. One or two things will annoy you on the day; none of them will be the football."}
+  else if(score>=0){v="Only if the ticket's a steal.";why="This one needs a reason. Drop the ticket price, pick a cheaper bed, and ask again."}
+  else{v="Watch it in the pub.";why="A midweek slog, poor value, or both. Save the leave days for the big one."}
+  $("vText").textContent=v; $("vWhy").textContent=why; $("vEyebrow").textContent="Verdict · "+score+" pts";
+
+  var ul=$("factors"); ul.innerHTML="";
+  F.forEach(function(x){
+    var li=document.createElement("li");
+    li.innerHTML='<span class="dot '+x.cls+'"></span><div><div class="t">'+x.t+'</div><div class="x">'+x.x+'</div></div><span class="pts">'+(x.pts>0?"+":"")+x.pts+'</span>';
+    ul.appendChild(li);
+  });
+  if(wx){
+    $("wx").innerHTML='At kick-off, Old Trafford: <b>'+Math.round(wx.temp)+'°C</b> · rain <b>'+Math.round(wx.rain*100)+'%</b>'+(wx.wind?' · wind <b>'+Math.round(wx.wind)+' km/h</b>':'');
+    $("wxNote").textContent=wx.src==="forecast"?"Live forecast from Open-Meteo for the kick-off hour.":"More than 16 days out, so this is the Manchester seasonal average for that month, not a forecast. Reopen the page nearer the time.";
+  }
+  window.__verdict="Man Utd v "+f.opp+" ("+f.comp+"), "+fmtDate(d)+" "+fmtUK(d)+" UK. "+plan.label+". Seat: "+(blk?blk.code+" ("+blk.info.stand+", "+blk.info.tierName.toLowerCase()+", "+blk.info.pos+") £"+blk.price:"none on sale")+". "+fl.l+"; "+(nights?h.n+" × "+nights:"no hotel")+". All-in "+gbp(total)+", "+(goals>0?gbp(total/goals):"∞")+" per goal. Verdict: "+v;
+}
+
+function currentBlock(f){var list=availFor(f); var v=$("block").value; for(var i=0;i<list.length;i++){if(list[i].code===v)return list[i]} return null}
+function fillBlocks(f,keep){
+  var list=availFor(f), lower=$("fLower").checked, side=$("fSide").checked, cheap=$("fCheap").checked;
+  var shown=list.filter(function(b){return (!lower||b.info.tier===1)&&(!side||b.info.side)&&(!cheap||b.price<=102)});
+  if(!shown.length&&list.length){shown=list; $("blockCount").textContent="No block matches the filters; showing all "+list.length}
+  else $("blockCount").textContent=shown.length+" of "+list.length+" blocks with seats";
+  shown.sort(function(a,b){return a.info.tier-b.info.tier||a.price-b.price});
+  var sel=$("block"), prev=keep?sel.value:null; sel.innerHTML="";
+  shown.forEach(function(b){var op=document.createElement("option");op.value=b.code;op.textContent=b.code+" · "+b.info.tierName+" · "+b.info.stand.replace(" Stand","")+", "+b.info.pos+" · £"+b.price;sel.appendChild(op)});
+  if(prev&&shown.some(function(b){return b.code===prev}))sel.value=prev;
+  $("saleLine").textContent=f.sale||"";
+  updateViewer(f);
+}
+var viewTimer=null;
+function updateViewer(f){
+  var blk=currentBlock(f), box=$("view3d").parentElement, fb=$("viewFallback");
+  var dl=$("seatInfo");
+  if(!blk){dl.innerHTML="<dt>Seats</dt><dd>"+(f.sale||"None on sale")+"</dd>"; $("view3d").removeAttribute("src"); box.classList.add("failed"); $("viewLink").href="https://preview.3ddigitalvenue.com/manutd"; $("seatNote").textContent=""; return}
+  dl.innerHTML="<dt>Block</dt><dd>"+blk.code+" — "+blk.info.stand+"</dd><dt>Tier</dt><dd>"+blk.info.tierName+" ("+blk.info.near+")</dd><dt>Where</dt><dd>"+blk.info.pos.charAt(0).toUpperCase()+blk.info.pos.slice(1)+"</dd><dt>Adult</dt><dd>£"+blk.price+(blk.price>102?" — padded seat / hospitality band":"")+"</dd>";
+  var url=viewUrl(blk.code); $("viewLink").href=url;
+  box.classList.remove("failed");
+  var ifr=$("view3d"); ifr.src=url;
+  clearTimeout(viewTimer);
+  // If the frame never reports a load (blocked by the host or by CSP), show the fallback.
+  var loaded=false; ifr.onload=function(){loaded=true};
+  viewTimer=setTimeout(function(){ if(!loaded) box.classList.add("failed") },15000);
+  // The Claude artifact sandbox blocks all third-party frames; everywhere else (your own domain) the viewer loads.
+  try{ if(/claude(usercontent)?\.(ai|com)$/.test(window.location.hostname)) box.classList.add("failed") }catch(e){}
+  $("seatNote").textContent="View is the 3D Digital Venue render for the block (drag to look around). Seats on sale within a block vary row by row; the club's seat map shows exact rows at checkout.";
+}
+function fillSelects(f){
+  var fs=$("flight"); fs.innerHTML="";
+  f.flights.forEach(function(o,i){var op=document.createElement("option");op.value=i;op.textContent=o.l+" — from $"+o.usd;fs.appendChild(op)});
+  var hs=$("hotel"); hs.innerHTML="";
+  var groups={};
+  HOTELS.forEach(function(h,i){var g=groups[h.tier]||(groups[h.tier]=document.createElement("optgroup"),groups[h.tier].label=h.tier,groups[h.tier]);var p=hotelPrice(h,f.hotelDate);var op=document.createElement("option");op.value=i;op.textContent=h.n+" — $"+p.usd+(p.checked===f.hotelDate?"":"*");g.appendChild(op)});
+  ["Budget","Mid","Near ground","Upmarket"].forEach(function(k){if(groups[k])hs.appendChild(groups[k])});
+  hs.value=HOTELS.findIndex(function(h){return /Aloft/.test(h.n)});
+}
+function pick(){var f=FIX[sel];$("ug").value=f.ug;$("og").value=f.og;$("nights").value=planFor(f).nights;fillSelects(f);fillBlocks(f,false);wx=null;loadWeather(f)}
+
+// ---- wiring -----------------------------------------------------------
+["ground","food","fx","nights","ug","og","flight","hotel"].forEach(function(id){$(id).addEventListener("input",render)});
+$("block").addEventListener("change",function(){updateViewer(FIX[sel]);render()});
+["fLower","fSide","fCheap"].forEach(function(id){$(id).addEventListener("change",function(){fillBlocks(FIX[sel],true);render()})});
+$("reset").addEventListener("click",function(){Object.keys(DEF).forEach(function(k){$(k).value=DEF[k]});pick()});
+$("copy").addEventListener("click",function(){
+  var t=window.__verdict||"", done=function(){$("copied").textContent="Copied.";setTimeout(function(){$("copied").textContent=""},1800)};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(function(){$("copied").textContent=t})}else{$("copied").textContent=t}
+});
+var now=new Date(); for(var i=0;i<FIX.length;i++){if(new Date(FIX[i].ko)>now){sel=i;break}}
+buildRail(); pick();
+})();
+</script>
