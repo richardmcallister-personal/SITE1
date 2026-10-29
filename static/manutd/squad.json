@@ -1,0 +1,270 @@
+[
+{
+"n": 1,
+"pos": "Goalkeeper",
+"nat": "Belgium",
+"name": "Senne Lammens",
+"wiki": "Senne Lammens",
+"photo": ""
+},
+{
+"n": 2,
+"pos": "Defender",
+"nat": "Portugal",
+"name": "Diogo Dalot",
+"wiki": "Diogo Dalot",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Diogo_Dalot_USMNT_v_Portugal_Mar_31_2026-12.jpg/200px-Diogo_Dalot_USMNT_v_Portugal_Mar_31_2026-12.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Portuguese footballer (born 1999)"
+},
+{
+"n": 3,
+"pos": "Defender",
+"nat": "Morocco",
+"name": "Noussair Mazraoui",
+"wiki": "Noussair Mazraoui",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/52/Noussair_Mazraoui_France_v_Morocco_9_July_2026-125_%28cropped%29.jpg/200px-Noussair_Mazraoui_France_v_Morocco_9_July_2026-125_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Moroccan footballer (born 1997)"
+},
+{
+"n": 4,
+"pos": "Defender",
+"nat": "Netherlands",
+"name": "Matthijs de Ligt",
+"wiki": "Matthijs de Ligt",
+"photo": "https://upload.wikimedia.org/wikipedia/commons/c/c9/2022-07-30_Fu%C3%9Fball%2C_M%C3%A4nner%2C_DFL-Supercup%2C_RB_Leipzig_-_FC_Bayern_M%C3%BCnchen_Matthijs_de_Ligt_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+"born": "Dutch footballer (born 1999)"
+},
+{
+"n": 5,
+"pos": "Defender",
+"nat": "England",
+"name": "Harry Maguire",
+"wiki": "Harry Maguire",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ab/Harry_Maguire_2023_%28cropped%29.jpg/200px-Harry_Maguire_2023_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "English footballer (born 1993)"
+},
+{
+"n": 6,
+"pos": "Defender",
+"nat": "Argentina",
+"name": "Lisandro Martínez",
+"wiki": "Lisandro Martínez",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6e/Lisandro_Martinez_Argentina_v_Egypt_7_July_2026-343_%28cropped%29.jpg/200px-Lisandro_Martinez_Argentina_v_Egypt_7_July_2026-343_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Argentine footballer (born 1998)"
+},
+{
+"n": 7,
+"pos": "Midfielder",
+"nat": "England",
+"name": "Mason Mount",
+"wiki": "Mason Mount",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/9/90/Mason_Mount_-_2021-12-08_-_FC_Zenit_Saint_Petersburg_v_Chelsea_F.C.jpg/200px-Mason_Mount_-_2021-12-08_-_FC_Zenit_Saint_Petersburg_v_Chelsea_F.C.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "English footballer (born 1999)"
+},
+{
+"n": 8,
+"pos": "Midfielder",
+"nat": "Portugal",
+"name": "Bruno Fernandes",
+"wiki": "Bruno Fernandes",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c7/Bruno_Fernandes_USMNT_v_Portugal_Mar_31_2026-27_%28cropped%29.jpg/200px-Bruno_Fernandes_USMNT_v_Portugal_Mar_31_2026-27_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Portuguese footballer (born 1994)"
+},
+{
+"n": 9,
+"pos": "Attacker",
+"nat": "England",
+"name": "Marcus Rashford",
+"wiki": "Marcus Rashford",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Marcus_Rashford_England_v_Ghana_23_June_2026-073.jpg/200px-Marcus_Rashford_England_v_Ghana_23_June_2026-073.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "English footballer (born 1997)"
+},
+{
+"n": 10,
+"pos": "Attacker",
+"nat": "Brazil",
+"name": "Matheus Cunha",
+"wiki": "Matheus Cunha",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Matheus_Cunha_Brazil_V_Morocco_13_June_2026-178_%28cropped%29.jpg/200px-Matheus_Cunha_Brazil_V_Morocco_13_June_2026-178_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Brazilian footballer (born 1999)"
+},
+{
+"n": 11,
+"pos": "Attacker",
+"nat": "Netherlands",
+"name": "Joshua Zirkzee",
+"wiki": "Joshua Zirkzee",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Joshua_Zirkzee_2019.jpg/200px-Joshua_Zirkzee_2019.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Dutch footballer (born 2001)"
+},
+{
+"n": 12,
+"pos": "Goalkeeper",
+"nat": "Wales",
+"name": "Karl Darlow",
+"wiki": "Karl Darlow",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Karl_Darlow_13092025_%283%29.jpg/200px-Karl_Darlow_13092025_%283%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Wales international footballer (born 1990)"
+},
+{
+"n": 13,
+"pos": "Defender",
+"nat": "Denmark",
+"name": "Patrick Dorgu",
+"wiki": "Patrick Dorgu",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Patrick_Dorgu_Como-Lecce_30_Dec_2024.jpg/200px-Patrick_Dorgu_Como-Lecce_30_Dec_2024.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Danish footballer (born 2004)"
+},
+{
+"n": 15,
+"pos": "Defender",
+"nat": "France",
+"name": "Leny Yoro",
+"wiki": "Leny Yoro",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/RC_Lens_-_Lille_OSC_%2808-10-2023%29_12_%28cropped1%29.jpg/200px-RC_Lens_-_Lille_OSC_%2808-10-2023%29_12_%28cropped1%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "French footballer (born 2005)"
+},
+{
+"n": 16,
+"pos": "Attacker",
+"nat": "Cote d'Ivoire",
+"name": "Amad Diallo",
+"wiki": "Amad Diallo",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1a/Amad_Diallo_Cote_D%27Ivoire_v_Ecuador_14_June_2026-256_%28cropped_2%29.jpg/200px-Amad_Diallo_Cote_D%27Ivoire_v_Ecuador_14_June_2026-256_%28cropped_2%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Ivorian footballer (born 2002)"
+},
+{
+"n": 17,
+"pos": "Midfielder",
+"nat": "Brazil",
+"name": "Andrey Santos",
+"wiki": "Andrey Santos (footballer, born 2004)",
+"photo": ""
+},
+{
+"n": 18,
+"pos": "Midfielder",
+"nat": "Belgium",
+"name": "Youri Tielemans",
+"wiki": "Youri Tielemans",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/Youri_Tielemans_USMNT_v_Belgium_Mar_28_2026-20_%28cropped%29.jpg/200px-Youri_Tielemans_USMNT_v_Belgium_Mar_28_2026-20_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Belgian footballer (born 1997)"
+},
+{
+"n": 19,
+"pos": "Attacker",
+"nat": "Cameroon",
+"name": "Bryan Mbeumo",
+"wiki": "Bryan Mbeumo",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Bryan_Mbeumo_00-02-31.18.png/200px-Bryan_Mbeumo_00-02-31.18.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Footballer (born 1999)"
+},
+{
+"n": 20,
+"pos": "Midfielder",
+"nat": "Cameroon",
+"name": "Carlos Baleba",
+"wiki": "Carlos Baleba",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Carlos_Baleba_24012026_%282%29.jpg/200px-Carlos_Baleba_24012026_%282%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Cameroonian footballer (born 2004)"
+},
+{
+"n": 22,
+"pos": "Goalkeeper",
+"nat": "England",
+"name": "Tom Heaton",
+"wiki": "Tom Heaton",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a6/Tom_Heaton_playing_for_Burnley_%28cropped%29.jpg/200px-Tom_Heaton_playing_for_Burnley_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "English footballer (born 1986)"
+},
+{
+"n": 23,
+"pos": "Defender",
+"nat": "England",
+"name": "Luke Shaw",
+"wiki": "Luke Shaw",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b3/Luke_Shaw%2C_Manchester_United_v_Newcastle_United%2C_11_September_2021_%2844%29_%28cropped%29.jpg/200px-Luke_Shaw%2C_Manchester_United_v_Newcastle_United%2C_11_September_2021_%2844%29_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "English footballer (born 1995)"
+},
+{
+"n": 25,
+"pos": "Midfielder",
+"nat": "Uruguay",
+"name": "Manuel Ugarte",
+"wiki": "Manuel Ugarte (footballer, born 2001)",
+"photo": "",
+"born": "Topics referred to by the same term"
+},
+{
+"n": 26,
+"pos": "Defender",
+"nat": "England",
+"name": "Ayden Heaven",
+"wiki": "Ayden Heaven",
+"photo": "https://upload.wikimedia.org/wikipedia/commons/4/47/Ayden_Heaven_2025.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+"born": "English footballer (born 2006)"
+},
+{
+"n": 30,
+"pos": "Attacker",
+"nat": "Slovenia",
+"name": "Benjamin Šeško",
+"wiki": "Benjamin Šeško",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/FC_RB_Salzburg_gegen_SK_Austria_Klagenfurt_%282023-05-28%29_38_%28cropped%29.jpg/200px-FC_RB_Salzburg_gegen_SK_Austria_Klagenfurt_%282023-05-28%29_38_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Slovenian footballer (born 2003)"
+},
+{
+"n": 31,
+"pos": "Attacker",
+"nat": "England",
+"name": "Shea Lacey",
+"wiki": "Shea Lacey",
+"photo": "",
+"born": "English footballer (born 2007)"
+},
+{
+"n": 37,
+"pos": "Midfielder",
+"nat": "England",
+"name": "Kobbie Mainoo",
+"wiki": "Kobbie Mainoo",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1f/Kobbie_Mainoo_England_v_Ghana_23_June_2026-042.jpg/200px-Kobbie_Mainoo_England_v_Ghana_23_June_2026-042.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "English footballer (born 2005)"
+},
+{
+"n": 38,
+"pos": "Midfielder",
+"nat": "England",
+"name": "Jack Fletcher",
+"wiki": "Jack Fletcher (footballer, born 2007)",
+"photo": "",
+"born": "English association football player"
+},
+{
+"n": 39,
+"pos": "Midfielder",
+"nat": "Scotland",
+"name": "Tyler Fletcher",
+"wiki": "Tyler Fletcher",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/17/Tyler_Fletcher_Scotland_v_Bolivia_6_June_2026-4.jpg/200px-Tyler_Fletcher_Scotland_v_Bolivia_6_June_2026-4.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "Scottish association football player (born 2007)"
+},
+{
+"n": 41,
+"pos": "Defender",
+"nat": "England",
+"name": "Harry Amass",
+"wiki": "Harry Amass",
+"photo": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b9/Harry_Amass_18102025_%284%29_%28cropped%29.jpg/200px-Harry_Amass_18102025_%284%29_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+"born": "English footballer (born 2007)"
+},
+{
+"n": 45,
+"pos": "Goalkeeper",
+"nat": "Northern Ireland",
+"name": "Dermot Mee",
+"wiki": "Dermot Mee",
+"photo": "",
+"born": "Northern Irish footballer (born 2002)"
+}
+]

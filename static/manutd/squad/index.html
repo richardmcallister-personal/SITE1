@@ -22,6 +22,7 @@ table.mu td.name{white-space:nowrap} table.mu td.name button{all:unset;cursor:po
 .bio{background:var(--tint);padding:16px 18px;display:none} .bio.on{display:block}
 .bio img{float:right;width:120px;margin:0 0 10px 14px}
 .bio h3{margin-top:0}
+.saves{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px} .saves li{background:var(--tint);padding:6px 10px;display:flex;gap:8px;align-items:center} .saves button{all:unset;cursor:pointer;font-weight:600} .saves button[data-del]{color:var(--red);font-weight:700;padding:0 4px}
 .face.sm{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;background:#eee}
 </style></head><body><div class="wrap">
 <header class="mu">
@@ -36,10 +37,12 @@ table.mu td.name{white-space:nowrap} table.mu td.name button{all:unset;cursor:po
   <div class="controls">
     <label>Fixture<select id="fix"></select></label>
     <label>Formation<select id="form"><option>4-3-3</option><option>4-2-3-1</option><option>3-4-3</option><option>4-4-2</option><option>3-5-2</option><option>4-1-4-1</option></select></label>
-    <button id="clear">Clear XI</button><button id="copy">Copy XI</button>
+    <button id="save">Save XI</button><button id="png">Download PNG</button><button id="copy">Copy text</button><button id="clear">Clear</button>
   </div>
   <div class="pitch" id="pitch"></div>
   <p class="sub" id="pickNote"></p>
+  <h3>Saved line-ups</h3>
+  <ul class="saves" id="saves"></ul>
 </div>
 
 <div class="sheet">
@@ -56,18 +59,13 @@ table.mu td.name{white-space:nowrap} table.mu td.name button{all:unset;cursor:po
     </div>
   </div>
 </div>
-<footer class="mu">Squad, injuries, suspensions and season statistics from API-Football; bios and portraits from Wikipedia on request (click a name). United-career totals are being compiled and will appear next to the season figures.</footer>
+<footer class="mu">Squad from the club's first-team list (1 Sept 2026); portraits and bios from Wikipedia (Creative Commons); injuries, suspensions and season statistics from API-Football. United-career totals are being compiled and will appear next to the season figures.</footer>
 </div>
 <script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script>
 <script>
 (function(){
   MU.nav("Squad");
-  // Fallback squad (2025/26 list) used until the API is connected.
-  var FALLBACK=[["Altay Bayındır",1,"Goalkeeper","Turkey"],["André Onana",24,"Goalkeeper","Cameroon"],["Senne Lammens",31,"Goalkeeper","Belgium"],
-   ["Diogo Dalot",2,"Defender","Portugal"],["Noussair Mazraoui",3,"Defender","Morocco"],["Matthijs de Ligt",4,"Defender","Netherlands"],["Harry Maguire",5,"Defender","England"],["Lisandro Martínez",6,"Defender","Argentina"],["Tyrell Malacia",12,"Defender","Netherlands"],["Patrick Dorgu",13,"Defender","Denmark"],["Leny Yoro",15,"Defender","France"],["Luke Shaw",23,"Defender","England"],["Ayden Heaven",26,"Defender","England"],["Tyler Fredricson",33,"Defender","England"],["Diego León",35,"Defender","Paraguay"],
-   ["Mason Mount",7,"Midfielder","England"],["Bruno Fernandes",8,"Midfielder","Portugal"],["Casemiro",18,"Midfielder","Brazil"],["Manuel Ugarte",25,"Midfielder","Uruguay"],["Kobbie Mainoo",37,"Midfielder","England"],["Toby Collyer",43,"Midfielder","England"],
-   ["Matheus Cunha",10,"Attacker","Brazil"],["Joshua Zirkzee",11,"Attacker","Netherlands"],["Amad Diallo",16,"Attacker","Cote d'Ivoire"],["Bryan Mbeumo",19,"Attacker","Cameroon"],["Benjamin Šeško",30,"Attacker","Slovenia"],["Chido Obi",32,"Attacker","Denmark"]]
-   .map(function(p){return {id:"f"+p[1],name:p[0],number:p[1],position:p[2],nationality:p[3],photo:""}});
+  var FALLBACK=[]; // loaded from /manutd/squad.json (current first-team squad, Wikipedia portraits)
   var FORMS={"4-3-3":[["GK"],["LB","CB","CB","RB"],["CM","CM","CM"],["LW","ST","RW"]],"4-2-3-1":[["GK"],["LB","CB","CB","RB"],["DM","DM"],["LW","AM","RW"],["ST"]],"3-4-3":[["GK"],["CB","CB","CB"],["LWB","CM","CM","RWB"],["LW","ST","RW"]],"4-4-2":[["GK"],["LB","CB","CB","RB"],["LM","CM","CM","RM"],["ST","ST"]],"3-5-2":[["GK"],["CB","CB","CB"],["LWB","CM","CM","CM","RWB"],["ST","ST"]],"4-1-4-1":[["GK"],["LB","CB","CB","RB"],["DM"],["LM","CM","CM","RM"],["ST"]]};
   var GROUP={GK:"Goalkeeper",LB:"Defender",CB:"Defender",RB:"Defender",LWB:"Defender",RWB:"Defender",DM:"Midfielder",CM:"Midfielder",AM:"Midfielder",LM:"Midfielder",RM:"Midfielder",LW:"Attacker",RW:"Attacker",ST:"Attacker"};
   var squad=[], out={}, stats={}, live=false;
@@ -107,7 +105,7 @@ table.mu td.name{white-space:nowrap} table.mu td.name button{all:unset;cursor:po
     var order={Goalkeeper:0,Defender:1,Midfielder:2,Attacker:3};
     var rows=squad.slice().sort(function(a,b){return order[a.position]-order[b.position]||(a.number||99)-(b.number||99)});
     $("squad").innerHTML='<table class="mu"><thead><tr><th>#</th><th>Player</th><th>Pos</th><th>Age</th><th class="n">Apps</th><th class="n">G</th><th class="n">A</th><th class="n">Min</th><th class="n">Rating</th></tr></thead><tbody>'+
-      rows.map(function(p){var s=stats[p.id]||{}; return '<tr'+(out[p.id]?' style="opacity:.55"':'')+'><td>'+(p.number||"")+'</td><td class="name">'+(p.photo?'<img class="face sm" src="'+p.photo+'" alt="">':'')+MU.flag(p.nationality)+'<button data-bio="'+MU.esc(p.name)+'">'+MU.esc(p.name)+'</button>'+(out[p.id]?' <span class="out">· out</span>':'')+'</td><td>'+({Goalkeeper:"GK",Defender:"DEF",Midfielder:"MID",Attacker:"ATT"}[p.position]||p.position)+'</td><td>'+(p.age||"")+'</td><td class="n">'+(s.apps==null?"":s.apps)+'</td><td class="n">'+(s.goals==null?"":s.goals)+'</td><td class="n">'+(s.assists==null?"":s.assists)+'</td><td class="n">'+(s.minutes==null?"":s.minutes)+'</td><td class="n">'+(s.rating?Number(s.rating).toFixed(2):"")+'</td></tr>'}).join("")+'</tbody></table>';
+      rows.map(function(p){var s=stats[p.id]||{}; return '<tr'+(out[p.id]?' style="opacity:.55"':'')+'><td>'+(p.number||"")+'</td><td class="name">'+(p.photo?'<img class="face sm" src="'+p.photo+'" alt="">':'')+MU.flag(p.nationality)+'<button data-bio="'+MU.esc(p.wiki||p.name)+'">'+MU.esc(p.name)+'</button>'+(out[p.id]?' <span class="out">· out</span>':'')+'</td><td>'+({Goalkeeper:"GK",Defender:"DEF",Midfielder:"MID",Attacker:"ATT"}[p.position]||p.position)+'</td><td>'+(p.age||"")+'</td><td class="n">'+(s.apps==null?"":s.apps)+'</td><td class="n">'+(s.goals==null?"":s.goals)+'</td><td class="n">'+(s.assists==null?"":s.assists)+'</td><td class="n">'+(s.minutes==null?"":s.minutes)+'</td><td class="n">'+(s.rating?Number(s.rating).toFixed(2):"")+'</td></tr>'}).join("")+'</tbody></table>';
     $("squad").querySelectorAll("button[data-bio]").forEach(function(b){b.addEventListener("click",function(){bio(b.dataset.bio)})});
   }
   function renderOut(){
@@ -115,7 +113,7 @@ table.mu td.name{white-space:nowrap} table.mu td.name button{all:unset;cursor:po
     $("injuries").innerHTML=list.length?'<table class="mu"><thead><tr><th>Player</th><th>Why</th><th>Since</th></tr></thead><tbody>'+list.map(function(o){return '<tr><td>'+MU.esc(o.name)+'</td><td>'+MU.esc(o.type)+(o.reason?' · '+MU.esc(o.reason):'')+'</td><td>'+(o.date?MU.fmtDate(o.date):'')+'</td></tr>'}).join("")+'</tbody></table>':'<div class="empty">'+(live?"Nobody listed as injured or suspended.":"Injury and suspension list arrives with the API; until then everyone is offered in the picker.")+'</div>';
   }
   function bio(name){
-    var box=$("bio"); box.className="bio on"; box.innerHTML="<p>Loading "+MU.esc(name)+"…</p>";
+    var box=$("bio"); box.className="bio on"; box.innerHTML="<p>Loading "+MU.esc(name.replace(/ \(.*\)$/,""))+"…</p>";
     fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(name.replace(/ /g,"_"))).then(function(r){return r.json()}).then(function(j){
       if(!j.extract){box.innerHTML="<p>No Wikipedia summary found for "+MU.esc(name)+".</p>";return}
       box.innerHTML=(j.thumbnail?'<img src="'+j.thumbnail.source+'" alt="">':'')+'<h3>'+MU.esc(j.title)+'</h3><p>'+MU.esc(j.extract)+'</p><p class="sub"><a href="'+j.content_urls.desktop.page+'" target="_blank" rel="noopener">Full article on Wikipedia</a></p>';
@@ -123,17 +121,58 @@ table.mu td.name{white-space:nowrap} table.mu td.name button{all:unset;cursor:po
   }
 
   // ---- data
-  function useFallback(){squad=FALLBACK; $("squadNote").textContent="Showing the 2025/26 squad list until the live squad, injuries and stats connect."; renderSquad(); renderOut(); renderPitch()}
-  MU.api("squad").then(function(j){
-    live=true;
-    squad=j.response[0].players.map(function(p){return {id:p.id,name:p.name,number:p.number,position:p.position,age:p.age,photo:p.photo,nationality:""}});
-    $("squadNote").textContent="Live squad from API-Football · season statistics are Premier League + cups + Europe combined.";
-    renderSquad(); renderPitch();
-    return Promise.all([
-      MU.api("injuries").then(function(k){k.response.forEach(function(x){var ko=x.fixture&&x.fixture.date; if(ko&&new Date(ko)<new Date(Date.now()-7*864e5))return; out[x.player.id]={name:x.player.name,type:x.player.type,reason:x.player.reason,date:ko}}); renderOut(); renderSquad(); renderPitch()}).catch(function(){renderOut()}),
-      (function pages(n){return MU.api("players",{page:n}).then(function(k){k.response.forEach(function(x){var agg={apps:0,goals:0,assists:0,minutes:0,rating:null,r:[]}; x.statistics.forEach(function(s){if(s.team.id!==MU.TEAM)return; agg.apps+=s.games.appearences||0; agg.goals+=s.goals.total||0; agg.assists+=s.goals.assists||0; agg.minutes+=s.games.minutes||0; if(s.games.rating)agg.r.push(+s.games.rating)}); if(agg.r.length)agg.rating=agg.r.reduce(function(a,b){return a+b})/agg.r.length; stats[x.player.id]=agg; var sp=squad.filter(function(p){return p.id===x.player.id})[0]; if(sp){sp.nationality=x.player.nationality; sp.age=sp.age||x.player.age}}); if(k.paging.current<k.paging.total&&n<6)return pages(n+1)})})(1).then(function(){renderSquad()})
-    ]);
-  }).catch(function(){useFallback()});
+  function norm(n){return n.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()}
+  function useFallback(){squad=FALLBACK; $("squadNote").textContent="First-team squad as of 1 September 2026 (loans excluded). Live injuries, suspensions and season statistics connect through the API."; renderSquad(); renderOut(); renderPitch()}
+  fetch("/manutd/squad.json").then(function(r){return r.json()}).then(function(j){
+    FALLBACK=j.map(function(p){return {id:"w"+p.n,name:p.name,number:p.n,position:p.pos,nationality:p.nat,photo:p.photo,wiki:p.wiki}});
+  }).catch(function(){}).then(function(){
+    useFallback();
+    return MU.api("squad").then(function(j){
+      live=true;
+      var byName={}; FALLBACK.forEach(function(p){byName[norm(p.name)]=p});
+      squad=j.response[0].players.map(function(p){var w=byName[norm(p.name)]||FALLBACK.filter(function(f){return norm(f.name).split(" ").pop()===norm(p.name).split(" ").pop()})[0]||{}; return {id:p.id,name:w.name||p.name,number:p.number||w.number,position:p.position,age:p.age,photo:w.photo||p.photo,nationality:w.nationality||"",wiki:w.wiki}});
+      $("squadNote").textContent="Live squad from API-Football · season statistics are league, cups and Europe combined.";
+      renderSquad(); renderPitch();
+      return Promise.all([
+        MU.api("injuries").then(function(k){k.response.forEach(function(x){var ko=x.fixture&&x.fixture.date; if(ko&&new Date(ko)<new Date(Date.now()-7*864e5))return; out[x.player.id]={name:x.player.name,type:x.player.type,reason:x.player.reason,date:ko}}); renderOut(); renderSquad(); renderPitch()}).catch(function(){renderOut()}),
+        (function pages(n){return MU.api("players",{page:n}).then(function(k){k.response.forEach(function(x){var agg={apps:0,goals:0,assists:0,minutes:0,rating:null,r:[]}; x.statistics.forEach(function(s){if(s.team.id!==MU.TEAM)return; agg.apps+=s.games.appearences||0; agg.goals+=s.goals.total||0; agg.assists+=s.goals.assists||0; agg.minutes+=s.games.minutes||0; if(s.games.rating)agg.r.push(+s.games.rating)}); if(agg.r.length)agg.rating=agg.r.reduce(function(a,b){return a+b})/agg.r.length; stats[x.player.id]=agg; var sp=squad.filter(function(p){return p.id===x.player.id})[0]; if(sp){sp.nationality=sp.nationality||x.player.nationality; sp.age=sp.age||x.player.age}}); if(k.paging.current<k.paging.total&&n<6)return pages(n+1)})})(1).then(function(){renderSquad()})
+      ]);
+    }).catch(function(){});
+  });
+
+  // ---- named saves + PNG export
+  function savesKey(){return "mu:xi:saved"}
+  function allSaves(){try{return JSON.parse(localStorage.getItem(savesKey())||"[]")}catch(e){return []}}
+  function renderSaves(){
+    var list=allSaves(), el=$("saves");
+    el.innerHTML=list.length?list.map(function(x,i){return '<li><button data-load="'+i+'">'+MU.esc(x.name)+'</button> <small>'+MU.esc(x.fixLabel)+' · '+MU.esc(x.form)+'</small> <button data-del="'+i+'" title="Delete" aria-label="Delete">×</button></li>'}).join(""):'<li><small>No saved line-ups yet.</small></li>';
+    el.querySelectorAll("[data-load]").forEach(function(b){b.addEventListener("click",function(){var x=allSaves()[+b.dataset.load]; if(!x)return; if([].some.call($("fix").options,function(o){return o.value===x.fix}))$("fix").value=x.fix; $("form").value=x.form; store(x.picks); renderPitch(); $("pickNote").textContent="Loaded “"+x.name+"”."})});
+    el.querySelectorAll("[data-del]").forEach(function(b){b.addEventListener("click",function(){var l=allSaves(); l.splice(+b.dataset.del,1); try{localStorage.setItem(savesKey(),JSON.stringify(l))}catch(e){} renderSaves()})});
+  }
+  $("save").addEventListener("click",function(){
+    var f=$("fix").selectedOptions[0].textContent, name=prompt("Name this line-up", "XI "+f.replace(/ · .*$/,"")+" "+$("form").value); if(!name)return;
+    var l=allSaves(); l.unshift({name:name,fix:$("fix").value,fixLabel:f,form:$("form").value,picks:saved(),at:Date.now()}); try{localStorage.setItem(savesKey(),JSON.stringify(l.slice(0,30)))}catch(e){} renderSaves(); $("pickNote").textContent="Saved “"+name+"”.";
+  });
+  $("png").addEventListener("click",function(){
+    var rows=FORMS[$("form").value], picks=saved(), W=900, H=1100, c=document.createElement("canvas"); c.width=W; c.height=H; var g=c.getContext("2d");
+    g.fillStyle="#1f6b3a"; g.fillRect(0,0,W,H); g.fillStyle="#23753f"; for(var y=0;y<H;y+=100)g.fillRect(0,y,W,50);
+    g.strokeStyle="rgba(255,255,255,.85)"; g.lineWidth=4; g.strokeRect(30,30,W-60,H-60); g.beginPath(); g.moveTo(30,H/2); g.lineTo(W-30,H/2); g.stroke(); g.beginPath(); g.arc(W/2,H/2,90,0,Math.PI*2); g.stroke();
+    g.strokeRect(W/2-180,30,360,140); g.strokeRect(W/2-180,H-170,360,140);
+    var f=window.MU_FIXTURES.filter(function(x){return x.ko===$("fix").value})[0];
+    g.fillStyle="#fff"; g.font="bold 30px Archivo, Arial"; g.textAlign="center"; g.fillText((f?(f.home?"United v "+f.opp:f.opp+" v United"):"United XI")+" · "+$("form").value,W/2,H-60);
+    g.font="16px Archivo, Arial"; g.fillText(f?MU.fmtDate(f.ko)+" · "+MU.fmtUK(f.ko)+" UK":"",W/2,H-36);
+    var i=0, jobs=[]; var rowH=(H-260)/rows.length;
+    rows.forEach(function(r,ri){var cy=H-160-rowH*ri-rowH/2; r.forEach(function(pos,ci){var cx=W*(ci+1)/(r.length+1), id=picks[i++], p=squad.filter(function(x){return String(x.id)===String(id)})[0];
+      jobs.push(new Promise(function(res){
+        function label(){g.fillStyle="#fff"; g.font="bold 18px Archivo, Arial"; g.textAlign="center"; g.shadowColor="#000"; g.shadowBlur=4; g.fillText(p?short(p.name):"—",cx,cy+66); g.shadowBlur=0; g.font="12px Archivo, Arial"; g.fillStyle="#ffe500"; g.fillText(pos+(p&&p.number?" · "+p.number:""),cx,cy+84); res()}
+        g.fillStyle="#fff"; g.beginPath(); g.arc(cx,cy,40,0,Math.PI*2); g.fill();
+        if(p&&p.photo){var im=new Image(); im.crossOrigin="anonymous"; im.onload=function(){g.save(); g.beginPath(); g.arc(cx,cy,38,0,Math.PI*2); g.clip(); var s=Math.max(76/im.width,76/im.height); g.drawImage(im,cx-im.width*s/2,cy-38,im.width*s,im.height*s); g.restore(); label()}; im.onerror=function(){g.fillStyle="#da020e"; g.font="bold 26px Archivo, Arial"; g.textAlign="center"; g.fillText(p.number?String(p.number):"",cx,cy+9); label()}; im.src=p.photo}
+        else{g.fillStyle="#da020e"; g.font="bold 26px Archivo, Arial"; g.textAlign="center"; g.fillText(p&&p.number?String(p.number):"",cx,cy+9); label()}
+      }));
+    })});
+    Promise.all(jobs).then(function(){try{var a=document.createElement("a"); a.download="united-xi-"+($("fix").value.slice(0,10))+".png"; a.href=c.toDataURL("image/png"); a.click()}catch(e){$("pickNote").textContent="Couldn't export the image: "+e.message}});
+  });
+  renderSaves();
 
   $("fix").addEventListener("change",renderPitch); $("form").addEventListener("change",renderPitch);
   $("clear").addEventListener("click",function(){store([]);renderPitch()});
