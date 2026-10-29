@@ -1,6 +1,7 @@
 // Fixture list used until the live API is connected (and as the trip-planner's source of truth).
 // ko = UTC. Home fixtures from tickets.manutd.com; away dates are the TV-selected ones (ESPN/PL), 29 Oct 2026.
 window.MU_FIXTURES=[
+ {opp:"Chelsea",comp:"Premier League",ko:"2026-10-31T12:30:00Z",home:false,venue:"Stamford Bridge",col:"#034694"},
  {opp:"Roma",comp:"Champions League",ko:"2026-11-03T20:00:00Z",home:true,venue:"Old Trafford"},
  {opp:"Aston Villa",comp:"Premier League",ko:"2026-11-08T16:30:00Z",home:true,venue:"Old Trafford"},
  {opp:"Liverpool",comp:"Premier League",ko:"2026-11-22T16:30:00Z",home:false,venue:"Anfield",col:"#C8102E"},
