@@ -1,9 +1,5 @@
-<!doctype html>
-<html lang="en-GB">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Should I Go? Manchester United</title>
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>Should I Go? Manchester United</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@400;600;700&display=swap">
 <style>
 /* Layout: a matchday programme — one fixture rail on top, then a two-column decision sheet (your trip and costs | the oracle's reading). */
@@ -37,6 +33,14 @@ h2{font-family:var(--display);font-weight:400;font-size:18px;letter-spacing:.06e
 .fx .k{font-size:13px;color:#bbb;font-variant-numeric:tabular-nums}
 .fx .c{display:inline-block;margin-top:6px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border-radius:0;background:#333;color:#fff}
 .fx.past{opacity:.45}
+.fx.away{background:var(--fc);color:var(--ft);border-right-color:rgba(255,255,255,.35);box-shadow:inset 0 6px 0 var(--fs,var(--fc))}
+.fx.away .d,.fx.away .k{color:var(--ft);opacity:.85} .fx.away .c{background:rgba(0,0,0,.28);color:var(--ft)} .fx.away .d b{font-weight:400;letter-spacing:.14em}
+.fx.away:hover{filter:brightness(1.08)}
+.fx.away[aria-pressed="true"]{background:#fff;color:var(--ink);box-shadow:inset 0 6px 0 var(--fc)} .fx.away[aria-pressed="true"] .d,.fx.away[aria-pressed="true"] .k{color:var(--muted);opacity:1} .fx.away[aria-pressed="true"] .c{background:var(--fc);color:var(--ft)}
+.awayTickets{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.awayTickets a{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px;background:#f3f2ee;color:var(--ink);text-decoration:none;font-weight:600}
+.awayTickets a:hover{background:#e9e8e3} .awayTickets a span{font-weight:400;color:var(--muted);font-size:13px}
+body.is-away .homeOnly{display:none} body:not(.is-away) .awayOnly{display:none}
 .sheet{display:grid;grid-template-columns:minmax(0,1fr);gap:0;margin-top:0;background:var(--paper);padding:0}
 .panel{padding:22px 26px}
 
@@ -100,16 +104,14 @@ a.book[aria-disabled="true"]{opacity:.4;pointer-events:none}
 footer{margin-top:28px;font-size:13px;color:#fff;opacity:.9;max-width:80ch}
 </style>
 
-</head>
-<body>
-<div class="wrap">
+</head><body><div class="wrap">
 <header>
   <div class="brand"><img src="crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Old Trafford trip planner</small>Manchester<br>United</h1></div>
   <div class="from">Tickets · flights<br>· hotels<span>Vellinge → CPH → MAN · GBP · UK / SE kick-offs</span></div>
 </header>
 
-<h2 style="margin-top:22px">Pick a home fixture</h2>
-<div class="rail" id="rail" role="listbox" aria-label="Upcoming home fixtures"></div>
+<h2 style="margin-top:22px">Pick a fixture</h2>
+<div class="rail" id="rail" role="listbox" aria-label="Upcoming fixtures, home and away"></div>
 
 <div class="sheet">
   <section class="panel">
@@ -124,10 +126,11 @@ footer{margin-top:28px;font-size:13px;color:#fff;opacity:.9;max-width:80ch}
 
     <h2>What it costs you</h2>
     <div class="card">
-      <div class="row narrow"><label>Ticket<span id="ticketLine">Pick a block below</span></label><b id="ticketCost" style="text-align:right;font-variant-numeric:tabular-nums">£—</b></div>
+      <div class="row narrow homeOnly"><label>Ticket<span id="ticketLine">Pick a block below</span></label><b id="ticketCost" style="text-align:right;font-variant-numeric:tabular-nums">£—</b></div>
+      <div class="row narrow awayOnly"><label for="awayTicket">Away ticket<span id="awayTicketSub">Premier League caps away tickets at £30</span></label><input id="awayTicket" type="number" min="0" step="1" value="30"></div>
       <div class="row narrow"><label>Flights<span id="flightLine">—</span></label><b id="flightCost" style="text-align:right;font-variant-numeric:tabular-nums">£—</b></div>
       <div class="row narrow"><label>Hotel<span id="hotelLine">—</span></label><b id="hotelCost" style="text-align:right;font-variant-numeric:tabular-nums">£—</b></div>
-      <div class="row narrow"><label for="ground">Trains, trams, taxis<span>Vellinge–CPH, MAN airport–town, to the ground</span></label><input id="ground" type="number" min="0" step="5" value="45"></div>
+      <div class="row narrow"><label for="ground">Trains, trams, taxis<span id="groundSub">Vellinge–CPH, MAN airport–town, to the ground</span></label><input id="ground" type="number" min="0" step="5" value="45"></div>
       <div class="row narrow"><label for="food">Food and drink<span>Pre-match pint tax included</span></label><input id="food" type="number" min="0" step="5" value="60"></div>
       <div class="row narrow"><label for="fx">USD → GBP<span>Fares were quoted in dollars</span></label><input id="fx" type="number" min="0.5" max="1" step="0.01" value="0.76"></div>
       <div class="total"><span>All-in</span><b id="total">£—</b></div>
@@ -135,8 +138,15 @@ footer{margin-top:28px;font-size:13px;color:#fff;opacity:.9;max-width:80ch}
 
     <input type="hidden" id="ug" value="1.5"><input type="hidden" id="og" value="1.2">
 
-    <h2>Where you'd sit</h2>
-    <div class="card">
+    <h2 class="awayOnly" id="awayHead">Getting in away</h2>
+    <div class="card awayOnly">
+      <p class="sub" id="awaySale" style="margin:0 0 10px"></p>
+      <dl class="plan" id="awayInfo"></dl>
+      <ul class="awayTickets" id="awayLinks"></ul>
+      <p class="sub" id="awayNote" style="margin-top:10px">United's away allocation is sold on tickets.manutd.com to members in order of away credits (your members' login). The host club's ticket office is the other official route — their home areas, members' schemes and hospitality. Football tickets may only be resold in the UK by the clubs or their authorised partners, so unofficial resale sites are left out.</p>
+    </div>
+    <h2 class="homeOnly">Where you'd sit</h2>
+    <div class="card homeOnly">
       <p class="sub" id="saleLine" style="margin:0 0 10px"></p>
       <div class="filters">
         <label><input type="checkbox" id="fLower" checked> Lower tier only</label>
@@ -164,7 +174,7 @@ footer{margin-top:28px;font-size:13px;color:#fff;opacity:.9;max-width:80ch}
 
 </div>
 
-<footer>Fixtures, kick-offs and seat availability read from tickets.manutd.com on 29 Oct 2026 (1 adult, logged in as an Official Member); blocks sell out and get released, so check before booking. Flight and hotel prices were checked on SlickTrip on 29 Oct 2026 for 1 adult and will have moved; round-trip fares are "from" prices pairing the named outbound with its cheapest return. Hotels are 4-star and up only (Hotel Football, the Marriott family, the high-end city hotels and those near the ground); prices are for the exact fixture night, cheapest room, 1 adult, and the hotel's own page shows the live rate and all sellers. Weather is the Open-Meteo forecast inside 16 days, otherwise Manchester's seasonal averages. Hosted versions of this page fetch live weather; some embedded viewers block it.</footer>
+<footer>Away fixtures, allocations and ballot dates read from the away-tickets page on tickets.manutd.com on 29 Oct 2026; away kick-off dates are the TV-selected ones and may still move. Home fixtures, kick-offs and seat availability read from tickets.manutd.com on 29 Oct 2026 (1 adult, logged in as an Official Member); blocks sell out and get released, so check before booking. Flight and hotel prices were checked on SlickTrip on 29 Oct 2026 for 1 adult and will have moved; round-trip fares are "from" prices pairing the named outbound with its cheapest return. Hotels are 4-star and up only (Hotel Football, the Marriott family, the high-end city hotels and those near the ground); prices are for the exact fixture night, cheapest room, 1 adult, and the hotel's own page shows the live rate and all sellers. Weather is the Open-Meteo forecast inside 16 days, otherwise Manchester's seasonal averages. Hosted versions of this page fetch live weather; some embedded viewers block it.</footer>
 </div>
 
 <script>
@@ -197,6 +207,57 @@ var FIX=[
  {opp:"Liverpool",comp:"Premier League",ko:"2027-01-23T15:00:00Z",tbc:true,ug:1.3,og:1.6,glam:3,hotelDate:"2027-01-23",sameDay:false,sale:"Members' ballot — apply by 8am Wed 11 Nov",
   flights:[{l:"Ryanair FR6880 · out 06:10, home Sun morning",usd:53}]}
 ];
+// ---- away fixtures (same window). Colours are the host club's; ticket links are the United away page
+// (members, by away credits) and the host club's own ticket office. flights: direct from CPH unless noted.
+var MU_AWAY="https://tickets.manutd.com/en-GB/categories/away-tickets";
+var AWAY=[
+ {opp:"Liverpool",away:true,comp:"Premier League",ko:"2026-11-22T16:30:00Z",venue:"Anfield",city:"Liverpool",col:"#C8102E",fg:"#fff",dest:"MAN",destNote:"Manchester (MAN), then 50 min by train to Lime Street",ug:1.3,og:1.6,glam:3,ticket:30,
+  sale:"Not yet on sale — United's PL away allocation (~3,000) goes to members by away credits about a month out",
+  tickets:[{l:"Man Utd away tickets (members)",u:MU_AWAY},{l:"Liverpool FC ticket office",u:"https://www.liverpoolfc.com/tickets"}],
+  flights:[{l:"easyJet U22238 · out 10:25 to MAN, home next day",usd:238},{l:"Ryanair UK RK6880 · out 12:35 to MAN, home next day",usd:332}],
+  hotels:[{n:"The Halyard Liverpool, Vignette Collection (4★, 4.7)",usd:144,d:true},{n:"Hard Days Night Hotel (4★)",usd:160},{n:"19 Duke Street (4★)",usd:142},{n:"Aparthotel Adagio Liverpool City Centre (4★)",usd:142},{n:"Cove Paradise Street, Liverpool ONE (4★)",usd:106},{n:"Duke Street Boutique Hotel (4★)",usd:90}]},
+ {opp:"Sporting CP",away:true,comp:"Champions League",ko:"2026-11-25T20:00:00Z",venue:"Estádio José Alvalade",city:"Lisbon",col:"#008056",fg:"#fff",dest:"LIS",destNote:"Lisbon (LIS), metro 20 min to Campo Grande / the stadium",ug:1.5,og:1.2,glam:2,ticket:33,
+  sale:"Sold out — members' ballot closed 27 Oct; 2,650 tickets at £33, all with 4+ credits successful",
+  tickets:[{l:"Man Utd away page (ballot result / returns)",u:MU_AWAY},{l:"Sporting CP ticket office",u:"https://tickets.sporting.pt/"}],
+  flights:[{l:"TAP TP757 · out 06:00, home next day",usd:333},{l:"TAP TP753 · out 12:40, home next day",usd:357}],
+  hotels:[{n:"1908 Lisboa Hotel (4★, 4.7)",usd:121,d:true},{n:"Dom Pedro Lisboa, Radisson Individuals (5★)",usd:135},{n:"Hotel Lisboa, Av. Liberdade (4★)",usd:100},{n:"Hotel Mundial (4★)",usd:106},{n:"WC by The Beautique Hotels (4★)",usd:89},{n:"Feeling Chiado 15 (4★)",usd:77},{n:"Czar Lisbon Hotel (4★)",usd:74}]},
+ {opp:"Newcastle United",away:true,comp:"Premier League",ko:"2026-12-02T20:15:00Z",venue:"St James' Park",city:"Newcastle",col:"#241F20",fg:"#fff",stripe:"#fff",dest:"MAN",destNote:"Manchester (MAN), then 2 h 30 by train to Newcastle (no direct CPH–NCL)",ug:1.4,og:1.4,glam:2,ticket:30,
+  sale:"Not yet on sale — members' away sale by credits, about a month out; £30 PL away cap",
+  tickets:[{l:"Man Utd away tickets (members)",u:MU_AWAY},{l:"Newcastle United ticket office",u:"https://www.newcastleunited.com/tickets/"}],
+  flights:[{l:"Ryanair FR6880 · out 06:55 to MAN, home next day",usd:115},{l:"easyJet U22236 · out 10:35 to MAN, home next day",usd:152}],
+  hotels:[{n:"Hotel du Vin Newcastle (4★, 4.5)",usd:172,d:true},{n:"Dakota Hotel Newcastle (5★, 4.8)",usd:287},{n:"Hilton Newcastle Tyne Bridge (4★)",usd:197},{n:"Staybridge Suites Newcastle (4★)",usd:179},{n:"Roomzzz Aparthotel Newcastle City (4★)",usd:134},{n:"The Caledonian Hotel (4★)",usd:101}]},
+ {opp:"Crystal Palace",away:true,comp:"Premier League",ko:"2026-12-13T19:00:00Z",venue:"Selhurst Park",city:"London",col:"#1B458F",fg:"#fff",stripe:"#C4122E",dest:"LOND",destNote:"London (STN or LGW), then train to Selhurst / Norwood Junction",ug:1.6,og:1.0,glam:1,ticket:30,
+  sale:"Not yet on sale — members' away sale by credits, about a month out; £30 PL away cap",
+  tickets:[{l:"Man Utd away tickets (members)",u:MU_AWAY},{l:"Crystal Palace ticket office",u:"https://www.cpfc.co.uk/tickets/"}],
+  flights:[{l:"Ryanair FR2619 · out 06:55 to STN, home next day",usd:58},{l:"Ryanair FR2882 · out 09:40 to STN, home next day",usd:89},{l:"easyJet U28720 · out 10:25 to LGW (easy for Selhurst), home next day",usd:153}],
+  hotels:[{n:"The Belgrave, Victoria (4★, 4.5)",usd:148,d:true},{n:"citizenM London Victoria Station (4★)",usd:185},{n:"The July London Victoria (4★, 4.8)",usd:252},{n:"Park Plaza Victoria London (4★)",usd:214},{n:"The Wellington by Blue Orchid (4★)",usd:156}]},
+ {opp:"Arsenal",away:true,comp:"Premier League",ko:"2026-12-20T16:30:00Z",venue:"Emirates Stadium",city:"London",col:"#EF0107",fg:"#fff",dest:"LOND",destNote:"London (STN), then train to Liverpool Street and tube to Arsenal / Holloway Road",ug:1.2,og:1.7,glam:3,ticket:30,
+  sale:"Not yet on sale — members' away sale by credits, about a month out; £30 PL away cap",
+  tickets:[{l:"Man Utd away tickets (members)",u:MU_AWAY},{l:"Arsenal ticket office",u:"https://www.arsenal.com/tickets/all"}],
+  flights:[{l:"Ryanair FR2619 · out 06:55 to STN, home next day",usd:108},{l:"Ryanair FR2882 · out 09:40 to STN, home next day",usd:110}],
+  hotels:[{n:"The Megaro, King's Cross (5★)",usd:218,d:true},{n:"St. Pancras London, Autograph Collection (5★)",usd:366},{n:"The Suites, St Pancras Hotel Group (4★, 4.7)",usd:253},{n:"The House of Toby, King's Cross (4★)",usd:214}]},
+ {opp:"Brighton & Hove Albion",away:true,comp:"Premier League",ko:"2027-01-02T12:30:00Z",venue:"Amex Stadium",city:"Brighton",col:"#0057B8",fg:"#fff",stripe:"#fff",dest:"LGW",destNote:"London Gatwick (LGW), 30 min by train to Brighton; Falmer is 9 min on from there",ug:1.5,og:1.1,glam:1,ticket:30,
+  sale:"Not yet on sale — members' away sale by credits, about a month out; £30 PL away cap",
+  tickets:[{l:"Man Utd away tickets (members)",u:MU_AWAY},{l:"Brighton & Hove Albion ticket office",u:"https://www.brightonandhovealbion.com/tickets"}],
+  flights:[{l:"Norwegian D83510 · out 07:10 New Year's Day, home after the game",usd:106},{l:"Norwegian D83512 · out 09:40 New Year's Day, home after the game",usd:150},{l:"easyJet U28724 · out 20:40 New Year's Day, home after the game",usd:139}],
+  hotels:[{n:"Maldron Hotel Brighton City Centre (4★, 4.6)",usd:94,d:true},{n:"The Grand Brighton (5★)",usd:142},{n:"Hotel Pelirocco (4★, 4.8)",usd:99},{n:"Sea Spray Brighton (4★)",usd:121},{n:"A Room With A View, seafront (5★ B&B)",usd:84},{n:"Mercure Brighton Seafront (4★)",usd:70}]},
+ {opp:"Aston Villa",away:true,comp:"Premier League",ko:"2027-01-16T15:00:00Z",venue:"Villa Park",city:"Birmingham",col:"#670E36",fg:"#95BFE5",dest:"MAN",destNote:"Manchester (MAN), then 1 h 30 by train to Birmingham New Street; Witton is 10 min on",ug:1.5,og:1.3,glam:2,ticket:30,sameDay:false,
+  sale:"Not yet on sale — members' away sale by credits, about a month out; £30 PL away cap",
+  tickets:[{l:"Man Utd away tickets (members)",u:MU_AWAY},{l:"Aston Villa ticket office",u:"https://tickets.avfc.co.uk/"}],
+  flights:[{l:"Ryanair FR6880 · out 06:10 to MAN, home Sun morning",usd:52}],
+  hotels:[{n:"Crowne Plaza Birmingham City Centre (4★)",usd:113,d:true},{n:"Hyatt Regency Birmingham (4★)",usd:171},{n:"Hilton Garden Inn Brindleyplace (4★)",usd:122},{n:"Staybridge Suites Birmingham (4★)",usd:104},{n:"Novotel Birmingham Centre (4★)",usd:101},{n:"Hotel Holloway (5★, 4.6)",usd:91}]},
+ {opp:"Villarreal",away:true,comp:"Champions League",ko:"2027-01-27T20:00:00Z",venue:"Estadio de la Cerámica",city:"Valencia",col:"#FFE667",fg:"#1a1a1a",dest:"VLC",destNote:"Valencia (VLC); Villarreal is 50 min by train from València Nord. No direct flight that week — 1 stop via Amsterdam",ug:1.5,og:1.1,glam:2,ticket:35,
+  sale:"Members' ballot opens by 8am Thu 17 Dec, closes 8am Tue 22 Dec (Executive Club, Season Ticket Holders, Official Members)",
+  tickets:[{l:"Man Utd away tickets — apply in the ballot",u:MU_AWAY},{l:"Villarreal CF ticket office",u:"https://villarrealcf.es/en/tickets/"}],
+  flights:[{l:"KLM + Transavia via AMS · out 09:55→15:10 (1 stop), home next day",usd:213}],
+  hotels:[{n:"The Valentia Cabillers (4★, 4.6)",usd:115,d:true},{n:"Meliá Valencia (4★)",usd:120},{n:"The Valentia Corretgeria (4★, 4.7)",usd:120},{n:"Hotel Boutique SH Inglés (4★)",usd:113},{n:"One Shot Reina Victoria (4★)",usd:96},{n:"Fetén (4★, 4.8)",usd:95},{n:"Petit Palace El Remei (4★)",usd:93}]},
+ {opp:"Brentford",away:true,comp:"Premier League",ko:"2027-01-30T15:00:00Z",venue:"Gtech Community Stadium",city:"London",col:"#E30613",fg:"#fff",stripe:"#fff",dest:"LOND",destNote:"London (STN/LHR); Kew Bridge is 35 min from Waterloo. Evening flights home make a day trip possible",ug:1.7,og:1.1,glam:1,ticket:30,sameDay:true,
+  sale:"Not yet on sale — members' away sale by credits, about a month out; £30 PL away cap",
+  tickets:[{l:"Man Utd away tickets (members)",u:MU_AWAY},{l:"Brentford FC ticket information",u:"https://www.brentfordfc.com/en/ticket-information"}],
+  flights:[{l:"Ryanair FR7395 · out 09:25 to STN, home that evening or next day",usd:51},{l:"Ryanair FR7383 · out 11:35 to STN (tight), home next day",usd:77},{l:"British Airways BA819 · out 06:10 to LHR, home next day",usd:191}],
+  hotels:[{n:"Wilde Aparthotels Paddington (4★, 4.8)",usd:212,d:true},{n:"Hilton London Metropole (4★)",usd:189},{n:"The Westbourne Hyde Park (4★)",usd:152},{n:"The Pilgrm Hotel Paddington (4★)",usd:146},{n:"Mercure London Paddington (4★)",usd:144}]}
+];
+AWAY.forEach(function(a){FIX.push(a)}); FIX.sort(function(a,b){return a.ko<b.ko?-1:1});
 var HOTELS={"football":{"id":"ChgIqM7t5JD-987jARoLL20vMDEzZGcwZzUQAQ","n":"Hotel Football, Old Trafford (Tribute Portfolio, stadium views)","g":"Hotel Football & near the ground"},"hgi":{"id":"ChoIhrzjp46HhtOQARoNL2cvMTFkZmxjdGw2bBAB","n":"Hilton Garden Inn, Emirates Old Trafford (tram 2 min)","g":"Hotel Football & near the ground"},"ac":{"id":"ChcI7oqWmbLL3tsXGgsvZy8xdm1yMHk5ZBAB","n":"AC Hotel Salford Quays (Marriott)","g":"Hotel Football & near the ground"},"copthorne":{"id":"ChcI1sjco9exsdprGgsvZy8xdHo3NWo4dhAB","n":"Copthorne Salford Quays","g":"Hotel Football & near the ground"},"hi_media":{"id":"ChkImrTQicn07O2aARoML2cvMTJoazVrMW1wEAE","n":"Holiday Inn MediaCityUK","g":"Hotel Football & near the ground"},"stock_exchange":{"id":"ChkIwNuD6qjXhZZHGg0vZy8xMWJ3Z3ZmOWN3EAE","n":"Stock Exchange Hotel (Autograph Collection)","g":"Marriott family"},"marriott_picc":{"id":"ChcIu5LrjtiQxOY3GgsvZy8xdHI3aHloZhAB","n":"Manchester Marriott Piccadilly","g":"Marriott family"},"marriott_va":{"id":"ChgIq7_am9yW-eXyARoLL2cvMXRmMnJzZmIQAQ","n":"Manchester Marriott Victoria & Albert","g":"Marriott family"},"reach":{"id":"ChoIoKDwga3T3bb4ARoNL2cvMTFzZHBfMG5qcxAB","n":"The Reach at Piccadilly (Tribute Portfolio)","g":"Marriott family"},"residence_inn":{"id":"ChoIt-300LDQ5O_eARoNL2cvMTFzaGp4N2IzMxAB","n":"Residence Inn by Marriott Piccadilly","g":"Marriott family"},"aloft":{"id":"ChoI0MCms9_qxqTXARoNL2cvMTFucWxtNGZjYhAB","n":"Aloft Manchester City Centre (Marriott)","g":"Marriott family"},"lowry":{"id":"ChUI1obFlKvKoPclGgkvbS8wMms4bTIQAQ","n":"The Lowry Hotel ★5","g":"High-end, city centre"},"edwardian":{"id":"ChoIh5Gy6PbL-NjOARoNL2cvMTFiNzdweW4xaBAB","n":"The Edwardian Manchester ★5","g":"High-end, city centre"},"dakota":{"id":"ChoI3bTCndmih7WtARoNL2cvMTFneF9nY3Z6ORAB","n":"Dakota Manchester ★5","g":"High-end, city centre"},"kimpton":{"id":"ChUI0POh4pHBmMoMGgkvbS8wZjloNGIQAQ","n":"Kimpton Clocktower ★5","g":"High-end, city centre"},"rex":{"id":"ChoImKTg_PGt38SuARoNL2cvMTFidHRrcTk2axAB","n":"The Rex (ex Hotel Gotham) ★5","g":"High-end, city centre"},"midland":{"id":"ChYIjYjIocHive30ARoJL20vMDNoXzN4EAE","n":"The Midland","g":"High-end, city centre"},"hyatt":{"id":"ChoInPmHg4C0vpjcARoNL2cvMTFnYmZieDl2ORAB","n":"Hyatt Regency Manchester","g":"High-end, city centre"},"treehouse":{"id":"ChoImN643YvDooP-ARoNL2cvMTF0M2YzaHJyNhAB","n":"Treehouse Hotel Manchester","g":"High-end, city centre"},"innside":{"id":"ChoI49rg44n85bahARoNL2cvMTFiYzh4aDV5axAB","n":"INNSiDE by Meliá","g":"High-end, city centre"},"mollies":{"id":"ChoIrMn5s5in2ZHwARoNL2cvMTFycTEwYzlkZxAB","n":"Mollie's Manchester","g":"Other 4-star, city centre"},"indigo":{"id":"ChoI1Pe5trKOk8biARoNL2cvMTFmNmZ3d2NwdhAB","n":"Hotel Indigo, Victoria Station","g":"Other 4-star, city centre"},"leven":{"id":"ChkI77O23vy4ubd_Gg0vZy8xMW5ucl9jc2NrEAE","n":"Leven Manchester","g":"Other 4-star, city centre"},"wilde":{"id":"ChoIvqzb5-TMgra9ARoNL2cvMTFwdzFoejNtcRAB","n":"Wilde Aparthotels, City Centre","g":"Other 4-star, city centre"},"doubletree":{"id":"ChcIkdm9vJD68OYWGgsvZy8xdGRjNHNndhAB","n":"DoubleTree by Hilton, Piccadilly","g":"Other 4-star, city centre"},"radisson_cc":{"id":"ChcI6NKsgZyJ45dIGgsvZy8xdG1wZGd3cRAB","n":"Radisson Manchester City Centre","g":"Other 4-star, city centre"},"radisson_blu":{"id":"ChoIg7acpJGXtZ7eARoNL2cvMTF5X3lfOG1uYhAB","n":"Radisson Blu Medlock (by the Etihad)","g":"Other 4-star, city centre"},"crowne":{"id":"ChcIwcKs-veJ74deGgsvZy8xdnluM2RzORAB","n":"Crowne Plaza City Centre","g":"Other 4-star, city centre"},"hyatt_house":{"id":"ChoI35myqO-X1a-IARoNL2cvMTFmM3kzNjl5eBAB","n":"Hyatt House Manchester","g":"Other 4-star, city centre"},"deansgate":{"id":"ChkI6Jn5t8CIosspGg0vZy8xMXhzN3pnd3luEAE","n":"The Manchester Deansgate Hotel","g":"Other 4-star, city centre"},"alan":{"id":"ChoIna-WxrPe7Za2ARoNL2cvMTFyX3F4MTJjMhAB","n":"The Alan","g":"Other 4-star, city centre"},"cow_hollow":{"id":"ChkImefFgLfb_NU5Gg0vZy8xMWYzd2Jnd2tuEAE","n":"The Cow Hollow Hotel","g":"Other 4-star, city centre"},"brewdog":{"id":"ChoInt2f-r3R367sARoNL2cvMTFuN2RjZzhmNxAB","n":"BrewDog Doghouse","g":"Other 4-star, city centre"},"velvet":{"id":"ChgInITCy_TyytGSARoLL2cvMXRkMjl3cWQQAQ","n":"Velvet Hotel, Canal Street","g":"Other 4-star, city centre"},"leonardo":{"id":"ChkIy9qs_bW10fJnGg0vZy8xMXB0dl9ieHQ2EAE","n":"Leonardo Hotel Piccadilly","g":"Other 4-star, city centre"},"citysuites":{"id":"ChkI1KehlpiOms1MGg0vZy8xMXJfbTZ4MDN5EAE","n":"CitySuites II Aparthotel ★5","g":"Other 4-star, city centre"},"heathcote":{"id":"ChcIkcjnkPCc2MOOARoKL20vMG40OW0yehAB","n":"Heathcote Hotel","g":"Other 4-star, city centre"},"maldron":{"id":"ChkIgoiPscaa8Ph5Gg0vZy8xMXE4azNxcGhqEAE","n":"Maldron City Centre","g":"Other 4-star, city centre"}};
 // Per-night USD, 1 adult, cheapest room, 4-star and up; checked on SlickTrip 29 Oct 2026 for each fixture night. Hotel Football is always listed; null = no price released yet.
 var HOTELSCOM_IDS={"football":"ho470859","hgi":"ho204169","ac":"ho278375","stock_exchange":"ho1241940384","aloft":"ho3935543264","hyatt":"ho629725216","hyatt_house":"ho623676480","indigo":"ho871307680","doubletree":"ho254899","radisson_blu":"ho4028266400","dakota":"ho1082808800","innside":"ho512127","mollies":"ho3294687520","alan":"ho222389","cow_hollow":"ho720634112","heathcote":"ho246925","velvet":"ho320511","deansgate":"ho3832667488"};
@@ -235,9 +296,9 @@ function viewUrl(code){return "https://preview.3ddigitalvenue.com/manutd?view_id
 function availFor(f){var raw=AVAIL[f.opp]||""; if(!raw)return []; return raw.split(" ").map(function(t){var p=t.split(":");return {code:p[0],price:parseFloat(p[1]),info:blockInfo(p[0])}}).filter(function(b){return b.info})}
 function addDays(iso,n){var d=new Date(iso+"T12:00:00Z"); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10)}
 function tripDates(f,nights){var ko=new Date(f.ko), day=ko.toISOString().slice(0,10), plan=planFor(f); var dep=plan.kind==="before"?addDays(day,-1):day; var ret=addDays(dep,Math.max(nights,0)); return {dep:dep,ret:ret}}
-function flightLink(f,nights){var t=tripDates(f,nights); return "https://slicktrip.com/flights?key="+encodeURIComponent("CPH;MAN;economy;1;"+t.dep+";"+t.ret)+"&stops=0"}
+function flightLink(f,nights){var t=tripDates(f,nights); return "https://slicktrip.com/flights?key="+encodeURIComponent("CPH;"+(f.dest||"MAN")+";economy;1;"+t.dep+";"+t.ret)+(f.dest==="VLC"?"":"&stops=0")}
 function hotelLink(f,nights){var t=tripDates(f,nights); return "https://slicktrip.com/hotels?key="+encodeURIComponent("Old-Trafford,-Manchester,-UK;"+t.dep+";"+t.ret+";1;0")}
-function ticketLink(f,code){var base="https://tickets.manutd.com/en-GB/events/"+(EVENTS[f.opp]||"")+"/old%20trafford"; var id=code?areaId(code):null; return id?base+"?area="+id+"&type=&sb2m=1":base+"?hallmap"}
+function ticketLink(f,code){if(f.away)return f.tickets[0].u; var base="https://tickets.manutd.com/en-GB/events/"+(EVENTS[f.opp]||"")+"/old%20trafford"; var id=code?areaId(code):null; return id?base+"?area="+id+"&type=&sb2m=1":base+"?hallmap"}
 var NORMALS={10:{t:13,rain:.45},11:{t:9,rain:.5},0:{t:7,rain:.5},1:{t:8,rain:.45},2:{t:10,rain:.4},3:{t:13,rain:.4},4:{t:16,rain:.4},5:{t:19,rain:.4},6:{t:21,rain:.4},7:{t:20,rain:.4},8:{t:18,rain:.4},9:{t:14,rain:.45}};
 var DEF={ground:45,food:60,fx:0.76};
 var $=function(id){return document.getElementById(id)};
@@ -258,9 +319,10 @@ function planFor(f){
   if(h<16){ if(f.sameDay===false)return {kind:"sameday-fail",label:"Fly in and out the same day",nights:1}; return {kind:"sameday",label:"Fly in and out the same day",nights:0} }
   return {kind:"evening",label:"Fly in on the day, stay the night",nights:1};
 }
-function hotelsFor(f){var night=tripDates(f,1).dep; var pr=Object.assign({},HOTEL_PRICES[night]||{}); if(!("football" in pr))pr.football=null; return Object.keys(pr).map(function(k){var h=HOTELS[k];return {key:k,id:h.id,n:h.n,g:h.g,usd:pr[k],night:night}}).sort(function(a,b){return (a.usd==null?1e9:a.usd)-(b.usd==null?1e9:b.usd)})}
+function hotelsFor(f){var night=tripDates(f,1).dep; if(f.away){return f.hotels.map(function(h,i){return {key:"a"+i,n:h.n,g:h.city||f.city,usd:h.usd,night:night,q:h.n.replace(/\s*\(.*?\)/g,"")+", "+f.city,d:!!h.d}})} var pr=Object.assign({},HOTEL_PRICES[night]||{}); if(!("football" in pr))pr.football=null; return Object.keys(pr).map(function(k){var h=HOTELS[k];return {key:k,id:h.id,n:h.n,g:h.g,usd:pr[k],night:night}}).sort(function(a,b){return (a.usd==null?1e9:a.usd)-(b.usd==null?1e9:b.usd)})}
 function hotelPageLink(h,f,nights){
   var t=tripDates(f,nights), id=HOTELSCOM_IDS[h.key];
+  if(h.q) return "https://www.hotels.com/Hotel-Search?destination="+encodeURIComponent(h.q)+"&startDate="+t.dep+"&endDate="+t.ret+"&adults=1&rooms=1";
   if(id) return "https://www.hotels.com/"+id+"/?chkin="+t.dep+"&chkout="+t.ret+"&rm1=a1";
   var q=HOTELSCOM_NAMES[h.key]||h.n.replace(/\s*\(.*?\)/g,"");
   return "https://www.hotels.com/Hotel-Search?destination="+encodeURIComponent(q+", Manchester")+"&startDate="+t.dep+"&endDate="+t.ret+"&adults=1&rooms=1";
@@ -272,8 +334,9 @@ function buildRail(){
   var now=new Date();
   FIX.forEach(function(f,i){
     var d=new Date(f.ko), b=document.createElement("button");
-    b.className="fx"+(d<now?" past":""); b.setAttribute("role","option"); b.setAttribute("aria-pressed",i===sel?"true":"false");
-    b.innerHTML='<div class="d">'+fmtDate(d)+'</div><div class="o">'+f.opp+'</div><div class="k">'+(f.tbc?"TBC · ":"")+fmtUK(d)+' UK · '+fmtSE(d)+' SE</div><span class="c">'+f.comp+'</span>';
+    b.className="fx"+(d<now?" past":"")+(f.away?" away":""); b.setAttribute("role","option"); b.setAttribute("aria-pressed",i===sel?"true":"false");
+    if(f.away){b.style.setProperty("--fc",f.col); b.style.setProperty("--ft",f.fg||"#fff"); if(f.stripe)b.style.setProperty("--fs",f.stripe)}
+    b.innerHTML='<div class="d">'+fmtDate(d)+(f.away?' · <b>Away</b>':'')+'</div><div class="o">'+f.opp+'</div><div class="k">'+(f.tbc?"TBC · ":"")+fmtUK(d)+' UK · '+fmtSE(d)+' SE</div><span class="c">'+f.comp+(f.away?' · '+f.venue:'')+'</span>';
     b.addEventListener("click",function(){sel=i;buildRail();pick()});
     rail.appendChild(b);
   });
@@ -301,15 +364,24 @@ function render(){
   var hl=hotelsFor(f), h=null; hl.forEach(function(x){if(x.key===$("hotel").value)h=x}); if(!h)h=hl[0]||null; var hp={usd:h?h.usd:0};
   var nights=Math.max(0,Math.round(num("nights")));
   var flightG=fl.usd*fx(), hotelG=nights*hp.usd*fx();
-  var blk=currentBlock(f);
-  var ticket=blk?blk.price:0;
+  var blk=f.away?null:currentBlock(f);
+  var ticket=f.away?num("awayTicket"):(blk?blk.price:0);
+  document.body.classList.toggle("is-away",!!f.away);
+  $("flightSub").textContent=f.away?("Direct CPH–"+(f.dest==="LOND"?"London":f.dest)+(f.dest==="VLC"?" (1 stop)":"")+", 1 adult, economy"):"Direct CPH–MAN, 1 adult, economy";
+  $("groundSub").textContent=f.away?("Vellinge–CPH, "+(f.destNote||"")):"Vellinge–CPH, MAN airport–town, to the ground";
   $("ticketCost").textContent=blk?gbp(ticket):"—";
   $("ticketLine").textContent=blk?blk.code+" · "+blk.info.stand+", "+blk.info.tierName.toLowerCase():(f.sale||"No tickets on sale");
+  if(f.away){
+    $("awayTicketSub").textContent=f.comp==="Premier League"?"Premier League caps away tickets at £30":"Set by the host club; United's price is shown when the allocation is announced";
+    $("awaySale").textContent=f.sale||"";
+    $("awayInfo").innerHTML="<dt>Ground</dt><dd>"+f.venue+", "+f.city+"</dd><dt>Away end</dt><dd>United's allocation, sold by away credits to members</dd><dt>Getting there</dt><dd>"+(f.destNote||"")+"</dd>";
+    $("awayLinks").innerHTML=f.tickets.map(function(t,i){return '<li><a href="'+t.u+'" target="_blank" rel="noopener">'+(i+1)+' · '+t.l+'<span>opens in a new tab</span></a></li>'}).join("");
+  }
   var total=ticket+flightG+hotelG+num("ground")+num("food");
   var ug=num("ug"), og=num("og"), goals=ug+og;
 
   // plan block
-  var dl=$("plan"), planHtml='<dt>Plan</dt><dd>'+plan.label+(plan.kind==="sameday-fail"?' <span class="flag">— not possible: the last direct flight home that day leaves at 07:40, before kick-off. Falling back to one night.</span>':'')+'</dd>';
+  var dl=$("plan"), planHtml=(f.away?'<dt>Match</dt><dd>'+f.opp+' v Manchester United · '+f.venue+', '+f.city+'</dd>':'')+'<dt>Plan</dt><dd>'+plan.label+(plan.kind==="sameday-fail"?' <span class="flag">— not possible: the last direct flight home that day leaves at 07:40, before kick-off. Falling back to one night.</span>':'')+'</dd>';
   planHtml+='<dt>Kick-off</dt><dd>'+fmtDate(d)+' · '+fmtUK(d)+' UK / '+fmtSE(d)+' Swedish'+(f.tbc?' <span class="flag">(TBC)</span>':'')+'</dd>';
   planHtml+='<dt>Nights</dt><dd>'+nights+(nights!==plan.nights?' (plan says '+plan.nights+')':'')+'</dd>';
   dl.innerHTML=planHtml;
@@ -323,11 +395,11 @@ function render(){
   var fL=flightLink(f,nights), hL=hotelLink(f,nights), tL=ticketLink(f,blk?blk.code:null);
   $("bookFlight").href=fL; $("bn2").href=fL;
   if(h){hL=hotelPageLink(h,f,nights)} $("bookHotel").href=hL; $("bn3").href=hL; $("bookHotel").setAttribute("aria-disabled",nights?"false":"true"); $("bn3").style.display=nights?"":"none";
-  $("bookTicket").href=tL; $("bn1").href=tL; $("bookTicket").textContent=blk?"Buy":(f.sale&&/ballot/i.test(f.sale)?"Apply":"Open");
+  $("bookTicket").href=tL; $("bn1").href=tL; $("bookTicket").textContent=blk?"Buy":(f.sale&&/ballot/i.test(f.sale)?"Apply":"Open"); $("bn1").textContent=f.away?"1 · Away ticket":"1 · Ticket";
   var td=tripDates(f,nights);
-  $("bookNote").textContent="Ticket first (seats go), then flights, then the bed. Flights and hotel open SlickTrip pre-set to CPH–MAN, "+td.dep+(nights?" to "+td.ret:" day return")+", 1 adult; pick the seller and pay on their site. The ticket link opens this fixture's seating plan on tickets.manutd.com under your members' login; it lands on block "+(blk?blk.code:"")+"'s seat map so you pick the exact row and seat.";
+  $("bookNote").textContent=f.away?("Away ticket first — it is the scarce part. Flights open SlickTrip pre-set to CPH–"+(f.dest||"MAN")+", "+td.dep+(nights?" to "+td.ret:" day return")+", 1 adult; the hotel opens hotels.com in "+f.city+" with these dates. "+(f.destNote||"")+"."):"Ticket first (seats go), then flights, then the bed. Flights and hotel open SlickTrip pre-set to CPH–MAN, "+td.dep+(nights?" to "+td.ret:" day return")+", 1 adult; pick the seller and pay on their site. The ticket link opens this fixture's seating plan on tickets.manutd.com under your members' login; it lands on block "+(blk?blk.code:"")+"'s seat map so you pick the exact row and seat.";
 
-  window.__verdict="Man Utd v "+f.opp+" ("+f.comp+"), "+fmtDate(d)+" "+fmtUK(d)+" UK. "+plan.label+". Seat: "+(blk?blk.code+" ("+blk.info.stand+", "+blk.info.tierName.toLowerCase()+", "+blk.info.pos+") £"+blk.price:"none on sale")+". "+fl.l+"; "+(nights?h.n+" × "+nights:"no hotel")+". All-in "+gbp(total)+".";
+  window.__verdict=(f.away?f.opp+" v Man Utd":"Man Utd v "+f.opp)+" ("+f.comp+"), "+fmtDate(d)+" "+fmtUK(d)+" UK. "+plan.label+". Seat: "+(blk?blk.code+" ("+blk.info.stand+", "+blk.info.tierName.toLowerCase()+", "+blk.info.pos+") £"+blk.price:"none on sale")+". "+fl.l+"; "+(nights?h.n+" × "+nights:"no hotel")+". All-in "+gbp(total)+".";
 }
 
 function currentBlock(f){var list=availFor(f); var v=$("block").value; for(var i=0;i<list.length;i++){if(list[i].code===v)return list[i]} return null}
@@ -368,19 +440,19 @@ function fillSelects(f){
   list.sort(function(a,b){return (a.key==="football"?-1:0)-(b.key==="football"?-1:0)});
   list.forEach(function(h){var g=groups[h.g]||(groups[h.g]=document.createElement("optgroup"),groups[h.g].label=h.g,groups[h.g]);var op=document.createElement("option");op.value=h.key;op.textContent=h.n+(h.usd==null?" — no price released yet (check live)":" — $"+h.usd);g.appendChild(op)});
   ["Hotel Football & near the ground","Marriott family","High-end, city centre","Other 4-star, city centre"].forEach(function(k){if(groups[k])hs.appendChild(groups[k])});
+  Object.keys(groups).forEach(function(k){if(!groups[k].parentNode)hs.appendChild(groups[k])});
+  if(f.away){var dflt=list.filter(function(h){return h.d})[0]||list[0]; if(dflt)hs.value=dflt.key; return}
   // default: Hotel Football when it has a price, else cheapest priced Marriott, else cheapest priced
   var pick=list.filter(function(h){return h.key==="football"&&h.usd!=null})[0]||list.filter(function(h){return h.usd!=null&&/Marriott|Tribute|Autograph|Aloft|Residence/.test(h.n)})[0]||list.filter(function(h){return h.usd!=null})[0]; if(pick)hs.value=pick.key;
 }
-function pick(){var f=FIX[sel];$("ug").value=f.ug;$("og").value=f.og;$("nights").value=planFor(f).nights;fillSelects(f);fillBlocks(f,false);wx=null;loadWeather(f)}
+function pick(){var f=FIX[sel];$("ug").value=f.ug;$("og").value=f.og;$("nights").value=planFor(f).nights;if(f.away)$("awayTicket").value=f.ticket||30;fillSelects(f);if(!f.away)fillBlocks(f,false);wx=null;loadWeather(f)}
 
 // ---- wiring -----------------------------------------------------------
-["ground","food","fx","nights","ug","og","flight","hotel"].forEach(function(id){$(id).addEventListener("input",render)});
-$("block").addEventListener("change",function(){updateViewer(FIX[sel]);render()});
-["fLower","fSide","fCheap"].forEach(function(id){$(id).addEventListener("change",function(){fillBlocks(FIX[sel],true);render()})});
+["ground","food","fx","nights","ug","og","flight","hotel","awayTicket"].forEach(function(id){$(id).addEventListener("input",render)});
+$("block").addEventListener("change",function(){if(!FIX[sel].away)updateViewer(FIX[sel]);render()});
+["fLower","fSide","fCheap"].forEach(function(id){$(id).addEventListener("change",function(){if(!FIX[sel].away)fillBlocks(FIX[sel],true);render()})});
 var now=new Date(); for(var i=0;i<FIX.length;i++){if(new Date(FIX[i].ko)>now){sel=i;break}}
 buildRail(); pick();
 })();
 </script>
-
-</body>
-</html>
+</body></html>
