@@ -47,6 +47,7 @@ export default {
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + "/manutd/trips/", 301);
     if (url.pathname.startsWith("/img/player/")) return portrait(url, ctx);
     if (url.pathname === "/feed") return feed(url, env, ctx);
+    if (url.pathname === "/wiki") return wiki(url, env, ctx);
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
 
     const route = ROUTES[url.pathname];
@@ -180,3 +181,78 @@ function parseFeed(xml) {
   return out;
 }
 function clean(s) { return s.replace(/^\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*$/, "$1").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").trim(); }
+
+// ---- Wikipedia player profile → JSON (summary + parsed football-biography infobox), cached 7 days.
+async function wiki(url, env, ctx) {
+  let title = (url.searchParams.get("title") || "").trim(), q = (url.searchParams.get("q") || "").trim();
+  if (!title && !q) return json({ error: "title or q required" }, 400);
+  const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
+  if (!title) {
+    // Resolve an abbreviated name ("K. Mainoo") to an article title via search.
+    const qkey = "wiki:q:v1:" + q.toLowerCase();
+    let hit = await env.MU_CACHE.get(qkey);
+    if (!hit) {
+      const r = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=1&srsearch=" + encodeURIComponent(q.replace(/^([A-Z])\. /, "$1* ") + " Manchester United footballer"), { headers: UA });
+      const j = r.ok ? await r.json() : null;
+      hit = j && j.query && j.query.search[0] ? j.query.search[0].title : "";
+      if (hit) ctx.waitUntil(env.MU_CACHE.put(qkey, hit, { expirationTtl: 30 * 86400 }));
+    }
+    if (!hit) return json({ error: "not found", q }, 404);
+    title = hit;
+  }
+  const key = "wiki:p:v1:" + title;
+  const cached = await env.MU_CACHE.get(key);
+  if (cached) return new Response(cached, { headers: headers("kv-hit") });
+  const enc = encodeURIComponent(title.replace(/ /g, "_"));
+  const [sr, wr] = await Promise.all([
+    fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + enc, { headers: UA }),
+    fetch("https://en.wikipedia.org/w/api.php?action=parse&format=json&prop=wikitext&redirects=1&page=" + enc, { headers: UA }),
+  ]);
+  const sum = sr.ok ? await sr.json() : {};
+  const wj = wr.ok ? await wr.json() : {};
+  const wt = wj.parse && wj.parse.wikitext ? wj.parse.wikitext["*"] : "";
+  const box = parseInfobox(wt);
+  const out = { title: sum.title || title, description: sum.description || "", extract: sum.extract || "", thumbnail: sum.thumbnail ? sum.thumbnail.source : "", original: sum.originalimage ? sum.originalimage.source : "", url: sum.content_urls ? sum.content_urls.desktop.page : "https://en.wikipedia.org/wiki/" + enc, infobox: box };
+  const body = JSON.stringify(out);
+  if (sum.title) ctx.waitUntil(env.MU_CACHE.put(key, body, { expirationTtl: 7 * 86400 }));
+  return new Response(body, { headers: headers(sum.title ? "upstream" : "upstream-empty") });
+}
+function parseInfobox(wt) {
+  const i = wt.search(/\{\{\s*Infobox football biography/i);
+  if (i < 0) return null;
+  let depth = 0, j = i;
+  for (; j < wt.length; j++) { if (wt.startsWith("{{", j)) { depth++; j++; } else if (wt.startsWith("}}", j)) { depth--; j++; if (depth === 0) break; } }
+  const body = wt.slice(i + 2, j - 1);
+  const parts = []; let cur = "", d = 0, b = 0;
+  for (let k = 0; k < body.length; k++) {
+    const c2 = body.substr(k, 2);
+    if (c2 === "{{") { d++; cur += c2; k++; continue; } if (c2 === "}}") { d--; cur += c2; k++; continue; }
+    if (c2 === "[[") { b++; cur += c2; k++; continue; } if (c2 === "]]") { b--; cur += c2; k++; continue; }
+    if (body[k] === "|" && d === 0 && b === 0) { parts.push(cur); cur = ""; continue; }
+    cur += body[k];
+  }
+  parts.push(cur);
+  const f = {};
+  parts.slice(1).forEach((p) => { const m = p.match(/^\s*([\w\-]+)\s*=\s*([\s\S]*)$/); if (m) f[m[1].toLowerCase()] = clean(m[2]); });
+  const rows = (pre, keys) => { const out = []; for (let n = 1; n < 40; n++) { const r = {}; let any = false; keys.forEach((k) => { const v = f[pre + k + n]; if (v !== undefined && v !== "") any = true; r[k] = v || ""; }); if (!any) { if (n > 3) break; else continue; } out.push(r); } return out; };
+  return {
+    name: f.name || "", fullname: f.fullname || f.full_name || "", birth_date: f.birth_date || "", birth_place: f.birth_place || "", death_date: f.death_date || "", height: f.height || "", position: f.position || "", currentclub: f.currentclub || "", clubnumber: f.clubnumber || "",
+    youth: rows("youth", ["years", "clubs"]), clubs: rows("", ["years", "clubs", "caps", "goals"]), national: rows("national", ["years", "team", "caps", "goals"]), manager: rows("manager", ["years", "clubs"]),
+    totalcaps: f.totalcaps || "", totalgoals: f.totalgoals || "",
+  };
+}
+// Reduce wikitext to plain text: refs out, links to their label, common templates to their value.
+function clean(v) {
+  let s = String(v);
+  s = s.replace(/<ref[^>]*\/>/g, "").replace(/<ref[\s\S]*?<\/ref>/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<br\s*\/?>/gi, " ");
+  for (let n = 0; n < 4; n++) {
+    s = s.replace(/\{\{\s*(?:birth date and age|birth date|death date and age|death date|bda|dda)\s*\|\s*(\d{4})\s*\|\s*(\d{1,2})\s*\|\s*(\d{1,2})[^}]*\}\}/gi, (m, y, mo, d) => y + "-" + String(mo).padStart(2, "0") + "-" + String(d).padStart(2, "0"));
+    s = s.replace(/\{\{\s*(?:birth year and age|death year and age)\s*\|\s*(\d{4})[^}]*\}\}/gi, "$1");
+    s = s.replace(/\{\{\s*(?:height|convert|cvt)\s*\|\s*(?:m\s*=\s*)?([\d.]+)\s*(?:\|\s*m)?[^}]*\}\}/gi, (m, x) => (parseFloat(x) < 3 ? x + " m" : x));
+    s = s.replace(/\{\{\s*(?:nowrap|nobr|nbsp|small|lang|flagicon|flagu|flag|fb|fbu|fbw|plainlist|hlist|ubl|unbulleted list|dts|date|start date|end date)\s*\|([^{}]*)\}\}/gi, (m, x) => x.split("|").filter((p) => !/=/.test(p)).join(" · "));
+    s = s.replace(/\{\{\s*[^{}|]*\s*\}\}/g, "");
+  }
+  s = s.replace(/\[\[(?:[^\]|]*\|)?([^\]]*)\]\]/g, "$1").replace(/\[https?:[^\s\]]*\s?([^\]]*)\]/g, "$1");
+  s = s.replace(/'{2,}/g, "").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
+  return s;
+}

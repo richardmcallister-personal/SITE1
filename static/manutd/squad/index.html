@@ -113,14 +113,7 @@ table.mu td.name{white-space:nowrap} table.mu td.name button{all:unset;cursor:po
     var list=Object.keys(out).map(function(id){return out[id]});
     $("injuries").innerHTML=list.length?'<table class="mu"><thead><tr><th>Player</th><th>Why</th><th>Since</th></tr></thead><tbody>'+list.map(function(o){return '<tr><td>'+MU.esc(o.name)+'</td><td>'+MU.esc(o.type)+(o.reason?' · '+MU.esc(o.reason):'')+'</td><td>'+(o.date?MU.fmtDate(o.date):'')+'</td></tr>'}).join("")+'</tbody></table>':'<div class="empty">'+(live?"Nobody listed as injured or suspended.":"Injury and suspension list arrives with the API; until then everyone is offered in the picker.")+'</div>';
   }
-  function bio(name){
-    var box=$("bio"); box.className="bio on"; box.innerHTML="<p>Loading "+MU.esc(name.replace(/ \(.*\)$/,""))+"…</p>";
-    fetch("https://en.wikipedia.org/api/rest_v1/page/summary/"+encodeURIComponent(name.replace(/ /g,"_"))).then(function(r){return r.json()}).then(function(j){
-      if(!j.extract){box.innerHTML="<p>No Wikipedia summary found for "+MU.esc(name)+".</p>";return}
-      box.innerHTML=(j.thumbnail?'<img src="'+j.thumbnail.source+'" alt="">':'')+'<h3>'+MU.esc(j.title)+'</h3><p>'+MU.esc(j.extract)+'</p><p class="sub"><a href="'+j.content_urls.desktop.page+'" target="_blank" rel="noopener">Full article on Wikipedia</a></p>';
-    }).catch(function(){box.innerHTML="<p>Couldn't reach Wikipedia.</p>"});
-  }
-
+  function bio(name){location.href="/manutd/player/?"+(/\(/.test(name)||name.split(" ").length>1&&!/^[A-Z]\. /.test(name)?"p=":"q=")+encodeURIComponent(name)}
   // ---- data
   function norm(n){return n.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase()}
   function useFallback(){squad=FALLBACK; $("squadNote").textContent="First-team squad as of 1 September 2026 (loans excluded). Live injuries, suspensions and season statistics connect through the API."; renderSquad(); renderOut(); renderPitch()}

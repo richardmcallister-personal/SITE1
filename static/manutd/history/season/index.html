@@ -24,7 +24,7 @@
 .stats{list-style:none;margin:0;padding:0;font-size:14px} .stats li{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;padding:4px 0;border-bottom:1px solid var(--rule)} .stats li span:first-child{text-align:right} .stats li span:nth-child(2){color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}
 .xi{font-size:13px;line-height:1.5} .xi b{display:block;font-weight:600;margin-top:4px}
 .events{font-size:13px;list-style:none;margin:0;padding:0} .events li{padding:3px 0} .events .min{display:inline-block;width:38px;color:var(--muted)}
-a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl:hover{border-bottom-color:var(--red);color:var(--red)}
+a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl.opp{border-bottom-style:dotted} a.pl:hover{border-bottom-color:var(--red);color:var(--red)}
 .pager{display:flex;justify-content:space-between;gap:12px;margin-top:22px;font-size:14px} .pager a{color:var(--ink)}
 </style></head><body><div class="wrap">
 <header class="mu">
@@ -66,9 +66,9 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
     var keys=Object.keys(P).filter(function(k){return k.charAt(0)!=="_"&&k.indexOf("@")<0}).sort(function(a,b){return b.length-a.length});
     var out=MU.esc(text), slots=[];
     keys.forEach(function(k){
-      var title=P[k+"@"+season]||P[k];
+      var ok=P[k+"@"+season]||P[k], opp=(P._opp||[]).indexOf(P[k+"@"+season]?k+"@"+season:k)>=0, title=ok;
       var re=new RegExp("(^|[^\\w'’.\\-\\u0001])("+k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")(?![\\w'’\\-\\u0001])","g");
-      out=out.replace(re,function(m,pre,name){slots.push('<a class="pl" href="'+wiki(title)+'" target="_blank" rel="noopener">'+name+'</a>'); return pre+"\u0001"+(slots.length-1)+"\u0001"});
+      out=out.replace(re,function(m,pre,name){slots.push(opp?'<a class="pl opp" href="'+wiki(title)+'" target="_blank" rel="noopener">'+name+'</a>':'<a class="pl" href="/manutd/player/?p='+encodeURIComponent(title)+'">'+name+'</a>'); return pre+"\u0001"+(slots.length-1)+"\u0001"});
     });
     return out.replace(/\u0001(\d+)\u0001/g,function(m,i){return slots[+i]});
   }
@@ -82,7 +82,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
         t.rows.map(function(r){var us=r.team==="Manchester United"; return '<tr'+(us?' class="us"':'')+'><td>'+r.pos+'</td><td>'+MU.crest(r.team)+MU.esc(r.team)+'</td><td class="n">'+r.p+'</td><td class="n">'+r.w+'</td><td class="n">'+r.d+'</td><td class="n">'+r.l+'</td><td class="n">'+r.gf+'</td><td class="n">'+r.ga+'</td><td class="n">'+(y<1976?r.gavg.toFixed(2):(r.gd>0?"+":"")+r.gd)+'</td><td class="n"><b>'+r.pts+'</b></td></tr>'}).join("")+'</tbody></table>';
     }).catch(function(){$("table").innerHTML=""});
   }
-  function searchLink(name){return '<a class="pl" href="https://en.wikipedia.org/w/index.php?search='+encodeURIComponent(name+" footballer")+'&go=Go" target="_blank" rel="noopener">'+MU.esc(name)+'</a>'}
+  function searchLink(name,team){return team&&/Manchester United/.test(team)?'<a class="pl" href="/manutd/player/?q='+encodeURIComponent(name)+'">'+MU.esc(name)+'</a>':MU.esc(name)}
   Promise.all([fetch("/manutd/history/seasons.json").then(function(r){return r.json()}),fetch("/manutd/history/players.json").then(function(r){return r.json()}).catch(function(){return {}})]).then(function(res){var all=res[0]; P=res[1]||{};
     var i=all.findIndex(function(x){return x.id===id}); if(i<0){i=all.length-1} var S=all[i];
     document.title="Manchester United · "+S.title;
@@ -111,10 +111,10 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
           html+='<div><h4>'+MU.esc(st[0].team.name)+' · '+MU.esc(st[1].team.name)+'</h4><ul class="stats">'+want.map(function(n){var a=get(st[0],n),b=get(st[1],n); if(a==="–"&&b==="–")return ""; return '<li><span>'+a+'</span><span>'+n.replace("Ball ","").replace(" Kicks","s")+'</span><span>'+b+'</span></li>'}).join("")+'</ul></div>';
         }
         if(lu&&lu.length){
-          html+='<div><h4>Line-ups</h4><div class="xi">'+lu.map(function(t){return '<b>'+MU.esc(t.team.name)+(t.formation?' · '+t.formation:'')+(t.coach&&t.coach.name?' · '+MU.esc(t.coach.name):'')+'</b>'+t.startXI.map(function(p){return searchLink(p.player.name)}).join(", ")+(t.substitutes&&t.substitutes.length?'<br><span style="color:var(--muted)">Bench: '+t.substitutes.map(function(p){return searchLink(p.player.name)}).join(", ")+'</span>':'')}).join("")+'</div></div>';
+          html+='<div><h4>Line-ups</h4><div class="xi">'+lu.map(function(t){return '<b>'+MU.esc(t.team.name)+(t.formation?' · '+t.formation:'')+(t.coach&&t.coach.name?' · '+MU.esc(t.coach.name):'')+'</b>'+t.startXI.map(function(p){return searchLink(p.player.name,t.team.name)}).join(", ")+(t.substitutes&&t.substitutes.length?'<br><span style="color:var(--muted)">Bench: '+t.substitutes.map(function(p){return searchLink(p.player.name,t.team.name)}).join(", ")+'</span>':'')}).join("")+'</div></div>';
         }
         if(ev&&ev.length){
-          html+='<div><h4>Events</h4><ul class="events">'+ev.filter(function(e){return e.time.elapsed>=0&&(e.type==="Goal"||e.type==="Card"||e.type==="subst")}).map(function(e){var t=e.type==="Goal"?"⚽ "+(e.detail==="Own Goal"?"(og) ":e.detail==="Penalty"?"(pen) ":"")+searchLink(e.player.name)+(e.assist&&e.assist.name?" <span style='color:var(--muted)'>("+MU.esc(e.assist.name)+")</span>":""):e.type==="Card"?(/Red/.test(e.detail)?"🟥 ":"🟨 ")+searchLink(e.player.name):"↔ "+searchLink(e.assist&&e.assist.name||"")+" for "+searchLink(e.player.name); return '<li><span class="min">'+e.time.elapsed+(e.time.extra?"+"+e.time.extra:"")+"'</span>"+t+' <span style="color:var(--muted)">'+MU.esc(e.team.name)+'</span></li>'}).join("")+'</ul></div>';
+          html+='<div><h4>Events</h4><ul class="events">'+ev.filter(function(e){return e.time.elapsed>=0&&(e.type==="Goal"||e.type==="Card"||e.type==="subst")}).map(function(e){var t=e.type==="Goal"?"⚽ "+(e.detail==="Own Goal"?"(og) ":e.detail==="Penalty"?"(pen) ":"")+searchLink(e.player.name,e.team.name)+(e.assist&&e.assist.name?" <span style='color:var(--muted)'>("+MU.esc(e.assist.name)+")</span>":""):e.type==="Card"?(/Red/.test(e.detail)?"🟥 ":"🟨 ")+searchLink(e.player.name,e.team.name):"↔ "+searchLink(e.assist&&e.assist.name||"",e.team.name)+" for "+searchLink(e.player.name,e.team.name); return '<li><span class="min">'+e.time.elapsed+(e.time.extra?"+"+e.time.extra:"")+"'</span>"+t+' <span style="color:var(--muted)">'+MU.esc(e.team.name)+'</span></li>'}).join("")+'</ul></div>';
         }
         box.innerHTML=html||"";
       });
