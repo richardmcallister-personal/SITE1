@@ -44,7 +44,25 @@ const WARM = ["/api/standings", "/api/ucl", "/api/fixtures", "/api/squad", "/api
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-    if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + "/manutd/trips/", 301);
+    const WIKI = /(^|\.)manutd\.wiki$/.test(url.hostname);
+    if (url.hostname === "www.manutd.wiki") return Response.redirect("https://manutd.wiki" + url.pathname + url.search, 301);
+    if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + (WIKI ? "/trips/" : "/manutd/trips/"), 301);
+    if (WIKI) {
+      // Clean URLs on the club domain: the site lives under /manutd/ in the repo; serve it at the root here.
+      const SERVICE = /^\/(api|img|feed|wiki)(\/|$)/;
+      if (url.pathname.startsWith("/manutd/")) return Response.redirect(url.origin + url.pathname.slice(7) + url.search, 301);
+      if (!SERVICE.test(url.pathname)) {
+        const inner = new URL(url.toString()); inner.pathname = "/manutd" + (url.pathname === "/" ? "/" : url.pathname);
+        const res = await env.ASSETS.fetch(new Request(inner.toString(), request));
+        const ct = res.headers.get("content-type") || "";
+        if (/text\/html|javascript|application\/json/.test(ct)) {
+          const body = (await res.text()).replace(/(["'(])\/manutd\//g, "$1/");
+          const h = new Headers(res.headers); h.delete("content-length");
+          return new Response(body, { status: res.status, headers: h });
+        }
+        return res;
+      }
+    }
     if (url.pathname.startsWith("/img/player/")) return portrait(url, ctx);
     if (url.pathname === "/feed") return feed(url, env, ctx);
     if (url.pathname === "/wiki") return wiki(url, env, ctx);
@@ -203,19 +221,24 @@ async function wiki(url, env, ctx) {
     if (!hit) return json({ error: "not found", q }, 404);
     title = hit;
   }
-  const key = "wiki:p:v2:" + title;
+  const key = "wiki:p:v3:" + title;
   const cached = await env.MU_CACHE.get(key);
   if (cached) return new Response(cached, { headers: headers("kv-hit") });
   const enc = encodeURIComponent(title.replace(/ /g, "_"));
-  const [sr, wr] = await Promise.all([
+  const [sr, wr, ir] = await Promise.all([
     fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + enc, { headers: UA }),
     fetch("https://en.wikipedia.org/w/api.php?action=parse&format=json&prop=wikitext&redirects=1&page=" + enc, { headers: UA }),
+    fetch("https://en.wikipedia.org/w/api.php?action=query&format=json&redirects=1&generator=images&gimlimit=30&prop=imageinfo&iiprop=url|mime&iiurlwidth=640&titles=" + enc, { headers: UA }),
   ]);
   const sum = sr.ok ? await sr.json() : {};
   const wj = wr.ok ? await wr.json() : {};
+  const ij = ir.ok ? await ir.json() : {};
   const wt = wj.parse && wj.parse.wikitext ? wj.parse.wikitext["*"] : "";
   const box = parseInfobox(wt);
-  const out = { title: sum.title || title, description: sum.description || "", extract: sum.extract || "", thumbnail: sum.thumbnail ? sum.thumbnail.source : "", original: sum.originalimage ? sum.originalimage.source : "", url: sum.content_urls ? sum.content_urls.desktop.page : "https://en.wikipedia.org/wiki/" + enc, infobox: box };
+  // Photos from the article: real photographs only (no SVG icons, flags, crests, maps).
+  const images = Object.values((ij.query && ij.query.pages) || {}).filter((pg) => pg.imageinfo && pg.imageinfo[0] && /image\/(jpeg|png)/.test(pg.imageinfo[0].mime) && !/flag|logo|crest|badge|icon|map|kit|shirt|signature|wikimedia|commons-logo|stadium/i.test(pg.title))
+    .map((pg) => ({ title: pg.title.replace(/^File:/, ""), thumb: pg.imageinfo[0].thumburl || pg.imageinfo[0].url, url: pg.imageinfo[0].descriptionurl || pg.imageinfo[0].url })).slice(0, 12);
+  const out = { title: sum.title || title, description: sum.description || "", extract: sum.extract || "", thumbnail: sum.thumbnail ? sum.thumbnail.source : "", original: sum.originalimage ? sum.originalimage.source : "", url: sum.content_urls ? sum.content_urls.desktop.page : "https://en.wikipedia.org/wiki/" + enc, infobox: box, images };
   const body = JSON.stringify(out);
   if (sum.title) ctx.waitUntil(env.MU_CACHE.put(key, body, { expirationTtl: 7 * 86400 }));
   return new Response(body, { headers: headers(sum.title ? "upstream" : "upstream-empty") });

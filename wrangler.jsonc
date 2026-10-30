@@ -5,8 +5,12 @@
   "assets": {
     "directory": "./public",
     "binding": "ASSETS",
-    "run_worker_first": ["/api/*", "/should-i-go/*"]
+    "run_worker_first": true
   },
+  "routes": [
+    { "pattern": "manutd.wiki", "custom_domain": true },
+    { "pattern": "www.manutd.wiki", "custom_domain": true }
+  ],
   "kv_namespaces": [
     { "binding": "MU_CACHE", "id": "d1d3669e50bd4a61aeec70e94738fc30" }
   ],
