@@ -26,6 +26,7 @@
 .events{font-size:13px;list-style:none;margin:0;padding:0} .events li{padding:3px 0} .events .min{display:inline-block;width:38px;color:var(--muted)}
 a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl.opp{border-bottom-style:dotted} a.pl:hover{border-bottom-color:var(--red);color:var(--red)}
 .pager{display:flex;justify-content:space-between;gap:12px;margin-top:22px;font-size:14px} .pager a{color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:26px}@media (max-width:820px){.two{grid-template-columns:1fr}} .fxlist .r small{font-weight:400;color:var(--muted)}
 </style></head><body><div class="wrap">
 <header class="mu">
   <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small id="eyebrow">Trophy season</small>Manchester<br>United</h1></a>
@@ -44,9 +45,13 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
   <p class="sub" id="tableNote" style="margin:0 0 8px"></p>
   <div id="table"></div>
 </div>
-<div class="sheet">
+<div class="sheet" id="decided">
   <h2>The matches that decided it</h2>
   <div id="matches"></div>
+</div>
+<div class="sheet">
+  <h2>All results</h2>
+  <div id="results"></div>
   <div class="pager" id="pager"></div>
 </div>
 <footer class="mu">Scores, scorers and line-ups from the club's and competitions' records. For matches from 2010 onwards, line-ups, statistics and events are read from API-Football where it holds them. <a href="/manutd/history/">All honours</a></footer>
@@ -83,19 +88,65 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
     }).catch(function(){$("table").innerHTML=""});
   }
   function searchLink(name,team){return team&&/Manchester United/.test(team)?'<a class="pl" href="/manutd/player/?q='+encodeURIComponent(name)+'">'+MU.esc(name)+'</a>':MU.esc(name)}
-  Promise.all([fetch("/manutd/history/seasons.json").then(function(r){return r.json()}),fetch("/manutd/history/players.json").then(function(r){return r.json()}).catch(function(){return {}})]).then(function(res){var all=res[0]; P=res[1]||{};
-    var i=all.findIndex(function(x){return x.id===id}); if(i<0){i=all.length-1} var S=all[i];
-    document.title="Manchester United · "+S.title;
-    $("eyebrow").textContent=S.trophies.join(" · "); $("h").textContent=S.title; $("from").innerHTML="History<span>"+MU.esc(S.title)+"</span>";
-    $("troph").innerHTML=S.trophies.map(tro).join("");
-    $("facts").innerHTML=[["Manager",S.manager],["Captain",S.captain],["League",S.league],["Top scorer",S.scorer]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+linkNames(f[1],S.id)+'</div></div>'}).join("");
-    renderTable(S);
-    $("summary").textContent=S.summary;
-    $("matches").innerHTML=S.matches.map(function(m,k){return '<div class="match" id="m'+k+'"><div class="head"><div class="team r">'+MU.esc(m.home)+crest(m.home)+'</div><div><div class="score">'+m.score+'</div><div class="meta">'+MU.esc(m.comp)+' · '+MU.fmtDate(m.date+"T12:00:00Z",{year:"numeric"})+' · '+MU.esc(m.venue)+'</div></div><div class="team">'+crest(m.away)+MU.esc(m.away)+'</div></div>'+
-      '<div class="scorers"><b>Scorers</b> '+linkNames(m.scorers,S.id)+'</div>'+(m.lineup?'<div class="lineup"><b>United</b> '+linkNames(m.lineup,S.id)+'</div>':'')+(m.note?'<div class="note">'+MU.esc(m.note)+'</div>':'')+(m.api?'<div class="live" id="live'+k+'"><small>Loading match data…</small></div>':'')+'</div>'}).join("");
-    var prev=all[i-1], next=all[i+1];
-    $("pager").innerHTML=(prev?'<a href="?s='+prev.id+'">← '+prev.title+' · '+prev.trophies.join(", ")+'</a>':'<span></span>')+(next?'<a href="?s='+next.id+'">'+next.title+' · '+next.trophies.join(", ")+' →</a>':'<span></span>');
-    S.matches.forEach(function(m,k){ if(m.api) liveStats(m,k) });
+  function ordinal(n){var o=["th","st","nd","rd"][n%10>3||Math.floor(n%100/10)===1?0:n%10]; return n+o}
+  function resRow(m){var res=m.gf>m.ga?"W":m.gf<m.ga?"L":"D"; return '<li class="'+(m.h?"home":"away")+'"><span class="d">'+MU.fmtDate(m.d+"T12:00:00Z",{year:"numeric"})+'</span><span class="o">'+(m.href?'<a href="'+m.href+'" style="color:inherit;text-decoration:none">':'')+MU.crest(m.o)+MU.esc(m.o)+(m.href?'</a>':'')+' <small>· '+MU.esc(m.comp||(m.c==="FAC"?"FA Cup":m.div))+(m.r?' · '+MU.esc(m.r)+(m.tie?' ('+m.tie+')':''):'')+(m.n?' · '+MU.esc(m.n):'')+'</small></span><span class="r">'+m.gf+'–'+m.ga+(m.aet?' <small>aet</small>':'')+(m.pens?' <small>pens '+m.pens+'</small>':'')+' '+MU.form(res)+'</span></li>'}
+  function renderResults(A,D){
+    var box=$("results"), y=parseInt(A.id,10);
+    function fromData(){ if(!D||!D.results)return; var L=D.results.filter(function(m){return m.c==="L"}).map(function(m){m.div=A.div;return m}), C=D.results.filter(function(m){return m.c!=="L"});
+      box.innerHTML='<p class="sub" style="margin:0 0 8px">'+L.length+' league games · '+A.w+'–'+A.d+'–'+A.l+', '+A.gf+'–'+A.ga+(C.length?' · FA Cup: '+C.length+' tie'+(C.length===1?"":"s")+(A.fac?', reached the '+A.fac:''):'')+'</p><div class="two"><div><h3>'+MU.esc(A.div)+'</h3><ul class="fxlist">'+L.map(resRow).join("")+'</ul></div><div><h3>FA Cup</h3><ul class="fxlist">'+(C.map(resRow).join("")||'<li><small>No FA Cup results in the source for this season.</small></li>')+'</ul></div></div>' }
+    if(y>=2010){
+      MU.api("season-fixtures",{season:y}).then(function(j){
+        var ms=j.response.filter(function(x){return /FT|AET|PEN|AWD/.test(x.fixture.status.short)}).sort(function(p,q){return p.fixture.timestamp-q.fixture.timestamp}).map(function(x){var home=x.teams.home.id===MU.TEAM, opp=home?x.teams.away:x.teams.home; return {d:x.fixture.date.slice(0,10),h:home,o:opp.name,gf:home?x.goals.home:x.goals.away,ga:home?x.goals.away:x.goals.home,comp:x.league.name+(x.league.round&&!/Regular Season/.test(x.league.round)?' · '+x.league.round:''),href:"/manutd/match/?id="+x.fixture.id,aet:x.fixture.status.short==="AET",pens:x.score&&x.score.penalty&&x.score.penalty.home!=null?x.score.penalty.home+"–"+x.score.penalty.away:""}});
+        if(!ms.length)throw new Error("none");
+        var comps={}; ms.forEach(function(m){var k=m.comp.split(" · ")[0]; (comps[k]=comps[k]||[]).push(m)});
+        box.innerHTML='<p class="sub" style="margin:0 0 8px">'+ms.length+' matches in all competitions, each linking to its match centre.</p><div class="two">'+Object.keys(comps).map(function(k){return '<div><h3>'+MU.comp(k,18)+MU.esc(k)+'</h3><ul class="fxlist">'+comps[k].map(resRow).join("")+'</ul></div>'}).join("")+'</div>';
+      }).catch(fromData);
+    } else fromData();
+  }
+  Promise.all([fetch("/manutd/history/seasons.json").then(function(r){return r.json()}),fetch("/manutd/history/players.json").then(function(r){return r.json()}).catch(function(){return {}}),fetch("/manutd/history/all.json").then(function(r){return r.json()}).catch(function(){return []})]).then(function(res){var all=res[0]; P=res[1]||{}; var ALL=res[2];
+    var cur=new Date().getUTCFullYear()-(new Date().getUTCMonth()>=6?0:1); if(ALL.length&&parseInt(ALL[ALL.length-1].id,10)<cur-1){for(var y=parseInt(ALL[ALL.length-1].id,10)+1;y<cur;y++)ALL.push({id:y+"-"+String(y+1).slice(2),title:y+"–"+String(y+1).slice(2),tier:1,div:"Premier League",api:true})}
+    var S=all.filter(function(x){return x.id===id})[0]||null, A=ALL.filter(function(x){return x.id===id})[0]||null;
+    if(!S&&!A){S=all[all.length-1]; A=ALL.filter(function(x){return x.id===S.id})[0]||null; id=S.id}
+    var T=S?S.title:A.title, tro_=S?S.trophies:[];
+    document.title="Manchester United · "+T;
+    $("h").textContent=T; $("from").innerHTML="History<span>"+MU.esc(T)+"</span>";
+    $("eyebrow").textContent=tro_.length?tro_.join(" · "):(A&&A.pos?A.div+" · "+ordinal(A.pos)+" of "+A.teams:"Season");
+    $("troph").innerHTML=tro_.map(tro).join("");
+    var dataP=A&&!A.api?fetch("/manutd/history/data/"+id+".json").then(function(r){return r.ok?r.json():null}).catch(function(){return null}):Promise.resolve(null);
+    if(S){
+      $("facts").innerHTML=[["Manager",S.manager],["Captain",S.captain],["League",S.league],["Top scorer",S.scorer]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+linkNames(f[1],S.id)+'</div></div>'}).join("");
+      $("summary").textContent=S.summary;
+      $("matches").innerHTML=S.matches.map(function(m,k){return '<div class="match" id="m'+k+'"><div class="head"><div class="team r">'+MU.esc(m.home)+crest(m.home)+'</div><div><div class="score">'+m.score+'</div><div class="meta">'+MU.esc(m.comp)+' · '+MU.fmtDate(m.date+"T12:00:00Z",{year:"numeric"})+' · '+MU.esc(m.venue)+'</div></div><div class="team">'+crest(m.away)+MU.esc(m.away)+'</div></div>'+
+        '<div class="scorers"><b>Scorers</b> '+linkNames(m.scorers,S.id)+'</div>'+(m.lineup?'<div class="lineup"><b>United</b> '+linkNames(m.lineup,S.id)+'</div>':'')+(m.note?'<div class="note">'+MU.esc(m.note)+'</div>':'')+(m.api?'<div class="live" id="live'+k+'"><small>Loading match data…</small></div>':'')+'</div>'}).join("");
+      S.matches.forEach(function(m,k){ if(m.api) liveStats(m,k) });
+    } else {
+      $("decided").style.display="none";
+      var rec=A&&A.pos?[["League",A.div+" · "+ordinal(A.pos)+" of "+A.teams],["Record",A.p+" played · "+A.w+"–"+A.d+"–"+A.l+" · "+A.gf+"–"+A.ga+" · "+A.pts+" pts"],["FA Cup",A.facWon?"Winners":(A.fac||"—")]]:[];
+      $("facts").innerHTML=rec.map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+MU.esc(f[1])+'</div></div>'}).join("");
+      $("summary").innerHTML='<small>Loading the season write-up…</small>';
+      MU.api("../wiki-season",{s:id}).then(function(w){
+        if(w.error)throw new Error(w.error);
+        var b=w.infobox||{}, more=[["Manager",b.manager],["Chairman",b.chairman],["Top scorer",b.seasonTopScorer||b.leagueTopScorer]].concat((b.cups||[]).map(function(c){return [c.name,c.result]})).concat([["Average attendance",b.averageAttendance]]).filter(function(f){return f[1]});
+        $("facts").innerHTML+=more.map(function(f){return '<div><div class="k">'+MU.esc(f[0])+'</div><div class="v">'+MU.esc(f[1])+'</div></div>'}).join("");
+        $("summary").innerHTML=MU.esc(w.extract)+' <small class="sub">From <a href="'+w.url+'" target="_blank" rel="noopener">the Wikipedia article</a>, CC BY-SA 4.0.</small>';
+      }).catch(function(){$("summary").innerHTML='<small class="sub">No write-up available for this season yet. The table and results below are from the match records.</small>'});
+    }
+    // table: per-season data file first, then the older tables.json
+    dataP.then(function(D){
+      var y=parseInt(id,10), div=A?A.div:(y>=1992?"Premier League":"First Division");
+      $("tableHead").textContent="Final "+div+" table · "+T;
+      function draw(t,gavg){ $("tableNote").textContent=t.rule+". Computed from every result of the season; United's row is highlighted.";
+        $("table").innerHTML='<table class="mu"><thead><tr><th>#</th><th>Team</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th class="n">GF</th><th class="n">GA</th><th class="n">'+(gavg?"GAv":"GD")+'</th><th class="n">Pts</th></tr></thead><tbody>'+
+          t.rows.map(function(r){var us=r.team==="Manchester United"; return '<tr'+(us?' class="us"':'')+'><td>'+r.pos+'</td><td>'+MU.crest(r.team)+MU.esc(r.team)+'</td><td class="n">'+r.p+'</td><td class="n">'+r.w+'</td><td class="n">'+r.d+'</td><td class="n">'+r.l+'</td><td class="n">'+r.gf+'</td><td class="n">'+r.ga+'</td><td class="n">'+(gavg?r.gavg.toFixed(3):(r.gd>0?"+":"")+r.gd)+'</td><td class="n"><b>'+r.pts+'</b></td></tr>'}).join("")+'</tbody></table>' }
+      if(D&&D.table){draw(D.table,y<1976)}
+      else if(A&&A.api){ MU.api("season-standings",{season:y}).then(function(j){var rows=j.response[0].league.standings[0].map(function(r){return {team:r.team.name,pos:r.rank,p:r.all.played,w:r.all.win,d:r.all.draw,l:r.all.lose,gf:r.all.goals.for,ga:r.all.goals.against,gd:r.goalsDiff,pts:r.points}}); draw({rule:"3 pts a win, goal difference",rows:rows},false)}).catch(function(){$("table").innerHTML=""}) }
+      else fetch("/manutd/history/tables.json").then(function(r){return r.json()}).then(function(TT){var t=TT[id]; if(t)draw(t,y<1976); else $("table").innerHTML=""}).catch(function(){$("table").innerHTML=""});
+      if(A) renderResults(A,D);
+    });
+    // pager across every season
+    var ids=ALL.map(function(x){return x.id}), k=ids.indexOf(id), prev=ALL[k-1], next=ALL[k+1];
+    function lab(x){var t=all.filter(function(q){return q.id===x.id})[0]; return x.title+(t?' · '+t.trophies.join(", "):(x.pos?' · '+ordinal(x.pos):''))}
+    $("pager").innerHTML=(prev?'<a href="?s='+prev.id+'">← '+lab(prev)+'</a>':'<span></span>')+'<a href="/manutd/history/seasons/">All seasons</a>'+(next?'<a href="?s='+next.id+'">'+lab(next)+' →</a>':'<span></span>');
   });
   function liveStats(m,k){
     var box=$("live"+k);

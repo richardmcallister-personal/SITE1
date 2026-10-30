@@ -39,6 +39,7 @@ const ROUTES = {
   "/api/transfers":     { ttl: 86400, path: () => `/transfers?team=${TEAM}` },
   "/api/team-fixtures": { ttl: 3600,  path: (u) => `/fixtures?team=${num(u, "team")}&season=${season()}&from=${(u.searchParams.get("from") || "").slice(0, 10)}&to=${(u.searchParams.get("to") || "").slice(0, 10)}` },
   "/api/fixture-players": { ttl: 30 * 86400, path: (u) => `/fixtures/players?fixture=${num(u, "fixture")}` },   // only fetched for finished matches
+  "/api/season-standings": { ttl: 30 * 86400, path: (u) => `/standings?league=${LEAGUES.pl}&season=${num(u, "season")}` },
   "/api/player-season": { ttl: 30 * 86400, path: (u) => `/players?id=${num(u, "id")}&season=${num(u, "season")}` },   // past seasons, for debut lookups
 };
 function num(u, k) { return String(parseInt(u.searchParams.get(k) || "0", 10) || 0); }
@@ -71,6 +72,7 @@ export default {
     if (url.pathname.startsWith("/img/player/")) return portrait(url, ctx);
     if (url.pathname === "/feed") return feed(url, env, ctx);
     if (url.pathname === "/wiki") return wiki(url, env, ctx);
+    if (url.pathname === "/wiki-season") return wikiSeason(url, env, ctx);
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
 
     if (url.pathname === "/api/youth") return youth(url, env, ctx);
@@ -448,3 +450,34 @@ async function buildYouth(env, limit) {
   return out;
 }
 function isoWeek(d) { const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day); const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return t.getUTCFullYear() + "-W" + String(Math.ceil(((t - y0) / 86400000 + 1) / 7)).padStart(2, "0"); }
+
+
+// ---- Wikipedia season article → JSON (lead + "Infobox football club season"), for the seasons without a hand-written page.
+async function wikiSeason(url, env, ctx) {
+  const s = (url.searchParams.get("s") || "").trim();              // "1992-93"
+  const m = s.match(/^(\d{4})-(\d{2})$/); if (!m) return json({ error: "s=YYYY-YY required" }, 400);
+  const key = "wiki:s:v1:" + s, cached = url.searchParams.get("debug") ? null : await env.MU_CACHE.get(key);
+  if (cached) return new Response(cached, { headers: headers("kv-hit") });
+  const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
+  const y = +m[1], yy = m[1] + "–" + m[2];
+  const cands = y < 1902 ? [yy + " Newton Heath F.C. season", yy + " Newton Heath LYR F.C. season", yy + " Manchester United F.C. season"] : [yy + " Manchester United F.C. season"];
+  let sum = null, title = "";
+  for (const c of cands) {
+    const r = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(c.replace(/ /g, "_")), { headers: UA });
+    if (r.ok) { sum = await r.json(); title = sum.title || c; break; }
+  }
+  if (!sum) return json({ error: "no article", tried: cands }, 404);
+  const enc = encodeURIComponent(title.replace(/ /g, "_"));
+  const wr = await fetch("https://en.wikipedia.org/w/api.php?action=parse&format=json&prop=wikitext&redirects=1&page=" + enc, { headers: UA });
+  const wj = wr.ok ? await wr.json() : {};
+  const wt = wj.parse && wj.parse.wikitext ? wj.parse.wikitext["*"] : "";
+  const f = boxFields(wt, /\{\{\s*Infobox football club season/i) || {};
+  const cups = [];
+  for (let n = 1; n <= 6; n++) if (f["cup" + n]) cups.push({ name: f["cup" + n], result: f["cup" + n + "result"] || "" });
+  const box = { manager: f.manager || f.mgrtitle || "", chairman: f.chairman || "", stadium: f.stadium || "", league: f.league || "", leagueResult: f.leagueresult || "", cups,
+    leagueTopScorer: f.leaguetopscorer || "", seasonTopScorer: f.seasontopscorer || "", highestAttendance: f.highestattendance || "", lowestAttendance: f.lowestattendance || "", averageAttendance: f.averageattendance || "", _keys: Object.keys(f) };
+  const out = { title, extract: sum.extract || "", thumbnail: sum.thumbnail ? sum.thumbnail.source : "", url: sum.content_urls ? sum.content_urls.desktop.page : "https://en.wikipedia.org/wiki/" + enc, infobox: box };
+  const body = JSON.stringify(out);
+  ctx.waitUntil(env.MU_CACHE.put(key, body, { expirationTtl: 30 * 86400 }));
+  return new Response(body, { headers: headers("upstream") });
+}
