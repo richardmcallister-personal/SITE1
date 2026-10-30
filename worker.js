@@ -189,18 +189,21 @@ async function wiki(url, env, ctx) {
   const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
   if (!title) {
     // Resolve an abbreviated name ("K. Mainoo") to an article title via search.
-    const qkey = "wiki:q:v1:" + q.toLowerCase();
+    const qkey = "wiki:q:v2:" + q.toLowerCase();
     let hit = await env.MU_CACHE.get(qkey);
     if (!hit) {
-      const r = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=1&srsearch=" + encodeURIComponent(q.replace(/^([A-Z])\. /, "$1* ") + " Manchester United footballer"), { headers: UA });
+      const surname = q.replace(/^[A-Z]\. ?/, "").split(" ").pop();
+      const r = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=5&srsearch=" + encodeURIComponent('hastemplate:"Infobox football biography" ' + q.replace(/^[A-Z]\. ?/, "") + " Manchester United"), { headers: UA });
       const j = r.ok ? await r.json() : null;
-      hit = j && j.query && j.query.search[0] ? j.query.search[0].title : "";
+      const list = j && j.query ? j.query.search : [];
+      const pick = list.filter((x) => x.title.toLowerCase().indexOf(surname.toLowerCase()) >= 0)[0] || list[0];
+      hit = pick ? pick.title : "";
       if (hit) ctx.waitUntil(env.MU_CACHE.put(qkey, hit, { expirationTtl: 30 * 86400 }));
     }
     if (!hit) return json({ error: "not found", q }, 404);
     title = hit;
   }
-  const key = "wiki:p:v1:" + title;
+  const key = "wiki:p:v2:" + title;
   const cached = await env.MU_CACHE.get(key);
   if (cached) return new Response(cached, { headers: headers("kv-hit") });
   const enc = encodeURIComponent(title.replace(/ /g, "_"));
@@ -246,7 +249,7 @@ function wtClean(v) {
   let s = String(v);
   s = s.replace(/<ref[^>]*\/>/g, "").replace(/<ref[\s\S]*?<\/ref>/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<br\s*\/?>/gi, " ");
   for (let n = 0; n < 4; n++) {
-    s = s.replace(/\{\{\s*(?:birth date and age|birth date|death date and age|death date|bda|dda)\s*\|\s*(\d{4})\s*\|\s*(\d{1,2})\s*\|\s*(\d{1,2})[^}]*\}\}/gi, (m, y, mo, d) => y + "-" + String(mo).padStart(2, "0") + "-" + String(d).padStart(2, "0"));
+    s = s.replace(/\{\{\s*(?:birth date and age|birth date|death date and age|death date|bda|dda|birth-date and age|birth-date)\s*\|([^}]*)\}\}/gi, (m, args) => { const n = args.split("|").map((x) => x.trim()).filter((x) => /^\d+$/.test(x)); return n.length >= 3 ? n[0] + "-" + n[1].padStart(2, "0") + "-" + n[2].padStart(2, "0") : (n[0] || ""); });
     s = s.replace(/\{\{\s*(?:birth year and age|death year and age)\s*\|\s*(\d{4})[^}]*\}\}/gi, "$1");
     s = s.replace(/\{\{\s*(?:height|convert|cvt)\s*\|\s*(?:m\s*=\s*)?([\d.]+)\s*(?:\|\s*m)?[^}]*\}\}/gi, (m, x) => (parseFloat(x) < 3 ? x + " m" : x));
     s = s.replace(/\{\{\s*(?:nowrap|nobr|nbsp|small|lang|flagicon|flagu|flag|fb|fbu|fbw|plainlist|hlist|ubl|unbulleted list|dts|date|start date|end date)\s*\|([^{}]*)\}\}/gi, (m, x) => x.split("|").filter((p) => !/=/.test(p)).join(" · "));
