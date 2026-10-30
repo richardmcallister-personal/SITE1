@@ -40,6 +40,11 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
   <p class="summary" id="summary"></p>
 </div>
 <div class="sheet">
+  <h2 id="tableHead">Final league table</h2>
+  <p class="sub" id="tableNote" style="margin:0 0 8px"></p>
+  <div id="table"></div>
+</div>
+<div class="sheet">
   <h2>The matches that decided it</h2>
   <div id="matches"></div>
   <div class="pager" id="pager"></div>
@@ -67,13 +72,24 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
     });
     return out.replace(/\u0001(\d+)\u0001/g,function(m,i){return slots[+i]});
   }
+  function renderTable(S){
+    var y=parseInt(S.id,10), div=y>=1992?"Premier League":"First Division";
+    $("tableHead").textContent="Final "+div+" table · "+S.title;
+    fetch("/manutd/history/tables.json").then(function(r){return r.json()}).then(function(T){
+      var t=T[S.id]; if(!t){$("table").innerHTML="";return}
+      $("tableNote").textContent=t.rule+". Rows in black are United.";
+      $("table").innerHTML='<table class="mu"><thead><tr><th>#</th><th>Team</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th class="n">GF</th><th class="n">GA</th><th class="n">'+(y<1976?"GAv":"GD")+'</th><th class="n">Pts</th></tr></thead><tbody>'+
+        t.rows.map(function(r){var us=r.team==="Manchester United"; return '<tr'+(us?' class="us"':'')+'><td>'+r.pos+'</td><td>'+MU.crest(r.team)+MU.esc(r.team)+'</td><td class="n">'+r.p+'</td><td class="n">'+r.w+'</td><td class="n">'+r.d+'</td><td class="n">'+r.l+'</td><td class="n">'+r.gf+'</td><td class="n">'+r.ga+'</td><td class="n">'+(y<1976?r.gavg.toFixed(2):(r.gd>0?"+":"")+r.gd)+'</td><td class="n"><b>'+r.pts+'</b></td></tr>'}).join("")+'</tbody></table>';
+    }).catch(function(){$("table").innerHTML=""});
+  }
   function searchLink(name){return '<a class="pl" href="https://en.wikipedia.org/w/index.php?search='+encodeURIComponent(name+" footballer")+'&go=Go" target="_blank" rel="noopener">'+MU.esc(name)+'</a>'}
   Promise.all([fetch("/manutd/history/seasons.json").then(function(r){return r.json()}),fetch("/manutd/history/players.json").then(function(r){return r.json()}).catch(function(){return {}})]).then(function(res){var all=res[0]; P=res[1]||{};
     var i=all.findIndex(function(x){return x.id===id}); if(i<0){i=all.length-1} var S=all[i];
     document.title="Manchester United · "+S.title;
     $("eyebrow").textContent=S.trophies.join(" · "); $("h").textContent=S.title; $("from").innerHTML="History<span>"+MU.esc(S.title)+"</span>";
     $("troph").innerHTML=S.trophies.map(tro).join("");
-    $("facts").innerHTML=[["Manager",S.manager],["Captain",S.captain],["League",S.league],["Top scorer",S.scorer]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+MU.esc(f[1])+'</div></div>'}).join("");
+    $("facts").innerHTML=[["Manager",S.manager],["Captain",S.captain],["League",S.league],["Top scorer",S.scorer]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+linkNames(f[1],S.id)+'</div></div>'}).join("");
+    renderTable(S);
     $("summary").textContent=S.summary;
     $("matches").innerHTML=S.matches.map(function(m,k){return '<div class="match" id="m'+k+'"><div class="head"><div class="team r">'+MU.esc(m.home)+crest(m.home)+'</div><div><div class="score">'+m.score+'</div><div class="meta">'+MU.esc(m.comp)+' · '+MU.fmtDate(m.date+"T12:00:00Z",{year:"numeric"})+' · '+MU.esc(m.venue)+'</div></div><div class="team">'+crest(m.away)+MU.esc(m.away)+'</div></div>'+
       '<div class="scorers"><b>Scorers</b> '+linkNames(m.scorers,S.id)+'</div>'+(m.lineup?'<div class="lineup"><b>United</b> '+linkNames(m.lineup,S.id)+'</div>':'')+(m.note?'<div class="note">'+MU.esc(m.note)+'</div>':'')+(m.api?'<div class="live" id="live'+k+'"><small>Loading match data…</small></div>':'')+'</div>'}).join("");
