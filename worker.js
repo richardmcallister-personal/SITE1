@@ -221,14 +221,18 @@ async function wiki(url, env, ctx) {
   const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
   if (!title) {
     // Resolve an abbreviated name ("K. Mainoo") to an article title via search.
-    const qkey = "wiki:q:v2:" + q.toLowerCase();
+    const qkey = "wiki:q:v3:" + q.toLowerCase();
     let hit = await env.MU_CACHE.get(qkey);
     if (!hit) {
       const surname = q.replace(/^[A-Z]\. ?/, "").split(" ").pop();
       const r = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=5&srsearch=" + encodeURIComponent('hastemplate:"Infobox football biography" ' + q.replace(/^[A-Z]\. ?/, "") + " Manchester United"), { headers: UA });
       const j = r.ok ? await r.json() : null;
       const list = j && j.query ? j.query.search : [];
-      const pick = list.filter((x) => x.title.toLowerCase().indexOf(surname.toLowerCase()) >= 0)[0] || list[0];
+      // Surname must be a whole word of the title (so "O. Martin" cannot land on "Martin Dúbravka"), and when the query
+      // carries an initial the title's first name must start with it; fall back to the plain surname match, then nothing.
+      const ini = (q.match(/^([A-Z])\. ?/) || [])[1], sn = surname.toLowerCase(), base = (t) => t.replace(/\s*\(.*\)$/, "");
+      const word = (t) => base(t).toLowerCase().split(/[\s-]+/).indexOf(sn) >= 0 && base(t).toLowerCase().split(/[\s-]+/).indexOf(sn) > 0;
+      const pick = list.filter((x) => word(x.title) && (!ini || base(x.title)[0].toUpperCase() === ini))[0] || list.filter((x) => word(x.title))[0] || (!ini ? list.filter((x) => x.title.toLowerCase().indexOf(sn) >= 0)[0] : null);
       hit = pick ? pick.title : "";
       if (hit) ctx.waitUntil(env.MU_CACHE.put(qkey, hit, { expirationTtl: 30 * 86400 }));
     }
