@@ -221,7 +221,7 @@ async function wiki(url, env, ctx) {
     if (!hit) return json({ error: "not found", q }, 404);
     title = hit;
   }
-  const key = "wiki:p:v4:" + title;
+  const key = "wiki:p:v5:" + title;
   const cached = url.searchParams.get("debug") ? null : await env.MU_CACHE.get(key);
   if (cached) return new Response(cached, { headers: headers("kv-hit") });
   const enc = encodeURIComponent(title.replace(/ /g, "_"));
@@ -261,10 +261,10 @@ function parseInfobox(wt) {
   parts.push(cur);
   const f = {};
   parts.slice(1).forEach((p) => { const m = p.match(/^\s*([\w\-]+)\s*=\s*([\s\S]*)$/); if (m) f[m[1].toLowerCase().replace(/_/g, "")] = wtClean(m[2]); });
-  const rows = (pre, keys) => { const out = []; for (let n = 1; n < 40; n++) { const r = {}; let any = false; keys.forEach((k) => { const v = f[pre + k + n]; if (v !== undefined && v !== "") any = true; r[k] = v || ""; }); if (!any) { if (n > 3) break; else continue; } out.push(r); } return out; };
+  const rows = (pre, keys) => { const out = []; for (let n = 1; n < 40; n++) { const r = {}; let any = false; keys.forEach((k) => { const v = f[pre + k + n]; if (v !== undefined && v !== "") any = true; r[k] = v || ""; }); if (!any) { if (n > 3) break; else continue; } if (r.clubs || r.team) out.push(r); } return out; };
   return {
     _keys: Object.keys(f),
-    name: f.name || "", fullname: f.fullname || "", birth_date: f.birth_date || "", birth_place: f.birth_place || "", death_date: f.death_date || "", height: f.height || "", position: f.position || "", currentclub: f.currentclub || "", clubnumber: f.clubnumber || "",
+    name: f.name || "", fullname: f.fullname || "", birth_date: f.birthdate || "", birth_place: f.birthplace || "", death_date: f.deathdate || "", height: f.height || "", position: f.position || "", currentclub: f.currentclub || "", clubnumber: f.clubnumber || "",
     youth: rows("youth", ["years", "clubs"]), clubs: rows("", ["years", "clubs", "caps", "goals"]), national: rows("national", ["years", "team", "caps", "goals"]), manager: rows("manager", ["years", "clubs"]),
     totalcaps: f.totalcaps || "", totalgoals: f.totalgoals || "",
   };
@@ -276,6 +276,7 @@ function wtClean(v) {
   for (let n = 0; n < 4; n++) {
     s = s.replace(/\{\{\s*(?:birth date and age|birth date|death date and age|death date|bda|dda|birth-date and age|birth-date)\s*\|([^}]*)\}\}/gi, (m, args) => { const n = args.split("|").map((x) => x.trim()).filter((x) => /^\d+$/.test(x)); return n.length >= 3 ? n[0] + "-" + n[1].padStart(2, "0") + "-" + n[2].padStart(2, "0") : (n[0] || ""); });
     s = s.replace(/\{\{\s*(?:birth year and age|death year and age)\s*\|\s*(\d{4})[^}]*\}\}/gi, "$1");
+    s = s.replace(/\{\{\s*(?:convert|cvt)\s*\|\s*(\d+)\s*\|\s*ft\s*\|\s*([\d.]+)\s*\|\s*in[^}]*\}\}/gi, (m, ft, inch) => ((parseInt(ft, 10) * 12 + parseFloat(inch)) * 0.0254).toFixed(2) + " m");
     s = s.replace(/\{\{\s*height\s*\|[^}]*ft\s*=\s*(\d+)[^}]*in\s*=\s*([\d.]+)[^}]*\}\}/gi, (m, ft, inch) => ((parseInt(ft, 10) * 12 + parseFloat(inch)) * 0.0254).toFixed(2) + " m");
     s = s.replace(/\{\{\s*(?:height|convert|cvt)\s*\|\s*(?:m\s*=\s*)?([\d.]+)\s*(?:\|\s*m)?[^}]*\}\}/gi, (m, x) => (parseFloat(x) < 3 ? x + " m" : x));
     s = s.replace(/\{\{\s*(?:nowrap|nobr|nbsp|small|lang|flagicon|flagu|flag|fb|fbu|fbw|plainlist|hlist|ubl|unbulleted list|dts|date|start date|end date)\s*\|([^{}]*)\}\}/gi, (m, x) => x.split("|").filter((p) => !/=/.test(p)).join(" · "));
