@@ -1,0 +1,115 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · Shirt museum</title>
+<link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 8px;align-items:center} .filters button{font:inherit;font-size:13px;padding:7px 12px;border:1px solid var(--rule);background:#fff;cursor:pointer} .filters button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)} .filters button b{font-family:var(--head);font-weight:400;margin-left:6px;color:var(--muted)} .filters button[aria-pressed="true"] b{color:#ccc}
+.filters button.own[aria-pressed="true"]{background:#0a7a2f;border-color:#0a7a2f} .filters button.want[aria-pressed="true"]{background:#b8860b;border-color:#b8860b}
+.decade{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:18px 0 6px;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.season{display:grid;grid-template-columns:150px 1fr;gap:16px;padding:12px 0;border-bottom:1px solid var(--rule);align-items:start}
+.season .meta a{font-family:var(--head);font-weight:400;font-size:26px;line-height:1;color:var(--ink);text-decoration:none} .season .meta small{display:block;color:var(--muted);font-size:12px;margin-top:6px;line-height:1.4}
+.season .meta .tr{display:block;font-size:11px;margin-top:6px} .season .meta .tr img{width:16px;height:16px;object-fit:contain;vertical-align:-3px;margin-right:3px}
+.shirts{display:flex;flex-wrap:wrap;gap:10px}
+.shirt{width:118px;border:1px solid var(--rule);background:#fff;padding:6px;cursor:pointer;position:relative;text-align:center}
+.shirt img{width:100%;aspect-ratio:1;object-fit:contain;display:block;background:#fafafa}
+.shirt .t{font-size:11px;line-height:1.3;margin-top:4px;color:var(--ink)} .shirt .t small{color:var(--muted)}
+.shirt .flag{position:absolute;top:6px;left:6px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 5px;color:#fff} .flag.own{background:#0a7a2f}.flag.want{background:#b8860b}
+.shirt.own{border-color:#0a7a2f;box-shadow:inset 0 0 0 1px #0a7a2f} .shirt.want{border-color:#b8860b}
+.shirt.dim{opacity:.35}
+@media (max-width:640px){.season{grid-template-columns:1fr} .shirt{width:calc(33.33% - 7px)}}
+/* detail */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.72);display:none;align-items:center;justify-content:center;padding:16px;z-index:50} .modal.on{display:flex}
+.panel{background:#fff;max-width:900px;width:100%;max-height:92vh;overflow:auto;display:grid;grid-template-columns:360px 1fr} @media (max-width:760px){.panel{grid-template-columns:1fr}}
+.panel img.big{width:100%;aspect-ratio:1;object-fit:contain;background:#f6f6f6}
+.panel .body{padding:18px 22px} .panel h2{margin:0 0 4px;border:0;padding:0;text-transform:none;letter-spacing:0;font-size:24px}
+.panel .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:var(--muted);margin-top:14px} .panel .v{font-size:14px;margin-top:3px;line-height:1.5}
+.panel .acts{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px} .panel .acts button{font:inherit;font-size:13px;padding:8px 14px;border:1px solid var(--ink);background:#fff;cursor:pointer} .panel .acts button[aria-pressed="true"].o{background:#0a7a2f;border-color:#0a7a2f;color:#fff} .panel .acts button[aria-pressed="true"].w{background:#b8860b;border-color:#b8860b;color:#fff}
+.panel textarea{width:100%;font:inherit;font-size:13px;padding:8px;border:1px solid var(--rule);min-height:60px;margin-top:4px}
+.panel .close{position:sticky;top:0;float:right;font:inherit;font-size:22px;line-height:1;background:#fff;border:0;cursor:pointer;padding:8px 12px}
+.panel .pl{display:inline-block;margin:0 8px 4px 0}
+.keybox{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px} .keybox input{font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--rule);min-width:180px} .keybox button{font:inherit;font-size:13px;padding:6px 10px;border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;margin:10px 0} .stats div{background:var(--tint);padding:10px 12px} .stats b{display:block;font-family:var(--head);font-weight:300;font-size:26px;line-height:1} .stats span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+</style>
+</head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>The shirt museum</small>Manchester<br>United</h1></a>
+  <div class="from">Shirts<span>Every kit since 1878 · your collection and wishlist</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+
+<div class="sheet">
+  <h2>Your collection</h2>
+  <p class="sub" style="margin:0 0 8px">Mark shirts you own and ones you want from any shirt's page. A collection key (any phrase you'll remember, 6+ characters) saves it to this site privately so it follows you between devices; without one it stays in this browser only.</p>
+  <div class="keybox"><label>Collection key <input id="key" type="password" placeholder="your phrase" autocomplete="off"></label><button id="keyGo">Load / save</button><span id="keyNote" class="sub" style="margin:0"></span></div>
+  <div class="stats" id="stats"></div>
+  <p class="sub" style="margin:0"><a href="#" id="csv">Download the collection as CSV</a></p>
+</div>
+<div class="sheet">
+  <h2>The kits</h2>
+  <div class="filters" id="kinds"></div>
+  <div class="filters" id="mine"></div>
+  <div class="filters"><label class="sub" style="margin:0">Era <select id="era" style="font:inherit;font-size:13px;padding:6px"></select></label></div>
+  <div id="list"></div>
+</div>
+<footer class="mu">Kit images from the site's own archive. Manufacturer and sponsor by season from the club's kit history. Players shown for a season are the most-used from the season squad records (1993–94 onwards) or the trophy-season write-ups.</footer>
+</div>
+<div class="modal" id="modal"><div class="panel" id="panel"></div></div>
+<script src="/manutd/mu.js"></script>
+<script>
+(function(){
+  MU.nav("Shirts"); var $=function(i){return document.getElementById(i)};
+  var KITS=[], NUM={}, SEAS={}, CB=[], kind="all", mine="all", era="all", col={owned:[],wish:[],notes:{}}, key="";
+  var MAKER=[[1878,"—"],[1975,"Admiral"],[1980,"Adidas"],[1992,"Umbro"],[2002,"Nike"],[2015,"Adidas"]];
+  var SPON=[[1878,"—"],[1982,"Sharp"],[2000,"Vodafone"],[2006,"AIG"],[2010,"Aon"],[2014,"Chevrolet"],[2021,"TeamViewer"],[2024,"Snapdragon"]];
+  function at(tbl,y){var v=tbl[0][1]; tbl.forEach(function(r){if(y>=r[0])v=r[1]}); return v}
+  function sid(k){return k.start+"-"+String(k.start+1).slice(2)}
+  function load(){try{var l=JSON.parse(localStorage.getItem("mu:kits:col")||"null"); if(l)col=l; key=localStorage.getItem("mu:kits:key")||""}catch(e){}}
+  function persist(){try{localStorage.setItem("mu:kits:col",JSON.stringify(col))}catch(e){} if(key){fetch("/collection?key="+encodeURIComponent(key),{method:"PUT",headers:{"content-type":"application/json"},body:JSON.stringify(Object.assign({},col,{updated:new Date().toISOString()}))}).then(function(r){return r.json()}).then(function(j){$("keyNote").textContent=j.ok?"Saved to the site "+MU.fmtUK(j.saved)+".":"Not saved: "+(j.error||"")}).catch(function(){$("keyNote").textContent="Saved in this browser; the site could not be reached."})} stats()}
+  function stats(){var o=col.owned.length, w=col.wish.length, byDecade={}; col.owned.forEach(function(id){var k=KITS.filter(function(x){return x.id===id})[0]; if(k){var d=Math.floor(k.start/10)*10; byDecade[d]=(byDecade[d]||0)+1}}); var top=Object.keys(byDecade).sort(function(a,b){return byDecade[b]-byDecade[a]})[0];
+    $("stats").innerHTML='<div><b>'+o+'</b><span>Shirts owned</span></div><div><b>'+w+'</b><span>On the wishlist</span></div><div><b>'+(KITS.length?Math.round(100*o/KITS.length):0)+'%</b><span>Of the museum</span></div><div><b>'+(top?top+"s":"—")+'</b><span>Strongest decade</span></div>'}
+  function has(list,id){return list.indexOf(id)>=0}
+  function toggle(list,id){var i=list.indexOf(id); if(i>=0)list.splice(i,1); else list.push(id); if(list===col.owned&&i<0){var j=col.wish.indexOf(id); if(j>=0)col.wish.splice(j,1)} persist(); render(); if($("modal").classList.contains("on"))open(id)}
+  function players(k){var s=sid(k), rows=(NUM[s]||[]).slice().sort(function(a,b){return b.apps-a.apps}).slice(0,6); if(rows.length)return rows.map(function(r){return '<a class="pl" href="/manutd/player/?p='+encodeURIComponent(r.title||r.name)+'">'+MU.esc(r.name)+' <small style="color:var(--muted)">'+r.no+' · '+r.apps+' apps</small></a>'}).join(""); var t=SEAS[s]; return t?[["Captain",t.captain],["Top scorer",t.scorer],["Manager",t.manager]].filter(function(f){return f[1]}).map(function(f){return '<span class="pl"><small style="color:var(--muted)">'+f[0]+'</small> '+MU.esc(f[1])+'</span>'}).join(""):'<span class="sub">No squad record for this season on the site yet.</span>'}
+  function matches(k){var s=sid(k), out=[]; var t=SEAS[s]; if(t)t.matches.forEach(function(m){out.push('<a class="pl" href="/manutd/history/season/?s='+s+'">'+MU.esc(m.home+" "+m.score+" "+m.away)+' <small style="color:var(--muted)">'+MU.esc(m.comp)+'</small></a>')}); CB.filter(function(c){return c.season===s}).forEach(function(c){out.push('<a class="pl" href="/manutd/comebacks/">'+MU.esc((c.home?"United v ":"")+c.opp+(c.home?"":" v United")+" "+c.score)+' <small style="color:var(--muted)">'+MU.esc(c.tags.join(", "))+'</small></a>')}); return out.join("")||'<span class="sub">Nothing on the site for this season yet.</span>'}
+  function open(id){var k=KITS.filter(function(x){return x.id===id})[0]; if(!k)return; var s=sid(k), t=SEAS[s];
+    $("panel").innerHTML='<img class="big" src="/manutd/assets/kits/'+k.file+'" alt=""><div class="body"><button class="close" id="close" aria-label="Close">×</button><h2>'+MU.esc(k.label)+' · '+MU.esc(k.title)+'</h2><div class="sub" style="margin:0">'+(k.special?'Match-specific shirt':k.kind==="goalkeeper"?"Goalkeeper":"Outfield")+' · '+at(MAKER,k.start)+(at(SPON,k.start)!=="—"?' · '+at(SPON,k.start):'')+'</div>'+
+      '<div class="acts"><button class="o" id="bo" aria-pressed="'+has(col.owned,id)+'">'+(has(col.owned,id)?"✓ In my collection":"I own this")+'</button><button class="w" id="bw" aria-pressed="'+has(col.wish,id)+'">'+(has(col.wish,id)?"★ On my wishlist":"Add to wishlist")+'</button></div>'+
+      '<div class="k">My notes</div><textarea id="note" placeholder="Player name on the back, size, condition, where it came from…">'+MU.esc(col.notes[id]||"")+'</textarea>'+
+      '<div class="k">Season</div><div class="v"><a class="pl" href="/manutd/history/season/?s='+s+'">'+MU.esc(k.label)+(t?' · '+t.trophies.join(", "):'')+'</a></div>'+
+      '<div class="k">Who wore it</div><div class="v">'+players(k)+'</div><div class="k">Memorable matches</div><div class="v">'+matches(k)+'</div>'+
+      (k.partial?'<div class="k">Note</div><div class="v">Image is a partial view of the shirt.</div>':'')+'</div>';
+    $("modal").classList.add("on"); document.body.style.overflow="hidden";
+    $("close").onclick=close; $("bo").onclick=function(){toggle(col.owned,id)}; $("bw").onclick=function(){toggle(col.wish,id)};
+    $("note").onchange=function(){col.notes[id]=this.value.trim(); if(!col.notes[id])delete col.notes[id]; persist()};
+  }
+  function close(){$("modal").classList.remove("on"); document.body.style.overflow=""}
+  $("modal").addEventListener("click",function(e){if(e.target===$("modal"))close()}); document.addEventListener("keydown",function(e){if(e.key==="Escape")close()});
+  function render(){
+    var rows=KITS.filter(function(k){return (kind==="all"||k.kind===kind||(kind==="outfield"&&/home|away|third|fourth/.test(k.kind)))&&(mine==="all"||(mine==="own"&&has(col.owned,k.id))||(mine==="want"&&has(col.wish,k.id))||(mine==="missing"&&!has(col.owned,k.id)))&&(era==="all"||Math.floor(k.start/10)*10===+era)});
+    var by={}; rows.forEach(function(k){(by[k.season]=by[k.season]||[]).push(k)});
+    var seasons=Object.keys(by).sort(function(a,b){return by[a][0].start-by[b][0].start}), out="", dec=null;
+    seasons.forEach(function(s){var ks=by[s], d=Math.floor(ks[0].start/10)*10; if(d!==dec){dec=d; out+='<div class="decade">'+d+'s</div>'} var t=SEAS[sid(ks[0])];
+      out+='<div class="season"><div class="meta"><a href="/manutd/history/season/?s='+sid(ks[0])+'">'+ks[0].label+'</a><small>'+at(MAKER,ks[0].start)+(at(SPON,ks[0].start)!=="—"?' · '+at(SPON,ks[0].start):'')+'</small>'+(t?'<span class="tr">'+t.trophies.map(function(x){return MU.comp(x,16)+MU.esc(x)}).join(" · ")+'</span>':'')+'</div><div class="shirts">'+ks.map(function(k){var o=has(col.owned,k.id), w=has(col.wish,k.id); return '<div class="shirt'+(o?" own":w?" want":"")+'" data-id="'+k.id+'">'+(o?'<span class="flag own">Owned</span>':w?'<span class="flag want">Want</span>':'')+'<img src="/manutd/assets/kits/thumbs/'+k.id+'.webp" alt="" loading="lazy"><div class="t">'+MU.esc(k.title)+'</div></div>'}).join("")+'</div></div>'});
+    $("list").innerHTML=out||'<p class="sub">No shirts match.</p>';
+  }
+  $("list").addEventListener("click",function(e){var s=e.target.closest(".shirt"); if(s)open(s.dataset.id)});
+  function chips(el,list,cur,set){el.innerHTML=list.map(function(x){return '<button class="'+(x[3]||"")+'" data-v="'+x[0]+'" aria-pressed="'+(x[0]===cur)+'">'+x[1]+(x[2]!=null?'<b>'+x[2]+'</b>':'')+'</button>'}).join(""); el.addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; set(b.dataset.v); [].forEach.call(el.children,function(x){x.setAttribute("aria-pressed",x===b)}); render()})}
+  $("keyGo").addEventListener("click",function(){key=$("key").value.trim(); if(key.length<6){$("keyNote").textContent="Use at least 6 characters.";return} try{localStorage.setItem("mu:kits:key",key)}catch(e){}
+    fetch("/collection?key="+encodeURIComponent(key)).then(function(r){return r.json()}).then(function(j){ if(j.error){$("keyNote").textContent=j.error;return}
+      if((j.owned.length||j.wish.length)&&(col.owned.length||col.wish.length)&&!confirm("A collection already exists for this key. Load it and replace what is in this browser? (Cancel keeps this browser's list and saves it to the key instead.)")){persist();return}
+      if(j.owned.length||j.wish.length||Object.keys(j.notes||{}).length){col={owned:j.owned,wish:j.wish,notes:j.notes||{}}; try{localStorage.setItem("mu:kits:col",JSON.stringify(col))}catch(e){} $("keyNote").textContent="Loaded "+j.owned.length+" owned, "+j.wish.length+" wished."; stats(); render()} else persist()}).catch(function(){$("keyNote").textContent="Could not reach the site."})});
+  $("csv").addEventListener("click",function(e){e.preventDefault(); var rows=[["id","season","shirt","status","notes"]]; KITS.forEach(function(k){var st=has(col.owned,k.id)?"owned":has(col.wish,k.id)?"wishlist":""; if(st)rows.push([k.id,k.label,k.title,st,(col.notes[k.id]||"")])}); var csv=rows.map(function(r){return r.map(function(c){return '"'+String(c).replace(/"/g,'""')+'"'}).join(",")}).join("\n"); var a=document.createElement("a"); a.href="data:text/csv;charset=utf-8,﻿"+encodeURIComponent(csv); a.download="united-shirts.csv"; a.click()});
+  load(); if(key)$("key").value=key;
+  Promise.all([fetch("/manutd/kits/kits.json").then(function(r){return r.json()}),fetch("/manutd/numbers/numbers.json").then(function(r){return r.json()}).catch(function(){return {}}),fetch("/manutd/history/seasons.json").then(function(r){return r.json()}).catch(function(){return []}),fetch("/manutd/comebacks/classics.json").then(function(r){return r.json()}).catch(function(){return []}),fetch("/manutd/comebacks/api.json").then(function(r){return r.json()}).catch(function(){return []})]).then(function(res){
+    KITS=res[0]; NUM=res[1]; res[2].forEach(function(s){SEAS[s.id]=s}); CB=res[3].concat(res[4]); CB.forEach(function(c){if(typeof c.season==="number")c.season=c.season+"-"+String(c.season+1).slice(2)});
+    var cnt={}; KITS.forEach(function(k){cnt[k.kind]=(cnt[k.kind]||0)+1});
+    chips($("kinds"),[["all","All",KITS.length],["outfield","Outfield",cnt.home+cnt.away+cnt.third+(cnt.fourth||0)],["home","Home",cnt.home],["away","Away",cnt.away],["third","Third",cnt.third],["goalkeeper","Goalkeeper",cnt.goalkeeper],["special","Finals & specials",cnt.special]],"all",function(v){kind=v});
+    chips($("mine"),[["all","Everything",null],["own","My collection",null,"own"],["want","Wishlist",null,"want"],["missing","Not owned yet",null]],"all",function(v){mine=v});
+    var decs={}; KITS.forEach(function(k){decs[Math.floor(k.start/10)*10]=1}); $("era").innerHTML='<option value="all">Every era</option>'+Object.keys(decs).sort().map(function(d){return '<option value="'+d+'">'+d+'s</option>'}).join(""); $("era").addEventListener("change",function(){era=this.value; render()});
+    stats(); render();
+    if(key)$("keyGo").click();
+    var want=new URLSearchParams(location.search).get("k"); if(want)open(want);
+  });
+})();
+</script></body></html>
