@@ -67,7 +67,10 @@ export default {
         "x-source": "api-football",
       },
     });
-    if (upstream.ok && !/Invalid API key|"message"\s*:\s*"You are not subscribed/i.test(body)) ctx.waitUntil(cache.put(cacheKey, res.clone()));
+    // API-Football answers 200 even for errors (rate limit, plan, key); only cache clean responses.
+    let clean = false;
+    try { const j = JSON.parse(body); clean = upstream.ok && j && (Array.isArray(j.errors) ? j.errors.length === 0 : Object.keys(j.errors || {}).length === 0) && !j.message; } catch (e) {}
+    if (clean) ctx.waitUntil(cache.put(cacheKey, res.clone()));
     return res;
   },
 };
