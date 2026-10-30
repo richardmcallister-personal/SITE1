@@ -59,13 +59,13 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
   // Replace known surnames (longest first; "X. Name" and "Name@season" overrides) with Wikipedia links.
   function linkNames(text,season){
     var keys=Object.keys(P).filter(function(k){return k.charAt(0)!=="_"&&k.indexOf("@")<0}).sort(function(a,b){return b.length-a.length});
-    var out=MU.esc(text);
+    var out=MU.esc(text), slots=[];
     keys.forEach(function(k){
       var title=P[k+"@"+season]||P[k];
-      var re=new RegExp("(^|[^\\w'’.\\-])("+k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&").replace(/'/g,"&#39;")+")(?![\\w'’\\-]|[^<]*>)","g");
-      out=out.replace(re,function(m,pre,name){return pre+'<a class="pl" href="'+wiki(title)+'" target="_blank" rel="noopener">'+name+'</a>'});
+      var re=new RegExp("(^|[^\\w'’.\\-\\u0001])("+k.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+")(?![\\w'’\\-\\u0001])","g");
+      out=out.replace(re,function(m,pre,name){slots.push('<a class="pl" href="'+wiki(title)+'" target="_blank" rel="noopener">'+name+'</a>'); return pre+"\u0001"+(slots.length-1)+"\u0001"});
     });
-    return out;
+    return out.replace(/\u0001(\d+)\u0001/g,function(m,i){return slots[+i]});
   }
   function searchLink(name){return '<a class="pl" href="https://en.wikipedia.org/w/index.php?search='+encodeURIComponent(name+" footballer")+'&go=Go" target="_blank" rel="noopener">'+MU.esc(name)+'</a>'}
   Promise.all([fetch("/manutd/history/seasons.json").then(function(r){return r.json()}),fetch("/manutd/history/players.json").then(function(r){return r.json()}).catch(function(){return {}})]).then(function(res){var all=res[0]; P=res[1]||{};
