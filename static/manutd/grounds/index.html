@@ -33,7 +33,7 @@
 (function(){
   MU.nav("Trips"); MU.checked("grounds",document.getElementById("stamp")); var $=function(i){return document.getElementById(i)}, G=[], cur=new URLSearchParams(location.search).get("g")||"";
   function key(g){return g.ground.toLowerCase().replace(/[^a-z0-9]+/g,"-")}
-  function nextAt(g){var now=new Date(); return (window.MU_FIXTURES||[]).filter(function(f){return !f.home&&new Date(f.ko)>now&&f.venue&&(f.venue.toLowerCase().indexOf(g.ground.toLowerCase().split(" ")[0])>=0||g.club===f.opp)})[0]}
+  function nextAt(g){var now=new Date(); return (window.MU_FIXTURES||[]).filter(function(f){return !f.home&&new Date(f.ko)>now&&g.club===f.opp})[0]}
   function show(k){cur=k; history.replaceState(null,"","?g="+k); [].forEach.call($("pick").children,function(a){a.setAttribute("aria-current",a.dataset.k===k)});
     var g=G.filter(function(x){return key(x)===k})[0]; if(!g){$("guide").innerHTML='<p class="sub">No guide for that ground yet.</p>';return}
     var f=nextAt(g), age=Math.round((Date.now()-new Date(g.checked+"T12:00:00Z"))/864e5);
