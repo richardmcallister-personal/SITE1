@@ -222,7 +222,7 @@ async function wiki(url, env, ctx) {
     title = hit;
   }
   const key = "wiki:p:v3:" + title;
-  const cached = await env.MU_CACHE.get(key);
+  const cached = url.searchParams.get("debug") ? null : await env.MU_CACHE.get(key);
   if (cached) return new Response(cached, { headers: headers("kv-hit") });
   const enc = encodeURIComponent(title.replace(/ /g, "_"));
   const [sr, wr, ir] = await Promise.all([
