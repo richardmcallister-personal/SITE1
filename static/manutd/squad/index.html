@@ -110,7 +110,7 @@ table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;
   }
   function renderOut(){
     var list=Object.keys(out).map(function(id){return out[id]});
-    $("injuries").innerHTML=list.length?'<table class="mu"><thead><tr><th>Player</th><th>Why</th><th>Since</th></tr></thead><tbody>'+list.map(function(o){return '<tr><td>'+MU.esc(o.name)+'</td><td>'+MU.esc(o.type)+(o.reason?' · '+MU.esc(o.reason):'')+'</td><td>'+(o.date?MU.fmtDate(o.date):'')+'</td></tr>'}).join("")+'</tbody></table>':'<div class="empty">'+(live?"Nobody listed as injured or suspended.":"Injury and suspension list arrives with the API; until then everyone is offered in the picker.")+'</div>';
+    $("injuries").innerHTML=list.length?'<table class="mu"><thead><tr><th>Player</th><th>Why</th><th>Since</th></tr></thead><tbody>'+list.map(function(o){var sp=squad.filter(function(p){return String(p.id)===String(o.id)})[0]; return '<tr><td><a class="pl" href="/manutd/player/?'+(sp&&sp.wiki?'p='+encodeURIComponent(sp.wiki):'q='+encodeURIComponent(sp?sp.name:o.name))+'">'+MU.esc(sp?sp.name:o.name)+'</a></td><td>'+MU.esc(o.type)+(o.reason?' · '+MU.esc(o.reason):'')+'</td><td>'+(o.date?MU.fmtDate(o.date):'')+'</td></tr>'}).join("")+'</tbody></table>':'<div class="empty">'+(live?"Nobody listed as injured or suspended.":"Injury and suspension list arrives with the API; until then everyone is offered in the picker.")+'</div>';
   }
   function bio(name){location.href="/manutd/player/?"+(/\(/.test(name)||name.split(" ").length>1&&!/^[A-Z]\. /.test(name)?"p=":"q=")+encodeURIComponent(name)}
   // ---- data
@@ -127,7 +127,7 @@ table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;
       $("squadNote").textContent="Live squad from API-Football · season statistics are league, cups and Europe combined.";
       renderSquad(); renderPitch();
       return Promise.all([
-        MU.api("injuries").then(function(k){k.response.forEach(function(x){var ko=x.fixture&&x.fixture.date; if(ko&&new Date(ko)<new Date(Date.now()-7*864e5))return; out[x.player.id]={name:x.player.name,type:x.player.type,reason:x.player.reason,date:ko}}); renderOut(); renderSquad(); renderPitch()}).catch(function(){renderOut()}),
+        MU.api("injuries").then(function(k){k.response.forEach(function(x){var ko=x.fixture&&x.fixture.date; if(ko&&new Date(ko)<new Date(Date.now()-7*864e5))return; out[x.player.id]={id:x.player.id,name:x.player.name,type:x.player.type,reason:x.player.reason,date:ko}}); renderOut(); renderSquad(); renderPitch()}).catch(function(){renderOut()}),
         (function pages(n){return MU.api("players",{page:n}).then(function(k){k.response.forEach(function(x){var agg={apps:0,goals:0,assists:0,minutes:0,rating:null,r:[]}; x.statistics.forEach(function(s){if(s.team.id!==MU.TEAM)return; agg.apps+=s.games.appearences||0; agg.goals+=s.goals.total||0; agg.assists+=s.goals.assists||0; agg.minutes+=s.games.minutes||0; if(s.games.rating)agg.r.push(+s.games.rating)}); if(agg.r.length)agg.rating=agg.r.reduce(function(a,b){return a+b})/agg.r.length; stats[x.player.id]=agg; var sp=squad.filter(function(p){return p.id===x.player.id})[0]; if(sp){sp.nationality=sp.nationality||x.player.nationality; sp.age=sp.age||x.player.age}}); if(k.paging.current<k.paging.total&&n<6)return pages(n+1)})})(1).then(function(){renderSquad()})
       ]);
     }).catch(function(){});
