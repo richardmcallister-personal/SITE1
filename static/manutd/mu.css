@@ -50,8 +50,9 @@ footer.mu a{color:#fff}
 .fxlist .d{font-family:var(--display);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .fxlist .o{font-weight:600} .fxlist .o small{font-weight:400;color:var(--muted)}
 .fxlist .r{font-family:var(--display);font-size:20px;min-width:64px;text-align:right}
-.fxlist li.away .o:before{content:"A";display:inline-block;font-family:var(--display);font-size:11px;background:var(--ink);color:#fff;padding:1px 5px;margin-right:8px}
-.fxlist li.home .o:before{content:"H";display:inline-block;font-family:var(--display);font-size:11px;background:var(--red);color:#fff;padding:1px 5px;margin-right:8px}
+.fxlist li .o:before{display:inline-block;font-family:var(--display);font-size:12px;letter-spacing:.12em;line-height:1;padding:5px 7px 4px;margin-right:10px;min-width:52px;text-align:center;vertical-align:1px}
+.fxlist li.away .o:before{content:"AWAY";background:var(--ink);color:#fff}
+.fxlist li.home .o:before{content:"HOME";background:var(--red);color:#fff}
 .chip{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;background:var(--tint);color:var(--ink);margin-left:6px}
 .chip.red{background:var(--red);color:#fff}
 @media (max-width:640px){.fxlist li{grid-template-columns:90px 1fr auto}.sheet{padding:16px}}
