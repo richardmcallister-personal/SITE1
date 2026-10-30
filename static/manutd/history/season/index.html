@@ -77,7 +77,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
     $("tableHead").textContent="Final "+div+" table · "+S.title;
     fetch("/manutd/history/tables.json").then(function(r){return r.json()}).then(function(T){
       var t=T[S.id]; if(!t){$("table").innerHTML="";return}
-      $("tableNote").textContent=t.rule+". Rows in black are United.";
+      $("tableNote").textContent=t.rule+". Computed from every result of the season; United's row is highlighted.";
       $("table").innerHTML='<table class="mu"><thead><tr><th>#</th><th>Team</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th class="n">GF</th><th class="n">GA</th><th class="n">'+(y<1976?"GAv":"GD")+'</th><th class="n">Pts</th></tr></thead><tbody>'+
         t.rows.map(function(r){var us=r.team==="Manchester United"; return '<tr'+(us?' class="us"':'')+'><td>'+r.pos+'</td><td>'+MU.crest(r.team)+MU.esc(r.team)+'</td><td class="n">'+r.p+'</td><td class="n">'+r.w+'</td><td class="n">'+r.d+'</td><td class="n">'+r.l+'</td><td class="n">'+r.gf+'</td><td class="n">'+r.ga+'</td><td class="n">'+(y<1976?r.gavg.toFixed(2):(r.gd>0?"+":"")+r.gd)+'</td><td class="n"><b>'+r.pts+'</b></td></tr>'}).join("")+'</tbody></table>';
     }).catch(function(){$("table").innerHTML=""});
