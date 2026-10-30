@@ -41,14 +41,14 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
 </div>
 <footer class="mu">Live data from API-Football; refreshed every minute from 90 minutes before kick-off until the final whistle, hourly otherwise. Kick-offs shown in UK and Swedish time.</footer>
 </div>
-<script src="/manutd/mu.js"></script>
+<script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script>
 <script>
 (function(){
   MU.nav("Season");
   var id=new URLSearchParams(location.search).get("id"), $=function(i){return document.getElementById(i)}, timer=null;
   var LIVE=/1H|HT|2H|ET|BT|P|LIVE|INT|SUSP/, DONE=/FT|AET|PEN|CANC|PST|ABD|AWD|WO/;
   function pl(p,team){return team&&team.id===MU.TEAM?'<a class="pl" href="/manutd/player/?q='+encodeURIComponent(p.name)+'">'+MU.esc(p.name)+'</a>':MU.esc(p.name)}
-  function status(f){var s=f.fixture.status, ko=new Date(f.fixture.date);
+  function status(f){var s=f.fixture.status, ko=new Date((s.short==="NS"||s.short==="TBD")?MU.ko(f).ko:f.fixture.date);
     if(LIVE.test(s.short)) return {cls:"live",txt:(s.short==="HT"?"Half-time":s.short==="P"?"Penalties":s.elapsed?s.elapsed+(s.extra?"+"+s.extra:"")+"′":s.long)};
     if(DONE.test(s.short)) return {cls:"",txt:s.short==="AET"?"Full time (aet)":s.short==="PEN"?"Full time (pens)":s.short==="FT"?"Full time":s.long};
     var ms=ko-new Date(); if(ms>0){var d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4); return {cls:"",txt:(d?d+"d ":"")+h+"h "+m+"m to kick-off"}}
@@ -56,14 +56,14 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
   }
   function render(j){
     var f=j.response&&j.response[0]; if(!f){$("score").innerHTML='<div></div><div class="mid"><div class="big">—</div><div class="st">Fixture not found</div></div><div></div>';return}
-    var h=f.teams.home, a=f.teams.away, st=status(f), ko=f.fixture.date, isUs=function(t){return t.id===MU.TEAM};
+    var h=f.teams.home, a=f.teams.away, st=status(f), kk=(f.fixture.status.short==="NS"||f.fixture.status.short==="TBD")?MU.ko(f):{ko:f.fixture.date,conf:true}, ko=kk.ko, isUs=function(t){return t.id===MU.TEAM};
     document.title="Manchester United · "+h.name+" v "+a.name;
     $("from").innerHTML="Match centre<span>"+MU.esc(f.league.name)+(f.league.round?" · "+MU.esc(f.league.round.replace("Regular Season - ","Matchweek ")):"")+"</span>";
     var goals=function(team){return (f.events||[]).filter(function(e){return e.type==="Goal"&&e.team.id===team.id&&e.detail!=="Missed Penalty"}).map(function(e){return MU.esc(e.player.name)+" "+e.time.elapsed+(e.time.extra?"+"+e.time.extra:"")+"′"+(e.detail==="Penalty"?" (pen)":e.detail==="Own Goal"?" (og)":"")}).join("<br>")};
     var scoreTxt=(f.goals.home==null?"":f.goals.home)+" – "+(f.goals.away==null?"":f.goals.away);
     if(f.goals.home==null) scoreTxt=MU.fmtUK(ko);
     $("score").innerHTML='<div><div class="team">'+MU.crest(h.name,56)+'<span>'+MU.esc(h.name)+'</span></div><div class="goals">'+goals(h)+'</div></div>'+
-      '<div class="mid"><div class="big">'+scoreTxt+'</div><div class="st '+st.cls+'">'+st.txt+'</div><div class="meta">'+MU.fmtDate(ko,{year:"numeric"})+' · '+MU.fmtUK(ko)+' UK / '+MU.fmtSE(ko)+' SE<br>'+MU.esc(f.fixture.venue.name||"")+(f.fixture.venue.city?', '+MU.esc(f.fixture.venue.city):'')+(f.score&&f.score.penalty&&f.score.penalty.home!=null?'<br>Penalties '+f.score.penalty.home+'–'+f.score.penalty.away:'')+(f.score&&f.score.halftime&&f.score.halftime.home!=null?'<br>HT '+f.score.halftime.home+'–'+f.score.halftime.away:'')+'</div></div>'+
+      '<div class="mid"><div class="big">'+scoreTxt+'</div><div class="st '+st.cls+'">'+st.txt+'</div><div class="meta">'+MU.fmtDate(ko,{year:"numeric"})+' · '+MU.fmtUK(ko)+' UK / '+MU.fmtSE(ko)+' SE'+MU.prov(kk)+'<br>'+MU.esc(f.fixture.venue.name||"")+(f.fixture.venue.city?', '+MU.esc(f.fixture.venue.city):'')+(f.score&&f.score.penalty&&f.score.penalty.home!=null?'<br>Penalties '+f.score.penalty.home+'–'+f.score.penalty.away:'')+(f.score&&f.score.halftime&&f.score.halftime.home!=null?'<br>HT '+f.score.halftime.home+'–'+f.score.halftime.away:'')+'</div></div>'+
       '<div><div class="team r"><span>'+MU.esc(a.name)+'</span>'+MU.crest(a.name,56)+'</div><div class="goals" style="text-align:right">'+goals(a)+'</div></div>';
     var day=ko.slice(0,10), acts='<a class="btn" href="/manutd/trips/">Plan the trip</a><a class="btn" href="/manutd/season/">Season</a>';
     if(!DONE.test(f.fixture.status.short)) acts+='<a class="btn" href="/manutd/squad/">Pick your XI</a>';

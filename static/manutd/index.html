@@ -65,7 +65,7 @@
     el.innerHTML='<div style="font-family:var(--head);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Next match · '+(f.home?"Old Trafford":"Away · "+MU.esc(f.venue))+'</div>'+
       '<div class="vs">'+MU.crest(f.home?"Manchester United":f.opp,64)+'<span>v</span>'+MU.crest(f.home?f.opp:"Manchester United",64)+'</div>'+
       '<div class="opp">'+(f.home?"United v "+MU.esc(f.opp):MU.esc(f.opp)+" v United")+'</div>'+
-      '<div class="meta">'+MU.fmtDate(f.ko)+' · '+MU.fmtUK(f.ko)+' UK / '+MU.fmtSE(f.ko)+' SE · '+MU.comp(f.comp,22)+MU.esc(f.comp)+(f.tbc?' · TBC':'')+'</div>'+
+      '<div class="meta">'+MU.fmtDate(f.ko)+' · '+MU.fmtUK(f.ko)+' UK / '+MU.fmtSE(f.ko)+' SE · '+MU.comp(f.comp,22)+MU.esc(f.comp)+MU.prov(f)+'</div>'+
       '<div class="count" id="count"></div><p style="margin:14px 0 0;display:flex;gap:8px;flex-wrap:wrap"><a class="btn red" href="/manutd/trips/">Plan the trip</a><a class="btn" id="mcBtn" href="/manutd/season/">Match centre</a></p>';
     function tick(){var ms=new Date(f.ko)-new Date(); if(ms<0){document.getElementById("count").innerHTML="<div><b>Live</b></div>";return}
       var d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4);
@@ -74,7 +74,7 @@
   }
   renderNext(next);
   var up=document.getElementById("upcoming");
-  up.innerHTML=fx.filter(function(f){return new Date(f.ko)>now}).slice(0,8).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK</span><span class="o">'+MU.crest(f.opp)+MU.esc(f.opp)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("");
+  up.innerHTML=fx.filter(function(f){return new Date(f.ko)>now}).slice(0,8).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK'+MU.prov(f)+'</span><span class="o">'+MU.crest(f.opp)+MU.esc(f.opp)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("");
 
   // Live bits
   MU.api("standings").then(function(j){
@@ -95,9 +95,9 @@
     // upcoming from live data too (replaces the static list when available)
     var nxt=j.response.filter(function(m){return !/FT|AET|PEN|CANC/.test(m.fixture.status.short)}).sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp})[0];
     if(nxt&&document.getElementById("mcBtn")){document.getElementById("mcBtn").href="/manutd/match/?id="+nxt.fixture.id; if(/1H|HT|2H|ET|P|LIVE/.test(nxt.fixture.status.short))document.getElementById("mcBtn").textContent="Live now · "+(nxt.goals.home==null?"":nxt.goals.home+"–"+nxt.goals.away)}
-    var next=j.response.filter(function(m){return m.fixture.status.short==="NS"||m.fixture.status.short==="TBD"}).sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp}).slice(0,8);
-    if(next.length){document.getElementById("upcoming").innerHTML=next.map(function(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home;
-      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'<br>'+MU.fmtUK(m.fixture.date)+' UK'+(m.fixture.status.short==="TBD"?" (TBC)":"")+'</span><span class="o"><a href="/manutd/match/?id='+m.fixture.id+'" style="color:inherit;text-decoration:none">'+MU.crest(opp.name)+MU.esc(opp.name)+'</a> <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r"></span></li>'}).join("")}
+    var next=j.response.filter(function(m){return m.fixture.status.short==="NS"||m.fixture.status.short==="TBD"}).sort(function(a,b){return new Date(MU.ko(a).ko)-new Date(MU.ko(b).ko)}).slice(0,8);
+    if(next.length){document.getElementById("upcoming").innerHTML=next.map(function(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, k=MU.ko(m);
+      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(k.ko)+'<br>'+MU.fmtUK(k.ko)+' UK'+MU.prov(k)+'</span><span class="o"><a href="/manutd/match/?id='+m.fixture.id+'" style="color:inherit;text-decoration:none">'+MU.crest(opp.name)+MU.esc(opp.name)+'</a> <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r"></span></li>'}).join("")}
   }).catch(function(e){MU.apiDown(document.getElementById("last"),e)});
 })();
 </script></body></html>

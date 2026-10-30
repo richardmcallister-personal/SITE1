@@ -66,3 +66,5 @@ html,body{overflow-x:hidden}
   header.mu{padding-top:18px} .from{text-align:left}
   nav.munav a{font-size:12px;padding:11px 12px}
 }
+
+.prov{display:inline-block;font-family:var(--head);font-weight:500;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#7a5a00;background:#fff4c2;border:1px solid #e6c84a;border-radius:3px;padding:1px 5px;margin-left:6px;vertical-align:middle}

@@ -37,7 +37,16 @@ window.MU=(function(){
   function fmtDate(iso,opt){return new Date(iso).toLocaleDateString("en-GB",Object.assign({weekday:"short",day:"numeric",month:"short",timeZone:"Europe/London"},opt||{}))}
   function fmtUK(iso){return new Date(iso).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/London"})}
   function fmtSE(iso){return new Date(iso).toLocaleTimeString("sv-SE",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Stockholm"})}
+  // ---- single fixture source: fixtures.js wins over the API for kick-off date/time; the API supplies ids, scores, status.
+  function nrm(n){return String(n||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z]/g,"")}
+  function fixFor(opp,home,iso){var L=window.MU_FIXTURES||[], a=nrm(opp), t=iso?new Date(iso).getTime():0;
+    return L.filter(function(f){if(!!f.home!==!!home)return false; var b=nrm(f.opp); if(!(a===b||a.indexOf(b)===0||b.indexOf(a)===0))return false; return !t||Math.abs(new Date(f.ko).getTime()-t)<5*864e5})[0]||null}
+  // ko(m): for an API match object → {ko, conf, src}. ko(f) for a fixtures.js entry works too.
+  function ko(m){ if(m&&m.fixture){var home=m.teams.home.id===TEAM, opp=(home?m.teams.away:m.teams.home).name, f=fixFor(opp,home,m.fixture.date);
+      if(f)return {ko:f.ko,conf:!!f.conf,src:"site"}; return {ko:m.fixture.date,conf:m.fixture.status.short!=="TBD",src:"api"} }
+    return {ko:m.ko,conf:!!m.conf,src:"site"} }
+  function prov(x){var c=x&&typeof x==="object"?x.conf:x; return c?"":'<span class="prov" title="Original Premier League slot — may move when that month\'s TV picks are announced">Provisional</span>'}
   function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
   function formHtml(str){return '<span class="form">'+String(str||"").split("").map(function(c){return '<b class="'+c+'">'+c+'</b>'}).join("")+'</span>'}
-  return {TEAM:TEAM,nav:nav,crest:crest,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,esc:esc,form:formHtml};
+  return {TEAM:TEAM,nav:nav,fixFor:fixFor,ko:ko,prov:prov,crest:crest,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,esc:esc,form:formHtml};
 })();

@@ -1,4 +1,9 @@
-// Fixture list: the club's official fixtures page, checked 30 Oct 2026 (times UK, stored as UTC). Used until the live API answers.
+// Single fixture source for every page (hub, season, trips, squad, match).
+// Dates/times from the club's official fixtures page, checked 30 Oct 2026, stored as UTC.
+// conf:true  = kick-off confirmed (Premier League TV picks announced, or a UEFA date).
+// conf:false = provisional: the original Premier League slot, which may move once that month's TV picks are announced
+//              (January picks are normally announced mid-November, and so on month by month).
+// The API-Football feed is used for ids, scores and status only; where it still shows a provisional slot, this file wins.
 window.MU_FIXTURES=[
 {
 "opp": "Chelsea",
@@ -6,21 +11,24 @@ window.MU_FIXTURES=[
 "ko": "2026-10-31T12:30:00Z",
 "home": false,
 "venue": "Stamford Bridge",
-"col": "#034694"
+"col": "#034694",
+"conf": true
 },
 {
 "opp": "Roma",
 "comp": "Champions League",
 "ko": "2026-11-03T20:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": true
 },
 {
 "opp": "Aston Villa",
 "comp": "Premier League",
 "ko": "2026-11-08T16:30:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": true
 },
 {
 "opp": "Liverpool",
@@ -28,7 +36,8 @@ window.MU_FIXTURES=[
 "ko": "2026-11-22T16:30:00Z",
 "home": false,
 "venue": "Anfield",
-"col": "#C8102E"
+"col": "#C8102E",
+"conf": true
 },
 {
 "opp": "Sporting CP",
@@ -36,14 +45,16 @@ window.MU_FIXTURES=[
 "ko": "2026-11-25T20:00:00Z",
 "home": false,
 "venue": "Estádio José Alvalade",
-"col": "#008056"
+"col": "#008056",
+"conf": true
 },
 {
 "opp": "Brentford",
 "comp": "Premier League",
 "ko": "2026-11-28T15:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": true
 },
 {
 "opp": "Newcastle United",
@@ -51,21 +62,24 @@ window.MU_FIXTURES=[
 "ko": "2026-12-02T20:15:00Z",
 "home": false,
 "venue": "St. James' Park",
-"col": "#241F20"
+"col": "#241F20",
+"conf": true
 },
 {
 "opp": "Coventry City",
 "comp": "Premier League",
 "ko": "2026-12-05T15:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": true
 },
 {
 "opp": "RB Leipzig",
 "comp": "Champions League",
 "ko": "2026-12-08T20:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": true
 },
 {
 "opp": "Crystal Palace",
@@ -73,7 +87,8 @@ window.MU_FIXTURES=[
 "ko": "2026-12-13T19:00:00Z",
 "home": false,
 "venue": "Selhurst Park",
-"col": "#1B458F"
+"col": "#1B458F",
+"conf": true
 },
 {
 "opp": "Arsenal",
@@ -81,21 +96,24 @@ window.MU_FIXTURES=[
 "ko": "2026-12-20T16:30:00Z",
 "home": false,
 "venue": "Emirates Stadium",
-"col": "#EF0107"
+"col": "#EF0107",
+"conf": true
 },
 {
 "opp": "Nottingham Forest",
 "comp": "Premier League",
 "ko": "2026-12-27T16:30:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": true
 },
 {
 "opp": "Sunderland",
 "comp": "Premier League",
 "ko": "2026-12-30T19:30:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": true
 },
 {
 "opp": "Brighton & Hove Albion",
@@ -103,14 +121,16 @@ window.MU_FIXTURES=[
 "ko": "2027-01-02T12:30:00Z",
 "home": false,
 "venue": "American Express Stadium",
-"col": "#0057B8"
+"col": "#0057B8",
+"conf": false
 },
 {
 "opp": "Newcastle United",
 "comp": "Premier League",
 "ko": "2027-01-07T20:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": false
 },
 {
 "opp": "Aston Villa",
@@ -118,21 +138,24 @@ window.MU_FIXTURES=[
 "ko": "2027-01-16T15:00:00Z",
 "home": false,
 "venue": "Villa Park",
-"col": "#670E36"
+"col": "#670E36",
+"conf": false
 },
 {
 "opp": "Bayern München",
 "comp": "Champions League",
 "ko": "2027-01-20T20:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": true
 },
 {
 "opp": "Liverpool",
 "comp": "Premier League",
 "ko": "2027-01-23T15:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": false
 },
 {
 "opp": "Villarreal",
@@ -140,7 +163,8 @@ window.MU_FIXTURES=[
 "ko": "2027-01-27T20:00:00Z",
 "home": false,
 "venue": "Estadio de la Cerámica",
-"col": "#FFE667"
+"col": "#FFE667",
+"conf": true
 },
 {
 "opp": "Brentford",
@@ -148,21 +172,24 @@ window.MU_FIXTURES=[
 "ko": "2027-01-30T15:00:00Z",
 "home": false,
 "venue": "Gtech Community Stadium",
-"col": "#E30613"
+"col": "#E30613",
+"conf": false
 },
 {
 "opp": "Chelsea",
 "comp": "Premier League",
 "ko": "2027-02-06T15:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": false
 },
 {
 "opp": "Brighton & Hove Albion",
 "comp": "Premier League",
 "ko": "2027-02-10T20:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": false
 },
 {
 "opp": "Nottingham Forest",
@@ -170,14 +197,16 @@ window.MU_FIXTURES=[
 "ko": "2027-02-20T15:00:00Z",
 "home": false,
 "venue": "The City Ground",
-"col": "#DD0000"
+"col": "#DD0000",
+"conf": false
 },
 {
 "opp": "Arsenal",
 "comp": "Premier League",
 "ko": "2027-02-27T15:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": false
 },
 {
 "opp": "Sunderland",
@@ -185,14 +214,16 @@ window.MU_FIXTURES=[
 "ko": "2027-03-03T20:00:00Z",
 "home": false,
 "venue": "Stadium of Light",
-"col": "#EB172B"
+"col": "#EB172B",
+"conf": false
 },
 {
 "opp": "Everton",
 "comp": "Premier League",
 "ko": "2027-03-13T15:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": false
 },
 {
 "opp": "Manchester City",
@@ -200,14 +231,16 @@ window.MU_FIXTURES=[
 "ko": "2027-03-20T15:00:00Z",
 "home": false,
 "venue": "Etihad Stadium",
-"col": "#6CABDD"
+"col": "#6CABDD",
+"conf": false
 },
 {
 "opp": "Hull City",
 "comp": "Premier League",
 "ko": "2027-04-10T14:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": false
 },
 {
 "opp": "Ipswich Town",
@@ -215,14 +248,16 @@ window.MU_FIXTURES=[
 "ko": "2027-04-17T14:00:00Z",
 "home": false,
 "venue": "Portman Road",
-"col": "#0E00F7"
+"col": "#0E00F7",
+"conf": false
 },
 {
 "opp": "Crystal Palace",
 "comp": "Premier League",
 "ko": "2027-04-24T14:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": false
 },
 {
 "opp": "Coventry City",
@@ -230,7 +265,8 @@ window.MU_FIXTURES=[
 "ko": "2027-05-01T14:00:00Z",
 "home": false,
 "venue": "Coventry Building Society Arena",
-"col": "#78D0F1"
+"col": "#78D0F1",
+"conf": false
 },
 {
 "opp": "AFC Bournemouth",
@@ -238,14 +274,16 @@ window.MU_FIXTURES=[
 "ko": "2027-05-08T14:00:00Z",
 "home": false,
 "venue": "Vitality Stadium",
-"col": "#DA291C"
+"col": "#DA291C",
+"conf": false
 },
 {
 "opp": "Leeds United",
 "comp": "Premier League",
 "ko": "2027-05-15T14:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": false
 },
 {
 "opp": "Tottenham Hotspur",
@@ -253,13 +291,15 @@ window.MU_FIXTURES=[
 "ko": "2027-05-23T14:00:00Z",
 "home": false,
 "venue": "Tottenham Hotspur Stadium",
-"col": "#132257"
+"col": "#132257",
+"conf": false
 },
 {
 "opp": "Fulham",
 "comp": "Premier League",
 "ko": "2027-05-30T15:00:00Z",
 "home": true,
-"venue": "Old Trafford"
+"venue": "Old Trafford",
+"conf": false
 }
 ];
