@@ -295,7 +295,7 @@ function boxFields(wt, re) {
   }
   parts.push(cur);
   const f = {};
-  parts.slice(1).forEach((p) => { const m = p.match(/^\s*([\w\-]+)\s*=\s*([\s\S]*)$/); if (m) f[m[1].toLowerCase().replace(/_/g, "")] = wtClean(m[2]); });
+  parts.slice(1).forEach((p) => { const m = p.match(/^\s*([\w\- ]+?)\s*=\s*([\s\S]*)$/); if (m) f[m[1].toLowerCase().replace(/[_\s]/g, "")] = wtClean(m[2]); });
   return f;
 }
 function parseInfobox(wt) {
@@ -456,10 +456,10 @@ function isoWeek(d) { const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMo
 async function wikiSeason(url, env, ctx) {
   const s = (url.searchParams.get("s") || "").trim();              // "1992-93"
   const m = s.match(/^(\d{4})-(\d{2})$/); if (!m) return json({ error: "s=YYYY-YY required" }, 400);
-  const key = "wiki:s:v1:" + s, cached = url.searchParams.get("debug") ? null : await env.MU_CACHE.get(key);
+  const key = "wiki:s:v2:" + s, cached = url.searchParams.get("debug") ? null : await env.MU_CACHE.get(key);
   if (cached) return new Response(cached, { headers: headers("kv-hit") });
   const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
-  const y = +m[1], yy = m[1] + "–" + m[2];
+  const y = +m[1], yy = m[1] + "–" + (m[2] === "00" ? String(y + 1) : m[2]);
   const cands = y < 1902 ? [yy + " Newton Heath F.C. season", yy + " Newton Heath LYR F.C. season", yy + " Manchester United F.C. season"] : [yy + " Manchester United F.C. season"];
   let sum = null, title = "";
   for (const c of cands) {
