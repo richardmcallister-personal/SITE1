@@ -6,11 +6,12 @@
 <style>
 .filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 8px} .filters button{font:inherit;font-size:13px;padding:7px 12px;border:1px solid var(--rule);background:#fff;cursor:pointer} .filters button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)} .filters button b{font-family:var(--head);font-weight:400;margin-left:6px;color:var(--muted)} .filters button[aria-pressed="true"] b{color:#ccc}
 .era{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:22px 0 4px;border-bottom:1px solid var(--rule);padding-bottom:4px} .era small{text-transform:none;letter-spacing:0;font-family:var(--body);font-weight:400;margin-left:8px}
-.item{display:grid;grid-template-columns:64px 1fr;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule)}
+.item{display:grid;grid-template-columns:64px 96px 1fr;gap:14px;padding:14px 0;border-bottom:1px solid var(--rule)}
+.item .cov{width:96px;height:140px;background:var(--tint);display:flex;align-items:center;justify-content:center;overflow:hidden} .item .cov img{width:100%;height:100%;object-fit:cover;display:block} .item .cov.pod img{object-fit:contain;background:#fff} .item .cov span{font-size:10px;color:var(--muted);text-align:center;padding:6px}
 .item .kind{font-family:var(--head);font-weight:500;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:var(--ink);text-align:center;padding:6px 4px;height:fit-content} .item .kind.book{background:#4a3b2a}.item .kind.doc{background:var(--red)}.item .kind.film{background:#1a2a5a}.item .kind.pod{background:#0a7a2f}
 .item h3{margin:0;font-family:var(--body);font-weight:600;font-size:17px;letter-spacing:0;text-transform:none;color:var(--ink)} .item .by{font-size:13px;color:var(--muted);margin:2px 0 6px} .item .adds{font-size:14px;line-height:1.5;max-width:78ch} .item .where{font-size:12px;color:var(--muted);margin-top:6px} .item .where b{color:var(--ink);font-weight:500}
 .item .acts{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap} .item .acts a,.item .acts button{font:inherit;font-size:11px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--ink);background:var(--tint);padding:4px 8px;border:0;cursor:pointer} .item .acts button[aria-pressed="true"]{background:#0a7a2f;color:#fff}
-@media (max-width:640px){.item{grid-template-columns:52px 1fr;gap:10px}}
+@media (max-width:640px){.item{grid-template-columns:52px 72px 1fr;gap:10px} .item .cov{width:72px;height:105px}}
 </style>
 </head><body><div class="wrap">
 <header class="mu">
@@ -40,8 +41,16 @@
     rows.sort(function(a,b){return order.indexOf(a.era)-order.indexOf(b.era)||a.y-b.y});
     rows.forEach(function(x){if(x.era!==e){e=x.era; out+='<div class="era">'+ERA[e][0]+(ERA[e][1]?'<small>'+ERA[e][1]+'</small>':'')+'</div>'}
       var q=encodeURIComponent(x.t+" "+(x.k==="book"?x.by.split(" with ")[0]:"Manchester United")), i=id(x);
-      out+='<div class="item"><div class="kind '+x.k+'">'+KIND[x.k]+'</div><div><h3>'+MU.esc(x.t)+'</h3><div class="by">'+MU.esc(x.by)+' · '+x.y+'</div><div class="adds">'+MU.esc(x.adds)+'</div><div class="where"><b>Where:</b> '+MU.esc(x.where)+'</div><div class="acts"><button data-id="'+i+'" aria-pressed="'+!!done[i]+'">'+(done[i]?"✓ Done":"Mark done")+'</button>'+(x.k==="book"?'<a href="https://www.worldcat.org/search?q='+q+'" target="_blank" rel="noopener">Find a copy</a>':x.k==="pod"?'<a href="https://www.youtube.com/results?search_query='+q+'" target="_blank" rel="noopener">Find it</a>':'<a href="https://www.justwatch.com/se/search?q='+encodeURIComponent(x.t)+'" target="_blank" rel="noopener">Where to stream</a>')+'<a href="https://www.youtube.com/@manutd/search?query='+q+'" target="_blank" rel="noopener">United channel</a></div></div></div>'});
+      out+='<div class="item"><div class="kind '+x.k+'">'+KIND[x.k]+'</div><div class="cov '+x.k+'" data-cov="'+i+'"><span>'+KIND[x.k]+'</span></div><div><h3>'+MU.esc(x.t)+'</h3><div class="by">'+MU.esc(x.by)+' · '+x.y+'</div><div class="adds">'+MU.esc(x.adds)+'</div><div class="where"><b>Where:</b> '+MU.esc(x.where)+'</div><div class="acts"><button data-id="'+i+'" aria-pressed="'+!!done[i]+'">'+(done[i]?"✓ Done":"Mark done")+'</button>'+(x.k==="book"?'<a href="https://www.worldcat.org/search?q='+q+'" target="_blank" rel="noopener">Find a copy</a>':x.k==="pod"?'<a href="https://www.youtube.com/results?search_query='+q+'" target="_blank" rel="noopener">Find it</a>':'<a href="https://www.justwatch.com/se/search?q='+encodeURIComponent(x.t)+'" target="_blank" rel="noopener">Where to stream</a>')+'<a href="https://www.youtube.com/@manutd/search?query='+q+'" target="_blank" rel="noopener">United channel</a></div></div></div>'});
     $("list").innerHTML=out||'<p class="sub">Nothing here for that combination.</p>';
+    rows.forEach(covers);
+  }
+  var COV={};
+  function covers(x){var i=id(x), el=document.querySelector('[data-cov="'+i+'"]'); if(!el)return;
+    function put(u){if(u){el.innerHTML='<img src="'+u+'" alt="" loading="lazy" onerror="this.parentNode.innerHTML=\'<span>'+KIND[x.k]+'</span>\'">'}}
+    if(COV[i]!==undefined)return put(COV[i]);
+    var q=x.k==="book"?{type:"book",q:x.t,by:x.by}:x.k==="pod"?{type:"pod",q:x.t.replace(/^The Athletic: /,"").replace(/^UWS: /,"")}:{type:"wiki",q:x.t,hint:x.k==="film"?"film":"documentary "+x.y};
+    MU.api("../cover",q).then(function(j){COV[i]=j.url||""; put(COV[i])}).catch(function(){COV[i]=""});
   }
   $("list").addEventListener("click",function(e){var b=e.target.closest("button[data-id]"); if(!b)return; done[b.dataset.id]=!done[b.dataset.id]; if(!done[b.dataset.id])delete done[b.dataset.id]; save(); render()});
   function chips(el,list,cur,set){el.innerHTML=list.map(function(x){return '<button data-v="'+x[0]+'" aria-pressed="'+(x[0]===cur)+'">'+x[1]+(x[2]!=null?'<b>'+x[2]+'</b>':'')+'</button>'}).join(""); el.addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; set(b.dataset.v); [].forEach.call(el.children,function(x){x.setAttribute("aria-pressed",x===b)}); render()})}

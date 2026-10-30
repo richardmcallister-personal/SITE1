@@ -56,7 +56,7 @@ export default {
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + (WIKI ? "/trips/" : "/manutd/trips/"), 301);
     if (WIKI) {
       // Clean URLs on the club domain: the site lives under /manutd/ in the repo; serve it at the root here.
-      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|collection)(\/|$)/;
+      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|collection|cover)(\/|$)/;
       if (url.pathname.startsWith("/manutd/")) return Response.redirect(url.origin + url.pathname.slice(7) + url.search, 301);
       if (!SERVICE.test(url.pathname)) {
         const inner = new URL(url.toString()); inner.pathname = "/manutd" + (url.pathname === "/" ? "/" : url.pathname);
@@ -76,6 +76,7 @@ export default {
     if (url.pathname === "/wiki-season") return wikiSeason(url, env, ctx);
     if (url.pathname === "/wiki-club") return wikiClub(url, env, ctx);
     if (url.pathname === "/wiki-raw") return wikiRaw(url, env, ctx);
+    if (url.pathname === "/cover") return cover(url, env, ctx);
     if (url.pathname === "/collection") { try { return await collection(request, url, env); } catch (e) { return json({ error: "collection: " + (e && e.message || e) }, 500); } }
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
 
@@ -548,4 +549,34 @@ async function collection(request, url, env) {
   }
   const cur = await env.MU_CACHE.get(id);
   return new Response(cur || JSON.stringify({ owned: [], wish: [], notes: {}, updated: null }), { headers: cors });
+}
+
+
+// ---- Cover art lookup for the bookshelf: Open Library (books), Wikipedia page image (films, documentaries), Apple podcast directory (shows).
+async function cover(url, env, ctx) {
+  const type = url.searchParams.get("type") || "book", q = (url.searchParams.get("q") || "").trim(), by = (url.searchParams.get("by") || "").trim();
+  if (!q) return json({ error: "q required" }, 400);
+  const key = "cover:v1:" + type + ":" + (q + "|" + by).toLowerCase(), cached = await env.MU_CACHE.get(key);
+  if (cached) return new Response(cached, { headers: headers("kv-hit") });
+  const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
+  let out = { url: "", src: "" };
+  try {
+    if (type === "book") {
+      const r = await fetch("https://openlibrary.org/search.json?limit=5&fields=key,title,cover_i,author_name,first_publish_year&title=" + encodeURIComponent(q) + (by ? "&author=" + encodeURIComponent(by.split(/ with | and /)[0]) : ""), { headers: UA });
+      const j = r.ok ? await r.json() : {}; const hit = (j.docs || []).filter((d) => d.cover_i)[0];
+      if (hit) out = { url: "https://covers.openlibrary.org/b/id/" + hit.cover_i + "-M.jpg", src: "Open Library", title: hit.title };
+    } else if (type === "pod") {
+      const r = await fetch("https://itunes.apple.com/search?media=podcast&limit=3&term=" + encodeURIComponent(q), { headers: UA });
+      const j = r.ok ? await r.json() : {}; const hit = (j.results || [])[0];
+      if (hit) out = { url: (hit.artworkUrl600 || hit.artworkUrl100 || "").replace("100x100", "600x600"), src: "Apple Podcasts", title: hit.collectionName };
+    } else {
+      // Wikipedia: search for the film/documentary article, then take its lead image.
+      const sr = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=3&srsearch=" + encodeURIComponent(q + " " + (url.searchParams.get("hint") || "film")), { headers: UA });
+      const sj = sr.ok ? await sr.json() : {}; const hit = (sj.query && sj.query.search || [])[0];
+      if (hit) { const pr = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(hit.title.replace(/ /g, "_")), { headers: UA }); const pj = pr.ok ? await pr.json() : {}; if (pj.thumbnail) out = { url: pj.originalimage && pj.originalimage.width < 1200 ? pj.originalimage.source : pj.thumbnail.source, src: "Wikipedia", title: pj.title, page: pj.content_urls ? pj.content_urls.desktop.page : "" }; }
+    }
+  } catch (e) { out.error = String(e); }
+  const body = JSON.stringify(out);
+  ctx.waitUntil(env.MU_CACHE.put(key, body, { expirationTtl: (out.url ? 30 : 1) * 86400 }));
+  return new Response(body, { headers: headers("upstream") });
 }
