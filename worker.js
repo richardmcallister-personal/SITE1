@@ -221,7 +221,7 @@ async function wiki(url, env, ctx) {
     if (!hit) return json({ error: "not found", q }, 404);
     title = hit;
   }
-  const key = "wiki:p:v6:" + title;
+  const key = "wiki:p:v7:" + title;
   const cached = url.searchParams.get("debug") ? null : await env.MU_CACHE.get(key);
   if (cached) return new Response(cached, { headers: headers("kv-hit") });
   const enc = encodeURIComponent(title.replace(/ /g, "_"));
@@ -230,11 +230,26 @@ async function wiki(url, env, ctx) {
     fetch("https://en.wikipedia.org/w/api.php?action=parse&format=json&prop=wikitext&redirects=1&page=" + enc, { headers: UA }),
     fetch("https://en.wikipedia.org/w/api.php?action=query&format=json&redirects=1&generator=images&gimlimit=30&prop=imageinfo&iiprop=url|mime&iiurlwidth=640&titles=" + enc, { headers: UA }),
   ]);
-  const sum = sr.ok ? await sr.json() : {};
-  const wj = wr.ok ? await wr.json() : {};
-  const ij = ir.ok ? await ir.json() : {};
-  const wt = wj.parse && wj.parse.wikitext ? wj.parse.wikitext["*"] : "";
-  const box = parseInfobox(wt);
+  let sum = sr.ok ? await sr.json() : {};
+  let wj = wr.ok ? await wr.json() : {};
+  let ij = ir.ok ? await ir.json() : {};
+  let wt = wj.parse && wj.parse.wikitext ? wj.parse.wikitext["*"] : "";
+  let box = parseInfobox(wt);
+  if ((sum.type === "disambiguation" || !box) && !url.searchParams.get("noretry")) {
+    // Wrong article (a disambiguation page, or no football infobox): try the "(footballer)" title, then a biography search.
+    const tries = [title + " (footballer)", title + " (Irish footballer)", title + " (Scottish footballer)", title + " (English footballer)"];
+    let found = null;
+    for (const t of tries) {
+      const r = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(t.replace(/ /g, "_")), { headers: UA });
+      if (r.ok) { const j = await r.json(); if (j.type !== "disambiguation" && /footballer|football manager|football player|soccer/i.test(j.description || "")) { found = j.title; break; } }
+    }
+    if (!found) {
+      const r = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=5&srsearch=" + encodeURIComponent('hastemplate:"Infobox football biography" "' + title.replace(/ \(.*\)$/, "") + '" Manchester United'), { headers: UA });
+      const j = r.ok ? await r.json() : null; const hit = j && j.query && j.query.search[0];
+      if (hit) found = hit.title;
+    }
+    if (found && found !== title) { const u2 = new URL(url.toString()); u2.searchParams.set("title", found); u2.searchParams.set("noretry", "1"); return wiki(u2, env, ctx); }
+  }
   if (url.searchParams.get("debug")) { const i0 = wt.search(/\{\{\s*Infobox football biography/i); return json({ keys: box && box._keys, raw: wt.slice(i0, i0 + 6000) }); }
   // Photos from the article: real photographs only (no SVG icons, flags, crests, maps).
   const images = Object.values((ij.query && ij.query.pages) || {}).filter((pg) => pg.imageinfo && pg.imageinfo[0] && /image\/(jpeg|png)/.test(pg.imageinfo[0].mime) && !/flag|logo|crest|badge|icon|map|kit|shirt|signature|wikimedia|commons-logo|stadium/i.test(pg.title))
