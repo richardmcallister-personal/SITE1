@@ -89,7 +89,7 @@ table.mu td.yrs{white-space:nowrap;color:var(--muted)}
           var r=j.response&&j.response[0]; if(!r)return;
           var st=(r.statistics||[]).filter(function(x){return x.team&&x.team.id===MU.TEAM&&x.games&&(x.games.appearences||x.games.minutes)});
           var yr=st.length&&st[0].league.season, lbl=yr?yr+"/"+String(yr+1).slice(2):"";
-          var gk=st.some(function(x){return x.goals&&x.goals.saves!=null})||/Goalkeeper/i.test(r.player.position||"");
+          var gk=st.some(function(x){return /Goalkeeper/i.test(x.games.position||"")})||/Goalkeeper/i.test(b.position||"");
           var tot={apps:0,starts:0,min:0,g:0,a:0,y:0,rd:0,sv:0,gc:0,r:[]};
           var rows=st.map(function(x){var g=x.games,go=x.goals||{},c=x.cards||{}; tot.apps+=g.appearences||0; tot.starts+=g.lineups||0; tot.min+=g.minutes||0; tot.g+=go.total||0; tot.a+=go.assists||0; tot.y+=c.yellow||0; tot.rd+=c.red||0; tot.sv+=go.saves||0; tot.gc+=go.conceded||0; if(g.rating)tot.r.push([+g.rating,g.appearences||1]);
             return '<tr><td>'+MU.comp(x.league.name,18)+MU.esc(x.league.name)+'</td><td class="n">'+(g.appearences||0)+' <small>('+(g.lineups||0)+')</small></td><td class="n">'+(g.minutes||0)+'</td>'+(gk?'<td class="n">'+(go.conceded==null?"—":go.conceded)+'</td><td class="n">'+(go.saves==null?"—":go.saves)+'</td>':'<td class="n">'+(go.total||0)+'</td><td class="n">'+(go.assists||0)+'</td>')+'<td class="n">'+(c.yellow||0)+(c.red?' / <span style="color:var(--red)">'+c.red+'</span>':'')+'</td><td class="n">'+(g.rating?(+g.rating).toFixed(2):"—")+'</td></tr>'}).join("");
