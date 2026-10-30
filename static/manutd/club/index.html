@@ -41,7 +41,7 @@
   <div class="filters" id="filters"><button data-f="all" aria-pressed="true">All</button><button data-f="L">League</button><button data-f="FAC">FA Cup</button><button data-f="OTH">League Cup & Europe</button><button data-f="H">At Old Trafford</button><button data-f="A">Away</button></div>
   <div id="list" class="res"></div>
 </div>
-<footer class="mu"><span id="stamp"></span> Club profile from Wikipedia, CC BY-SA 4.0. Head-to-head figures are league and FA Cup meetings: the match archive to 2024/25 (FA Cup to 2018/19), then the live feed from 2025/26. League Cup and European ties appear from 2025/26 but are not counted. <a href="/manutd/history/seasons/">All seasons</a></footer>
+<footer class="mu"><span id="stamp"></span> Club profile from Wikipedia, CC BY-SA 4.0. Head-to-head figures cover every competitive meeting: league and FA Cup from the match archive, League Cup, European and other cup ties from the Wikipedia season articles (1956/57 on, CC BY-SA 4.0), and the live feed from 2021/22 for cups and 2025/26 for everything. Wartime and friendly matches are not included. <a href="/manutd/history/seasons/">All seasons</a></footer>
 </div>
 <script src="/manutd/mu.js"></script>
 <script>
@@ -75,13 +75,13 @@
     return fetch("/manutd/history/clubs/"+canon.slug+".json").then(function(r){if(!r.ok)throw new Error("none");return r.json()})}).then(function(c){
     M=c.matches; var a=c.all, pct=function(n){return a.p?Math.round(100*n/a.p):0};
     $("eyebrow").textContent=a.p+" meetings since "+c.first.slice(0,4);
-    $("h2hNote").textContent="United's record in "+a.p+" league and FA Cup meetings, "+fmt(c.first)+" to "+fmt(c.last)+", across "+c.seasons+" seasons."+(c.other&&c.other.p?" League Cup and European ties ("+c.other.p+" since 2025/26, "+c.other.w+"–"+c.other.d+"–"+c.other.l+") are listed below but not counted in the totals.":"");
+    $("h2hNote").textContent="United's record in "+a.p+" competitive meetings, "+fmt(c.first)+" to "+fmt(c.last)+", across "+c.seasons+" seasons"+(c.other&&c.other.p?", including "+c.other.p+" League Cup, European and other cup ties.":".");
     $("h2h").innerHTML='<div><b>'+a.p+'</b><span>Played</span></div><div class="w"><b>'+a.w+'</b><span>United wins</span></div><div><b>'+a.d+'</b><span>Draws</span></div><div class="l"><b>'+a.l+'</b><span>'+MU.esc(name)+' wins</span></div><div><b>'+a.gf+'–'+a.ga+'</b><span>Goals</span></div>';
     $("bar").innerHTML='<i class="w" style="width:'+pct(a.w)+'%" title="United wins '+pct(a.w)+'%"></i><i class="d" style="width:'+pct(a.d)+'%"></i><i class="l" style="width:'+pct(a.l)+'%"></i>';
     var sp=function(x){return x.p?x.w+"–"+x.d+"–"+x.l+" ("+x.gf+"–"+x.ga+")":"—"};
-    $("h2hFacts").innerHTML=[["League",sp(c.league)],["FA Cup",sp(c.facup)],["Biggest United win",c.best.gf+"–"+c.best.ga+" · "+fmt(c.best.d)+(c.best.h?" (H)":" (A)")],["Heaviest defeat",c.worst.gf<c.worst.ga?c.worst.gf+"–"+c.worst.ga+" · "+fmt(c.worst.d)+(c.worst.h?" (H)":" (A)"):"Never beaten"],["First meeting",fmt(c.first)],["Most recent",fmt(c.last)]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+MU.esc(f[1])+'</div></div>'}).join("");
+    $("h2hFacts").innerHTML=[["League",sp(c.league)],["FA Cup",sp(c.facup)],["League Cup & Europe",sp(c.other)],["Biggest United win",c.best.gf+"–"+c.best.ga+" · "+fmt(c.best.d)+(c.best.h?" (H)":" (A)")],["Heaviest defeat",c.worst.gf<c.worst.ga?c.worst.gf+"–"+c.worst.ga+" · "+fmt(c.worst.d)+(c.worst.h?" (H)":" (A)"):"Never beaten"],["First meeting",fmt(c.first)],["Most recent",fmt(c.last)]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+MU.esc(f[1])+'</div></div>'}).join("");
     render();
-  }).catch(function(){$("h2hNote").textContent="No league or FA Cup meetings with "+name+" in the archive (European and League Cup ties are not included)."; $("list").innerHTML=""});
+  }).catch(function(){$("h2hNote").textContent="No competitive meetings with "+name+" in the archive."; $("list").innerHTML=""});
 })();
 </script>
 </body></html>

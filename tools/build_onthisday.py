@@ -13,7 +13,7 @@ for f in sorted(glob.glob(H + '/data/*.json')):
     for r in d['results']: add(r, d['id'], d['div'] if r['c'] == 'L' else 'FA Cup')
 for f in glob.glob(H + '/clubs/*.json'):
     for m in json.load(open(f))['matches']:
-        if m['s'] >= '2025-26': add(m, m['s'], m.get('div', ''))
+        if m['c'] not in ('L',) or m['s'] >= '2025-26': add(m, m['s'], m.get('div', ''))   # cups from build_cups.py and recent seasons
 S = {s['id']: s for s in json.load(open(H + '/seasons.json'))}
 key = {}
 for s in S.values():

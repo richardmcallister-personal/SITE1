@@ -5,7 +5,7 @@
 },
 "clubs": {
 "date": "2026-10-30",
-"note": "107 clubs"
+"note": "232 clubs"
 },
 "numbers": {
 "date": "2026-10-30",
@@ -29,10 +29,14 @@
 },
 "onthisday": {
 "date": "2026-10-30",
-"note": "5266 matches across 302 days"
+"note": "6006 matches across 315 days"
 },
 "grounds": {
 "date": "2026-10-30",
 "note": "17 grounds from the host clubs' own supporter pages"
+},
+"cups": {
+"date": "2026-10-30",
+"note": "711 cup and European matches 1956–2025"
 }
 }
