@@ -36,7 +36,7 @@ a.pl{color:inherit;text-decoration:none;border-bottom:1px dotted #999}
 
 <div class="sheet">
   <h2>This week</h2>
-  <p class="sub" id="weekNote">Every match in the last seven days for a United loanee or an academy player in the first-team squad: minutes, role, position and match rating.</p>
+  <p class="sub" id="weekNote">Every match in the last seven days for a United loanee, an academy player in the first-team squad, or an under-21 signing: minutes, role, position and match rating. Unused substitutes are listed too.</p>
   <div class="cards" id="week"></div>
 </div>
 <div class="sheet">
@@ -77,18 +77,18 @@ a.pl{color:inherit;text-decoration:none;border-bottom:1px dotted #999}
   function render(j){
     var P=j.players||[], loans=P.filter(function(p){return p.status==="loan"}), acad=P.filter(function(p){return p.status==="academy"});
     P.forEach(function(p){p.seasonYear=j.season});
-    $("tLoan").textContent=loans.length; $("tAcad").textContent=acad.length;
+    $("tLoan").textContent=loans.length; $("tAcad").textContent=acad.length+(P.filter(function(p){return p.status==="young"}).length?" (+"+P.filter(function(p){return p.status==="young"}).length+" U21 signings)":"");
     $("tWin").textContent=MU.fmtDate(j.window.from+"T12:00:00Z")+" – "+MU.fmtDate(j.window.to+"T12:00:00Z"); $("tUpd").textContent=MU.fmtDate(j.generated)+" "+MU.fmtUK(j.generated)+" UK";
     // This week
     var wk=P.filter(function(p){return p.week&&p.week.length});
     $("week").innerHTML=wk.length?wk.map(function(p){
-      return '<div class="card"><div class="who">'+face(p)+'<div><b>'+plink(p)+'<span class="badge '+(p.status==="loan"?"loan":"acad")+'">'+(p.status==="loan"?"On loan":"Academy")+'</span></b><small>'+(p.age?p.age+" · ":"")+MU.esc(p.position||"")+' · '+club(p.club,16)+'</small></div></div><ul>'+
+      return '<div class="card"><div class="who">'+face(p)+'<div><b>'+plink(p)+'<span class="badge '+(p.status==="loan"?"loan":p.status==="young"?"note":"acad")+'">'+(p.status==="loan"?"On loan":p.status==="young"?"U21 signing":"Academy")+'</span></b><small>'+(p.age?p.age+" · ":"")+MU.esc(p.position||"")+' · '+club(p.club,16)+'</small></div></div><ul>'+
         p.week.sort(function(a,b){return a.fixture.date<b.fixture.date?1:-1}).map(function(w){var n=notable(w); return '<li><div>'+MU.fmtDate(w.fixture.date)+' · '+(w.fixture.home?"v ":"at ")+club(w.fixture.opp,16)+' <b>'+w.fixture.score+'</b><div class="m">'+MU.esc(w.fixture.league)+' · '+role(w)+(n.length?' · <b>'+n.join(", ")+'</b>':'')+'</div></div><div style="text-align:right"><b>'+w.minutes+'′</b><div class="m">'+rate(w.rating)+'</div></div></li>'}).join("")+'</ul></div>'
     }).join(""):'<p class="empty">No loanee or academy squad member played in the last seven days (or the feed has no match data for their clubs yet).</p>';
     // Loan watch
     $("loans").innerHTML=loans.length?'<table class="mu"><thead><tr><th>Player</th><th>Club</th><th>Competition</th><th class="n">Apps <small>(starts)</small></th><th class="n">Mins</th><th class="n">G</th><th class="n">A</th><th class="n">Cards</th><th class="n">Rating</th></tr></thead><tbody>'+loans.map(function(p){
-      var rows=p.season.filter(function(x){return x.team.id===p.club.id}); if(!rows.length)rows=p.season;
-      if(!rows.length)return '<tr><td class="who">'+plink(p)+'</td><td>'+club(p.club)+'</td><td colspan="7" class="empty">No appearances yet'+(p.since?' · loan from '+MU.fmtDate(p.since):'')+'</td></tr>';
+      var rows=p.season.filter(function(x){return x.team.id===p.club.id});
+      if(!rows.length)return '<tr><td class="who">'+plink(p)+'</td><td>'+club(p.club)+'</td><td colspan="7" class="empty">No club appearances yet'+(p.since?' · loan from '+MU.fmtDate(p.since):'')+'</td></tr>';
       return rows.map(function(x,i){return '<tr>'+(i===0?'<td class="who" rowspan="'+rows.length+'">'+plink(p)+'<br><small style="color:var(--muted)">'+(p.age?p.age+" · ":"")+MU.esc(p.position||x.position||"")+'</small></td><td rowspan="'+rows.length+'">'+club(x.team)+'</td>':'')+'<td>'+MU.esc(x.league)+'</td><td class="n">'+x.apps+' <small>('+x.starts+')</small></td><td class="n">'+x.minutes+'</td><td class="n">'+x.goals+'</td><td class="n">'+x.assists+'</td><td class="n">'+x.yellow+(x.red?' / <span style="color:var(--red)">'+x.red+'</span>':'')+'</td><td class="n">'+rate(x.rating)+'</td></tr>'}).join("")
     }).join("")+'</tbody></table>':'<p class="empty">No loans out recorded by the feed for this season.</p>';
     // Academy

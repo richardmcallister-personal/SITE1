@@ -106,7 +106,7 @@ export default {
         await refresh(env, key, route, url);
         await sleep(1200);
       }
-      const yk = "youth:v1:report", y = await load(env, yk);
+      const yk = "youth:v2:report", y = await load(env, yk);
       if (!y.body || y.age > YOUTH_TTL * 0.8) await buildYouth(env, 25).catch(() => {});
     })());
   },
@@ -333,7 +333,7 @@ function wtClean(v) {
 // ---- Academy & loan watch: one composite report, cached in KV, rebuilt by the cron and on demand when stale.
 const YOUTH_TTL = 6 * 3600;
 async function youth(url, env, ctx) {
-  const key = "youth:v1:report";
+  const key = "youth:v2:report";
   const { body, fresh, age } = await load(env, key);
   if (body && fresh) return answer(body, "kv-hit", age);
   if (body) { ctx.waitUntil(buildYouth(env, 12).catch(() => {})); return answer(body, "kv-stale", age); }
@@ -371,7 +371,9 @@ async function buildYouth(env, limit) {
       loans[p.player.id] = { id: p.player.id, name: p.player.name, status: "loan", club: { id: last.teams.in.id, name: last.teams.in.name, logo: last.teams.in.logo }, since: last.date };
   }
   const squad = (sq.response && sq.response[0] ? sq.response[0].players : []);
-  const academy = squad.filter((p) => (p.age && p.age <= 21) || (p.number && p.number >= 40)).map((p) => ({ id: p.id, name: p.name, status: "academy", club: { id: TEAM, name: "Manchester United", logo: "" }, age: p.age, number: p.number, position: p.position, photo: p.photo }));
+  // Young signings in the squad are watched too, but are not "academy" and get no debut ladder (ids from the API squad list).
+  const SIGNED = new Set([ /* Yoro */ 342970, /* Andrey Santos */ 305834, /* Baleba */ 356041, /* Dorgu */ 382452 ]);
+  const academy = squad.filter((p) => (p.age && p.age <= 21) || (p.number && p.number >= 40)).map((p) => ({ id: p.id, name: p.name, status: SIGNED.has(p.id) ? "young" : "academy", club: { id: TEAM, name: "Manchester United", logo: "" }, age: p.age, number: p.number, position: p.position, photo: p.photo }));
   const watch = Object.values(loans).concat(academy.filter((a) => !loans[a.id]));
   // 2. Season stats per player (all teams, so a loanee's loan-club rows come through), plus earlier seasons for the debut ladder.
   for (const w of watch) {
@@ -436,9 +438,9 @@ async function buildYouth(env, limit) {
   for (const w of watch) { w.utd.squads = bench[w.id] || 0; w.utd.firstThisSeason = first[w.id] || null; w.utd.firstStartThisSeason = firstStart[w.id] || null; }
   watch.sort((a, b) => (a.status === b.status ? (b.week.reduce((x, y) => x + y.minutes, 0) - a.week.reduce((x, y) => x + y.minutes, 0)) : a.status === "loan" ? -1 : 1));
   const out = JSON.stringify({ generated: new Date().toISOString(), season: S, window: { from: iso(d7), to: iso(today) }, players: watch });
-  await env.MU_CACHE.put("youth:v1:report", Math.floor(Date.now() / 1000) + "\n" + YOUTH_TTL + "\n" + out, { expirationTtl: YOUTH_TTL + KEEP });
+  await env.MU_CACHE.put("youth:v2:report", Math.floor(Date.now() / 1000) + "\n" + YOUTH_TTL + "\n" + out, { expirationTtl: YOUTH_TTL + KEEP });
   // weekly archive, one per ISO week, kept 90 days
-  const wk = isoWeek(today); await env.MU_CACHE.put("youth:v1:week:" + wk, out, { expirationTtl: 90 * 86400 });
+  const wk = isoWeek(today); await env.MU_CACHE.put("youth:v2:week:" + wk, out, { expirationTtl: 90 * 86400 });
   return out;
 }
 function isoWeek(d) { const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day); const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return t.getUTCFullYear() + "-W" + String(Math.ceil(((t - y0) / 86400000 + 1) / 7)).padStart(2, "0"); }
