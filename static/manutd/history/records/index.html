@@ -1,0 +1,88 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · Records</title>
+<link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>
+.h2h{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin:10px 0 16px}
+.h2h div{background:#fff;border:1px solid var(--rule);padding:12px;text-align:center} .h2h b{display:block;font-family:var(--head);font-weight:300;font-size:30px;line-height:1} .h2h span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.h2h .w b{color:#0a7a2f}.h2h .l b{color:var(--red)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px} .filters button{font:inherit;font-size:13px;padding:6px 12px;border:1px solid var(--rule);background:#fff;cursor:pointer} .filters button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.res .fxlist li{grid-template-columns:110px 1fr auto;padding:6px 0;gap:10px} .res .fxlist li .o:before{min-width:0;padding:4px 6px 3px;margin-right:8px} .res .fxlist li.home .o:before{content:"H"} .res .fxlist li.away .o:before{content:"A"}
+.res .fxlist .o{font-weight:500} .res .fxlist .o small{display:block;font-size:12px} .res .fxlist .r{font-size:19px;min-width:58px}
+.runs{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px} .run{background:var(--tint);padding:12px 14px} .run b{font-family:var(--head);font-weight:300;font-size:34px;line-height:1;display:block} .run .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)} .run p{margin:6px 0 0;font-size:13px;line-height:1.5} .run small{color:var(--muted)}
+table.mu td.pos{white-space:nowrap} table.mu tr.hl td{font-weight:600}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:22px} @media (max-width:760px){.two{grid-template-columns:1fr}}
+.dec{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px} .dec div{background:#fff;border:1px solid var(--rule);padding:10px 12px;font-size:13px} .dec b{display:block;font-family:var(--head);font-weight:500;font-size:15px;letter-spacing:.08em} .bar{display:flex;height:8px;border-radius:4px;overflow:hidden;margin:6px 0 4px} .bar i{display:block} .bar .w{background:#0a7a2f}.bar .d{background:#bbb}.bar .l{background:var(--red)}
+</style>
+</head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small id="eyebrow">Computed from the archive</small>Manchester<br>United</h1></a>
+  <div class="from">History<span>Records</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+
+<div class="sheet">
+  <h2>Every competitive match</h2>
+  <p class="sub" id="allNote" style="margin:0 0 8px"></p>
+  <div class="h2h" id="all"></div>
+  <div class="dec" id="dec"></div>
+</div>
+<div class="sheet">
+  <h2>Biggest wins and defeats</h2>
+  <div class="filters" id="f1"><button data-k="wins" aria-pressed="true">Biggest wins</button><button data-k="wins_league">League wins</button><button data-k="wins_away">Away wins</button><button data-k="defeats">Heaviest defeats</button><button data-k="defeats_home">Home defeats</button><button data-k="goalfests">Most goals in a game</button><button data-k="draws">Highest-scoring draws</button></div>
+  <div id="games" class="res"></div>
+</div>
+<div class="sheet">
+  <h2>Longest runs</h2>
+  <p class="sub" style="margin:0 0 8px">Consecutive competitive matches, Shield and Super Cup one-offs excluded (the usual convention). The club's 45-match unbeaten run of 1998–99 and the 14 straight wins of 1904–05 both come straight out of the archive.</p>
+  <div class="filters" id="f2"><button data-k="unbeaten" aria-pressed="true">Unbeaten</button><button data-k="unbeaten_league">Unbeaten (league)</button><button data-k="winning">Winning</button><button data-k="winning_league">Winning (league)</button><button data-k="unbeaten_home">Unbeaten at home</button><button data-k="unbeaten_away">Unbeaten away</button><button data-k="scoring">Scoring in every game</button><button data-k="cleansheets">Clean sheets</button><button data-k="winless">Without a win</button><button data-k="losing">Defeats</button><button data-k="goalless">Without scoring</button></div>
+  <div id="runs" class="runs"></div>
+</div>
+<div class="sheet">
+  <h2>Seasons</h2>
+  <p class="sub" style="margin:0 0 8px">League figures per season; "all competitions" columns add the cups. Points are as awarded at the time (two for a win before 1981/82).</p>
+  <div class="filters" id="f3"><button data-k="most_goals" aria-pressed="true">Most league goals</button><button data-k="most_goals_all">Most goals, all comps</button><button data-k="fewest_goals">Fewest goals</button><button data-k="fewest_conceded">Fewest conceded</button><button data-k="most_conceded">Most conceded</button><button data-k="most_points">Most points</button><button data-k="best_pct">Best win rate</button><button data-k="worst_pct">Worst win rate</button><button data-k="most_wins">Most wins</button><button data-k="most_defeats">Most defeats</button><button data-k="clean_sheets">Clean sheets</button><button data-k="away_wins">Away wins</button><button data-k="home_defeats">Home defeats</button></div>
+  <div id="seasons"></div>
+  <p class="sub" id="tiers" style="margin:10px 0 0"></p>
+</div>
+<div class="sheet">
+  <h2>Opponents</h2>
+  <div class="two">
+    <div><h3>Most often played</h3><div id="mostPlayed"></div></div>
+    <div><h3>Best and worst records <small style="color:var(--muted);font-weight:400">(20+ meetings)</small></h3><div id="bestWorst"></div></div>
+  </div>
+</div>
+<footer class="mu"><span id="stamp"></span> Everything on this page is computed from the match archive: league and FA Cup from engsoccerdata, League Cup, European and other cup ties from the Wikipedia season articles (CC BY-SA 4.0), and the live feed for recent seasons. No wartime, friendly or pre-League games, so the archive begins with Newton Heath's first League season, 1892/93. <a href="/manutd/history/seasons/">All seasons</a> · <a href="/manutd/history/opponents/">Every opponent</a> · <a href="/manutd/history/managers/">Every manager</a></footer>
+</div>
+<script src="/manutd/mu.js"></script>
+<script>
+(function(){
+  MU.nav("History"); MU.checked("records",document.getElementById("stamp"),"Last checked");
+  var $=function(i){return document.getElementById(i)}, R;
+  function fmt(d){return MU.fmtDate(d+"T12:00:00Z",{year:"numeric",weekday:undefined})}
+  function sea(s){return '<a href="/manutd/history/season/?s='+s+'">'+s.replace("-","–")+'</a>'}
+  function ordinal(n){var s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
+  function game(m){var res=m.gf>m.ga?"W":m.gf<m.ga?"L":"D", note=(m.c!=="L"?(m.div||"")+(m.r?" · "+m.r:""):m.div||"")+" · "+m.s.replace("-","–");
+    return '<li class="'+(m.h?"home":"away")+'"><span class="d">'+fmt(m.d)+'</span><span class="o">'+(m.h?"United v "+MU.club(m.o):MU.club(m.o)+" v United")+'<small>'+MU.esc(note)+'</small></span><span class="r">'+(m.id?'<a href="/manutd/match/?id='+m.id+'" style="color:inherit;text-decoration:none">':'')+m.gf+'–'+m.ga+(m.id?'</a>':'')+' '+MU.form(res)+'</span></li>'}
+  function tabs(id,fn){var box=$(id); box.addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; [].forEach.call(box.children,function(x){x.setAttribute("aria-pressed",x===b)}); fn(b.dataset.k)}); fn(box.querySelector("[aria-pressed=true]").dataset.k)}
+  function runCard(r,k){var what={unbeaten:"unbeaten",unbeaten_league:"unbeaten in the league",winning:"straight wins",winning_league:"straight league wins",unbeaten_home:"home games unbeaten",unbeaten_away:"away games unbeaten",scoring:"games scoring",cleansheets:"clean sheets in a row",winless:"without a win",losing:"straight defeats",goalless:"without a goal"}[k];
+    return '<div class="run"><b>'+r.n+'</b><span class="k">'+what+'</span><p>'+fmt(r.fr)+' – '+fmt(r.to)+'<br><small>'+r.w+'W '+r.d+'D '+r.l+'L, '+r.gf+'–'+r.ga+' · '+r.s.map(function(s){return s.replace("-","–")}).join(", ")+'</small>'+(r.ended?'<br><small>Ended by '+MU.esc(r.ended.o)+' '+(r.ended.h?"(H) ":"(A) ")+r.ended.gf+'–'+r.ended.ga+', '+fmt(r.ended.d)+'</small>':'')+'</p></div>'}
+  fetch("/manutd/history/records.json").then(function(r){return r.json()}).then(function(j){R=j;
+    var a=j.all, pct=function(n){return Math.round(100*n/a.p)};
+    $("allNote").textContent=a.p+" matches from "+fmt(j.span[0])+" to "+fmt(j.span[1])+".";
+    $("all").innerHTML='<div><b>'+a.p+'</b><span>Played</span></div><div class="w"><b>'+a.w+'</b><span>Won</span></div><div><b>'+a.d+'</b><span>Drawn</span></div><div class="l"><b>'+a.l+'</b><span>Lost</span></div><div><b>'+pct(a.w)+'%</b><span>Win rate</span></div><div><b>'+a.gf+'–'+a.ga+'</b><span>Goals</span></div>';
+    $("dec").innerHTML=j.decades.map(function(d){var p=function(n){return Math.round(100*n/d.p)}; return '<div><b>'+d.dec+'</b>'+d.p+' played · '+p(d.w)+'% won<div class="bar"><i class="w" style="width:'+p(d.w)+'%"></i><i class="d" style="width:'+p(d.d)+'%"></i><i class="l" style="width:'+p(d.l)+'%"></i></div><small style="color:var(--muted)">'+d.w+'–'+d.d+'–'+d.l+', '+d.gf+'–'+d.ga+'</small></div>'}).join("");
+    tabs("f1",function(k){$("games").innerHTML='<ul class="fxlist">'+j[k].map(game).join("")+'</ul>'});
+    tabs("f2",function(k){$("runs").innerHTML=j.runs[k].map(function(r){return runCard(r,k)}).join("")});
+    tabs("f3",function(k){var rows=j.seasons[k], extra=k==="most_goals_all"||k==="clean_sheets"||k==="away_wins"||k==="home_defeats";
+      $("seasons").innerHTML='<table class="mu"><thead><tr><th>Season</th><th>Division</th><th class="n">Pos</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th class="n">GF</th><th class="n">GA</th><th class="n">Pts</th><th class="n">Win %</th>'+(extra?'<th class="n">'+(k==="most_goals_all"?"All comps GF":k==="clean_sheets"?"Clean sheets":k==="away_wins"?"Away wins":"Home defeats")+'</th>':'')+'</tr></thead><tbody>'+rows.map(function(s,i){
+        return '<tr'+(i===0?' class="hl"':'')+'><td class="yrs">'+sea(s.s)+'</td><td>'+MU.esc(s.div)+'</td><td class="n">'+(s.pos?ordinal(s.pos):"—")+'</td><td class="n">'+s.p+'</td><td class="n">'+s.w+'</td><td class="n">'+s.d+'</td><td class="n">'+s.l+'</td><td class="n">'+s.gf+'</td><td class="n">'+s.ga+'</td><td class="n">'+(s.pts==null?"—":s.pts)+'</td><td class="n">'+s.pct+'%</td>'+(extra?'<td class="n">'+(k==="most_goals_all"?s.allgf+' <small>in '+s.allp+'</small>':k==="clean_sheets"?s.cs:k==="away_wins"?s.aw:s.hl)+'</td>':'')+'</tr>'}).join("")+'</tbody></table>'});
+    $("tiers").innerHTML='<b>'+j.seasons.titles.length+' league titles:</b> '+j.seasons.titles.map(sea).join(", ")+'.<br><b>Relegated</b> after '+j.seasons.relegations.map(sea).join(", ")+'; <b>promoted</b> after '+j.seasons.promotions.map(sea).join(", ")+'.';
+    var tr=function(o){return '<tr><td>'+MU.club(o.o)+'</td><td class="n">'+o.p+'</td><td class="n">'+o.w+'</td><td class="n">'+o.d+'</td><td class="n">'+o.l+'</td><td class="n">'+(o.pct!=null?o.pct:Math.round(100*o.w/o.p))+'%</td></tr>'}, th='<thead><tr><th>Club</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th class="n">Won</th></tr></thead>';
+    $("mostPlayed").innerHTML='<table class="mu">'+th+'<tbody>'+j.opponents.most_played.map(tr).join("")+'</tbody></table>';
+    $("bestWorst").innerHTML='<table class="mu">'+th+'<tbody>'+j.opponents.best_record.slice(0,6).map(tr).join("")+'<tr><td colspan="6" style="color:var(--muted);font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding-top:12px">Worst</td></tr>'+j.opponents.worst_record.slice(0,6).map(tr).join("")+'</tbody></table>';
+  });
+})();
+</script>
+</body></html>

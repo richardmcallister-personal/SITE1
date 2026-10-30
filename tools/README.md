@@ -8,6 +8,7 @@ Everything here talks to the live site's Worker (manutd.wiki), never to API-Foot
 | `build_cups.py` | `tools/data/cups.json` | League Cup, European and other cup ties 1956/57–2024/25 (FA Cup from 2019/20) from the Wikipedia season articles, live feed from 2021/22 |
 | `build_managers.py` | `history/managers.json` | Wikipedia's list of managers + record by season computed from the archive, trophies from seasons.json, arrivals from numbers.json |
 | `build_season_api.py <year>` | `history/data/<season>.json`, `history/all.json` | one-off: fill a season the archive lacks from the live feed and Wikipedia's league table (used for 2022/23) |
+| `build_records.py` | `history/records.json` | biggest wins/defeats, runs, season extremes, opponent records, by decade — from the same match set |
 | `build_clubs.py` | `history/clubs/*.json`, `history/clubs.json` | match archive + cups.json + live feed from 2025/26; every competitive meeting |
 | `build_numbers.py` | `numbers/numbers.json` | Wikipedia season articles via `/wiki-raw` |
 | `update.sh` | all of the above | |
