@@ -76,7 +76,7 @@ export default {
     if (url.pathname === "/wiki-season") return wikiSeason(url, env, ctx);
     if (url.pathname === "/wiki-club") return wikiClub(url, env, ctx);
     if (url.pathname === "/wiki-raw") return wikiRaw(url, env, ctx);
-    if (url.pathname === "/collection") return collection(request, url, env);
+    if (url.pathname === "/collection") { try { return await collection(request, url, env); } catch (e) { return json({ error: "collection: " + (e && e.message || e) }, 500); } }
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
 
     if (url.pathname === "/api/youth") return youth(url, env, ctx);
