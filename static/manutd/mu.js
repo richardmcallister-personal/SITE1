@@ -1,7 +1,7 @@
 // Shared bits for the Manchester United hub pages.
 window.MU=(function(){
   var TEAM=33;
-  var NAV=[["/manutd/","Hub"],["/manutd/trips/","Trips"],["/manutd/season/","Season"],["/manutd/squad/","Squad"],["/manutd/history/","History"]];
+  var NAV=[["/manutd/","Hub"],["/manutd/trips/","Trips"],["/manutd/season/","Season"],["/manutd/squad/","Squad"],["/manutd/history/","History"],["/manutd/links/","Links"]];
   function nav(active){
     var el=document.querySelector("nav.munav"); if(!el)return;
     el.innerHTML=NAV.map(function(n){return '<a href="'+n[0]+'"'+(n[1]===active?' aria-current="page"':'')+'>'+n[1]+'</a>'}).join("");

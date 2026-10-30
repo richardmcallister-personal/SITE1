@@ -45,6 +45,7 @@ export default {
     const url = new URL(request.url);
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + "/manutd/trips/", 301);
     if (url.pathname.startsWith("/img/player/")) return portrait(url, ctx);
+    if (url.pathname === "/feed") return feed(url, env, ctx);
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
 
     const route = ROUTES[url.pathname];
@@ -126,3 +127,49 @@ async function portrait(url, ctx) {
   ctx.waitUntil(cache.put(key, res.clone()));
   return res;
 }
+
+// RSS/Atom → JSON for the Links page. Only the feeds listed here can be requested (no open proxy).
+// Cached in KV for 30 minutes.
+const FEEDS = {
+  "bbc":        "https://feeds.bbci.co.uk/sport/football/teams/manchester-united/rss.xml",
+  "guardian":   "https://www.theguardian.com/football/manchester-united/rss",
+  "sky":        "https://www.skysports.com/rss/12040",
+  "yt-manutd":  "https://www.youtube.com/feeds/videos.xml?channel_id=UC6yW44UGJJBvYTlfC7CRg2Q",
+  "yt-paddock": "https://www.youtube.com/feeds/videos.xml?channel_id=UC7w8GnTF2Sp3wldDMtCCtVw",
+  "yt-athletic":"https://www.youtube.com/feeds/videos.xml?channel_id=UCGYYNGmyhZ_kwBF_lqqXdAQ",
+  "yt-pl":      "https://www.youtube.com/feeds/videos.xml?channel_id=UCpryVRk_VDudG8SHXgWcG0w",
+  "pod-totd":   "https://feeds.acast.com/public/shows/6819aed5eb146d8e3506a450",
+  "pod-paddock":"https://feeds.megaphone.fm/COMG2101809856",
+  "pod-tus":    "https://feeds.acast.com/public/shows/the-united-stand",
+  "pod-weekly": "https://feeds.megaphone.fm/COMG3531106743",
+  "pod-tribf":  "https://feeds.megaphone.fm/GLT8847082992",
+};
+async function feed(url, env, ctx) {
+  const id = url.searchParams.get("id"), src = FEEDS[id];
+  if (!src) return json({ error: "unknown feed" }, 404);
+  const key = "feed:v1:" + id;
+  const cached = await env.MU_CACHE.get(key);
+  if (cached) return new Response(cached, { headers: headers("kv-hit") });
+  let xml = "";
+  try { const r = await fetch(src, { headers: { "user-agent": "Mozilla/5.0 (site1 manutd hub)" }, cf: { cacheTtl: 0 } }); xml = r.ok ? await r.text() : ""; } catch (e) {}
+  const items = parseFeed(xml).slice(0, 12);
+  const body = JSON.stringify({ id, items });
+  if (items.length) ctx.waitUntil(env.MU_CACHE.put(key, body, { expirationTtl: 1800 }));
+  return new Response(body, { headers: headers(items.length ? "upstream" : "upstream-empty") });
+}
+function parseFeed(xml) {
+  const out = [];
+  const blocks = xml.match(/<(item|entry)\b[\s\S]*?<\/\1>/g) || [];
+  for (const b of blocks) {
+    const tag = (n) => { const m = b.match(new RegExp("<" + n + "(?:\\s[^>]*)?>([\\s\\S]*?)<\\/" + n + ">")); return m ? clean(m[1]) : ""; };
+    let link = tag("link");
+    if (!link) { const m = b.match(/<link[^>]*href="([^"]+)"/); link = m ? m[1] : ""; }
+    const enc = b.match(/<enclosure[^>]*url="([^"]+)"/);
+    const yt = b.match(/<yt:videoId>([^<]+)</);
+    const dur = b.match(/<itunes:duration>([^<]+)</);
+    const img = b.match(/<itunes:image[^>]*href="([^"]+)"/) || b.match(/<media:thumbnail[^>]*url="([^"]+)"/);
+    out.push({ title: tag("title"), link, date: tag("pubDate") || tag("published") || tag("updated"), summary: (tag("description") || tag("itunes:summary") || tag("media:description")).replace(/<[^>]+>/g, "").slice(0, 280), audio: enc ? enc[1] : "", video: yt ? yt[1] : "", duration: dur ? dur[1] : "", image: img ? img[1] : "" });
+  }
+  return out;
+}
+function clean(s) { return s.replace(/^\s*<!\[CDATA\[([\s\S]*?)\]\]>\s*$/, "$1").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#39;|&apos;/g, "'").trim(); }
