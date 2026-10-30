@@ -235,6 +235,7 @@ async function wiki(url, env, ctx) {
   const ij = ir.ok ? await ir.json() : {};
   const wt = wj.parse && wj.parse.wikitext ? wj.parse.wikitext["*"] : "";
   const box = parseInfobox(wt);
+  if (url.searchParams.get("debug")) { const i0 = wt.search(/\{\{\s*Infobox football biography/i); return json({ keys: box && box._keys, raw: wt.slice(i0, i0 + 6000) }); }
   // Photos from the article: real photographs only (no SVG icons, flags, crests, maps).
   const images = Object.values((ij.query && ij.query.pages) || {}).filter((pg) => pg.imageinfo && pg.imageinfo[0] && /image\/(jpeg|png)/.test(pg.imageinfo[0].mime) && !/flag|logo|crest|badge|icon|map|kit|shirt|signature|wikimedia|commons-logo|stadium/i.test(pg.title))
     .map((pg) => ({ title: pg.title.replace(/^File:/, ""), thumb: pg.imageinfo[0].thumburl || pg.imageinfo[0].url, url: pg.imageinfo[0].descriptionurl || pg.imageinfo[0].url })).slice(0, 12);
@@ -262,6 +263,7 @@ function parseInfobox(wt) {
   parts.slice(1).forEach((p) => { const m = p.match(/^\s*([\w\-]+)\s*=\s*([\s\S]*)$/); if (m) f[m[1].toLowerCase()] = wtClean(m[2]); });
   const rows = (pre, keys) => { const out = []; for (let n = 1; n < 40; n++) { const r = {}; let any = false; keys.forEach((k) => { const v = f[pre + k + n]; if (v !== undefined && v !== "") any = true; r[k] = v || ""; }); if (!any) { if (n > 3) break; else continue; } out.push(r); } return out; };
   return {
+    _keys: Object.keys(f),
     name: f.name || "", fullname: f.fullname || f.full_name || "", birth_date: f.birth_date || "", birth_place: f.birth_place || "", death_date: f.death_date || "", height: f.height || "", position: f.position || "", currentclub: f.currentclub || "", clubnumber: f.clubnumber || "",
     youth: rows("youth", ["years", "clubs"]), clubs: rows("", ["years", "clubs", "caps", "goals"]), national: rows("national", ["years", "team", "caps", "goals"]), manager: rows("manager", ["years", "clubs"]),
     totalcaps: f.totalcaps || "", totalgoals: f.totalgoals || "",
