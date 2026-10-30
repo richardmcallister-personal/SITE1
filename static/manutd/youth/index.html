@@ -58,7 +58,7 @@ a.pl{color:inherit;text-decoration:none;border-bottom:1px dotted #999}
   var $=function(i){return document.getElementById(i)};
   function face(p){return '<img class="face" src="/img/player/'+p.id+'.png" alt="" onerror="this.style.visibility=\'hidden\'">'}
   function plink(p){return '<a class="pl" href="/manutd/player/?q='+encodeURIComponent(p.fullname||p.name)+'">'+MU.esc(p.name)+'</a>'}
-  function club(c,size){return (MU.crest(c.name,size||18)||(c.logo?'<img class="logo" src="'+c.logo+'" alt="">':''))+MU.esc(c.name)}
+  function club(c,size){return MU.crest(c.name,1)?MU.club(c.name,size||18):(c.logo?'<img class="logo" src="'+c.logo+'" alt="">':'')+MU.esc(c.name)}
   function rate(r){return (r==null||!r)?'—':'<span class="'+(r>=7?'r7':r<6?'r6':'')+'">'+r.toFixed(1)+'</span>'}
   function role(w){if(w.unused)return "Unused sub"; var s=(w.started?"Started":"Sub")+(w.position?" · "+w.position:""); if(w.captain)s+=" · captain"; return s}
   function notable(w){var n=[]; if(w.goals)n.push(w.goals+(w.goals>1?" goals":" goal")); if(w.assists)n.push(w.assists+(w.assists>1?" assists":" assist")); if(w.saves)n.push(w.saves+" saves"); if(w.conceded===0&&w.minutes>=60&&w.saves!=null)n.push("clean sheet"); if(w.rating>=7.5)n.push("rated "+w.rating.toFixed(1)); if(w.red)n.push("sent off"); return n}

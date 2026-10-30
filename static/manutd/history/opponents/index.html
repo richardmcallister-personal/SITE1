@@ -1,0 +1,31 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · Opponents</title>
+<link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>.pct{display:inline-block;width:70px;height:8px;background:#eee;border-radius:4px;overflow:hidden;vertical-align:middle;margin-right:6px}.pct i{display:block;height:100%;background:#0a7a2f}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px} .filters input{font:inherit;font-size:14px;padding:6px 10px;border:1px solid var(--rule);min-width:220px}</style>
+</head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Every opponent since 1892</small>Manchester<br>United</h1></a>
+  <div class="from">History<span>Opponents</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+<div class="sheet">
+  <h2>Every club United have met</h2>
+  <p class="sub" style="margin:0 0 10px">League and FA Cup meetings in the archive, most-played first. Each club has its own page: profile, head-to-head record and every meeting.</p>
+  <div class="filters"><input id="q" placeholder="Find a club…" aria-label="Find a club"></div>
+  <div id="list"></div>
+</div>
+<footer class="mu">League meetings to 2024/25 and FA Cup to 2018/19 from the match archive; League Cup and European ties are not included. <a href="/manutd/history/seasons/">All seasons</a></footer>
+</div>
+<script src="/manutd/mu.js"></script>
+<script>
+(function(){
+  MU.nav("History"); var $=function(i){return document.getElementById(i)}, ROWS=[];
+  function render(){var q=$("q").value.toLowerCase(), rows=ROWS.filter(function(c){return c.name.toLowerCase().indexOf(q)>=0});
+    $("list").innerHTML='<table class="mu"><thead><tr><th>Club</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th>United win rate</th><th>First</th><th>Last</th></tr></thead><tbody>'+rows.map(function(c){var pct=Math.round(100*c.w/c.p); return '<tr><td>'+MU.club(c.name)+'</td><td class="n">'+c.p+'</td><td class="n">'+c.w+'</td><td class="n">'+c.d+'</td><td class="n">'+c.l+'</td><td><span class="pct"><i style="width:'+pct+'%"></i></span>'+pct+'%</td><td>'+c.first+'</td><td>'+c.last+'</td></tr>'}).join("")+'</tbody></table>'}
+  $("q").addEventListener("input",render);
+  fetch("/manutd/history/clubs.json").then(function(r){return r.json()}).then(function(j){ROWS=j; render()});
+})();
+</script></body></html>

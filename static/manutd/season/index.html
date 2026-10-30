@@ -36,7 +36,7 @@
   function table(rows,opts){
     return '<table class="mu"><thead><tr><th>#</th><th>Team</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th class="n">GD</th><th class="n">Pts</th><th>Form</th></tr></thead><tbody>'+
       rows.map(function(r){var cls=r.team.id===MU.TEAM?"us":""; var d=(r.description||"").toLowerCase(); if(/champions league/.test(d)&&!/qualif/.test(d))cls+=" ucl"; else if(/europa|conference/.test(d))cls+=" uel"; else if(/relegation/.test(d))cls+=" rel";
-        return '<tr class="'+cls+'"><td>'+r.rank+'</td><td>'+(MU.crest(r.team.name)||'<img class="logo" src="'+r.team.logo+'" alt="">')+MU.esc(r.team.name)+'</td><td class="n">'+r.all.played+'</td><td class="n">'+r.all.win+'</td><td class="n">'+r.all.draw+'</td><td class="n">'+r.all.lose+'</td><td class="n">'+(r.goalsDiff>0?"+":"")+r.goalsDiff+'</td><td class="n"><b>'+r.points+'</b></td><td>'+MU.form(r.form)+'</td></tr>'}).join("")+'</tbody></table>'+
+        return '<tr class="'+cls+'"><td>'+r.rank+'</td><td>'+(MU.crest(r.team.name,1)?MU.club(r.team.name):'<img class="logo" src="'+r.team.logo+'" alt="">'+MU.esc(r.team.name))+'</td><td class="n">'+r.all.played+'</td><td class="n">'+r.all.win+'</td><td class="n">'+r.all.draw+'</td><td class="n">'+r.all.lose+'</td><td class="n">'+(r.goalsDiff>0?"+":"")+r.goalsDiff+'</td><td class="n"><b>'+r.points+'</b></td><td>'+MU.form(r.form)+'</td></tr>'}).join("")+'</tbody></table>'+
       (opts&&opts.note?'<p class="sub">'+opts.note+'</p>':'');
   }
   MU.api("standings").then(function(j){
@@ -49,7 +49,7 @@
   function li(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, st=m.fixture.status.short, done=st==="FT"||st==="AET"||st==="PEN";
     var gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home, res=done?(gf>ga?"W":gf<ga?"L":"D"):"";
     var k=done?{ko:m.fixture.date,conf:true}:MU.ko(m);
-    return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(k.ko)+'<br>'+(done?"":MU.fmtUK(k.ko)+" UK"+MU.prov(k))+'</span><span class="o"><a href="/manutd/match/?id='+m.fixture.id+'" style="color:inherit;text-decoration:none">'+(MU.crest(opp.name)||'<img class="logo" src="'+opp.logo+'" alt="">')+MU.esc(opp.name)+'</a> <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r">'+(done?gf+'–'+ga+' '+MU.form(res):'')+'</span></li>'}
+    return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(k.ko)+'<br>'+(done?"":MU.fmtUK(k.ko)+" UK"+MU.prov(k))+'</span><span class="o">'+(MU.crest(opp.name,1)?MU.club(opp.name):'<img class="logo" src="'+opp.logo+'" alt="">'+MU.esc(opp.name))+' <a class="chip" href="/manutd/match/?id='+m.fixture.id+'">Match</a> <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r">'+(done?gf+'–'+ga+' '+MU.form(res):'')+'</span></li>'}
   MU.api("fixtures").then(function(j){
     var all=j.response.slice().sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp});
     var done=all.filter(function(m){return /FT|AET|PEN/.test(m.fixture.status.short)}).reverse();
@@ -59,7 +59,7 @@
   }).catch(function(e){
     MU.apiDown(document.getElementById("results"),e);
     var now=new Date();
-    document.getElementById("fixtures").innerHTML=window.MU_FIXTURES.filter(function(f){return new Date(f.ko)>now}).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK'+MU.prov(f)+'</span><span class="o">'+MU.crest(f.opp)+MU.esc(f.opp)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("")+'<li><span class="d"></span><span class="o"><small>From the site fixture list (the official club fixtures page); results arrive with the API.</small></span><span></span></li>';
+    document.getElementById("fixtures").innerHTML=window.MU_FIXTURES.filter(function(f){return new Date(f.ko)>now}).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK'+MU.prov(f)+'</span><span class="o">'+MU.club(f.opp)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("")+'<li><span class="d"></span><span class="o"><small>From the site fixture list (the official club fixtures page); results arrive with the API.</small></span><span></span></li>';
   });
 })();
 </script></body></html>

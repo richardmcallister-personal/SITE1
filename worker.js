@@ -55,7 +55,7 @@ export default {
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + (WIKI ? "/trips/" : "/manutd/trips/"), 301);
     if (WIKI) {
       // Clean URLs on the club domain: the site lives under /manutd/ in the repo; serve it at the root here.
-      const SERVICE = /^\/(api|img|feed|wiki|wiki-season)(\/|$)/;
+      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club)(\/|$)/;
       if (url.pathname.startsWith("/manutd/")) return Response.redirect(url.origin + url.pathname.slice(7) + url.search, 301);
       if (!SERVICE.test(url.pathname)) {
         const inner = new URL(url.toString()); inner.pathname = "/manutd" + (url.pathname === "/" ? "/" : url.pathname);
@@ -73,6 +73,7 @@ export default {
     if (url.pathname === "/feed") return feed(url, env, ctx);
     if (url.pathname === "/wiki") return wiki(url, env, ctx);
     if (url.pathname === "/wiki-season") return wikiSeason(url, env, ctx);
+    if (url.pathname === "/wiki-club") return wikiClub(url, env, ctx);
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
 
     if (url.pathname === "/api/youth") return youth(url, env, ctx);
@@ -477,6 +478,33 @@ async function wikiSeason(url, env, ctx) {
   const box = { manager: f.manager || f.mgrtitle || "", chairman: f.chairman || "", stadium: f.stadium || "", league: f.league || "", leagueResult: f.leagueresult || "", cups,
     leagueTopScorer: f.leaguetopscorer || "", seasonTopScorer: f.seasontopscorer || "", highestAttendance: f.highestattendance || "", lowestAttendance: f.lowestattendance || "", averageAttendance: f.averageattendance || "", _keys: Object.keys(f) };
   const out = { title, extract: sum.extract || "", thumbnail: sum.thumbnail ? sum.thumbnail.source : "", url: sum.content_urls ? sum.content_urls.desktop.page : "https://en.wikipedia.org/wiki/" + enc, infobox: box };
+  const body = JSON.stringify(out);
+  ctx.waitUntil(env.MU_CACHE.put(key, body, { expirationTtl: 30 * 86400 }));
+  return new Response(body, { headers: headers("upstream") });
+}
+
+
+// ---- Wikipedia club article → JSON (lead + "Infobox football club"), for the club biography pages.
+const CLUB_TITLES = { "Yeovil": "Yeovil Town F.C.", "Kettering": "Kettering Town F.C.", "Wimbledon": "Wimbledon F.C.", "Accrington F.C.": "Accrington F.C.", "Loughborough": "Loughborough F.C.", "Nelson": "Nelson F.C.", "Weymouth": "Weymouth F.C.", "Darwen": "Darwen F.C.", "Workington": "Workington A.F.C.", "Rochdale": "Rochdale A.F.C.", "Wrexham": "Wrexham A.F.C.", "Bournemouth": "AFC Bournemouth", "AFC Bournemouth": "AFC Bournemouth", "Sheffield Wednesday": "Sheffield Wednesday F.C.", "Wolverhampton Wanderers": "Wolverhampton Wanderers F.C.", "Manchester United": "Manchester United F.C." };
+async function wikiClub(url, env, ctx) {
+  const name = (url.searchParams.get("name") || "").trim(); if (!name) return json({ error: "name required" }, 400);
+  const key = "wiki:c:v1:" + name.toLowerCase(), cached = url.searchParams.get("debug") ? null : await env.MU_CACHE.get(key);
+  if (cached) return new Response(cached, { headers: headers("kv-hit") });
+  const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
+  const cands = CLUB_TITLES[name] ? [CLUB_TITLES[name]] : (/F\.C\.$/.test(name) ? [name] : [name + " F.C.", name + " A.F.C.", name]);
+  let sum = null, title = "";
+  for (const c of cands) {
+    const r = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(c.replace(/ /g, "_")), { headers: UA });
+    if (r.ok) { const j = await r.json(); if (j.type !== "disambiguation") { sum = j; title = j.title || c; break; } }
+  }
+  if (!sum) return json({ error: "no article", tried: cands }, 404);
+  const enc = encodeURIComponent(title.replace(/ /g, "_"));
+  const wr = await fetch("https://en.wikipedia.org/w/api.php?action=parse&format=json&prop=wikitext&redirects=1&page=" + enc, { headers: UA });
+  const wj = wr.ok ? await wr.json() : {};
+  const wt = wj.parse && wj.parse.wikitext ? wj.parse.wikitext["*"] : "";
+  const f = boxFields(wt, /\{\{\s*Infobox football club\b/i) || {};
+  const box = { clubname: f.clubname || "", fullname: f.fullname || "", nickname: f.nickname || "", founded: f.founded || "", dissolved: f.dissolved || "", ground: f.ground || f.stadium || "", capacity: f.capacity || "", owner: f.owner || "", chairman: f.chairman || "", manager: f.manager || f.mgr || "", mgrtitle: f.mgrtitle || "", league: f.league || "", season: f.season || "", position: f.position || "", website: f.website || "", _keys: Object.keys(f) };
+  const out = { title, description: sum.description || "", extract: sum.extract || "", thumbnail: sum.thumbnail ? sum.thumbnail.source : "", url: sum.content_urls ? sum.content_urls.desktop.page : "https://en.wikipedia.org/wiki/" + enc, infobox: box };
   const body = JSON.stringify(out);
   ctx.waitUntil(env.MU_CACHE.put(key, body, { expirationTtl: 30 * 86400 }));
   return new Response(body, { headers: headers("upstream") });

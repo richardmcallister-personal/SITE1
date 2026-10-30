@@ -1,0 +1,87 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · Club</title>
+<link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>
+.prof{display:grid;grid-template-columns:140px 1fr;gap:22px;align-items:start} @media (max-width:640px){.prof{grid-template-columns:1fr}}
+.prof img.big{width:140px;height:140px;object-fit:contain}
+.prof .nm{font-size:28px;margin:0;border:0;padding:0;text-transform:none;letter-spacing:0}
+.desc{color:var(--muted);margin:2px 0 10px;font-size:14px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:4px;margin:12px 0}
+.facts div{background:var(--tint);padding:10px 12px} .facts .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:var(--muted)} .facts .v{font-size:14px;margin-top:3px;word-break:break-word}
+.lead{font-size:15px;line-height:1.6;max-width:78ch} .attr{font-size:12px;color:var(--muted)}
+.h2h{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin:10px 0 16px}
+.h2h div{background:#fff;border:1px solid var(--rule);padding:12px;text-align:center} .h2h b{display:block;font-family:var(--head);font-weight:300;font-size:30px;line-height:1} .h2h span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.h2h .w b{color:#0a7a2f}.h2h .l b{color:var(--red)}
+.bar{display:flex;height:10px;border-radius:5px;overflow:hidden;margin:4px 0 14px} .bar i{display:block} .bar .w{background:#0a7a2f}.bar .d{background:#bbb}.bar .l{background:var(--red)}
+.res .fxlist li{grid-template-columns:110px 1fr auto;padding:6px 0;gap:10px} .res .fxlist li .o:before{min-width:0;padding:4px 6px 3px;margin-right:8px} .res .fxlist li.home .o:before{content:"H"} .res .fxlist li.away .o:before{content:"A"}
+.res .fxlist .o{font-weight:500} .res .fxlist .o small{display:block;font-size:12px}
+.res .fxlist .r{font-size:19px;min-width:58px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px} .filters button{font:inherit;font-size:13px;padding:6px 12px;border:1px solid var(--rule);background:#fff;cursor:pointer} .filters button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sea{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 2px} .sea a{color:inherit;text-decoration:none}
+</style>
+</head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small id="eyebrow">Club</small>Manchester<br>United</h1></a>
+  <div class="from" id="from">Club<span>Biography</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+
+<div class="sheet" id="top"><small>Loading…</small></div>
+<div class="sheet">
+  <h2>Head to head with United</h2>
+  <p class="sub" id="h2hNote" style="margin:0 0 8px"></p>
+  <div class="h2h" id="h2h"></div>
+  <div class="bar" id="bar"></div>
+  <div class="facts" id="h2hFacts"></div>
+</div>
+<div class="sheet">
+  <h2>Every meeting</h2>
+  <div class="filters" id="filters"><button data-f="all" aria-pressed="true">All</button><button data-f="L">League</button><button data-f="FAC">FA Cup</button><button data-f="H">At Old Trafford</button><button data-f="A">Away</button></div>
+  <div id="list" class="res"></div>
+</div>
+<footer class="mu">Club profile from Wikipedia, CC BY-SA 4.0. Head-to-head figures are league and FA Cup meetings in the match archive (league to 2024/25, FA Cup to 2018/19); League Cup and European ties are not included. <a href="/manutd/history/seasons/">All seasons</a></footer>
+</div>
+<script src="/manutd/mu.js"></script>
+<script>
+(function(){
+  MU.nav("History");
+  var $=function(i){return document.getElementById(i)}, name=new URLSearchParams(location.search).get("c")||"", slug=name.toLowerCase().replace(/f\.c\./g,"fc").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+  document.title="Manchester United · "+name; $("from").innerHTML="Club<span>"+MU.esc(name)+"</span>";
+  function fmt(d){return MU.fmtDate(d+"T12:00:00Z",{year:"numeric"})}
+  function peopleLink(t){return MU.esc(t||"")}
+  // Profile
+  MU.api("../wiki-club",{name:name}).then(function(w){
+    if(w.error)throw new Error(w.error);
+    var b=w.infobox||{}, facts=[["Full name",b.fullname],["Nickname",b.nickname],["Founded",b.founded],["Dissolved",b.dissolved],["Ground",b.ground+(b.capacity?" · "+b.capacity:"")],[b.mgrtitle||"Manager",b.manager],["Chairman",b.chairman||b.owner],["League",b.league+(b.position?" · "+b.position:"")]].filter(function(f){return f[1]&&f[1]!==" · "});
+    $("top").innerHTML='<div class="prof"><img class="big" src="/manutd/assets/crests/'+(MU.crest(name,1).match(/crests\/([^"]+)\.png/)||[,"x"])[1]+'.png" alt="" onerror="this.style.visibility=\'hidden\'"><div><h2 class="nm">'+MU.esc(w.title.replace(/ (A\.)?F\.C\.$/,""))+'</h2><p class="desc">'+MU.esc(w.description)+'</p><div class="facts">'+facts.map(function(f){return '<div><div class="k">'+MU.esc(f[0])+'</div><div class="v">'+peopleLink(f[1])+'</div></div>'}).join("")+'</div><p class="lead">'+MU.esc(w.extract)+'</p><p class="attr">From <a href="'+w.url+'" target="_blank" rel="noopener">the Wikipedia article</a>, CC BY-SA 4.0.</p></div></div>';
+  }).catch(function(){$("top").innerHTML='<div class="prof">'+MU.crest(name,64)+'<div><h2 class="nm">'+MU.esc(name)+'</h2><p class="desc">No Wikipedia profile found for this club name.</p></div></div>'});
+  // Head to head
+  var M=[], mode="all";
+  function render(){
+    var rows=M.filter(function(m){return mode==="all"||(mode==="L"&&m.c==="L")||(mode==="FAC"&&m.c==="FAC")||(mode==="H"&&m.h)||(mode==="A"&&!m.h)}).slice().reverse(), out="", sea=null;
+    rows.forEach(function(m){ if(m.s!==sea){sea=m.s; out+='<div class="sea"><a href="/manutd/history/season/?s='+m.s+'">'+m.s.replace("-","–")+' · '+MU.esc(m.div)+'</a></div><ul class="fxlist">'; }
+      var res=m.gf>m.ga?"W":m.gf<m.ga?"L":"D", note=[m.c==="FAC"?"FA Cup"+(m.r?" · "+m.r:""):"",m.tie||"",m.n||""].filter(Boolean).join(" · ");
+      out+='<li class="'+(m.h?"home":"away")+'"><span class="d">'+fmt(m.d)+'</span><span class="o">'+(m.h?"United v "+MU.esc(name):MU.esc(name)+" v United")+(note?'<small>'+MU.esc(note)+'</small>':'')+'</span><span class="r">'+m.gf+'–'+m.ga+(m.aet?'<small> aet</small>':'')+' '+MU.form(res)+'</span></li>';
+    });
+    // close lists: rebuild with proper closing tags
+    $("list").innerHTML=out.replace(/<div class="sea">/g,'</ul><div class="sea">').replace(/^<\/ul>/,"")+(rows.length?'</ul>':'<p class="sub">No meetings in the archive.</p>');
+  }
+  $("filters").addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; mode=b.dataset.f; [].forEach.call($("filters").children,function(x){x.setAttribute("aria-pressed",x===b)}); render()});
+  fetch("/manutd/history/clubs.json").then(function(r){return r.json()}).then(function(ix){
+    var mine=MU.crest(name,1), canon=ix.filter(function(x){return x.name===name})[0]||(mine?ix.filter(function(x){return MU.crest(x.name,1)===mine})[0]:null);
+    if(!canon)throw new Error("none"); if(canon.name!==name){name=canon.name; document.title="Manchester United · "+name; $("from").innerHTML="Club<span>"+MU.esc(name)+"</span>"}
+    return fetch("/manutd/history/clubs/"+canon.slug+".json").then(function(r){if(!r.ok)throw new Error("none");return r.json()})}).then(function(c){
+    M=c.matches; var a=c.all, pct=function(n){return a.p?Math.round(100*n/a.p):0};
+    $("eyebrow").textContent=a.p+" meetings since "+c.first.slice(0,4);
+    $("h2hNote").textContent="United's record in "+a.p+" league and FA Cup meetings, "+fmt(c.first)+" to "+fmt(c.last)+", across "+c.seasons+" seasons.";
+    $("h2h").innerHTML='<div><b>'+a.p+'</b><span>Played</span></div><div class="w"><b>'+a.w+'</b><span>United wins</span></div><div><b>'+a.d+'</b><span>Draws</span></div><div class="l"><b>'+a.l+'</b><span>'+MU.esc(name)+' wins</span></div><div><b>'+a.gf+'–'+a.ga+'</b><span>Goals</span></div>';
+    $("bar").innerHTML='<i class="w" style="width:'+pct(a.w)+'%" title="United wins '+pct(a.w)+'%"></i><i class="d" style="width:'+pct(a.d)+'%"></i><i class="l" style="width:'+pct(a.l)+'%"></i>';
+    var sp=function(x){return x.p?x.w+"–"+x.d+"–"+x.l+" ("+x.gf+"–"+x.ga+")":"—"};
+    $("h2hFacts").innerHTML=[["League",sp(c.league)],["FA Cup",sp(c.facup)],["Biggest United win",c.best.gf+"–"+c.best.ga+" · "+fmt(c.best.d)+(c.best.h?" (H)":" (A)")],["Heaviest defeat",c.worst.gf<c.worst.ga?c.worst.gf+"–"+c.worst.ga+" · "+fmt(c.worst.d)+(c.worst.h?" (H)":" (A)"):"Never beaten"],["First meeting",fmt(c.first)],["Most recent",fmt(c.last)]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+MU.esc(f[1])+'</div></div>'}).join("");
+    render();
+  }).catch(function(){$("h2hNote").textContent="No league or FA Cup meetings with "+name+" in the archive (European and League Cup ties are not included)."; $("list").innerHTML=""});
+})();
+</script>
+</body></html>
