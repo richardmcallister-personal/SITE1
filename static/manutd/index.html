@@ -69,7 +69,7 @@
   }
   renderNext(next);
   var up=document.getElementById("upcoming");
-  up.innerHTML=fx.filter(function(f){return new Date(f.ko)>now}).slice(0,8).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK</span><span class="o">'+MU.esc(f.opp)+' <small>· '+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("");
+  up.innerHTML=fx.filter(function(f){return new Date(f.ko)>now}).slice(0,8).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK</span><span class="o">'+MU.crest(f.opp)+MU.esc(f.opp)+' <small>· '+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("");
 
   // Live bits
   MU.api("standings").then(function(j){
@@ -86,11 +86,11 @@
     document.getElementById("last").innerHTML='<ul class="fxlist">'+played.map(function(m){
       var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home;
       var res=gf>ga?"W":gf<ga?"L":"D";
-      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'</span><span class="o">'+MU.esc(opp.name)+' <small>· '+MU.esc(m.league.name)+'</small></span><span class="r">'+gf+'–'+ga+' '+MU.form(res)+'</span></li>'}).join("")+'</ul>';
+      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'</span><span class="o">'+MU.crest(opp.name)+MU.esc(opp.name)+' <small>· '+MU.esc(m.league.name)+'</small></span><span class="r">'+gf+'–'+ga+' '+MU.form(res)+'</span></li>'}).join("")+'</ul>';
     // upcoming from live data too (replaces the static list when available)
     var next=j.response.filter(function(m){return m.fixture.status.short==="NS"||m.fixture.status.short==="TBD"}).sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp}).slice(0,8);
     if(next.length){document.getElementById("upcoming").innerHTML=next.map(function(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home;
-      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'<br>'+MU.fmtUK(m.fixture.date)+' UK'+(m.fixture.status.short==="TBD"?" (TBC)":"")+'</span><span class="o">'+MU.esc(opp.name)+' <small>· '+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r"></span></li>'}).join("")}
+      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'<br>'+MU.fmtUK(m.fixture.date)+' UK'+(m.fixture.status.short==="TBD"?" (TBC)":"")+'</span><span class="o">'+MU.crest(opp.name)+MU.esc(opp.name)+' <small>· '+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r"></span></li>'}).join("")}
   }).catch(function(e){MU.apiDown(document.getElementById("last"),e)});
 })();
 </script></body></html>
