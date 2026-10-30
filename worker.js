@@ -138,6 +138,7 @@ const FEEDS = {
   "yt-paddock": "https://www.youtube.com/feeds/videos.xml?channel_id=UC7w8GnTF2Sp3wldDMtCCtVw",
   "yt-athletic":"https://www.youtube.com/feeds/videos.xml?channel_id=UCGYYNGmyhZ_kwBF_lqqXdAQ",
   "yt-pl":      "https://www.youtube.com/feeds/videos.xml?channel_id=UCpryVRk_VDudG8SHXgWcG0w",
+  "yt-tus":     "https://www.youtube.com/feeds/videos.xml?channel_id=UCMmVPVb0BwSIOWVeDwlPocQ",
   "pod-totd":   "https://feeds.acast.com/public/shows/6819aed5eb146d8e3506a450",
   "pod-paddock":"https://feeds.megaphone.fm/COMG2101809856",
   "pod-tus":    "https://feeds.acast.com/public/shows/the-united-stand",

@@ -89,7 +89,7 @@
     {id:"pod-second",name:"Second Captains",by:"Dublin — Ken Early, Eoin McDevitt, Ciarán Murphy, Mark Horgan",site:"https://secondcaptains.com/"}
   ];
   var NEWS=[{id:"bbc",name:"BBC Sport"},{id:"guardian",name:"The Guardian"},{id:"sky",name:"Sky Sports"}];
-  var YT=[{id:"yt-manutd",name:"Manchester United",url:"https://www.youtube.com/@manutd",official:true},{id:"yt-paddock",name:"Stretford Paddock",url:"https://www.youtube.com/@StretfordPaddock"},{id:"yt-athletic",name:"The Athletic FC",url:"https://www.youtube.com/@TheAthleticFC"},{id:"yt-pl",name:"Premier League",url:"https://www.youtube.com/@premierleague"}];
+  var YT=[{id:"yt-manutd",name:"Manchester United",url:"https://www.youtube.com/@manutd",official:true},{id:"yt-tus",name:"The United Stand",url:"https://www.youtube.com/@UnitedStand"},{id:"yt-paddock",name:"Stretford Paddock",url:"https://www.youtube.com/@StretfordPaddock"},{id:"yt-athletic",name:"The Athletic FC",url:"https://www.youtube.com/@TheAthleticFC"},{id:"yt-pl",name:"Premier League",url:"https://www.youtube.com/@premierleague"}];
   function when(d){var t=new Date(d); if(isNaN(t))return ""; var h=(Date.now()-t)/36e5; return h<1?"just now":h<24?Math.floor(h)+" h ago":h<48?"yesterday":MU.fmtDate(t.toISOString())}
   function dur(s){if(!s)return ""; if(/:/.test(s))return s.replace(/^00:/,""); var n=+s; return n?Math.round(n/60)+" min":""}
   var $=function(id){return document.getElementById(id)};
