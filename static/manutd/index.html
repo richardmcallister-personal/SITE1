@@ -24,13 +24,13 @@
 </style></head><body><div class="wrap">
 <header class="mu">
   <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Season 2026/27</small>Manchester<br>United</h1></a>
-  <div class="from">Club hub<span>Premier League · Champions League · FA Cup · EFL Cup</span></div>
+  <div class="from">Club hub<span style="display:flex;gap:10px;justify-content:flex-end;align-items:center;margin-top:8px"><img src="/manutd/assets/comps/premier-league.png" alt="Premier League" style="height:28px"><img src="/manutd/assets/comps/champions-league.png" alt="Champions League" style="height:28px"><img src="/manutd/assets/comps/fa-cup.png" alt="FA Cup" style="height:28px"><img src="/manutd/assets/comps/league-cup-carabao.png" alt="League Cup" style="height:28px"></span></div>
 </header>
 <nav class="munav" aria-label="Sections"></nav>
 
 <div class="hero">
   <div class="next" id="next"><div class="k" style="font-family:var(--display);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Next match</div><div class="opp">—</div></div>
-  <div class="pos" id="pos"><div><div class="k">Premier League</div><div class="big">—</div></div><p class="sub">Live position, points and form arrive once the API key is active.</p></div>
+  <div class="pos" id="pos"><div><div class="k"><img src="/manutd/assets/comps/premier-league.png" alt="" style="height:18px;width:auto;vertical-align:-5px;margin-right:6px">Premier League</div><div class="big">—</div></div><p class="sub">Live position, points and form arrive once the API key is active.</p></div>
 </div>
 
 <div class="links">
@@ -69,7 +69,7 @@
   }
   renderNext(next);
   var up=document.getElementById("upcoming");
-  up.innerHTML=fx.filter(function(f){return new Date(f.ko)>now}).slice(0,8).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK</span><span class="o">'+MU.crest(f.opp)+MU.esc(f.opp)+' <small>· '+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("");
+  up.innerHTML=fx.filter(function(f){return new Date(f.ko)>now}).slice(0,8).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK</span><span class="o">'+MU.crest(f.opp)+MU.esc(f.opp)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("");
 
   // Live bits
   MU.api("standings").then(function(j){
@@ -77,7 +77,7 @@
     if(!me)return;
     var pos=document.getElementById("pos");
     var ord=["th","st","nd","rd"][me.rank%10>3||Math.floor(me.rank%100/10)===1?0:me.rank%10];
-    pos.innerHTML='<div><div class="k">Premier League · after '+me.all.played+' games</div><div class="big">'+me.rank+'<small>'+ord+'</small></div></div>'+
+    pos.innerHTML='<div><div class="k"><img src="/manutd/assets/comps/premier-league.png" alt="" style="height:18px;width:auto;vertical-align:-5px;margin-right:6px">Premier League · after '+me.all.played+' games</div><div class="big">'+me.rank+'<small>'+ord+'</small></div></div>'+
       '<table class="mu" style="margin-top:10px"><tr><td>Points</td><td class="n">'+me.points+'</td></tr><tr><td>W–D–L</td><td class="n">'+me.all.win+'–'+me.all.draw+'–'+me.all.lose+'</td></tr><tr><td>Goal difference</td><td class="n">'+(me.goalsDiff>0?"+":"")+me.goalsDiff+'</td></tr><tr><td>Form</td><td class="n">'+MU.form(me.form)+'</td></tr></table>'+
       '<p class="sub" style="color:#bbb">'+MU.esc(me.description||"")+' · <a href="/manutd/season/" style="color:#fff">Full table</a></p>';
   }).catch(function(e){ /* keep placeholder */ });
@@ -86,11 +86,11 @@
     document.getElementById("last").innerHTML='<ul class="fxlist">'+played.map(function(m){
       var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home;
       var res=gf>ga?"W":gf<ga?"L":"D";
-      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'</span><span class="o">'+MU.crest(opp.name)+MU.esc(opp.name)+' <small>· '+MU.esc(m.league.name)+'</small></span><span class="r">'+gf+'–'+ga+' '+MU.form(res)+'</span></li>'}).join("")+'</ul>';
+      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'</span><span class="o">'+MU.crest(opp.name)+MU.esc(opp.name)+' <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+'</small></span><span class="r">'+gf+'–'+ga+' '+MU.form(res)+'</span></li>'}).join("")+'</ul>';
     // upcoming from live data too (replaces the static list when available)
     var next=j.response.filter(function(m){return m.fixture.status.short==="NS"||m.fixture.status.short==="TBD"}).sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp}).slice(0,8);
     if(next.length){document.getElementById("upcoming").innerHTML=next.map(function(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home;
-      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'<br>'+MU.fmtUK(m.fixture.date)+' UK'+(m.fixture.status.short==="TBD"?" (TBC)":"")+'</span><span class="o">'+MU.crest(opp.name)+MU.esc(opp.name)+' <small>· '+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r"></span></li>'}).join("")}
+      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'<br>'+MU.fmtUK(m.fixture.date)+' UK'+(m.fixture.status.short==="TBD"?" (TBC)":"")+'</span><span class="o">'+MU.crest(opp.name)+MU.esc(opp.name)+' <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r"></span></li>'}).join("")}
   }).catch(function(e){MU.apiDown(document.getElementById("last"),e)});
 })();
 </script></body></html>

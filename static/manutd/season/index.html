@@ -14,11 +14,11 @@
 <div class="ticker" id="ticker"><span><span class="k">Last season</span><span class="v">3rd · 71 pts</span></span><span><span class="k">Manager</span><span class="v">Michael Carrick</span></span><span><span class="k">Europe</span><span class="v">Champions League</span></span></div>
 
 <div class="sheet">
-  <h2>Premier League table</h2>
+  <h2><img src="/manutd/assets/comps/premier-league.png" alt="" style="height:26px;width:auto;vertical-align:-7px;margin-right:8px">Premier League table</h2>
   <div id="pl"></div>
 </div>
 <div class="sheet">
-  <h2>Champions League · league phase</h2>
+  <h2><img src="/manutd/assets/comps/champions-league.png" alt="" style="height:26px;width:auto;vertical-align:-7px;margin-right:8px">Champions League · league phase</h2>
   <div id="ucl"></div>
 </div>
 <div class="sheet">
@@ -48,7 +48,7 @@
   }).catch(function(e){MU.apiDown(document.getElementById("ucl"),e)});
   function li(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, st=m.fixture.status.short, done=st==="FT"||st==="AET"||st==="PEN";
     var gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home, res=done?(gf>ga?"W":gf<ga?"L":"D"):"";
-    return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'<br>'+(done?"":MU.fmtUK(m.fixture.date)+" UK")+'</span><span class="o">'+(MU.crest(opp.name)||'<img class="logo" src="'+opp.logo+'" alt="">')+MU.esc(opp.name)+' <small>· '+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r">'+(done?gf+'–'+ga+' '+MU.form(res):'')+'</span></li>'}
+    return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'<br>'+(done?"":MU.fmtUK(m.fixture.date)+" UK")+'</span><span class="o">'+(MU.crest(opp.name)||'<img class="logo" src="'+opp.logo+'" alt="">')+MU.esc(opp.name)+' <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r">'+(done?gf+'–'+ga+' '+MU.form(res):'')+'</span></li>'}
   MU.api("fixtures").then(function(j){
     var all=j.response.slice().sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp});
     var done=all.filter(function(m){return /FT|AET|PEN/.test(m.fixture.status.short)}).reverse();
@@ -58,7 +58,7 @@
   }).catch(function(e){
     MU.apiDown(document.getElementById("results"),e);
     var now=new Date();
-    document.getElementById("fixtures").innerHTML=window.MU_FIXTURES.filter(function(f){return new Date(f.ko)>now}).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK</span><span class="o">'+MU.crest(f.opp)+MU.esc(f.opp)+' <small>· '+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("")+'<li><span class="d"></span><span class="o"><small>To end of January from the trip planner; the full season list arrives with the API.</small></span><span></span></li>';
+    document.getElementById("fixtures").innerHTML=window.MU_FIXTURES.filter(function(f){return new Date(f.ko)>now}).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK</span><span class="o">'+MU.crest(f.opp)+MU.esc(f.opp)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("")+'<li><span class="d"></span><span class="o"><small>To end of January from the trip planner; the full season list arrives with the API.</small></span><span></span></li>';
   });
 })();
 </script></body></html>
