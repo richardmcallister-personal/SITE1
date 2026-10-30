@@ -1,0 +1,89 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · Manager</title>
+<link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>
+.prof{display:grid;grid-template-columns:200px 1fr;gap:22px;align-items:start} @media (max-width:640px){.prof{grid-template-columns:1fr}}
+.prof img.photo{width:200px;height:250px;object-fit:cover;object-position:top;background:var(--tint)}
+.prof .nm{font-size:28px;margin:0;border:0;padding:0;text-transform:none;letter-spacing:0}
+.desc{color:var(--muted);margin:2px 0 10px;font-size:14px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:4px;margin:12px 0}
+.facts div{background:var(--tint);padding:10px 12px} .facts .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:var(--muted)} .facts .v{font-size:14px;margin-top:3px;word-break:break-word}
+.lead{font-size:15px;line-height:1.6;max-width:78ch} .attr{font-size:12px;color:var(--muted)}
+.h2h{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin:10px 0 16px}
+.h2h div{background:#fff;border:1px solid var(--rule);padding:12px;text-align:center} .h2h b{display:block;font-family:var(--head);font-weight:300;font-size:30px;line-height:1} .h2h span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.h2h .w b{color:#0a7a2f}.h2h .l b{color:var(--red)}
+.bar{display:flex;height:10px;border-radius:5px;overflow:hidden;margin:4px 0 14px} .bar i{display:block} .bar .w{background:#0a7a2f}.bar .d{background:#bbb}.bar .l{background:var(--red)}
+.troph{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 4px} .troph span{display:inline-flex;align-items:center;gap:6px;background:var(--tint);padding:6px 10px;font-size:13px} .troph img{height:20px}
+table.mu td.tro{font-size:12px} table.mu tr.part td{color:var(--muted)} table.mu td.pos{white-space:nowrap}
+.arr{columns:3;column-gap:24px;font-size:14px;line-height:1.7} @media (max-width:800px){.arr{columns:2}} @media (max-width:480px){.arr{columns:1}} .arr .sea{break-after:avoid;font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:10px 0 2px} .arr .sea:first-child{margin-top:0} .arr small{color:var(--muted)}
+.spells a{margin-right:10px}
+</style>
+</head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small id="eyebrow">Manager</small>Manchester<br>United</h1></a>
+  <div class="from" id="from">Manager<span>…</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+
+<div class="sheet" id="top"><small>Loading…</small></div>
+<div class="sheet">
+  <h2>Record in charge</h2>
+  <p class="sub" id="note" style="margin:0 0 8px"></p>
+  <div class="h2h" id="rec"></div>
+  <div class="bar" id="bar"></div>
+  <div class="troph" id="troph"></div>
+  <div class="facts" id="facts"></div>
+</div>
+<div class="sheet">
+  <h2>Season by season</h2>
+  <p class="sub" style="margin:0 0 8px">Competitive matches under him in each season; greyed seasons are ones he began or ended part-way through. League position is the club's finish that season.</p>
+  <div id="seasons"></div>
+</div>
+<div class="sheet" id="arrSheet" hidden>
+  <h2>Players who arrived under him</h2>
+  <p class="sub" style="margin:0 0 8px">Everyone whose first appearance in a United squad list came in one of his seasons, from the squad-number records (1994/95 on). Signings and academy graduates both appear; a player who arrived mid-season under a successor will show against the manager who started that season.</p>
+  <div class="arr" id="arr"></div>
+</div>
+<footer class="mu"><span id="stamp"></span> Profile and list of managers from Wikipedia, CC BY-SA 4.0. Records are computed from the match archive (league and FA Cup), the Wikipedia season articles (League Cup, Europe and other cups from 1956/57) and the live feed; wartime and pre-League games are not included, which is why some totals fall short of the published figure. <a href="/manutd/history/managers/">All managers</a></footer>
+</div>
+<script src="/manutd/mu.js"></script>
+<script>
+(function(){
+  MU.nav("History"); MU.checked("managers",document.getElementById("stamp"),"Last checked");
+  var $=function(i){return document.getElementById(i)}, slug=new URLSearchParams(location.search).get("m")||"";
+  function fmt(d){return d?MU.fmtDate(d+"T12:00:00Z",{year:"numeric",weekday:undefined}):"present"}
+  function ordinal(n){var s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
+  var TLOGO={"Premier League":"premier-league","First Division":"premier-league","FA Cup":"fa-cup","League Cup":"league-cup-carabao","Champions League":"champions-league","European Cup":"champions-league"};
+  var CN={L:"League",FAC:"FA Cup",LC:"League Cup",UCL:"Europe",UEL:"Europe",CWC:"Europe",SC:"Super Cup",ICC:"Intercontinental",CWCup:"Club World Cup",CS:"Shield",OTH:"Other"};
+  fetch("/manutd/history/managers.json").then(function(r){return r.json()}).then(function(all){
+    var M=all.filter(function(x){return x.slug===slug})[0]; if(!M){$("top").innerHTML='<p class="sub">No manager with that name. <a href="/manutd/history/managers/">All managers</a></p>'; return}
+    var spells=all.filter(function(x){return x.name===M.name});
+    document.title="Manchester United · "+M.name; $("from").innerHTML="Manager<span>"+MU.esc(M.name)+"</span>"; $("eyebrow").textContent=(M.role?M.role.charAt(0).toUpperCase()+M.role.slice(1)+" manager":"Manager")+" · "+fmt(M.from).replace(/^\w+ /,"")+" – "+(M.to?fmt(M.to).replace(/^\w+ /,""):"present");
+    // Profile from Wikipedia through the player/person endpoint
+    MU.api("../wiki",{q:M.name}).then(function(j){
+      if(j.error)throw new Error(j.error);
+      var facts=[["Nationality",M.nat],["Appointed",fmt(M.from)],["Left",M.to?fmt(M.to):"In post"],["Born",j.born]].filter(function(f){return f[1]});
+      $("top").innerHTML='<div class="prof">'+(j.thumbnail?'<img class="photo" src="'+(j.original||j.thumbnail)+'" alt="">':'<div class="photo" style="width:200px;height:250px;background:var(--tint)"></div>')+'<div><h2 class="nm">'+MU.esc(M.name)+'</h2><p class="desc">'+MU.esc(j.description||"")+'</p><div class="facts">'+facts.map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+MU.esc(f[1])+'</div></div>'}).join("")+'</div><p class="lead">'+MU.esc(j.extract)+'</p><p class="attr">From <a href="'+j.url+'" target="_blank" rel="noopener">the Wikipedia article</a>, CC BY-SA 4.0.'+(spells.length>1?' <span class="spells">Spells: '+spells.map(function(s){return s.slug===M.slug?'<b>'+s.from.slice(0,4)+'–'+(s.to?s.to.slice(0,4):"now")+'</b>':'<a href="/manutd/manager/?m='+s.slug+'">'+s.from.slice(0,4)+'–'+(s.to?s.to.slice(0,4):"now")+'</a>'}).join(" ")+'</span>':'')+'</p></div></div>';
+    }).catch(function(){$("top").innerHTML='<div class="prof"><div></div><div><h2 class="nm">'+MU.esc(M.name)+'</h2><p class="desc">'+(M.nat?MU.esc(M.nat)+" · ":"")+fmt(M.from)+' – '+(M.to?fmt(M.to):"present")+'</p>'+(M.notes?'<p class="lead">'+MU.esc(M.notes)+'</p>':'')+'</div></div>'});
+    // Record
+    var r=M.rec, pct=function(n){return r.p?Math.round(100*n/r.p):0};
+    $("note").textContent=r.p+" competitive matches from "+fmt(M.from)+" to "+(M.to?fmt(M.to):"today")+(M.wiki&&M.wiki.p!==r.p?". Wikipedia's published record is "+M.wiki.p+" played, "+M.wiki.w+"–"+M.wiki.d+"–"+M.wiki.l+"; the difference is wartime, pre-League or otherwise unarchived games.":".");
+    $("rec").innerHTML='<div><b>'+r.p+'</b><span>Played</span></div><div class="w"><b>'+r.w+'</b><span>Won</span></div><div><b>'+r.d+'</b><span>Drawn</span></div><div class="l"><b>'+r.l+'</b><span>Lost</span></div><div><b>'+pct(r.w)+'%</b><span>Win rate</span></div><div><b>'+r.gf+'–'+r.ga+'</b><span>Goals</span></div>';
+    $("bar").innerHTML='<i class="w" style="width:'+pct(r.w)+'%"></i><i class="d" style="width:'+pct(r.d)+'%"></i><i class="l" style="width:'+pct(r.l)+'%"></i>';
+    $("troph").innerHTML=M.honours.length?M.honours.map(function(h){var k=Object.keys(TLOGO).filter(function(t){return h.indexOf(t)>=0})[0]; return '<span>'+(k?'<img src="/manutd/assets/comps/'+TLOGO[k]+'.png" alt="">':'')+MU.esc(h)+'</span>'}).join(""):'<span>No major honours</span>';
+    var sc=function(m){return m?m.gf+"–"+m.ga+" v "+m.o+" · "+fmt(m.d)+(m.h?" (H)":" (A)"):"—"};
+    $("facts").innerHTML=[["Biggest win",sc(M.best)],["Heaviest defeat",M.worst&&M.worst.gf<M.worst.ga?sc(M.worst):"Never beaten"],["Seasons",M.seasons.length],["Trophies in the archive",M.trophies.length||"0"]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+MU.esc(String(f[1]))+'</div></div>'}).join("");
+    // Seasons
+    $("seasons").innerHTML='<table class="mu"><thead><tr><th>Season</th><th>Competitions</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th class="n">GF</th><th class="n">GA</th><th>League</th><th>Trophies</th></tr></thead><tbody>'+M.seasons.map(function(s){
+      var comps=s.comps.map(function(c){return CN[c]||c}).filter(function(x,i,a){return a.indexOf(x)===i}).join(", ");
+      return '<tr'+(s.part?' class="part"':'')+'><td class="yrs"><a href="/manutd/history/season/?s='+s.s+'">'+s.s.replace("-","–")+'</a>'+(s.part?' <small>part</small>':'')+'</td><td>'+MU.esc(comps)+'</td><td class="n">'+s.p+'</td><td class="n">'+s.w+'</td><td class="n">'+s.d+'</td><td class="n">'+s.l+'</td><td class="n">'+s.gf+'</td><td class="n">'+s.ga+'</td><td class="pos">'+(s.pos?ordinal(s.pos)+' <small>'+MU.esc(s.div)+'</small>':'—')+'</td><td class="tro">'+((s.trophies||[]).join(", ")||"")+'</td></tr>'}).join("")+'</tbody></table>';
+    // Arrivals
+    if(M.arrivals&&M.arrivals.length){$("arrSheet").hidden=false; var out="", sea=null;
+      M.arrivals.forEach(function(p){ if(p.s!==sea){sea=p.s; out+='<div class="sea">'+sea.replace("-","–")+'</div>'} out+='<div><a class="pl" href="/manutd/player/?p='+encodeURIComponent(p.title)+'">'+MU.esc(p.name)+'</a>'+(p.pos?' <small>'+MU.esc(p.pos)+'</small>':'')+'</div>'});
+      $("arr").innerHTML=out}
+  });
+})();
+</script>
+</body></html>

@@ -7,4 +7,5 @@ python3 tools/build_cups.py
 python3 tools/build_clubs.py
 python3 tools/build_numbers.py
 python3 tools/build_onthisday.py
+python3 tools/build_managers.py
 echo "builds done — review git status, then commit and push"

@@ -71,6 +71,8 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
   var P={};
   function wiki(t){return "https://en.wikipedia.org/wiki/"+encodeURIComponent(t.replace(/ /g,"_"))}
   // Replace known surnames (longest first; "X. Name" and "Name@season" overrides) with Wikipedia links.
+  var MGRS=fetch("/manutd/history/managers.json").then(function(r){return r.json()}).catch(function(){return []});
+  function mgrLinks(){MGRS.then(function(ms){[].forEach.call(document.querySelectorAll("#facts a.pl"),function(a){var n=a.textContent.replace(/^Sir /,""), hit=ms.filter(function(m){return m.name===n||m.name.replace(/^[A-Z]\. ?/,"")===n}); if(hit.length){var sp=hit.filter(function(m){return !m.role})[0]||hit[0]; a.href="/manutd/manager/?m="+sp.slug; a.title="Managerial record"}})})}
   function linkNames(text,season){
     var keys=Object.keys(P).filter(function(k){return k.charAt(0)!=="_"&&k.indexOf("@")<0}).sort(function(a,b){return b.length-a.length});
     var out=MU.esc(text), slots=[];
@@ -119,7 +121,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
     $("troph").innerHTML=tro_.map(tro).join("");
     var dataP=A&&!A.api?fetch("/manutd/history/data/"+id+".json").then(function(r){return r.ok?r.json():null}).catch(function(){return null}):Promise.resolve(null);
     if(S){
-      $("facts").innerHTML=[["Manager",S.manager],["Captain",S.captain],["League",S.league],["Top scorer",S.scorer]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+linkNames(f[1],S.id)+'</div></div>'}).join("");
+      $("facts").innerHTML=[["Manager",S.manager],["Captain",S.captain],["League",S.league],["Top scorer",S.scorer]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+linkNames(f[1],S.id)+'</div></div>'}).join(""); mgrLinks();
       $("summary").textContent=S.summary;
       $("matches").innerHTML=S.matches.map(function(m,k){return '<div class="match" id="m'+k+'"><div class="head"><div class="team r">'+(m.home==="Manchester United"?MU.esc(m.home):'<a class="cl" href="/manutd/club/?c='+encodeURIComponent(m.home)+'">'+MU.esc(m.home)+'</a>')+crest(m.home)+'</div><div><div class="score">'+m.score+'</div><div class="meta">'+MU.esc(m.comp)+' · '+MU.fmtDate(m.date+"T12:00:00Z",{year:"numeric"})+' · '+MU.esc(m.venue)+'</div></div><div class="team">'+crest(m.away)+(m.away==="Manchester United"?MU.esc(m.away):'<a class="cl" href="/manutd/club/?c='+encodeURIComponent(m.away)+'">'+MU.esc(m.away)+'</a>')+'</div></div>'+
         '<div class="scorers"><b>Scorers</b> '+linkNames(m.scorers,S.id)+'</div>'+(m.lineup?'<div class="lineup"><b>United</b> '+linkNames(m.lineup,S.id)+'</div>':'')+(m.note?'<div class="note">'+MU.esc(m.note)+'</div>':'')+(m.api?'<div class="live" id="live'+k+'"><small>Loading match data…</small></div>':'')+'</div>'}).join("");
@@ -136,7 +138,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
         var NAME=/((?:[A-Z]\. ?){1,3}[A-Z][\w'’\-]+(?: [A-Z][\w'’\-]+)?|(?:Sir )?[A-Z][\w'’\-]+(?: (?:van |de |di |O’|O')?[A-Z][\w'’\-]+){1,2})/g;
         function people(t,mode){return MU.esc(t||"").replace(NAME,function(n){return mode==="wiki"?'<a class="pl opp" href="https://en.wikipedia.org/wiki/Special:Search?search='+encodeURIComponent(n+" Manchester United")+'" target="_blank" rel="noopener">'+n+'</a>':'<a class="pl" href="/manutd/player/?q='+encodeURIComponent(n)+'">'+n+'</a>'})}
         var more=[["Manager",people(b.manager)],["Chairman",people(b.chairman,"wiki")],["Top scorer",people(b.seasonTopScorer||b.leagueTopScorer)]].concat((b.cups||[]).map(function(c){return [MU.esc(c.name),MU.esc(c.result)]})).concat([["Average attendance",MU.esc(b.averageAttendance)]]).filter(function(f){return f[1]});
-        $("facts").innerHTML+=more.map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+f[1]+'</div></div>'}).join("");
+        $("facts").innerHTML+=more.map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+f[1]+'</div></div>'}).join(""); mgrLinks();
         $("summary").innerHTML=MU.esc(w.extract)+' <small class="sub">From <a href="'+w.url+'" target="_blank" rel="noopener">the Wikipedia article</a>, CC BY-SA 4.0.</small>';
       }).catch(function(){$("summary").innerHTML='<small class="sub">No write-up available for this season yet. The table and results below are from the match records.</small>'});
     }

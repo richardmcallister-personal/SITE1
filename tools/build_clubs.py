@@ -43,6 +43,7 @@ index = []
 def agg(rows): return dict(p=len(rows), w=sum(1 for m in rows if m['gf'] > m['ga']), d=sum(1 for m in rows if m['gf'] == m['ga']), l=sum(1 for m in rows if m['gf'] < m['ga']), gf=sum(m['gf'] for m in rows), ga=sum(m['ga'] for m in rows))
 for name, ms in clubs.items():
     ms.sort(key=lambda m: m['d'])
+    seen = set(); ms[:] = [m for m in ms if not ((m['d'], m['c']) in seen or seen.add((m['d'], m['c'])))]   # same tie from two sources
     allr = agg(ms); lg = agg([m for m in ms if m['c'] == 'L']); fc = agg([m for m in ms if m['c'] == 'FAC']); other = agg([m for m in ms if m['c'] not in ('L', 'FAC')])
     best = max(ms, key=lambda m: (m['gf'] - m['ga'], m['gf'])); worst = min(ms, key=lambda m: (m['gf'] - m['ga'], -m['ga']))
     rec = dict(name=name, slug=slug(name), all=allr, league=lg, facup=fc, other=other, first=ms[0]['d'], last=ms[-1]['d'], seasons=len(set(m['s'] for m in ms)), best=best, worst=worst)
