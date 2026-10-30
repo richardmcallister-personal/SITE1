@@ -36,6 +36,10 @@ const ROUTES = {
   "/api/lineups":       { ttl: 86400, path: (u) => `/fixtures/lineups?fixture=${num(u, "fixture")}` },
   "/api/fixture-stats": { ttl: 86400, path: (u) => `/fixtures/statistics?fixture=${num(u, "fixture")}` },
   "/api/events":        { ttl: 86400, path: (u) => `/fixtures/events?fixture=${num(u, "fixture")}` },
+  "/api/transfers":     { ttl: 86400, path: () => `/transfers?team=${TEAM}` },
+  "/api/team-fixtures": { ttl: 3600,  path: (u) => `/fixtures?team=${num(u, "team")}&season=${season()}&from=${(u.searchParams.get("from") || "").slice(0, 10)}&to=${(u.searchParams.get("to") || "").slice(0, 10)}` },
+  "/api/fixture-players": { ttl: 30 * 86400, path: (u) => `/fixtures/players?fixture=${num(u, "fixture")}` },   // only fetched for finished matches
+  "/api/player-season": { ttl: 30 * 86400, path: (u) => `/players?id=${num(u, "id")}&season=${num(u, "season")}` },   // past seasons, for debut lookups
 };
 function num(u, k) { return String(parseInt(u.searchParams.get(k) || "0", 10) || 0); }
 
@@ -69,6 +73,7 @@ export default {
     if (url.pathname === "/wiki") return wiki(url, env, ctx);
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
 
+    if (url.pathname === "/api/youth") return youth(url, env, ctx);
     const route = ROUTES[url.pathname];
     if (!route) return json({ error: "unknown route" }, 404);
     if (!env.API_FOOTBALL_KEY) return json({ error: "API_FOOTBALL_KEY secret not set on the Worker" }, 500);
@@ -101,6 +106,8 @@ export default {
         await refresh(env, key, route, url);
         await sleep(1200);
       }
+      const yk = "youth:v1:report", y = await load(env, yk);
+      if (!y.body || y.age > YOUTH_TTL * 0.8) await buildYouth(env);
     })());
   },
 };
@@ -321,3 +328,111 @@ function wtClean(v) {
   s = s.replace(/'{2,}/g, "").replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/\s+/g, " ").trim();
   return s;
 }
+
+
+// ---- Academy & loan watch: one composite report, cached in KV, rebuilt by the cron and on demand when stale.
+const YOUTH_TTL = 6 * 3600;
+async function youth(url, env, ctx) {
+  const key = "youth:v1:report";
+  const { body, fresh, age } = await load(env, key);
+  if (body && fresh) return answer(body, "kv-hit", age);
+  if (body) { ctx.waitUntil(buildYouth(env)); return answer(body, "kv-stale", age); }
+  try { const out = await buildYouth(env); return answer(out, "upstream", 0); }
+  catch (e) { return json({ error: String(e) }, 200); }
+}
+// Fetch one API route through the same KV cache the pages use.
+async function viaCache(env, pathWithQuery) {
+  const u = new URL("https://site1.local" + pathWithQuery), route = ROUTES[u.pathname], key = "api:v3:" + u.pathname + u.search;
+  const { body, fresh } = await load(env, key);
+  if (body && fresh) return JSON.parse(body);
+  const r = await refresh(env, key, route, u);
+  await sleep(250);
+  if (r.ok) return JSON.parse(r.body);
+  if (body) return JSON.parse(body);
+  throw new Error("API failed for " + pathWithQuery + ": " + r.body.slice(0, 120));
+}
+async function buildYouth(env) {
+  const S = season(), today = new Date(), d7 = new Date(today.getTime() - 7 * 86400000);
+  const iso = (d) => d.toISOString().slice(0, 10);
+  const seasonStart = S + "-06-01";
+  // 1. Who to watch. Loanees: this season's loans out of United not since cancelled; academy: the youngest first-team squad members.
+  const [tr, sq] = await Promise.all([viaCache(env, "/api/transfers"), viaCache(env, "/api/squad")]);
+  const loans = {};
+  for (const p of tr.response || []) {
+    const ts = (p.transfers || []).filter((t) => t.date >= seasonStart).sort((a, b) => (a.date < b.date ? -1 : 1));
+    const last = ts[ts.length - 1];
+    if (last && /loan/i.test(last.type || "") && last.teams.out && last.teams.out.id === TEAM && last.teams.in && last.teams.in.id !== TEAM)
+      loans[p.player.id] = { id: p.player.id, name: p.player.name, status: "loan", club: { id: last.teams.in.id, name: last.teams.in.name, logo: last.teams.in.logo }, since: last.date };
+  }
+  const squad = (sq.response && sq.response[0] ? sq.response[0].players : []);
+  const academy = squad.filter((p) => (p.age && p.age <= 21) || (p.number && p.number >= 40)).map((p) => ({ id: p.id, name: p.name, status: "academy", club: { id: TEAM, name: "Manchester United", logo: "" }, age: p.age, number: p.number, position: p.position, photo: p.photo }));
+  const watch = Object.values(loans).concat(academy.filter((a) => !loans[a.id]));
+  // 2. Season stats per player (all teams, so a loanee's loan-club rows come through), plus earlier seasons for the debut ladder.
+  for (const w of watch) {
+    const j = await viaCache(env, `/api/player?id=${w.id}`);
+    const r = j.response && j.response[0];
+    if (r) {
+      w.name = r.player.name; w.age = r.player.age; w.photo = r.player.photo; w.nationality = r.player.nationality; w.birth = r.player.birth && r.player.birth.date;
+      w.season = (r.statistics || []).filter((x) => x.games && (x.games.appearences || x.games.minutes || x.games.lineups)).map((x) => ({ team: { id: x.team.id, name: x.team.name, logo: x.team.logo }, league: x.league.name, apps: x.games.appearences || 0, starts: x.games.lineups || 0, minutes: x.games.minutes || 0, position: x.games.position, rating: x.games.rating ? +x.games.rating : null, goals: x.goals.total || 0, assists: x.goals.assists || 0, conceded: x.goals.conceded, saves: x.goals.saves, yellow: (x.cards && x.cards.yellow) || 0, red: (x.cards && x.cards.red) || 0, benched: x.substitutes && x.substitutes.bench || 0 }));
+      w.position = w.position || (w.season[0] && w.season[0].position) || "";
+    } else w.season = [];
+    // United debut: earliest season (last four) with a United appearance.
+    w.utd = { apps: 0, starts: 0, minutes: 0, debutSeason: null };
+    for (let y = S; y >= S - 3; y--) {
+      const jj = y === S ? j : await viaCache(env, `/api/player-season?id=${w.id}&season=${y}`);
+      const rr = jj.response && jj.response[0];
+      const rows = rr ? (rr.statistics || []).filter((x) => x.team.id === TEAM && x.games && x.games.appearences) : [];
+      const apps = rows.reduce((a, x) => a + (x.games.appearences || 0), 0);
+      if (y === S) { w.utd.apps = apps; w.utd.starts = rows.reduce((a, x) => a + (x.games.lineups || 0), 0); w.utd.minutes = rows.reduce((a, x) => a + (x.games.minutes || 0), 0); }
+      if (apps) w.utd.debutSeason = y;
+      if (rr && rr.player && rr.player.age && y !== S && !apps && (w.age || 99) - (S - y) < 16) break;
+    }
+  }
+  // 3. Last seven days, match by match, from the per-fixture player stats of each club involved.
+  const clubs = {}; watch.forEach((w) => { clubs[w.club.id] = w.club; });
+  const byClub = {};
+  for (const cid of Object.keys(clubs)) {
+    const fx = await viaCache(env, `/api/team-fixtures?team=${cid}&from=${iso(d7)}&to=${iso(today)}`);
+    byClub[cid] = (fx.response || []).filter((m) => /FT|AET|PEN/.test(m.fixture.status.short));
+  }
+  for (const w of watch) w.week = [];
+  for (const cid of Object.keys(byClub)) {
+    for (const m of byClub[cid]) {
+      const fp = await viaCache(env, `/api/fixture-players?fixture=${m.fixture.id}`);
+      const side = (fp.response || []).filter((t) => t.team.id === +cid)[0];
+      if (!side) continue;
+      const squadIds = new Set(side.players.map((p) => p.player.id));
+      for (const w of watch) {
+        if (w.club.id !== +cid || !squadIds.has(w.id)) continue;
+        const row = side.players.filter((p) => p.player.id === w.id)[0], g = row.statistics[0] || {}, gm = g.games || {};
+        const home = m.teams.home.id === +cid, opp = home ? m.teams.away : m.teams.home;
+        w.week.push({ fixture: { id: m.fixture.id, date: m.fixture.date, league: m.league.name, home, opp: { id: opp.id, name: opp.name, logo: opp.logo }, score: (home ? m.goals.home : m.goals.away) + "–" + (home ? m.goals.away : m.goals.home) },
+          minutes: gm.minutes || 0, started: !gm.substitute && !!gm.minutes, sub: !!gm.substitute && !!gm.minutes, unused: !gm.minutes, position: gm.position || "", number: gm.number, rating: gm.rating ? +gm.rating : null, captain: !!gm.captain,
+          goals: (g.goals && g.goals.total) || 0, assists: (g.goals && g.goals.assists) || 0, conceded: g.goals ? g.goals.conceded : null, saves: g.goals ? g.goals.saves : null, yellow: (g.cards && g.cards.yellow) || 0, red: (g.cards && g.cards.red) || 0, shots: g.shots && g.shots.total || 0, keyPasses: g.passes && g.passes.key || 0, tacklesTotal: g.tackles && g.tackles.total || 0, duelsWon: g.duels && g.duels.won || 0, dribbles: g.dribbles && g.dribbles.success || 0 });
+      }
+    }
+  }
+  // 4. United matchday squads this season, for the academy ladder (bench appearances count).
+  const ufx = await viaCache(env, "/api/fixtures");
+  const played = (ufx.response || []).filter((m) => /FT|AET|PEN/.test(m.fixture.status.short)).sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
+  const bench = {}, first = {}, firstStart = {};
+  for (const m of played) {
+    const fp = await viaCache(env, `/api/fixture-players?fixture=${m.fixture.id}`);
+    const side = (fp.response || []).filter((t) => t.team.id === TEAM)[0]; if (!side) continue;
+    const home = m.teams.home.id === TEAM, opp = home ? m.teams.away.name : m.teams.home.name;
+    for (const p of side.players) {
+      const gm = (p.statistics[0] || {}).games || {};
+      bench[p.player.id] = (bench[p.player.id] || 0) + 1;
+      if (gm.minutes && !first[p.player.id]) first[p.player.id] = { date: m.fixture.date, opp, league: m.league.name, minutes: gm.minutes, sub: !!gm.substitute };
+      if (gm.minutes && !gm.substitute && !firstStart[p.player.id]) firstStart[p.player.id] = { date: m.fixture.date, opp, league: m.league.name };
+    }
+  }
+  for (const w of watch) { w.utd.squads = bench[w.id] || 0; w.utd.firstThisSeason = first[w.id] || null; w.utd.firstStartThisSeason = firstStart[w.id] || null; }
+  watch.sort((a, b) => (a.status === b.status ? (b.week.reduce((x, y) => x + y.minutes, 0) - a.week.reduce((x, y) => x + y.minutes, 0)) : a.status === "loan" ? -1 : 1));
+  const out = JSON.stringify({ generated: new Date().toISOString(), season: S, window: { from: iso(d7), to: iso(today) }, players: watch });
+  await env.MU_CACHE.put("youth:v1:report", Math.floor(Date.now() / 1000) + "\n" + YOUTH_TTL + "\n" + out, { expirationTtl: YOUTH_TTL + KEEP });
+  // weekly archive, one per ISO week, kept 90 days
+  const wk = isoWeek(today); await env.MU_CACHE.put("youth:v1:week:" + wk, out, { expirationTtl: 90 * 86400 });
+  return out;
+}
+function isoWeek(d) { const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day); const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return t.getUTCFullYear() + "-W" + String(Math.ceil(((t - y0) / 86400000 + 1) / 7)).padStart(2, "0"); }
