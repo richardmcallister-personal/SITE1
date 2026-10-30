@@ -55,7 +55,7 @@ export default {
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + (WIKI ? "/trips/" : "/manutd/trips/"), 301);
     if (WIKI) {
       // Clean URLs on the club domain: the site lives under /manutd/ in the repo; serve it at the root here.
-      const SERVICE = /^\/(api|img|feed|wiki)(\/|$)/;
+      const SERVICE = /^\/(api|img|feed|wiki|wiki-season)(\/|$)/;
       if (url.pathname.startsWith("/manutd/")) return Response.redirect(url.origin + url.pathname.slice(7) + url.search, 301);
       if (!SERVICE.test(url.pathname)) {
         const inner = new URL(url.toString()); inner.pathname = "/manutd" + (url.pathname === "/" ? "/" : url.pathname);
