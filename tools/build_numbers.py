@@ -48,7 +48,8 @@ def parse(wt):
             ta, tg = cs[len(cs) - from_end], cs[len(cs) - from_end + 1]
             def n(x): mm = re.match(r'^(\d+)(?:\((\d+)\))?', x); return (int(mm.group(1)) + int(mm.group(2) or 0)) if mm else 0
             def g(x): mm = re.match(r'^(\d+)', x); return int(mm.group(1)) if mm else 0
-            out.append(dict(no=int(m.group(1)), pos=cs[1][:3], name=(nm.group(2) or nm.group(1)).strip(), title=nm.group(1).strip(), apps=n(ta), goals=g(tg)))
+            pos = next((c[:2] for c in cs[1:4] if re.match(r'^(GK|DF|MF|FW)', c)), cs[1][:3])   # 1996–2000 tables carry a "CL no." column before Pos.
+            out.append(dict(no=int(m.group(1)), pos=pos, name=(nm.group(2) or nm.group(1)).strip(), title=nm.group(1).strip(), apps=n(ta), goals=g(tg)))
     return out
 res = json.load(open(OUT)) if os.path.exists(OUT) else {}
 Y = season_now()
