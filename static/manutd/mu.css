@@ -56,3 +56,13 @@ footer.mu a{color:#fff}
 .chip{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;background:var(--tint);color:var(--ink);margin-left:6px}
 .chip.red{background:var(--red);color:#fff}
 @media (max-width:640px){.fxlist li{grid-template-columns:90px 1fr auto}.sheet{padding:16px}}
+
+/* ---- phones: tables scroll inside their panel instead of widening the page ---- */
+html,body{overflow-x:hidden}
+.sheet{overflow-x:auto;-webkit-overflow-scrolling:touch}
+@media (max-width:640px){
+  table.mu{font-size:13px} table.mu th,table.mu td{padding:6px 5px}
+  h1{font-size:clamp(40px,12vw,64px)} h1 small{font-size:.22em}
+  header.mu{padding-top:18px} .from{text-align:left}
+  nav.munav a{font-size:12px;padding:11px 12px}
+}
