@@ -33,7 +33,7 @@ table.mu td.name{white-space:nowrap} table.mu td.name button{all:unset;cursor:po
 
 <div class="sheet">
   <h2>Team picker</h2>
-  <p class="sub" style="margin:0 0 12px">Pick a fixture and a shape. Only players not injured or suspended are offered; each player can be used once. Your XI is saved in this browser per fixture.</p>
+  <p class="sub" style="margin:0 0 12px">Pick a fixture and a shape. The whole first-team squad is offered (players out on loan are not listed); anyone injured, suspended or doubtful is marked in the list and sorted to the bottom. Each player can be used once. Your XI is saved in this browser per fixture.</p>
   <div class="controls">
     <label>Fixture<select id="fix"></select></label>
     <label>Formation<select id="form"><option>4-3-3</option><option>4-2-3-1</option><option>3-4-3</option><option>4-4-2</option><option>3-5-2</option><option>4-1-4-1</option></select></label>
@@ -79,7 +79,7 @@ table.mu td.name{white-space:nowrap} table.mu td.name button{all:unset;cursor:po
   function key(){return "mu:xi:"+$("fix").value+":"+$("form").value}
   function saved(){try{return JSON.parse(localStorage.getItem(key())||"[]")}catch(e){return []}}
   function store(arr){try{localStorage.setItem(key(),JSON.stringify(arr))}catch(e){}}
-  function available(){return squad.filter(function(p){return !out[p.id]})}
+  function available(){return squad.slice()}  // whole squad (loanees are not in the list); injured/doubtful are flagged, not hidden
 
   function renderPitch(){
     var rows=FORMS[$("form").value], picks=saved(), pitch=$("pitch"), idx=0; pitch.innerHTML="";
@@ -89,15 +89,15 @@ table.mu td.name{white-space:nowrap} table.mu td.name button{all:unset;cursor:po
         var i=idx++, slot=document.createElement("div"); slot.className="slot";
         var cur=picks[i]||"", p=squad.filter(function(x){return String(x.id)===String(cur)})[0];
         var opts=available().filter(function(x){return String(x.id)===String(cur)||picks.indexOf(String(x.id))<0});
-        opts.sort(function(a,b){var ga=a.position===GROUP[pos]?0:1, gb=b.position===GROUP[pos]?0:1; return ga-gb||(a.number||99)-(b.number||99)});
-        slot.innerHTML='<div class="pos">'+pos+'</div>'+(p&&p.photo?'<img class="face" src="'+p.photo+'" alt="" onerror="this.onerror=null;this.src=\''+(p.wikiPhoto||'/manutd/assets/devil.png')+'\'">':'<img class="face" src="/manutd/assets/devil.png" alt="" style="object-fit:contain;padding:8px">')+'<div class="nm">'+(p?MU.esc(short(p.name)):"")+'</div><select data-i="'+i+'"><option value="">— pick —</option>'+opts.map(function(x){return '<option value="'+x.id+'"'+(String(x.id)===String(cur)?' selected':'')+'>'+(x.position===GROUP[pos]?"":"· ")+MU.esc(x.name)+(x.number?" ("+x.number+")":"")+'</option>'}).join("")+'</select>';
+        opts.sort(function(a,b){var ga=(a.position===GROUP[pos]?0:1)+(out[a.id]?2:0), gb=(b.position===GROUP[pos]?0:1)+(out[b.id]?2:0); return ga-gb||(a.number||99)-(b.number||99)});
+        slot.innerHTML='<div class="pos">'+pos+'</div>'+(p&&p.photo?'<img class="face" src="'+p.photo+'" alt="" onerror="this.onerror=null;this.src=\''+(p.wikiPhoto||'/manutd/assets/devil.png')+'\'">':'<img class="face" src="/manutd/assets/devil.png" alt="" style="object-fit:contain;padding:8px">')+'<div class="nm">'+(p?MU.esc(short(p.name)):"")+'</div><select data-i="'+i+'"><option value="">— pick —</option>'+opts.map(function(x){return '<option value="'+x.id+'"'+(String(x.id)===String(cur)?' selected':'')+'>'+(x.position===GROUP[pos]?"":"· ")+MU.esc(x.name)+(x.number?" ("+x.number+")":"")+(out[x.id]?(/questionable|doubt/i.test(out[x.id].type)?" — doubtful":" — OUT"):"")+'</option>'}).join("")+'</select>';
         row.appendChild(slot);
       });
       pitch.appendChild(row);
     });
     pitch.querySelectorAll("select").forEach(function(s){s.addEventListener("change",function(){var arr=saved(); arr[+s.dataset.i]=s.value; store(arr); renderPitch()})});
     var n=picks.filter(Boolean).length, f=window.MU_FIXTURES.filter(function(x){return x.ko===$("fix").value})[0];
-    $("pickNote").textContent=n+" of 11 picked for "+(f?(f.home?"United v "+f.opp:f.opp+" v United")+" ("+MU.fmtDate(f.ko)+")":"")+". Players listed with a dot are out of their natural position.";
+    $("pickNote").textContent=n+" of 11 picked for "+(f?(f.home?"United v "+f.opp:f.opp+" v United")+" ("+MU.fmtDate(f.ko)+")":"")+". Players listed with a dot are out of their natural position; OUT / doubtful follows the club's injury list.";
   }
   function short(n){var p=n.split(" "); return p.length>1&&n.length>16?p[p.length-1]:n}
 
