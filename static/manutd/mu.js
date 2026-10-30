@@ -8,7 +8,8 @@ window.MU=(function(){
   }
   // GET /api/<name>?..., cached in sessionStorage for 30 min so page hops don't re-hit the Worker.
   function api(name,params){
-    var q=params?"?"+Object.keys(params).map(function(k){return k+"="+encodeURIComponent(params[k])}).join("&"):"";
+    params=Object.assign({},params||{},{v:"3"});   // bumps the URL so browsers drop copies cached by earlier Worker builds
+    var q="?"+Object.keys(params).map(function(k){return k+"="+encodeURIComponent(params[k])}).join("&");
     var url="/api/"+name+q, key="mu:"+url;
     try{var c=JSON.parse(sessionStorage.getItem(key)||"null"); if(c&&Date.now()-c.t<18e5)return Promise.resolve(c.v)}catch(e){}
     if(api._inflight[url])return api._inflight[url];
