@@ -17,6 +17,7 @@
 .pos .big small{font-size:.3em;vertical-align:top;margin-left:4px}
 .pos .k{font-family:var(--display);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#bbb;display:flex;align-items:center;gap:8px}
 .pos .k img,.from .comps img{background:#fff;border-radius:6px;padding:3px;box-sizing:content-box}
+.from .comps a{display:block;line-height:0} .from .comps img{height:30px;width:30px;object-fit:contain} .from .comps img.dark{background:#111} .from .comps a:hover img{outline:2px solid #fff}
 .pos table{color:#fff} .pos .sub{color:#bbb}
 .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:4px;margin-top:4px}
 .links a{display:block;background:#fff;color:var(--ink);text-decoration:none;padding:18px 22px}
@@ -25,7 +26,7 @@
 </style></head><body><div class="wrap">
 <header class="mu">
   <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Season 2026/27</small>Manchester<br>United</h1></a>
-  <div class="from">Club hub<span class="comps" style="display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:8px"><img src="/manutd/assets/comps/premier-league.png" alt="Premier League" style="height:30px;width:30px;object-fit:contain"><img src="/manutd/assets/comps/champions-league.png" alt="Champions League" style="height:30px;width:30px;object-fit:contain"><img src="/manutd/assets/comps/fa-cup.png" alt="FA Cup" style="height:30px;width:30px;object-fit:contain"><img src="/manutd/assets/comps/league-cup-carabao.png" alt="League Cup" style="height:30px;width:30px;object-fit:contain"></span></div>
+  <div class="from">Club hub<span class="comps" style="display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:8px"><a href="https://www.premierleague.com/" target="_blank" rel="noopener" title="Premier League"><img src="/manutd/assets/comps/premier-league.png" alt="Premier League"></a><a href="https://www.uefa.com/uefachampionsleague/" target="_blank" rel="noopener" title="UEFA Champions League"><img src="/manutd/assets/comps/champions-league.png" alt="Champions League"></a><a href="https://www.thefa.com/competitions/thefacup" target="_blank" rel="noopener" title="The FA Cup"><img src="/manutd/assets/comps/fa-cup.png" alt="FA Cup" class="dark"></a><a href="https://www.efl.com/competitions/carabao-cup/" target="_blank" rel="noopener" title="Carabao Cup"><img src="/manutd/assets/comps/league-cup-carabao.png" alt="Carabao Cup"></a></span></div>
 </header>
 <nav class="munav" aria-label="Sections"></nav>
 

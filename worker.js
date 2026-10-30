@@ -44,6 +44,7 @@ export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + "/manutd/trips/", 301);
+    if (url.pathname.startsWith("/img/player/")) return portrait(url, ctx);
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
 
     const route = ROUTES[url.pathname];
@@ -110,3 +111,18 @@ function headers(src, age) {
 function answer(body, src, age) { return new Response(body, { status: 200, headers: headers(src, age) }); }
 function json(obj, status = 200) { return new Response(JSON.stringify(obj), { status, headers: headers("worker") }); }
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+// Player portraits from API-Football's media host, cached at the edge for a day and sent with CORS
+// so the team-picker's PNG export can draw them. No API quota is used for these.
+async function portrait(url, ctx) {
+  const m = url.pathname.match(/^\/img\/player\/(\d+)\.png$/);
+  if (!m) return new Response("not found", { status: 404 });
+  const cache = caches.default, key = new Request(url.origin + "/__img/v1/" + m[1]);
+  const hit = await cache.match(key);
+  if (hit) return hit;
+  const up = await fetch("https://media.api-sports.io/football/players/" + m[1] + ".png", { cf: { cacheTtl: 86400 } });
+  if (!up.ok) return new Response("not found", { status: 404 });
+  const res = new Response(up.body, { status: 200, headers: { "content-type": "image/png", "cache-control": "public, max-age=86400", "access-control-allow-origin": "*" } });
+  ctx.waitUntil(cache.put(key, res.clone()));
+  return res;
+}
