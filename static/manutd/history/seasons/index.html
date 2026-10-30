@@ -5,7 +5,8 @@
 <link rel="stylesheet" href="/manutd/mu.css">
 <style>
 table.mu td.s a{color:var(--ink);text-decoration:none;font-weight:600} table.mu td.s a:hover{color:var(--red)}
-table.mu tr.t1 td{box-shadow:inset 4px 0 0 var(--gold)} table.mu tr.rel td{box-shadow:inset 4px 0 0 var(--red)}
+table.mu tr.t1 td:first-child{box-shadow:inset 4px 0 0 var(--gold)} table.mu tr.rel td:first-child{box-shadow:inset 4px 0 0 var(--red)}
+table.mu td.s,table.mu td.dv,table.mu td.fc{white-space:nowrap} table.mu td.tro{white-space:nowrap}
 table.mu tr.d2 td{background:#fafafa}
 .tro{font-size:12px} .tro img{width:16px;height:16px;object-fit:contain;vertical-align:-3px;margin-right:3px}
 .decade{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);background:var(--tint)}
@@ -45,7 +46,7 @@ table.mu tr.d2 td{background:#fafafa}
     rows.forEach(function(a){
       var d=Math.floor(parseInt(a.id,10)/10)*10; if(d!==dec){dec=d; html+='<tr><td colspan="12" class="decade">'+d+'s</td></tr>'}
       var cls=[]; if(a.pos===1&&a.tier===1)cls.push("t1"); if(a.rel)cls.push("rel"); if(a.tier===2)cls.push("d2");
-      html+='<tr class="'+cls.join(" ")+'"><td class="s"><a href="/manutd/history/season/?s='+a.id+'">'+a.title+'</a></td><td>'+MU.esc(a.div)+'</td><td class="n">'+(a.pos?ordinal(a.pos):"—")+'</td><td class="n">'+(a.p||"")+'</td><td class="n">'+(a.w==null?"":a.w)+'</td><td class="n">'+(a.d==null?"":a.d)+'</td><td class="n">'+(a.l==null?"":a.l)+'</td><td class="n">'+(a.gf==null?"":a.gf)+'</td><td class="n">'+(a.ga==null?"":a.ga)+'</td><td class="n"><b>'+(a.pts==null?"":a.pts)+'</b></td><td>'+(a.facWon?'<b>Winners</b>':(a.fac||""))+'</td><td class="tro">'+a.tro.map(function(t){var l=TLOGO[t]; return (l?'<img src="/manutd/assets/comps/'+l+'.png" alt="">':'')+MU.esc(t)}).join(" · ")+'</td></tr>';
+      html+='<tr class="'+cls.join(" ")+'"><td class="s"><a href="/manutd/history/season/?s='+a.id+'">'+a.title+'</a></td><td class="dv">'+MU.esc(a.div)+'</td><td class="n">'+(a.pos?ordinal(a.pos):"—")+'</td><td class="n">'+(a.p||"")+'</td><td class="n">'+(a.w==null?"":a.w)+'</td><td class="n">'+(a.d==null?"":a.d)+'</td><td class="n">'+(a.l==null?"":a.l)+'</td><td class="n">'+(a.gf==null?"":a.gf)+'</td><td class="n">'+(a.ga==null?"":a.ga)+'</td><td class="n"><b>'+(a.pts==null?"":a.pts)+'</b></td><td class="fc">'+(a.facWon?'<b>Winners</b>':(a.fac||""))+'</td><td class="tro">'+a.tro.map(function(t){var l=TLOGO[t]; return (l?'<img src="/manutd/assets/comps/'+l+'.png" alt="">':'')+MU.esc(t)}).join(" · ")+'</td></tr>';
     });
     $("list").innerHTML=html+'</tbody></table>';
   }
