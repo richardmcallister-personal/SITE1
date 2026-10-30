@@ -59,7 +59,7 @@
   }).catch(function(e){
     MU.apiDown(document.getElementById("results"),e);
     var now=new Date();
-    document.getElementById("fixtures").innerHTML=window.MU_FIXTURES.filter(function(f){return new Date(f.ko)>now}).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK'+MU.prov(f)+'</span><span class="o">'+MU.crest(f.opp)+MU.esc(f.opp)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("")+'<li><span class="d"></span><span class="o"><small>From the site fixture list (club's official fixtures page); results arrive with the API.</small></span><span></span></li>';
+    document.getElementById("fixtures").innerHTML=window.MU_FIXTURES.filter(function(f){return new Date(f.ko)>now}).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK'+MU.prov(f)+'</span><span class="o">'+MU.crest(f.opp)+MU.esc(f.opp)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("")+'<li><span class="d"></span><span class="o"><small>From the site fixture list (the official club fixtures page); results arrive with the API.</small></span><span></span></li>';
   });
 })();
 </script></body></html>
