@@ -100,7 +100,8 @@
   PODS.forEach(function(p){MU.api("../feed",{id:p.id}).then(function(j){
     var ul=document.querySelector("#"+p.id+" .eps");
     var art=(j.show&&j.show.image)||"";
-    ul.innerHTML=j.items.slice(0,3).map(function(e,i){var im=e.image||art; return '<li>'+(im?'<img src="'+im+'" alt="" loading="lazy">':'<span></span>')+'<div><div class="t"><a href="'+e.link+'" target="_blank" rel="noopener">'+MU.esc(e.title)+'</a></div><div class="m">'+when(e.date)+(e.duration?' · '+dur(e.duration):'')+'</div>'+(e.audio&&i===0?'<audio controls preload="none" src="'+e.audio+'"></audio>':'')+'</div></li>'}).join("")||'<li><small>No episodes found.</small></li>';
+    ul.innerHTML=j.items.slice(0,3).map(function(e,i){var im=e.image||art; return '<li>'+(im?'<img src="'+im+'" alt="" loading="lazy">':'<span></span>')+'<div><div class="t"><a href="'+e.link+'" target="_blank" rel="noopener">'+MU.esc(e.title)+'</a></div><div class="m">'+when(e.date)+(e.duration?' · '+dur(e.duration):'')+'</div>'+(e.audio?'<audio controls preload="none" src="'+e.audio+'"></audio>':'')+'</div></li>'}).join("")||'<li><small>No episodes found.</small></li>';
+    ul.querySelectorAll("audio").forEach(function(a){a.addEventListener("play",function(){document.querySelectorAll("audio").forEach(function(o){if(o!==a)o.pause()})})});
   }).catch(function(){document.querySelector("#"+p.id+" .eps").innerHTML='<li><small>Feed unavailable right now.</small></li>'})});
 
   $("news").innerHTML=NEWS.map(function(n){return '<div class="show" id="'+n.id+'"><h3>'+MU.esc(n.name)+'</h3><ul class="news linklist"><li><small>Loading…</small></li></ul></div>'}).join("");
