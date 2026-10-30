@@ -49,7 +49,9 @@
   function covers(x){var i=id(x), el=document.querySelector('[data-cov="'+i+'"]'); if(!el)return;
     function put(u){if(u){el.innerHTML='<img src="'+u+'" alt="" loading="lazy" onerror="this.parentNode.innerHTML=\'<span>'+KIND[x.k]+'</span>\'">'}}
     if(COV[i]!==undefined)return put(COV[i]);
-    var q=x.k==="book"?{type:"book",q:x.t,by:x.by}:x.k==="pod"?{type:"pod",q:x.t.replace(/^The Athletic: /,"").replace(/^UWS: /,"")}:{type:"wiki",q:x.t,hint:x.k==="film"?"film":"documentary "+x.y};
+    var FEED={"the-athletic-talk-of-the-devils":"pod-totd","stretford-paddock":"pod-paddock","the-overlap":"pod-overlap","stick-to-football":"pod-overlap"};
+    if(x.k==="pod"&&FEED[i]){fetch("/feed?id="+FEED[i]).then(function(r){return r.json()}).then(function(j){COV[i]=(j.image||j.artwork||(j.show&&j.show.image)||"")||""; put(COV[i])}).catch(function(){COV[i]=""}); return}
+    var q=x.k==="book"?{type:"book",q:x.t,by:x.by}:x.k==="pod"?{type:"wiki",q:x.t.replace(/^UWS: /,""),hint:"podcast"}:{type:"wiki",q:x.t,hint:x.k==="film"?"film":"documentary "+x.y};
     MU.api("../cover",q).then(function(j){COV[i]=j.url||""; put(COV[i])}).catch(function(){COV[i]=""});
   }
   $("list").addEventListener("click",function(e){var b=e.target.closest("button[data-id]"); if(!b)return; done[b.dataset.id]=!done[b.dataset.id]; if(!done[b.dataset.id])delete done[b.dataset.id]; save(); render()});

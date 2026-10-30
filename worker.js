@@ -556,15 +556,19 @@ async function collection(request, url, env) {
 async function cover(url, env, ctx) {
   const type = url.searchParams.get("type") || "book", q = (url.searchParams.get("q") || "").trim(), by = (url.searchParams.get("by") || "").trim();
   if (!q) return json({ error: "q required" }, 400);
-  const key = "cover:v1:" + type + ":" + (q + "|" + by).toLowerCase(), cached = await env.MU_CACHE.get(key);
+  const key = "cover:v2:" + type + ":" + (q + "|" + by).toLowerCase(), cached = await env.MU_CACHE.get(key);
   if (cached) return new Response(cached, { headers: headers("kv-hit") });
   const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
   let out = { url: "", src: "" };
   try {
     if (type === "book") {
-      const r = await fetch("https://openlibrary.org/search.json?limit=5&fields=key,title,cover_i,author_name,first_publish_year&title=" + encodeURIComponent(q) + (by ? "&author=" + encodeURIComponent(by.split(/ with | and /)[0]) : ""), { headers: UA });
-      const j = r.ok ? await r.json() : {}; const hit = (j.docs || []).filter((d) => d.cover_i)[0];
-      if (hit) out = { url: "https://covers.openlibrary.org/b/id/" + hit.cover_i + "-M.jpg", src: "Open Library", title: hit.title };
+      const main = q.split(/[:—]/)[0].trim(), surname = by ? by.split(/ with | and /)[0].trim().split(" ").pop() : "";
+      const tries = [[main, surname], [q, surname], [main, ""]];
+      for (const t of tries) {
+        const r = await fetch("https://openlibrary.org/search.json?limit=5&fields=key,title,cover_i,author_name,first_publish_year&title=" + encodeURIComponent(t[0]) + (t[1] ? "&author=" + encodeURIComponent(t[1]) : ""), { headers: UA });
+        const j = r.ok ? await r.json() : {}; const hit = (j.docs || []).filter((d) => d.cover_i)[0];
+        if (hit) { out = { url: "https://covers.openlibrary.org/b/id/" + hit.cover_i + "-M.jpg", src: "Open Library", title: hit.title }; break; }
+      }
     } else if (type === "pod") {
       const r = await fetch("https://itunes.apple.com/search?media=podcast&limit=3&term=" + encodeURIComponent(q), { headers: UA });
       const j = r.ok ? await r.json() : {}; const hit = (j.results || [])[0];
@@ -572,8 +576,11 @@ async function cover(url, env, ctx) {
     } else {
       // Wikipedia: search for the film/documentary article, then take its lead image.
       const sr = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=3&srsearch=" + encodeURIComponent(q + " " + (url.searchParams.get("hint") || "film")), { headers: UA });
-      const sj = sr.ok ? await sr.json() : {}; const hit = (sj.query && sj.query.search || [])[0];
-      if (hit) { const pr = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(hit.title.replace(/ /g, "_")), { headers: UA }); const pj = pr.ok ? await pr.json() : {}; if (pj.thumbnail) out = { url: pj.originalimage && pj.originalimage.width < 1200 ? pj.originalimage.source : pj.thumbnail.source, src: "Wikipedia", title: pj.title, page: pj.content_urls ? pj.content_urls.desktop.page : "" }; }
+      const sj = sr.ok ? await sr.json() : {};
+      for (const hit of (sj.query && sj.query.search || []).slice(0, 3)) {
+        const pr = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(hit.title.replace(/ /g, "_")), { headers: UA }); const pj = pr.ok ? await pr.json() : {};
+        if (pj.type !== "disambiguation" && pj.thumbnail) { out = { url: pj.originalimage && pj.originalimage.width < 1200 ? pj.originalimage.source : pj.thumbnail.source, src: "Wikipedia", title: pj.title, page: pj.content_urls ? pj.content_urls.desktop.page : "" }; break; }
+      }
     }
   } catch (e) { out.error = String(e); }
   const body = JSON.stringify(out);
