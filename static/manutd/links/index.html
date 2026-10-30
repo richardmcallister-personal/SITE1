@@ -84,7 +84,9 @@
     {id:"pod-paddock",name:"Manchester United Podcast by Stretford Paddock",by:"Stretford Paddock",site:"https://www.youtube.com/@StretfordPaddock"},
     {id:"pod-tus",name:"The United Stand",by:"Mark Goldbridge and the TUS team",site:"https://www.youtube.com/@TheUnitedStand"},
     {id:"pod-weekly",name:"Manchester United Weekly Podcast",by:"Harry Robinson & Jack Tait",site:""},
-    {id:"pod-tribf",name:"The Rest Is Football",by:"Lineker, Shearer, Richards — all football, United most weeks",site:"https://www.goalhangerpodcasts.com/the-rest-is-football"}
+    {id:"pod-tribf",name:"The Rest Is Football",by:"Lineker, Shearer, Richards — all football, United most weeks",site:"https://www.goalhangerpodcasts.com/the-rest-is-football"},
+    {id:"pod-overlap",name:"The Overlap",by:"Gary Neville, Roy Keane, Jamie Carragher, Ian Wright, Jill Scott",site:"https://www.youtube.com/@TheOverlap"},
+    {id:"pod-second",name:"Second Captains",by:"Dublin — Ken Early, Eoin McDevitt, Ciarán Murphy, Mark Horgan",site:"https://secondcaptains.com/"}
   ];
   var NEWS=[{id:"bbc",name:"BBC Sport"},{id:"guardian",name:"The Guardian"},{id:"sky",name:"Sky Sports"}];
   var YT=[{id:"yt-manutd",name:"Manchester United",url:"https://www.youtube.com/@manutd",official:true},{id:"yt-paddock",name:"Stretford Paddock",url:"https://www.youtube.com/@StretfordPaddock"},{id:"yt-athletic",name:"The Athletic FC",url:"https://www.youtube.com/@TheAthleticFC"},{id:"yt-pl",name:"Premier League",url:"https://www.youtube.com/@premierleague"}];
@@ -95,7 +97,8 @@
   $("pods").innerHTML=PODS.map(function(p){return '<div class="show" id="'+p.id+'"><h3>'+(p.site?'<a href="'+p.site+'" target="_blank" rel="noopener">'+MU.esc(p.name)+'</a>':MU.esc(p.name))+'</h3><p class="by">'+MU.esc(p.by)+'</p><ul class="eps"><li><small>Loading…</small></li></ul></div>'}).join("");
   PODS.forEach(function(p){MU.api("../feed",{id:p.id}).then(function(j){
     var ul=document.querySelector("#"+p.id+" .eps");
-    ul.innerHTML=j.items.slice(0,3).map(function(e,i){return '<li>'+(e.image?'<img src="'+e.image+'" alt="" loading="lazy">':'<span></span>')+'<div><div class="t"><a href="'+e.link+'" target="_blank" rel="noopener">'+MU.esc(e.title)+'</a></div><div class="m">'+when(e.date)+(e.duration?' · '+dur(e.duration):'')+'</div>'+(e.audio&&i===0?'<audio controls preload="none" src="'+e.audio+'"></audio>':'')+'</div></li>'}).join("")||'<li><small>No episodes found.</small></li>';
+    var art=(j.show&&j.show.image)||"";
+    ul.innerHTML=j.items.slice(0,3).map(function(e,i){var im=e.image||art; return '<li>'+(im?'<img src="'+im+'" alt="" loading="lazy">':'<span></span>')+'<div><div class="t"><a href="'+e.link+'" target="_blank" rel="noopener">'+MU.esc(e.title)+'</a></div><div class="m">'+when(e.date)+(e.duration?' · '+dur(e.duration):'')+'</div>'+(e.audio&&i===0?'<audio controls preload="none" src="'+e.audio+'"></audio>':'')+'</div></li>'}).join("")||'<li><small>No episodes found.</small></li>';
   }).catch(function(){document.querySelector("#"+p.id+" .eps").innerHTML='<li><small>Feed unavailable right now.</small></li>'})});
 
   $("news").innerHTML=NEWS.map(function(n){return '<div class="show" id="'+n.id+'"><h3>'+MU.esc(n.name)+'</h3><ul class="news linklist"><li><small>Loading…</small></li></ul></div>'}).join("");

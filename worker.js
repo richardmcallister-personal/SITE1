@@ -143,17 +143,22 @@ const FEEDS = {
   "pod-tus":    "https://feeds.acast.com/public/shows/the-united-stand",
   "pod-weekly": "https://feeds.megaphone.fm/COMG3531106743",
   "pod-tribf":  "https://feeds.megaphone.fm/GLT8847082992",
+  "pod-second": "https://feeds.acast.com/public/shows/627a2e8f84f3d50012cf11fb",
+  "pod-overlap":"https://feeds.acast.com/public/shows/d2a98018-244b-4999-9a83-9c2b9d43a1e3",
 };
 async function feed(url, env, ctx) {
   const id = url.searchParams.get("id"), src = FEEDS[id];
   if (!src) return json({ error: "unknown feed" }, 404);
-  const key = "feed:v1:" + id;
+  const key = "feed:v2:" + id;
   const cached = await env.MU_CACHE.get(key);
   if (cached) return new Response(cached, { headers: headers("kv-hit") });
   let xml = "";
   try { const r = await fetch(src, { headers: { "user-agent": "Mozilla/5.0 (site1 manutd hub)" }, cf: { cacheTtl: 0 } }); xml = r.ok ? await r.text() : ""; } catch (e) {}
   const items = parseFeed(xml).slice(0, 12);
-  const body = JSON.stringify({ id, items });
+  const head = xml.split(/<(?:item|entry)\b/)[0] || "";
+  const sm = head.match(/<itunes:image[^>]*href="([^"]+)"/) || head.match(/<image>[\s\S]*?<url>([^<]+)<\/url>/);
+  const show = { image: sm ? clean(sm[1]) : "" };
+  const body = JSON.stringify({ id, show, items });
   if (items.length) ctx.waitUntil(env.MU_CACHE.put(key, body, { expirationTtl: 1800 }));
   return new Response(body, { headers: headers(items.length ? "upstream" : "upstream-empty") });
 }
