@@ -40,6 +40,7 @@ const ROUTES = {
   "/api/team-fixtures": { ttl: 3600,  path: (u) => `/fixtures?team=${num(u, "team")}&season=${season()}&from=${(u.searchParams.get("from") || "").slice(0, 10)}&to=${(u.searchParams.get("to") || "").slice(0, 10)}` },
   "/api/fixture-players": { ttl: 30 * 86400, path: (u) => `/fixtures/players?fixture=${num(u, "fixture")}` },   // only fetched for finished matches
   "/api/season-standings": { ttl: 30 * 86400, path: (u) => `/standings?league=${LEAGUES.pl}&season=${num(u, "season")}` },
+  "/api/players-season": { ttl: 30 * 86400, path: (u) => `/players?team=${TEAM}&season=${num(u, "season")}&page=${u.searchParams.get("page") || 1}` },
   "/api/player-season": { ttl: 30 * 86400, path: (u) => `/players?id=${num(u, "id")}&season=${num(u, "season")}` },   // past seasons, for debut lookups
 };
 function num(u, k) { return String(parseInt(u.searchParams.get(k) || "0", 10) || 0); }
@@ -55,7 +56,7 @@ export default {
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + (WIKI ? "/trips/" : "/manutd/trips/"), 301);
     if (WIKI) {
       // Clean URLs on the club domain: the site lives under /manutd/ in the repo; serve it at the root here.
-      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club)(\/|$)/;
+      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw)(\/|$)/;
       if (url.pathname.startsWith("/manutd/")) return Response.redirect(url.origin + url.pathname.slice(7) + url.search, 301);
       if (!SERVICE.test(url.pathname)) {
         const inner = new URL(url.toString()); inner.pathname = "/manutd" + (url.pathname === "/" ? "/" : url.pathname);
@@ -74,6 +75,7 @@ export default {
     if (url.pathname === "/wiki") return wiki(url, env, ctx);
     if (url.pathname === "/wiki-season") return wikiSeason(url, env, ctx);
     if (url.pathname === "/wiki-club") return wikiClub(url, env, ctx);
+    if (url.pathname === "/wiki-raw") return wikiRaw(url, env, ctx);
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
 
     if (url.pathname === "/api/youth") return youth(url, env, ctx);
@@ -508,4 +510,19 @@ async function wikiClub(url, env, ctx) {
   const body = JSON.stringify(out);
   ctx.waitUntil(env.MU_CACHE.put(key, body, { expirationTtl: 30 * 86400 }));
   return new Response(body, { headers: headers("upstream") });
+}
+
+
+// ---- raw wikitext of one article (cached a day) — used by the build scripts that compile squad numbers.
+async function wikiRaw(url, env, ctx) {
+  const title = (url.searchParams.get("title") || "").trim(); if (!title) return json({ error: "title required" }, 400);
+  const key = "wiki:raw:v1:" + title, cached = await env.MU_CACHE.get(key);
+  if (cached) return new Response(cached, { headers: { "content-type": "text/plain; charset=utf-8", "x-source": "kv-hit" } });
+  const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
+  const r = await fetch("https://en.wikipedia.org/w/api.php?action=parse&format=json&prop=wikitext&redirects=1&page=" + encodeURIComponent(title.replace(/ /g, "_")), { headers: UA });
+  const j = r.ok ? await r.json() : {};
+  const wt = j.parse && j.parse.wikitext ? j.parse.wikitext["*"] : "";
+  if (!wt) return json({ error: "no article", title }, 404);
+  ctx.waitUntil(env.MU_CACHE.put(key, wt, { expirationTtl: 86400 }));
+  return new Response(wt, { headers: { "content-type": "text/plain; charset=utf-8", "x-source": "upstream" } });
 }
