@@ -1,0 +1,109 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · Academy & loans</title>
+<link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>
+.logo{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-right:6px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px;margin-top:10px}
+.card{border:1px solid var(--rule);border-radius:6px;padding:12px 14px;background:#fff}
+.card .who{display:flex;gap:12px;align-items:center}
+.card .who img.face{width:52px;height:52px;border-radius:50%;object-fit:cover;background:var(--tint)}
+.card .who b{font-size:16px;display:block}
+.card .who small{color:var(--muted);display:block;font-size:12px}
+.card ul{list-style:none;margin:10px 0 0;padding:0}
+.card li{padding:7px 0;border-top:1px solid var(--rule);font-size:13px;display:grid;grid-template-columns:1fr auto;gap:8px}
+.card li .m{color:var(--muted);font-size:12px}
+.badge{display:inline-block;font-family:var(--head);font-weight:500;font-size:10px;letter-spacing:.1em;text-transform:uppercase;border-radius:3px;padding:1px 6px;margin-left:6px;vertical-align:middle}
+.badge.loan{background:#111;color:#fff}.badge.acad{background:var(--red);color:#fff}.badge.note{background:#fff4c2;color:#7a5a00;border:1px solid #e6c84a}
+.ladder{display:flex;gap:0;margin:6px 0 0;flex-wrap:wrap}
+.ladder span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border:1px solid var(--rule);background:#fafafa;color:var(--muted);margin:0 -1px 0 0}
+.ladder span.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.ladder span.now{background:var(--red);color:#fff;border-color:var(--red)}
+table.mu td.who{white-space:nowrap}
+.r7{color:#0a7a2f;font-weight:600}.r6{color:#9a3b00}
+a.pl{color:inherit;text-decoration:none;border-bottom:1px dotted #999}
+.empty{color:var(--muted);font-size:13px}
+</style>
+</head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Academy & loan watch</small>Manchester<br>United</h1></a>
+  <div class="from">Academy & loans<span>Weekly minutes, roles and form · the route to a first-team debut</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+
+<div class="ticker" id="ticker"><span><span class="k">Loanees</span><span class="v" id="tLoan">—</span></span><span><span class="k">Academy in first-team squad</span><span class="v" id="tAcad">—</span></span><span><span class="k">Window</span><span class="v" id="tWin">—</span></span><span><span class="k">Updated</span><span class="v" id="tUpd">—</span></span></div>
+
+<div class="sheet">
+  <h2>This week</h2>
+  <p class="sub" id="weekNote">Every match in the last seven days for a United loanee or an academy player in the first-team squad: minutes, role, position and match rating.</p>
+  <div class="cards" id="week"></div>
+</div>
+<div class="sheet">
+  <h2>Loan watch · season to date</h2>
+  <p class="sub">All competitions at the loan club. Rating is the average match rating out of 10.</p>
+  <div id="loans"></div>
+</div>
+<div class="sheet">
+  <h2>Academy · route to the first team</h2>
+  <p class="sub">The youngest members of the first-team squad, with where each one is on the road from the academy to a regular place. Stages come from this season's matchday squads and the last two seasons' appearances.</p>
+  <div id="academy"></div>
+</div>
+<footer class="mu">Figures from API-Football via this site's Worker; the report rebuilds every six hours and archives one copy a week. Academy games (U18 / U21 / youth cups) are not in the feed, so a player only appears here once he is in a first-team squad or out on loan.</footer>
+</div>
+<script src="/manutd/mu.js"></script>
+<script>
+(function(){
+  MU.nav("Academy");
+  var $=function(i){return document.getElementById(i)};
+  function face(p){return '<img class="face" src="/img/player/'+p.id+'.png" alt="" onerror="this.style.visibility=\'hidden\'">'}
+  function plink(p){return '<a class="pl" href="/manutd/player/?q='+encodeURIComponent(p.name)+'">'+MU.esc(p.name)+'</a>'}
+  function club(c,size){return (MU.crest(c.name,size||18)||(c.logo?'<img class="logo" src="'+c.logo+'" alt="">':''))+MU.esc(c.name)}
+  function rate(r){return r==null?'—':'<span class="'+(r>=7?'r7':r<6?'r6':'')+'">'+r.toFixed(1)+'</span>'}
+  function role(w){if(w.unused)return "Unused sub"; var s=(w.started?"Started":"Sub")+(w.position?" · "+w.position:""); if(w.captain)s+=" · captain"; return s}
+  function notable(w){var n=[]; if(w.goals)n.push(w.goals+(w.goals>1?" goals":" goal")); if(w.assists)n.push(w.assists+(w.assists>1?" assists":" assist")); if(w.saves)n.push(w.saves+" saves"); if(w.conceded===0&&w.minutes>=60&&w.saves!=null)n.push("clean sheet"); if(w.rating>=7.5)n.push("rated "+w.rating.toFixed(1)); if(w.red)n.push("sent off"); return n}
+  function stage(p){
+    var u=p.utd, s=0;                       // 0 academy · 1 matchday squad · 2 debut · 3 first start · 4 regular
+    if(u.squads)s=1; if(u.debutSeason)s=2; if(u.firstStartThisSeason||(u.starts>0))s=3; if(u.starts>=5||u.apps>=10)s=4;
+    var L=["Academy","Matchday squad","Debut","First start","Regular"];
+    return '<div class="ladder">'+L.map(function(l,i){return '<span class="'+(i<s?'on':i===s?'now':'')+'">'+l+'</span>'}).join("")+'</div>';
+  }
+  function stageNote(p){var u=p.utd, n=[];
+    if(u.firstThisSeason)n.push("First appearance this season "+MU.fmtDate(u.firstThisSeason.date)+" v "+u.firstThisSeason.opp+(u.firstThisSeason.sub?" (sub)":"")+" · "+u.firstThisSeason.league);
+    else if(u.debutSeason&&u.debutSeason<(p.seasonYear||9e9))n.push("Debut in "+u.debutSeason+"/"+String(u.debutSeason+1).slice(2));
+    if(u.firstStartThisSeason)n.push("First start "+MU.fmtDate(u.firstStartThisSeason.date)+" v "+u.firstStartThisSeason.opp);
+    n.push(u.squads+" matchday squad"+(u.squads===1?"":"s")+" · "+u.apps+" app"+(u.apps===1?"":"s")+" ("+u.starts+" start"+(u.starts===1?"":"s")+") · "+u.minutes+" min");
+    return n.join(" · ")}
+  function render(j){
+    var P=j.players||[], loans=P.filter(function(p){return p.status==="loan"}), acad=P.filter(function(p){return p.status==="academy"});
+    P.forEach(function(p){p.seasonYear=j.season});
+    $("tLoan").textContent=loans.length; $("tAcad").textContent=acad.length;
+    $("tWin").textContent=MU.fmtDate(j.window.from+"T12:00:00Z")+" – "+MU.fmtDate(j.window.to+"T12:00:00Z"); $("tUpd").textContent=MU.fmtDate(j.generated)+" "+MU.fmtUK(j.generated)+" UK";
+    // This week
+    var wk=P.filter(function(p){return p.week&&p.week.length});
+    $("week").innerHTML=wk.length?wk.map(function(p){
+      return '<div class="card"><div class="who">'+face(p)+'<div><b>'+plink(p)+'<span class="badge '+(p.status==="loan"?"loan":"acad")+'">'+(p.status==="loan"?"On loan":"Academy")+'</span></b><small>'+(p.age?p.age+" · ":"")+MU.esc(p.position||"")+' · '+club(p.club,16)+'</small></div></div><ul>'+
+        p.week.sort(function(a,b){return a.fixture.date<b.fixture.date?1:-1}).map(function(w){var n=notable(w); return '<li><div>'+MU.fmtDate(w.fixture.date)+' · '+(w.fixture.home?"v ":"at ")+club(w.fixture.opp,16)+' <b>'+w.fixture.score+'</b><div class="m">'+MU.esc(w.fixture.league)+' · '+role(w)+(n.length?' · <b>'+n.join(", ")+'</b>':'')+'</div></div><div style="text-align:right"><b>'+w.minutes+'′</b><div class="m">'+rate(w.rating)+'</div></div></li>'}).join("")+'</ul></div>'
+    }).join(""):'<p class="empty">No loanee or academy squad member played in the last seven days (or the feed has no match data for their clubs yet).</p>';
+    // Loan watch
+    $("loans").innerHTML=loans.length?'<table class="mu"><thead><tr><th>Player</th><th>Club</th><th>Competition</th><th class="n">Apps <small>(starts)</small></th><th class="n">Mins</th><th class="n">G</th><th class="n">A</th><th class="n">Cards</th><th class="n">Rating</th></tr></thead><tbody>'+loans.map(function(p){
+      var rows=p.season.filter(function(x){return x.team.id===p.club.id}); if(!rows.length)rows=p.season;
+      if(!rows.length)return '<tr><td class="who">'+plink(p)+'</td><td>'+club(p.club)+'</td><td colspan="7" class="empty">No appearances yet'+(p.since?' · loan from '+MU.fmtDate(p.since):'')+'</td></tr>';
+      return rows.map(function(x,i){return '<tr>'+(i===0?'<td class="who" rowspan="'+rows.length+'">'+plink(p)+'<br><small style="color:var(--muted)">'+(p.age?p.age+" · ":"")+MU.esc(p.position||x.position||"")+'</small></td><td rowspan="'+rows.length+'">'+club(x.team)+'</td>':'')+'<td>'+MU.esc(x.league)+'</td><td class="n">'+x.apps+' <small>('+x.starts+')</small></td><td class="n">'+x.minutes+'</td><td class="n">'+x.goals+'</td><td class="n">'+x.assists+'</td><td class="n">'+x.yellow+(x.red?' / <span style="color:var(--red)">'+x.red+'</span>':'')+'</td><td class="n">'+rate(x.rating)+'</td></tr>'}).join("")
+    }).join("")+'</tbody></table>':'<p class="empty">No loans out recorded by the feed for this season.</p>';
+    // Academy
+    $("academy").innerHTML=acad.length?acad.sort(function(a,b){return (b.utd.minutes-a.utd.minutes)||(b.utd.squads-a.utd.squads)}).map(function(p){
+      return '<div class="card" style="margin-top:10px"><div class="who">'+face(p)+'<div><b>'+plink(p)+(p.number?' <small style="color:var(--muted)">#'+p.number+'</small>':'')+'</b><small>'+(p.age?p.age+" · ":"")+MU.esc(p.position||"")+(p.nationality?' · '+MU.flag(p.nationality)+' '+MU.esc(p.nationality):'')+'</small></div></div>'+stage(p)+'<p class="sub" style="margin-top:8px">'+stageNote(p)+'</p></div>'
+    }).join(""):'<p class="empty">No academy players in the first-team squad feed right now.</p>';
+  }
+  function fetchReport(n){
+    MU.api("youth").then(function(j){
+      if(j.building){ $("week").innerHTML='<p class="empty">'+MU.esc(j.note)+' Checking again shortly…</p>'; if(n<20)setTimeout(function(){try{sessionStorage.removeItem("mu:/api/youth?v=3")}catch(e){} fetchReport(n+1)},30000); return }
+      if(j.error)throw new Error(j.error);
+      render(j);
+    }).catch(function(e){MU.apiDown($("week"),e)});
+  }
+  fetchReport(0);
+})();
+</script>
+</body></html>
