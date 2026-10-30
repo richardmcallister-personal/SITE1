@@ -38,10 +38,10 @@
 </div>
 <div class="sheet">
   <h2>Every meeting</h2>
-  <div class="filters" id="filters"><button data-f="all" aria-pressed="true">All</button><button data-f="L">League</button><button data-f="FAC">FA Cup</button><button data-f="H">At Old Trafford</button><button data-f="A">Away</button></div>
+  <div class="filters" id="filters"><button data-f="all" aria-pressed="true">All</button><button data-f="L">League</button><button data-f="FAC">FA Cup</button><button data-f="OTH">League Cup & Europe</button><button data-f="H">At Old Trafford</button><button data-f="A">Away</button></div>
   <div id="list" class="res"></div>
 </div>
-<footer class="mu">Club profile from Wikipedia, CC BY-SA 4.0. Head-to-head figures are league and FA Cup meetings in the match archive (league to 2024/25, FA Cup to 2018/19); League Cup and European ties are not included. <a href="/manutd/history/seasons/">All seasons</a></footer>
+<footer class="mu">Club profile from Wikipedia, CC BY-SA 4.0. Head-to-head figures are league and FA Cup meetings: the match archive to 2024/25 (FA Cup to 2018/19), then the live feed from 2025/26. League Cup and European ties appear from 2025/26 but are not counted. <a href="/manutd/history/seasons/">All seasons</a></footer>
 </div>
 <script src="/manutd/mu.js"></script>
 <script>
@@ -60,10 +60,10 @@
   // Head to head
   var M=[], mode="all";
   function render(){
-    var rows=M.filter(function(m){return mode==="all"||(mode==="L"&&m.c==="L")||(mode==="FAC"&&m.c==="FAC")||(mode==="H"&&m.h)||(mode==="A"&&!m.h)}).slice().reverse(), out="", sea=null;
+    var rows=M.filter(function(m){return mode==="all"||(mode==="L"&&m.c==="L")||(mode==="FAC"&&m.c==="FAC")||(mode==="OTH"&&m.c!=="L"&&m.c!=="FAC")||(mode==="H"&&m.h)||(mode==="A"&&!m.h)}).slice().reverse(), out="", sea=null;
     rows.forEach(function(m){ if(m.s!==sea){sea=m.s; out+='<div class="sea"><a href="/manutd/history/season/?s='+m.s+'">'+m.s.replace("-","–")+' · '+MU.esc(m.div)+'</a></div><ul class="fxlist">'; }
-      var res=m.gf>m.ga?"W":m.gf<m.ga?"L":"D", note=[m.c==="FAC"?"FA Cup"+(m.r?" · "+m.r:""):"",m.tie||"",m.n||""].filter(Boolean).join(" · ");
-      out+='<li class="'+(m.h?"home":"away")+'"><span class="d">'+fmt(m.d)+'</span><span class="o">'+(m.h?"United v "+MU.esc(name):MU.esc(name)+" v United")+(note?'<small>'+MU.esc(note)+'</small>':'')+'</span><span class="r">'+m.gf+'–'+m.ga+(m.aet?'<small> aet</small>':'')+' '+MU.form(res)+'</span></li>';
+      var res=m.gf>m.ga?"W":m.gf<m.ga?"L":"D", note=[m.c!=="L"?(m.div||"FA Cup")+(m.r?" · "+m.r:""):"",m.tie||"",m.n||"",m.pens?"pens "+m.pens:""].filter(Boolean).join(" · ");
+      out+='<li class="'+(m.h?"home":"away")+'"><span class="d">'+fmt(m.d)+'</span><span class="o">'+(m.h?"United v "+MU.esc(name):MU.esc(name)+" v United")+(note?'<small>'+MU.esc(note)+'</small>':'')+'</span><span class="r">'+(m.id?'<a href="/manutd/match/?id='+m.id+'" style="color:inherit;text-decoration:none" title="Match centre">':'')+m.gf+'–'+m.ga+(m.id?'</a>':'')+(m.aet?'<small> aet</small>':'')+' '+MU.form(res)+'</span></li>';
     });
     // close lists: rebuild with proper closing tags
     $("list").innerHTML=out.replace(/<div class="sea">/g,'</ul><div class="sea">').replace(/^<\/ul>/,"")+(rows.length?'</ul>':'<p class="sub">No meetings in the archive.</p>');
@@ -75,7 +75,7 @@
     return fetch("/manutd/history/clubs/"+canon.slug+".json").then(function(r){if(!r.ok)throw new Error("none");return r.json()})}).then(function(c){
     M=c.matches; var a=c.all, pct=function(n){return a.p?Math.round(100*n/a.p):0};
     $("eyebrow").textContent=a.p+" meetings since "+c.first.slice(0,4);
-    $("h2hNote").textContent="United's record in "+a.p+" league and FA Cup meetings, "+fmt(c.first)+" to "+fmt(c.last)+", across "+c.seasons+" seasons.";
+    $("h2hNote").textContent="United's record in "+a.p+" league and FA Cup meetings, "+fmt(c.first)+" to "+fmt(c.last)+", across "+c.seasons+" seasons."+(c.other&&c.other.p?" League Cup and European ties ("+c.other.p+" since 2025/26, "+c.other.w+"–"+c.other.d+"–"+c.other.l+") are listed below but not counted in the totals.":"");
     $("h2h").innerHTML='<div><b>'+a.p+'</b><span>Played</span></div><div class="w"><b>'+a.w+'</b><span>United wins</span></div><div><b>'+a.d+'</b><span>Draws</span></div><div class="l"><b>'+a.l+'</b><span>'+MU.esc(name)+' wins</span></div><div><b>'+a.gf+'–'+a.ga+'</b><span>Goals</span></div>';
     $("bar").innerHTML='<i class="w" style="width:'+pct(a.w)+'%" title="United wins '+pct(a.w)+'%"></i><i class="d" style="width:'+pct(a.d)+'%"></i><i class="l" style="width:'+pct(a.l)+'%"></i>';
     var sp=function(x){return x.p?x.w+"–"+x.d+"–"+x.l+" ("+x.gf+"–"+x.ga+")":"—"};
