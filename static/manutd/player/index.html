@@ -34,7 +34,7 @@ table.mu td.yrs{white-space:nowrap;color:var(--muted)}
 </div>
 <div class="sheet" id="career" style="display:none">
   <div class="cols">
-    <div><h2>Club career</h2><div id="clubs"></div><div id="youth"></div></div>
+    <div><div id="season"></div><h2>Club career</h2><div id="clubs"></div><div id="youth"></div></div>
     <div><h2>International</h2><div id="national"></div><div id="manager"></div><h2 style="margin-top:22px">Honours with United</h2><p class="sub" id="honNote" style="margin:0 0 8px"></p><div class="seasons" id="honours"></div><h2 style="margin-top:22px">In the season write-ups</h2><div class="seasons" id="onsite"></div></div>
   </div>
 </div>
@@ -77,6 +77,28 @@ table.mu td.yrs{white-space:nowrap;color:var(--muted)}
     $("youth").innerHTML=b.youth&&b.youth.length?'<h3>Youth</h3>'+table(b.youth,["years","clubs"],["Years","Club"]):"";
     $("national").innerHTML=table(b.national,["years","team","caps","goals"],["Years","Team","Caps","Goals"]);
     $("manager").innerHTML=b.manager&&b.manager.length?'<h3>Managerial career</h3>'+table(b.manager,["years","clubs"],["Years","Club"]):"";
+    // This season, live from the API — only when the player is in the current first-team squad.
+    (function(){
+      function norm(n){return (n||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z ]/g," ").replace(/\s+/g," ").trim()}
+      var plain=norm(name.replace(/\s*\(.*\)$/,"")), parts=plain.split(" "), last=parts[parts.length-1], first=parts[0];
+      function same(api){var a=norm(api).split(" "); if(a.length===1)return a[0]===plain||a[0]===last&&parts.length===1; var al=a[a.length-1], af=a[0]; if(al!==last)return false; return af.length===1?af===first[0]:af===first}
+      MU.api("squad").then(function(sq){
+        var ps=sq.response&&sq.response[0]?sq.response[0].players:[], hit=ps.filter(function(p){return same(p.name)})[0];
+        if(!hit)return;
+        return MU.api("player",{id:hit.id}).then(function(j){
+          var r=j.response&&j.response[0]; if(!r)return;
+          var st=(r.statistics||[]).filter(function(x){return x.team&&x.team.id===MU.TEAM&&x.games&&(x.games.appearences||x.games.minutes)});
+          var yr=st.length&&st[0].league.season, lbl=yr?yr+"/"+String(yr+1).slice(2):"";
+          var gk=st.some(function(x){return x.goals&&x.goals.saves!=null})||/Goalkeeper/i.test(r.player.position||"");
+          var tot={apps:0,starts:0,min:0,g:0,a:0,y:0,rd:0,sv:0,gc:0,r:[]};
+          var rows=st.map(function(x){var g=x.games,go=x.goals||{},c=x.cards||{}; tot.apps+=g.appearences||0; tot.starts+=g.lineups||0; tot.min+=g.minutes||0; tot.g+=go.total||0; tot.a+=go.assists||0; tot.y+=c.yellow||0; tot.rd+=c.red||0; tot.sv+=go.saves||0; tot.gc+=go.conceded||0; if(g.rating)tot.r.push([+g.rating,g.appearences||1]);
+            return '<tr><td>'+MU.comp(x.league.name,18)+MU.esc(x.league.name)+'</td><td class="n">'+(g.appearences||0)+' <small>('+(g.lineups||0)+')</small></td><td class="n">'+(g.minutes||0)+'</td>'+(gk?'<td class="n">'+(go.conceded==null?"—":go.conceded)+'</td><td class="n">'+(go.saves==null?"—":go.saves)+'</td>':'<td class="n">'+(go.total||0)+'</td><td class="n">'+(go.assists||0)+'</td>')+'<td class="n">'+(c.yellow||0)+(c.red?' / <span style="color:var(--red)">'+c.red+'</span>':'')+'</td><td class="n">'+(g.rating?(+g.rating).toFixed(2):"—")+'</td></tr>'}).join("");
+          var wr=tot.r.length?(tot.r.reduce(function(a,b){return a+b[0]*b[1]},0)/tot.r.reduce(function(a,b){return a+b[1]},0)).toFixed(2):"—";
+          var hdr=["Competition","Apps <small>(starts)</small>","Mins"].concat(gk?["Conceded","Saves"]:["Goals","Assists"]).concat(["Cards","Rating"]);
+          $("season").innerHTML='<h2>This season'+(lbl?' · '+lbl:'')+'</h2><p class="sub" style="margin:0 0 8px">Live from API-Football, all competitions; rating is the average match rating out of 10. <a href="/manutd/squad/">Squad page</a>.</p>'+(st.length?'<table class="mu"><thead><tr>'+hdr.map(function(h,i){return '<th'+(i?' class="n"':'')+'>'+h+'</th>'}).join("")+'</tr></thead><tbody>'+rows+(st.length>1?'<tr><td><b>Total</b></td><td class="n"><b>'+tot.apps+'</b> <small>('+tot.starts+')</small></td><td class="n"><b>'+tot.min+'</b></td>'+(gk?'<td class="n"><b>'+tot.gc+'</b></td><td class="n"><b>'+tot.sv+'</b></td>':'<td class="n"><b>'+tot.g+'</b></td><td class="n"><b>'+tot.a+'</b></td>')+'<td class="n"><b>'+tot.y+(tot.rd?' / '+tot.rd:'')+'</b></td><td class="n"><b>'+wr+'</b></td></tr>':'')+'</tbody></table>':'<p class="sub">No appearances yet this season.</p>')+'<div style="height:18px"></div>';
+        });
+      }).catch(function(){});
+    })();
     // seasons on this site that mention the player
     Promise.all([fetch("/manutd/history/seasons.json").then(function(r){return r.json()}),fetch("/manutd/history/players.json").then(function(r){return r.json()})]).then(function(res){
       var S=res[0],P=res[1], keys=Object.keys(P).filter(function(k){return P[k]===j.title||P[k]===title});
