@@ -33,6 +33,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
   <div class="actions" id="actions"></div>
   <p class="note" id="note"></p>
 </div>
+<div class="sheet" id="reportSheet" style="display:none"><div id="report"></div></div>
 <div class="sheet" id="body" style="display:none">
   <div class="cols">
     <div><h2>Events</h2><ul class="ev" id="events"></ul><h2 style="margin-top:22px">Statistics</h2><ul class="bars" id="stats"></ul></div>
@@ -58,6 +59,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
     var f=j.response&&j.response[0]; if(!f){$("score").innerHTML='<div></div><div class="mid"><div class="big">—</div><div class="st">Fixture not found</div></div><div></div>';return}
     var h=f.teams.home, a=f.teams.away, st=status(f), kk=(f.fixture.status.short==="NS"||f.fixture.status.short==="TBD")?MU.ko(f):{ko:f.fixture.date,conf:true}, ko=kk.ko, isUs=function(t){return t.id===MU.TEAM};
     document.title="Manchester United · "+h.name+" v "+a.name;
+    if(/FT|AET|PEN/.test(f.fixture.status.short)){$("report").innerHTML=MU.report(f,{link:false}); $("reportSheet").style.display=""}
     $("from").innerHTML="Match centre<span>"+MU.esc(f.league.name)+(f.league.round?" · "+MU.esc(f.league.round.replace("Regular Season - ","Matchweek ")):"")+"</span>";
     var goals=function(team){return (f.events||[]).filter(function(e){return e.type==="Goal"&&e.team.id===team.id&&e.detail!=="Missed Penalty"}).map(function(e){return MU.esc(e.player.name)+" "+e.time.elapsed+(e.time.extra?"+"+e.time.extra:"")+"′"+(e.detail==="Penalty"?" (pen)":e.detail==="Own Goal"?" (og)":"")}).join("<br>")};
     var scoreTxt=(f.goals.home==null?"":f.goals.home)+" – "+(f.goals.away==null?"":f.goals.away);

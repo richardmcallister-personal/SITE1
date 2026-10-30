@@ -21,6 +21,12 @@
 .pos .k img,.from .comps img{background:#fff;border-radius:6px;padding:3px;box-sizing:content-box}
 .from .comps a{display:block;line-height:0} .from .comps img{height:30px;width:30px;object-fit:contain} .from .comps img.dark{background:#111} .from .comps a:hover img{outline:2px solid #fff}
 .pos table{color:#fff} .pos .sub{color:#bbb}
+.preview{margin-top:16px;border-top:1px solid var(--rule);padding-top:12px} .preview h4{font-family:var(--head);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:10px 0 4px}
+.preview .h2h{display:flex;gap:6px;flex-wrap:wrap} .preview .h2h div{background:var(--tint);padding:8px 10px;text-align:center;min-width:64px} .preview .h2h b{display:block;font-family:var(--head);font-weight:300;font-size:22px;line-height:1} .preview .h2h span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.preview ul{list-style:none;margin:0;padding:0;font-size:13px} .preview li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid var(--rule)} .preview li small{color:var(--muted)}
+.preview .kit{display:flex;align-items:center;gap:10px} .preview .kit img{width:56px;height:56px;object-fit:contain;background:#fafafa;border:1px solid var(--rule)}
+.preview .two{display:grid;grid-template-columns:1fr 1fr;gap:14px} @media (max-width:640px){.preview .two{grid-template-columns:1fr}}
+.otdy{display:inline-block;min-width:44px;font-family:var(--head);font-weight:300;font-size:18px;color:var(--red);margin-right:8px;vertical-align:-2px}
 .links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:4px;margin-top:4px}
 .links a{display:block;background:#fff;color:var(--ink);text-decoration:none;padding:18px 22px}
 .links a:hover{background:var(--tint)} .links a b{display:block;font-family:var(--head);font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
@@ -49,6 +55,12 @@
   <a href="/manutd/history/"><b>History</b><span>Every honour, the managers who won them, and the matches that decided them.</span></a>
 </div>
 
+<div class="sheet" style="margin-top:4px" id="reportSheet" hidden><div id="report"></div></div>
+<div class="sheet" style="margin-top:4px">
+  <h2>On this day</h2>
+  <p class="sub" id="otdNote" style="margin:0 0 8px"></p>
+  <ul class="fxlist" id="otd"></ul>
+</div>
 <div class="sheet" style="margin-top:4px">
   <h2>Last five</h2>
   <div id="last"></div>
@@ -71,13 +83,41 @@
       '<div class="vs">'+MU.crest(f.home?"Manchester United":f.opp,64)+'<span>v</span>'+MU.crest(f.home?f.opp:"Manchester United",64)+'</div>'+
       '<div class="opp">'+(f.home?"United v "+MU.esc(f.opp):MU.esc(f.opp)+" v United")+'</div>'+
       '<div class="meta">'+MU.fmtDate(f.ko)+' · '+MU.fmtUK(f.ko)+' UK / '+MU.fmtSE(f.ko)+' SE · '+MU.comp(f.comp,22)+MU.esc(f.comp)+MU.prov(f)+'</div>'+
-      '<div class="count" id="count"></div><p style="margin:14px 0 0;display:flex;gap:8px;flex-wrap:wrap"><a class="btn red" href="/manutd/trips/">Plan the trip</a><a class="btn" id="mcBtn" href="/manutd/season/">Match centre</a></p>';
+      '<div class="count" id="count"></div><p style="margin:14px 0 0;display:flex;gap:8px;flex-wrap:wrap"><a class="btn red" href="/manutd/trips/">Plan the trip</a><a class="btn" id="mcBtn" href="/manutd/season/">Match centre</a></p><div class="preview" id="preview"></div>';
     function tick(){var ms=new Date(f.ko)-new Date(); if(ms<0){document.getElementById("count").innerHTML="<div><b>Live</b></div>";return}
       var d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4);
       document.getElementById("count").innerHTML='<div><b>'+d+'</b><span>days</span></div><div><b>'+h+'</b><span>hours</span></div><div><b>'+m+'</b><span>min</span></div>'}
     tick(); setInterval(tick,30000);
   }
   renderNext(next);
+  // ---- Match preview: head-to-head, last five meetings, form, doubts, the kit.
+  function preview(f){ if(!f||!document.getElementById("preview"))return; var el=document.getElementById("preview"), slug=(MU.crest(f.opp,1).match(/crests\/([^"]+)\.png/)||[])[1];
+    Promise.all([fetch("/manutd/history/clubs.json").then(function(r){return r.json()}).catch(function(){return []}),fetch("/manutd/kits/kits.json").then(function(r){return r.json()}).catch(function(){return []}),MU.api("injuries").catch(function(){return {response:[]}}),MU.api("standings").catch(function(){return null})]).then(function(res){
+      var ix=res[0], canon=ix.filter(function(x){return x.name===f.opp})[0]||ix.filter(function(x){return slug&&(MU.crest(x.name,1).match(/crests\/([^"]+)\.png/)||[])[1]===slug})[0];
+      var y=new Date().getUTCFullYear()-(new Date().getUTCMonth()>=6?0:1), sid=y+"-"+String(y+1).slice(2), kit=res[1].filter(function(k){return k.season===sid&&k.kind===(f.home?"home":"away")&&!k.gk})[0]||res[1].filter(function(k){return k.season===sid&&!k.gk&&k.kind!=="special"})[0];
+      var inj=(res[2].response||[]).filter(function(x){var d=x.fixture&&x.fixture.date; return !d||new Date(d)>new Date(Date.now()-7*864e5)}).reduce(function(a,x){if(!a.some(function(q){return q.player.id===x.player.id}))a.push(x);return a},[]);
+      var me=res[3]&&res[3].response[0]?res[3].response[0].league.standings[0].filter(function(r){return r.team.id===MU.TEAM})[0]:null, them=res[3]&&res[3].response[0]?res[3].response[0].league.standings[0].filter(function(r){return r.team.name===f.opp||(MU.crest(r.team.name,1).match(/crests\/([^"]+)\.png/)||[])[1]===slug})[0]:null;
+      var h2hP=canon?fetch("/manutd/history/clubs/"+canon.slug+".json").then(function(r){return r.json()}).catch(function(){return null}):Promise.resolve(null);
+      h2hP.then(function(c){
+        var html='<h4>Match preview</h4><div class="two"><div>';
+        if(c){var a=c.all; html+='<div class="h2h"><div><b>'+a.p+'</b><span>Played</span></div><div><b>'+a.w+'</b><span>United</span></div><div><b>'+a.d+'</b><span>Drawn</span></div><div><b>'+a.l+'</b><span>'+MU.esc(f.opp.split(" ")[0])+'</span></div></div><h4>Last five meetings</h4><ul>'+c.matches.slice(-5).reverse().map(function(m){var res=m.gf>m.ga?"W":m.gf<m.ga?"L":"D"; return '<li><span>'+MU.fmtDate(m.d+"T12:00:00Z",{year:"numeric"})+' <small>'+(m.h?"H":"A")+' · '+MU.esc(m.div||"")+'</small></span><span>'+m.gf+'–'+m.ga+' '+MU.form(res)+'</span></li>'}).join("")+'</ul><p class="sub" style="margin:4px 0 0"><a href="/manutd/club/?c='+encodeURIComponent(c.name)+'">Full head-to-head →</a></p>'}
+        else html+='<p class="sub">No head-to-head in the archive for '+MU.esc(f.opp)+'.</p>';
+        html+='</div><div>';
+        if(me)html+='<h4>Form</h4><ul><li><span>United <small>'+me.rank+(["th","st","nd","rd"][me.rank%10>3||Math.floor(me.rank%100/10)===1?0:me.rank%10])+' · '+me.points+' pts</small></span><span>'+MU.form(me.form)+'</span></li>'+(them?'<li><span>'+MU.esc(f.opp)+' <small>'+them.rank+(["th","st","nd","rd"][them.rank%10>3||Math.floor(them.rank%100/10)===1?0:them.rank%10])+' · '+them.points+' pts</small></span><span>'+MU.form(them.form)+'</span></li>':'')+'</ul>';
+        html+='<h4>Doubts and absentees</h4>'+(inj.length?'<ul>'+inj.slice(0,8).map(function(x){return '<li><span><a class="pl" href="/manutd/player/?q='+encodeURIComponent(x.player.name)+'" style="color:inherit;text-decoration:none">'+MU.esc(x.player.name)+'</a> <small>'+MU.esc(x.player.reason||"")+'</small></span><span><small>'+MU.esc(x.player.type||"")+'</small></span></li>'}).join("")+'</ul>':'<p class="sub">No injuries or suspensions reported.</p>');
+        if(kit)html+='<h4>The kit</h4><div class="kit"><a href="/manutd/kits/?k='+kit.id+'"><img src="/manutd/assets/kits/thumbs/'+kit.id+'.webp" alt=""></a><span>'+MU.esc(kit.label)+' '+MU.esc(kit.title.toLowerCase())+(f.home?'':' <small style="color:var(--muted)">(expected; depends on the clash)</small>')+'</span></div>';
+        html+='</div></div>'; el.innerHTML=html;
+      });
+    }).catch(function(){});
+  }
+  preview(next);
+  // ---- On this day: the archive indexed by calendar day.
+  fetch("/manutd/history/onthisday.json").then(function(r){return r.json()}).then(function(O){
+    var d=new Date(), md=d.toLocaleDateString("en-GB",{month:"2-digit",day:"2-digit",timeZone:"Europe/London"}).split("/").reverse().join("-"), ms=O[md]||[], yr=d.getFullYear();
+    document.getElementById("otdNote").textContent=ms.length?ms.length+" United matches have been played on "+MU.fmtDate(d.toISOString(),{weekday:undefined,day:"numeric",month:"long"})+" since 1892. The ones worth remembering:":"No United match on this date in the archive — a rest day across 130 seasons.";
+    document.getElementById("otd").innerHTML=ms.slice(0,6).map(function(m){var res=m.gf>m.ga?"W":m.gf<m.ga?"L":"D", y=parseInt(m.d,10);
+      return '<li class="'+(m.h?"home":"away")+'"><span class="d"><span class="otdy">'+(yr-y)+'</span>yrs ago</span><span class="o">'+MU.club(m.o)+' <small>· '+MU.esc(m.comp||m.div)+(m.r?' · '+MU.esc(m.r):'')+' · <a href="/manutd/history/season/?s='+m.s+'">'+m.s.replace("-","–")+'</a>'+(m.scorers?' · '+MU.esc(m.scorers):'')+(m.tags&&m.tags.length?' · <a href="/manutd/comebacks/">'+m.tags.map(function(t){return MU.TAGLABEL[t]||t}).join(", ")+'</a>':'')+'</small></span><span class="r">'+(m.id?'<a href="/manutd/match/?id='+m.id+'" style="color:inherit;text-decoration:none">':'')+m.gf+'–'+m.ga+(m.id?'</a>':'')+' '+MU.form(res)+'</span></li>'}).join("");
+  }).catch(function(){});
   var up=document.getElementById("upcoming");
   up.innerHTML=fx.filter(function(f){return new Date(f.ko)>now}).slice(0,8).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtUK(f.ko)+' UK'+MU.prov(f)+'</span><span class="o">'+MU.club(f.opp)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("");
 
@@ -97,6 +137,8 @@
       var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home;
       var res=gf>ga?"W":gf<ga?"L":"D";
       return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'</span><span class="o">'+MU.club(opp.name)+' <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+'</small></span><span class="r"><a href="/manutd/match/?id='+m.fixture.id+'" style="color:inherit;text-decoration:none">'+gf+'–'+ga+'</a> '+MU.form(res)+'</span></li>'}).join("")+'</ul>';
+    // match report for the latest finished match (kept on the match centre page too)
+    if(played[0]){MU.api("match",{fixture:played[0].fixture.id}).then(function(j){var f=j.response&&j.response[0]; if(!f)return; document.getElementById("report").innerHTML=MU.report(f,{label:"Latest match"}); document.getElementById("reportSheet").hidden=false}).catch(function(){})}
     // upcoming from live data too (replaces the static list when available)
     var nxt=j.response.filter(function(m){return !/FT|AET|PEN|CANC/.test(m.fixture.status.short)}).sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp})[0];
     if(nxt&&document.getElementById("mcBtn")){document.getElementById("mcBtn").href="/manutd/match/?id="+nxt.fixture.id; if(/1H|HT|2H|ET|P|LIVE/.test(nxt.fixture.status.short))document.getElementById("mcBtn").textContent="Live now · "+(nxt.goals.home==null?"":nxt.goals.home+"–"+nxt.goals.away)}
