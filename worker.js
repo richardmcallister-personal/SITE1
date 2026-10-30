@@ -221,7 +221,7 @@ async function wiki(url, env, ctx) {
     if (!hit) return json({ error: "not found", q }, 404);
     title = hit;
   }
-  const key = "wiki:p:v5:" + title;
+  const key = "wiki:p:v6:" + title;
   const cached = url.searchParams.get("debug") ? null : await env.MU_CACHE.get(key);
   if (cached) return new Response(cached, { headers: headers("kv-hit") });
   const enc = encodeURIComponent(title.replace(/ /g, "_"));
@@ -244,8 +244,8 @@ async function wiki(url, env, ctx) {
   if (sum.title) ctx.waitUntil(env.MU_CACHE.put(key, body, { expirationTtl: 7 * 86400 }));
   return new Response(body, { headers: headers(sum.title ? "upstream" : "upstream-empty") });
 }
-function parseInfobox(wt) {
-  const i = wt.search(/\{\{\s*Infobox football biography/i);
+function boxFields(wt, re) {
+  const i = wt.search(re);
   if (i < 0) return null;
   let depth = 0, j = i;
   for (; j < wt.length; j++) { if (wt.startsWith("{{", j)) { depth++; j++; } else if (wt.startsWith("}}", j)) { depth--; j++; if (depth === 0) break; } }
@@ -261,6 +261,17 @@ function parseInfobox(wt) {
   parts.push(cur);
   const f = {};
   parts.slice(1).forEach((p) => { const m = p.match(/^\s*([\w\-]+)\s*=\s*([\s\S]*)$/); if (m) f[m[1].toLowerCase().replace(/_/g, "")] = wtClean(m[2]); });
+  return f;
+}
+function parseInfobox(wt) {
+  const f = boxFields(wt, /\{\{\s*Infobox football biography/i);
+  if (!f) return null;
+  if (f.embed) {
+    // Football box embedded in a general biography box (actors, pundits…): personal details live in the outer box.
+    const outer = boxFields(wt, /\{\{\s*Infobox (?:person|sportsperson|football official)/i) || {};
+    ["name", "fullname", "birthname", "birthdate", "birthplace", "deathdate", "height"].forEach((k) => { if (!f[k] && outer[k]) f[k] = outer[k]; });
+    if (!f.fullname && outer.birthname) f.fullname = outer.birthname;
+  }
   const rows = (pre, keys) => { const out = []; for (let n = 1; n < 40; n++) { const r = {}; let any = false; keys.forEach((k) => { const v = f[pre + k + n]; if (v !== undefined && v !== "") any = true; r[k] = v || ""; }); if (!any) { if (n > 3) break; else continue; } if (r.clubs || r.team) out.push(r); } return out; };
   return {
     _keys: Object.keys(f),
