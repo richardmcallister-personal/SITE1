@@ -56,7 +56,7 @@ export default {
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + (WIKI ? "/trips/" : "/manutd/trips/"), 301);
     if (WIKI) {
       // Clean URLs on the club domain: the site lives under /manutd/ in the repo; serve it at the root here.
-      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw)(\/|$)/;
+      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|collection)(\/|$)/;
       if (url.pathname.startsWith("/manutd/")) return Response.redirect(url.origin + url.pathname.slice(7) + url.search, 301);
       if (!SERVICE.test(url.pathname)) {
         const inner = new URL(url.toString()); inner.pathname = "/manutd" + (url.pathname === "/" ? "/" : url.pathname);
@@ -76,6 +76,7 @@ export default {
     if (url.pathname === "/wiki-season") return wikiSeason(url, env, ctx);
     if (url.pathname === "/wiki-club") return wikiClub(url, env, ctx);
     if (url.pathname === "/wiki-raw") return wikiRaw(url, env, ctx);
+    if (url.pathname === "/collection") return collection(request, url, env);
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
 
     if (url.pathname === "/api/youth") return youth(url, env, ctx);
@@ -525,4 +526,26 @@ async function wikiRaw(url, env, ctx) {
   if (!wt) return json({ error: "no article", title }, 404);
   ctx.waitUntil(env.MU_CACHE.put(key, wt, { expirationTtl: 86400 }));
   return new Response(wt, { headers: { "content-type": "text/plain; charset=utf-8", "x-source": "upstream" } });
+}
+
+
+// ---- Shirt collection: owned / wishlist / notes, stored in KV under a hash of the owner's passphrase.
+// GET  /collection?key=…         → the saved collection (or an empty one)
+// PUT  /collection?key=…  body   → replace it (JSON, 64 KB max)
+async function collection(request, url, env) {
+  const key = (url.searchParams.get("key") || "").trim();
+  if (key.length < 6) return json({ error: "a collection key of at least 6 characters is required" }, 400);
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("mu-collection:" + key));
+  const id = "col:v1:" + Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("");
+  const cors = { "access-control-allow-origin": "*", "access-control-allow-methods": "GET,PUT,OPTIONS", "access-control-allow-headers": "content-type", "cache-control": "no-store", "content-type": "application/json; charset=utf-8" };
+  if (request.method === "OPTIONS") return new Response(null, { headers: cors });
+  if (request.method === "PUT") {
+    const body = await request.text();
+    if (body.length > 65536) return new Response(JSON.stringify({ error: "too large" }), { status: 413, headers: cors });
+    try { const j = JSON.parse(body); if (!j || typeof j !== "object" || !Array.isArray(j.owned) || !Array.isArray(j.wish)) throw 0; } catch (e) { return new Response(JSON.stringify({ error: "expected {owned:[],wish:[],notes:{}}" }), { status: 400, headers: cors }); }
+    await env.MU_CACHE.put(id, body);
+    return new Response(JSON.stringify({ ok: true, saved: new Date().toISOString() }), { headers: cors });
+  }
+  const cur = await env.MU_CACHE.get(id);
+  return new Response(cur || JSON.stringify({ owned: [], wish: [], notes: {}, updated: null }), { headers: cors });
 }
