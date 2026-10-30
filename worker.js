@@ -107,7 +107,7 @@ export default {
         await sleep(1200);
       }
       const yk = "youth:v1:report", y = await load(env, yk);
-      if (!y.body || y.age > YOUTH_TTL * 0.8) await buildYouth(env);
+      if (!y.body || y.age > YOUTH_TTL * 0.8) await buildYouth(env, 25).catch(() => {});
     })());
   },
 };
@@ -336,27 +336,33 @@ async function youth(url, env, ctx) {
   const key = "youth:v1:report";
   const { body, fresh, age } = await load(env, key);
   if (body && fresh) return answer(body, "kv-hit", age);
-  if (body) { ctx.waitUntil(buildYouth(env)); return answer(body, "kv-stale", age); }
-  try { const out = await buildYouth(env); return answer(out, "upstream", 0); }
-  catch (e) { return json({ error: String(e) }, 200); }
+  if (body) { ctx.waitUntil(buildYouth(env, 12).catch(() => {})); return answer(body, "kv-stale", age); }
+  try { const out = await buildYouth(env, 12); return answer(out, "upstream", 0); }
+  catch (e) { if (e.budget) return json({ building: true, note: "First build in progress — the report assembles over a few minutes; the hourly job finishes it.", at: e.at }, 200); return json({ error: String(e) }, 200); }
 }
 // Fetch one API route through the same KV cache the pages use.
-async function viaCache(env, pathWithQuery) {
+// Each call to the API costs one unit of a per-invocation budget (Workers cap subrequests; the API caps calls per minute),
+// so a full build spreads over several cron runs — every piece lands in KV, and the next run picks up where this one stopped.
+async function viaCache(env, pathWithQuery, budget) {
   const u = new URL("https://site1.local" + pathWithQuery), route = ROUTES[u.pathname], key = "api:v3:" + u.pathname + u.search;
   const { body, fresh } = await load(env, key);
   if (body && fresh) return JSON.parse(body);
+  if (body && budget && budget.left <= 0) return JSON.parse(body);
+  if (budget && budget.left <= 0) throw Object.assign(new Error("budget"), { budget: true, at: pathWithQuery });
+  if (budget) budget.left--;
   const r = await refresh(env, key, route, u);
-  await sleep(250);
+  await sleep(1300);
   if (r.ok) return JSON.parse(r.body);
   if (body) return JSON.parse(body);
   throw new Error("API failed for " + pathWithQuery + ": " + r.body.slice(0, 120));
 }
-async function buildYouth(env) {
+async function buildYouth(env, limit) {
+  const B = { left: limit || 12 };
   const S = season(), today = new Date(), d7 = new Date(today.getTime() - 7 * 86400000);
   const iso = (d) => d.toISOString().slice(0, 10);
   const seasonStart = S + "-06-01";
   // 1. Who to watch. Loanees: this season's loans out of United not since cancelled; academy: the youngest first-team squad members.
-  const [tr, sq] = await Promise.all([viaCache(env, "/api/transfers"), viaCache(env, "/api/squad")]);
+  const [tr, sq] = await Promise.all([viaCache(env, "/api/transfers", B), viaCache(env, "/api/squad", B)]);
   const loans = {};
   for (const p of tr.response || []) {
     const ts = (p.transfers || []).filter((t) => t.date >= seasonStart).sort((a, b) => (a.date < b.date ? -1 : 1));
@@ -369,7 +375,7 @@ async function buildYouth(env) {
   const watch = Object.values(loans).concat(academy.filter((a) => !loans[a.id]));
   // 2. Season stats per player (all teams, so a loanee's loan-club rows come through), plus earlier seasons for the debut ladder.
   for (const w of watch) {
-    const j = await viaCache(env, `/api/player?id=${w.id}`);
+    const j = await viaCache(env, `/api/player?id=${w.id}`, B);
     const r = j.response && j.response[0];
     if (r) {
       w.name = r.player.name; w.age = r.player.age; w.photo = r.player.photo; w.nationality = r.player.nationality; w.birth = r.player.birth && r.player.birth.date;
@@ -378,8 +384,8 @@ async function buildYouth(env) {
     } else w.season = [];
     // United debut: earliest season (last four) with a United appearance.
     w.utd = { apps: 0, starts: 0, minutes: 0, debutSeason: null };
-    for (let y = S; y >= S - 3; y--) {
-      const jj = y === S ? j : await viaCache(env, `/api/player-season?id=${w.id}&season=${y}`);
+    for (let y = S; y >= S - ((w.age || 99) <= 23 ? 2 : 0); y--) {
+      const jj = y === S ? j : await viaCache(env, `/api/player-season?id=${w.id}&season=${y}`, B);
       const rr = jj.response && jj.response[0];
       const rows = rr ? (rr.statistics || []).filter((x) => x.team.id === TEAM && x.games && x.games.appearences) : [];
       const apps = rows.reduce((a, x) => a + (x.games.appearences || 0), 0);
@@ -392,13 +398,13 @@ async function buildYouth(env) {
   const clubs = {}; watch.forEach((w) => { clubs[w.club.id] = w.club; });
   const byClub = {};
   for (const cid of Object.keys(clubs)) {
-    const fx = await viaCache(env, `/api/team-fixtures?team=${cid}&from=${iso(d7)}&to=${iso(today)}`);
+    const fx = await viaCache(env, `/api/team-fixtures?team=${cid}&from=${iso(d7)}&to=${iso(today)}`, B);
     byClub[cid] = (fx.response || []).filter((m) => /FT|AET|PEN/.test(m.fixture.status.short));
   }
   for (const w of watch) w.week = [];
   for (const cid of Object.keys(byClub)) {
     for (const m of byClub[cid]) {
-      const fp = await viaCache(env, `/api/fixture-players?fixture=${m.fixture.id}`);
+      const fp = await viaCache(env, `/api/fixture-players?fixture=${m.fixture.id}`, B);
       const side = (fp.response || []).filter((t) => t.team.id === +cid)[0];
       if (!side) continue;
       const squadIds = new Set(side.players.map((p) => p.player.id));
@@ -413,11 +419,11 @@ async function buildYouth(env) {
     }
   }
   // 4. United matchday squads this season, for the academy ladder (bench appearances count).
-  const ufx = await viaCache(env, "/api/fixtures");
+  const ufx = await viaCache(env, "/api/fixtures", B);
   const played = (ufx.response || []).filter((m) => /FT|AET|PEN/.test(m.fixture.status.short)).sort((a, b) => a.fixture.timestamp - b.fixture.timestamp);
   const bench = {}, first = {}, firstStart = {};
   for (const m of played) {
-    const fp = await viaCache(env, `/api/fixture-players?fixture=${m.fixture.id}`);
+    const fp = await viaCache(env, `/api/fixture-players?fixture=${m.fixture.id}`, B);
     const side = (fp.response || []).filter((t) => t.team.id === TEAM)[0]; if (!side) continue;
     const home = m.teams.home.id === TEAM, opp = home ? m.teams.away.name : m.teams.home.name;
     for (const p of side.players) {
