@@ -233,7 +233,7 @@ function parseInfobox(wt) {
   }
   parts.push(cur);
   const f = {};
-  parts.slice(1).forEach((p) => { const m = p.match(/^\s*([\w\-]+)\s*=\s*([\s\S]*)$/); if (m) f[m[1].toLowerCase()] = clean(m[2]); });
+  parts.slice(1).forEach((p) => { const m = p.match(/^\s*([\w\-]+)\s*=\s*([\s\S]*)$/); if (m) f[m[1].toLowerCase()] = wtClean(m[2]); });
   const rows = (pre, keys) => { const out = []; for (let n = 1; n < 40; n++) { const r = {}; let any = false; keys.forEach((k) => { const v = f[pre + k + n]; if (v !== undefined && v !== "") any = true; r[k] = v || ""; }); if (!any) { if (n > 3) break; else continue; } out.push(r); } return out; };
   return {
     name: f.name || "", fullname: f.fullname || f.full_name || "", birth_date: f.birth_date || "", birth_place: f.birth_place || "", death_date: f.death_date || "", height: f.height || "", position: f.position || "", currentclub: f.currentclub || "", clubnumber: f.clubnumber || "",
@@ -242,7 +242,7 @@ function parseInfobox(wt) {
   };
 }
 // Reduce wikitext to plain text: refs out, links to their label, common templates to their value.
-function clean(v) {
+function wtClean(v) {
   let s = String(v);
   s = s.replace(/<ref[^>]*\/>/g, "").replace(/<ref[\s\S]*?<\/ref>/g, "").replace(/<!--[\s\S]*?-->/g, "").replace(/<br\s*\/?>/gi, " ");
   for (let n = 0; n < 4; n++) {
