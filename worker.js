@@ -1,33 +1,44 @@
 // SITE1 Worker: serves the Hugo build from ./public and proxies a small set of
-// API-Football endpoints under /api/* for the Should I Go? page.
+// API-Football endpoints under /api/* for the Manchester United hub.
+//
+// Efficiency rules (API-Football Pro: 7,500 calls/day, per-minute cap):
+//  - Every upstream answer is stored in KV (global, not per data centre) for TTL seconds,
+//    and kept for 7 days beyond that. A stale copy is served immediately while one
+//    background refresh runs, so a visitor never waits on the API and never sees its errors.
+//  - A cron (see wrangler.jsonc) warms the core endpoints every hour, so ordinary traffic
+//    costs ~0 upstream calls. Expect roughly 150–250 calls a day in total.
+//  - Error answers (rate limit, plan, key) are never cached; the stale copy stays instead.
 // The API key lives in the API_FOOTBALL_KEY secret (wrangler secret put API_FOOTBALL_KEY).
-// Responses are cached at the edge for an hour (Cache API), so the free daily quota is safe.
 
 const TEAM = 33;          // Manchester United
-const LEAGUES = { pl: 39, ucl: 2, fa: 45, efl: 48 };
+const LEAGUES = { pl: 39, ucl: 2 };
 const API = "https://v3.football.api-sports.io";
-const TTL = 3600;         // seconds
+const KEEP = 7 * 24 * 3600;     // seconds a copy stays in KV after it goes stale
 
 function season(now = new Date()) {
-  // API-Football labels 2026/27 as 2026 (season starts in July/August)
   const y = now.getUTCFullYear(), m = now.getUTCMonth() + 1;
-  return m >= 7 ? y : y - 1;
+  return m >= 7 ? y : y - 1;   // API-Football labels 2026/27 as 2026
 }
 
+// name -> { path(url), ttl seconds }
 const ROUTES = {
-  "/api/fixtures":  () => `/fixtures?team=${TEAM}&season=${season()}`,
-  "/api/standings": () => `/standings?league=${LEAGUES.pl}&season=${season()}`,
-  "/api/ucl":       () => `/standings?league=${LEAGUES.ucl}&season=${season()}`,
-  "/api/squad":     () => `/players/squads?team=${TEAM}`,
-  "/api/injuries":  () => `/injuries?team=${TEAM}&season=${season()}`,
-  "/api/players":   (u) => `/players?team=${TEAM}&season=${season()}&page=${u.searchParams.get("page") || 1}`,
-  "/api/player":    (u) => `/players?id=${encodeURIComponent(u.searchParams.get("id") || "")}&season=${u.searchParams.get("season") || season()}`,
-  "/api/sidelined": (u) => `/sidelined?player=${encodeURIComponent(u.searchParams.get("id") || "")}`,
-  "/api/lineups":   (u) => `/fixtures/lineups?fixture=${encodeURIComponent(u.searchParams.get("fixture") || "")}`,
-  "/api/fixture-stats": (u) => `/fixtures/statistics?fixture=${encodeURIComponent(u.searchParams.get("fixture") || "")}`,
-  "/api/events":    (u) => `/fixtures/events?fixture=${encodeURIComponent(u.searchParams.get("fixture") || "")}`,
-  "/api/status":    () => `/status`,
+  "/api/status":        { ttl: 300,   path: () => `/status` },
+  "/api/standings":     { ttl: 1800,  path: () => `/standings?league=${LEAGUES.pl}&season=${season()}` },
+  "/api/ucl":           { ttl: 1800,  path: () => `/standings?league=${LEAGUES.ucl}&season=${season()}` },
+  "/api/fixtures":      { ttl: 1800,  path: () => `/fixtures?team=${TEAM}&season=${season()}` },
+  "/api/squad":         { ttl: 21600, path: () => `/players/squads?team=${TEAM}` },
+  "/api/injuries":      { ttl: 3600,  path: () => `/injuries?team=${TEAM}&season=${season()}` },
+  "/api/players":       { ttl: 10800, path: (u) => `/players?team=${TEAM}&season=${season()}&page=${u.searchParams.get("page") || 1}` },
+  "/api/player":        { ttl: 86400, path: (u) => `/players?id=${num(u, "id")}&season=${u.searchParams.get("season") || season()}` },
+  "/api/sidelined":     { ttl: 86400, path: (u) => `/sidelined?player=${num(u, "id")}` },
+  "/api/lineups":       { ttl: 86400, path: (u) => `/fixtures/lineups?fixture=${num(u, "fixture")}` },
+  "/api/fixture-stats": { ttl: 86400, path: (u) => `/fixtures/statistics?fixture=${num(u, "fixture")}` },
+  "/api/events":        { ttl: 86400, path: (u) => `/fixtures/events?fixture=${num(u, "fixture")}` },
 };
+function num(u, k) { return String(parseInt(u.searchParams.get(k) || "0", 10) || 0); }
+
+// Warmed every hour by the cron so pages never wait on the API.
+const WARM = ["/api/standings", "/api/ucl", "/api/fixtures", "/api/squad", "/api/injuries", "/api/players?page=1", "/api/players?page=2", "/api/players?page=3"];
 
 export default {
   async fetch(request, env, ctx) {
@@ -39,44 +50,63 @@ export default {
     if (!route) return json({ error: "unknown route" }, 404);
     if (!env.API_FOOTBALL_KEY) return json({ error: "API_FOOTBALL_KEY secret not set on the Worker" }, 500);
 
-    const cache = caches.default;
-    const cacheKey = new Request(url.origin + "/__cache/v2" + url.pathname + url.search, { method: "GET" });
-    const hit = await cache.match(cacheKey);
-    if (hit) return hit;
+    const key = "api:v3:" + url.pathname + url.search;
+    const { body, fresh, age } = await load(env, key);
+    if (body && fresh) return answer(body, "kv-hit", age);
+    if (body) { ctx.waitUntil(refresh(env, key, route, url)); return answer(body, "kv-stale", age); }
 
-    // Keys from dashboard.api-football.com use the api-sports host; keys from RapidAPI use theirs.
-    // Try the direct host first and fall back to RapidAPI if the key is rejected.
-    let upstream, body;
-    for (let attempt = 0; attempt < 4; attempt++) {
-      upstream = await fetch(API + route(url), { headers: { "x-apisports-key": env.API_FOOTBALL_KEY }, cf: { cacheTtl: 0 } });
-      body = await upstream.text();
-      if (!/"rateLimit"/.test(body)) break;              // per-minute cap: wait and retry
-      await new Promise((r) => setTimeout(r, 1500 + attempt * 1500));
-    }
-    if (/Invalid API key/i.test(body)) {
-      upstream = await fetch("https://api-football-v1.p.rapidapi.com/v3" + route(url), {
-        headers: { "x-rapidapi-key": env.API_FOOTBALL_KEY, "x-rapidapi-host": "api-football-v1.p.rapidapi.com" },
-        cf: { cacheTtl: 0 },
-      });
-      body = await upstream.text();
-    }
-    const res = new Response(body, {
-      status: upstream.status,
-      headers: {
-        "content-type": "application/json; charset=utf-8",
-        "cache-control": `public, max-age=${TTL}`,
-        "access-control-allow-origin": "*",
-        "x-source": "api-football",
-      },
-    });
-    // API-Football answers 200 even for errors (rate limit, plan, key); only cache clean responses.
-    let clean = false;
-    try { const j = JSON.parse(body); clean = upstream.ok && j && (Array.isArray(j.errors) ? j.errors.length === 0 : Object.keys(j.errors || {}).length === 0) && !j.message; } catch (e) {}
-    if (clean) ctx.waitUntil(cache.put(cacheKey, res.clone()));
-    return res;
+    // Nothing cached yet: fetch now (the first visitor pays once; the cron keeps it warm after that).
+    const r = await refresh(env, key, route, url);
+    return r.ok ? answer(r.body, "upstream", 0) : new Response(r.body, { status: 200, headers: headers("upstream-error") });
+  },
+
+  // Hourly warm-up (wrangler.jsonc → triggers.crons). Sequential, spaced, so it never trips the per-minute cap.
+  async scheduled(event, env, ctx) {
+    ctx.waitUntil((async () => {
+      for (const p of WARM) {
+        const url = new URL("https://site1.local" + p);
+        const route = ROUTES[url.pathname];
+        const key = "api:v3:" + url.pathname + url.search;
+        const { body, age } = await load(env, key);
+        if (body && age < route.ttl * 0.8) continue;        // still fresh enough, skip
+        await refresh(env, key, route, url);
+        await sleep(1200);
+      }
+    })());
   },
 };
 
-function json(obj, status = 200) {
-  return new Response(JSON.stringify(obj), { status, headers: { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*" } });
+async function load(env, key) {
+  const raw = await env.MU_CACHE.get(key);
+  if (!raw) return { body: null };
+  const nl = raw.indexOf("\n");
+  const stamp = parseInt(raw.slice(0, nl), 10);   // first line: unix seconds when fetched + ttl
+  const ttl = parseInt(raw.slice(nl + 1, raw.indexOf("\n", nl + 1)), 10);
+  const body = raw.slice(raw.indexOf("\n", nl + 1) + 1);
+  const age = Math.floor(Date.now() / 1000) - stamp;
+  return { body, fresh: age < ttl, age };
 }
+
+// Fetch from API-Football with a few retries on the per-minute cap; store only clean answers.
+async function refresh(env, key, route, url) {
+  let upstream, body = "";
+  for (let attempt = 0; attempt < 4; attempt++) {
+    try {
+      upstream = await fetch(API + route.path(url), { headers: { "x-apisports-key": env.API_FOOTBALL_KEY }, cf: { cacheTtl: 0 } });
+      body = await upstream.text();
+    } catch (e) { body = JSON.stringify({ errors: { network: String(e) } }); }
+    if (!/"rateLimit"/.test(body)) break;
+    await sleep(1500 + attempt * 1500);
+  }
+  let clean = false;
+  try { const j = JSON.parse(body); clean = !!upstream && upstream.ok && j && (Array.isArray(j.errors) ? j.errors.length === 0 : Object.keys(j.errors || {}).length === 0) && !j.message; } catch (e) {}
+  if (clean) await env.MU_CACHE.put(key, Math.floor(Date.now() / 1000) + "\n" + route.ttl + "\n" + body, { expirationTtl: route.ttl + KEEP });
+  return { ok: clean, body };
+}
+
+function headers(src, age) {
+  return { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=120", "access-control-allow-origin": "*", "x-source": src, "x-age": String(age || 0) };
+}
+function answer(body, src, age) { return new Response(body, { status: 200, headers: headers(src, age) }); }
+function json(obj, status = 200) { return new Response(JSON.stringify(obj), { status, headers: headers("worker") }); }
+function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }

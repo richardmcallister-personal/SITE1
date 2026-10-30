@@ -11,13 +11,15 @@ window.MU=(function(){
     var q=params?"?"+Object.keys(params).map(function(k){return k+"="+encodeURIComponent(params[k])}).join("&"):"";
     var url="/api/"+name+q, key="mu:"+url;
     try{var c=JSON.parse(sessionStorage.getItem(key)||"null"); if(c&&Date.now()-c.t<18e5)return Promise.resolve(c.v)}catch(e){}
-    return fetch(url).then(function(r){return r.json()}).then(function(j){
+    if(api._inflight[url])return api._inflight[url];
+    return api._inflight[url]=fetch(url).then(function(r){return r.json()}).then(function(j){
       if(j.errors&&Object.keys(j.errors).length){var e=new Error(JSON.stringify(j.errors)); e.api=true; throw e}
       if(j.message)throw Object.assign(new Error(j.message),{api:true});
       try{sessionStorage.setItem(key,JSON.stringify({t:Date.now(),v:j}))}catch(e){}
       return j;
-    });
+    }).finally(function(){delete api._inflight[url]});
   }
+  api._inflight={};
   function apiDown(el,err){
     if(!el)return;
     el.innerHTML='<div class="empty"><b>Live data not connected yet.</b> This section fills from API-Football once the Worker key is active'+(err&&err.message?' <span style="opacity:.7">('+String(err.message).slice(0,120)+')</span>':'')+'.</div>';
