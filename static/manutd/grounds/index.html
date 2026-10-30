@@ -1,0 +1,54 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · Ground guides</title>
+<link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>
+.pick{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px} .pick a{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);padding:6px 10px;color:var(--ink);text-decoration:none;font-size:13px;background:#fff} .pick a[aria-current="true"]{background:var(--ink);color:#fff;border-color:var(--ink)} .pick a .crest{margin:0}
+.pick a .when{font-size:11px;color:var(--muted)} .pick a[aria-current="true"] .when{color:#ccc}
+.guide h2{display:flex;align-items:center;gap:10px;flex-wrap:wrap} .guide h2 .crest{margin:0} .guide h2 small{font-family:var(--body);font-weight:400;text-transform:none;letter-spacing:0;font-size:14px;color:var(--muted)}
+.g{display:grid;grid-template-columns:1fr 1fr;gap:18px 26px;margin-top:12px} @media (max-width:760px){.g{grid-template-columns:1fr}}
+.g h3{margin:0 0 4px} .g p{margin:0;font-size:14px;line-height:1.55}
+.g .wide{grid-column:1/-1}
+.fx{background:var(--tint);padding:12px 14px;margin-top:14px;font-size:14px} .fx b{font-weight:600}
+.src{font-size:12px;color:var(--muted);margin-top:16px} .src a{color:var(--muted)}
+.warn{font-size:12px;color:#7a5a00;background:#fff4c2;border:1px solid #e6c84a;padding:6px 10px;display:inline-block;margin-top:8px}
+</style>
+</head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Before you go</small>Manchester<br>United</h1></a>
+  <div class="from">Ground guides<span>Arrival, meeting spots, the away end, bag rules, getting home</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+<div class="sheet">
+  <h2>Pick a ground</h2>
+  <p class="sub" style="margin:0 0 10px">Every away ground on this season's list. Each guide is written from the host club's own supporter pages and one away-travel source, with the date it was last checked shown on the guide — clubs change bag rules and turnstiles, so check the date before you rely on it.</p>
+  <div class="pick" id="pick"></div>
+</div>
+<div class="sheet guide" id="guide"><p class="sub">Choose a ground above.</p></div>
+<footer class="mu"><span id="stamp"></span> Sources are linked on each guide. Trains, pubs and policies change: the last-checked date is the thing to look at. <a href="/manutd/trips/">Trips</a></footer>
+</div>
+<script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script>
+<script>
+(function(){
+  MU.nav("Trips"); MU.checked("grounds",document.getElementById("stamp")); var $=function(i){return document.getElementById(i)}, G=[], cur=new URLSearchParams(location.search).get("g")||"";
+  function key(g){return g.ground.toLowerCase().replace(/[^a-z0-9]+/g,"-")}
+  function nextAt(g){var now=new Date(); return (window.MU_FIXTURES||[]).filter(function(f){return !f.home&&new Date(f.ko)>now&&f.venue&&(f.venue.toLowerCase().indexOf(g.ground.toLowerCase().split(" ")[0])>=0||g.club===f.opp)})[0]}
+  function show(k){cur=k; history.replaceState(null,"","?g="+k); [].forEach.call($("pick").children,function(a){a.setAttribute("aria-current",a.dataset.k===k)});
+    var g=G.filter(function(x){return key(x)===k})[0]; if(!g){$("guide").innerHTML='<p class="sub">No guide for that ground yet.</p>';return}
+    var f=nextAt(g), age=Math.round((Date.now()-new Date(g.checked+"T12:00:00Z"))/864e5);
+    var sec=function(t,v,wide){return '<div'+(wide?' class="wide"':'')+'><h3>'+t+'</h3><p>'+MU.esc(v||"Not stated by the sources.")+'</p></div>'};
+    $("guide").innerHTML='<h2>'+MU.crest(g.club,36)+MU.esc(g.ground)+' <small>'+MU.esc(g.club)+' · '+MU.esc(g.city)+'</small></h2>'+
+      (f?'<div class="fx"><b>Next visit:</b> '+MU.fmtDate(f.ko,{year:"numeric"})+' · '+MU.fmtUK(f.ko)+' UK'+MU.prov(f)+' · '+MU.esc(f.comp)+' · <a href="/manutd/trips/">plan the trip</a> · <a href="/manutd/club/?c='+encodeURIComponent(g.club)+'">head-to-head</a></div>':'')+
+      '<span class="warn">Last checked '+MU.fmtDate(g.checked+"T12:00:00Z",{year:"numeric"})+(age>60?' · '+age+' days ago, re-check before travelling':'')+'</span>'+
+      '<div class="g">'+sec("Getting there",g.arrival)+sec("From the airport",g.from_airport)+sec("The away end",g.away_end)+sec("Meeting spots",g.meeting)+sec("Bags and what you can bring",g.bags)+sec("Getting away afterwards",g.after)+sec("Tips",g.tips,true)+'</div>'+
+      '<p class="src">Sources: '+(g.sources||[]).map(function(u){try{return '<a href="'+u+'" target="_blank" rel="noopener">'+new URL(u).hostname.replace(/^www\./,"")+'</a>'}catch(e){return ''}}).filter(Boolean).join(" · ")+'</p>';
+  }
+  fetch("/manutd/grounds/grounds.json").then(function(r){return r.json()}).then(function(j){G=j;
+    var now=new Date(); G.forEach(function(g){var f=nextAt(g); g._next=f?new Date(f.ko).getTime():9e15}); G.sort(function(a,b){return a._next-b._next||a.club.localeCompare(b.club)});
+    $("pick").innerHTML=G.map(function(g){var f=nextAt(g); return '<a href="?g='+key(g)+'" data-k="'+key(g)+'">'+MU.crest(g.club,18)+MU.esc(g.ground)+(f?'<span class="when">'+MU.fmtDate(f.ko)+'</span>':'')+'</a>'}).join("");
+    $("pick").addEventListener("click",function(e){var a=e.target.closest("a"); if(!a)return; e.preventDefault(); show(a.dataset.k)});
+    show(cur||key(G[0]));
+  }).catch(function(){$("guide").innerHTML='<p class="sub">Guides are being written.</p>'});
+})();
+</script></body></html>
