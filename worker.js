@@ -40,7 +40,7 @@ export default {
     if (!env.API_FOOTBALL_KEY) return json({ error: "API_FOOTBALL_KEY secret not set on the Worker" }, 500);
 
     const cache = caches.default;
-    const cacheKey = new Request(url.toString(), { method: "GET" });
+    const cacheKey = new Request(url.origin + "/__cache/v2" + url.pathname + url.search, { method: "GET" });
     const hit = await cache.match(cacheKey);
     if (hit) return hit;
 
