@@ -66,7 +66,8 @@
   fetch("/manutd/numbers/numbers.json").then(function(r){return r.json()}).then(function(j){DATA=j; grid(); show(cur);
     // current season, live
     var y=new Date().getUTCFullYear()-(new Date().getUTCMonth()>=6?0:1), id=y+"-"+String(y+1).slice(2); if(DATA[id])return;
-    MU.api("squad").then(function(sq){var ps=sq.response[0].players.filter(function(p){return p.number}); var rows=ps.map(function(p){return {no:p.number,name:p.name,pos:{Goalkeeper:"GK",Defender:"DF",Midfielder:"MF",Attacker:"FW"}[p.position]||"",apps:0,goals:0,id:p.id,live:true}});
+    MU.api("squad").then(function(sq){var ps=sq.response[0].players.filter(function(p){return p.number}); var recent=[].concat.apply([],seasons().slice(-3).map(function(s){return DATA[s]})); function full(n){var a=n.split(" "), last=a[a.length-1].toLowerCase(), ini=a[0].length<=2?a[0][0].toLowerCase():null; var hit=recent.filter(function(r){var b=r.name.split(" "); return b[b.length-1].toLowerCase()===last&&(!ini||b[0][0].toLowerCase()===ini)})[0]; return hit?{name:hit.name,title:hit.title}:{name:n}}
+      var rows=ps.map(function(p){var f=full(p.name); return {no:p.number,name:f.name,title:f.title,pos:{Goalkeeper:"GK",Defender:"DF",Midfielder:"MF",Attacker:"FW"}[p.position]||"",apps:0,goals:0,id:p.id,live:true}});
       return (function pages(n){return MU.api("players",{page:n}).then(function(k){k.response.forEach(function(x){var r=rows.filter(function(q){return q.id===x.player.id})[0]; if(!r)return; x.statistics.forEach(function(s){if(s.team.id!==MU.TEAM)return; r.apps+=s.games.appearences||0; r.goals+=s.goals.total||0})}); if(k.paging.current<k.paging.total&&n<6)return pages(n+1)})})(1).then(function(){DATA[id]=rows; grid(); show(cur)});
     }).catch(function(){});
   });
