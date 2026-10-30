@@ -66,7 +66,7 @@
       '<div class="vs">'+MU.crest(f.home?"Manchester United":f.opp,64)+'<span>v</span>'+MU.crest(f.home?f.opp:"Manchester United",64)+'</div>'+
       '<div class="opp">'+(f.home?"United v "+MU.esc(f.opp):MU.esc(f.opp)+" v United")+'</div>'+
       '<div class="meta">'+MU.fmtDate(f.ko)+' · '+MU.fmtUK(f.ko)+' UK / '+MU.fmtSE(f.ko)+' SE · '+MU.comp(f.comp,22)+MU.esc(f.comp)+(f.tbc?' · TBC':'')+'</div>'+
-      '<div class="count" id="count"></div><p style="margin:14px 0 0"><a class="btn red" href="/manutd/trips/">Plan the trip</a></p>';
+      '<div class="count" id="count"></div><p style="margin:14px 0 0;display:flex;gap:8px;flex-wrap:wrap"><a class="btn red" href="/manutd/trips/">Plan the trip</a><a class="btn" id="mcBtn" href="/manutd/season/">Match centre</a></p>';
     function tick(){var ms=new Date(f.ko)-new Date(); if(ms<0){document.getElementById("count").innerHTML="<div><b>Live</b></div>";return}
       var d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4);
       document.getElementById("count").innerHTML='<div><b>'+d+'</b><span>days</span></div><div><b>'+h+'</b><span>hours</span></div><div><b>'+m+'</b><span>min</span></div>'}
@@ -91,11 +91,13 @@
     document.getElementById("last").innerHTML='<ul class="fxlist">'+played.map(function(m){
       var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home;
       var res=gf>ga?"W":gf<ga?"L":"D";
-      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'</span><span class="o">'+MU.crest(opp.name)+MU.esc(opp.name)+' <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+'</small></span><span class="r">'+gf+'–'+ga+' '+MU.form(res)+'</span></li>'}).join("")+'</ul>';
+      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'</span><span class="o"><a href="/manutd/match/?id='+m.fixture.id+'" style="color:inherit;text-decoration:none">'+MU.crest(opp.name)+MU.esc(opp.name)+'</a> <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+'</small></span><span class="r">'+gf+'–'+ga+' '+MU.form(res)+'</span></li>'}).join("")+'</ul>';
     // upcoming from live data too (replaces the static list when available)
+    var nxt=j.response.filter(function(m){return !/FT|AET|PEN|CANC/.test(m.fixture.status.short)}).sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp})[0];
+    if(nxt&&document.getElementById("mcBtn")){document.getElementById("mcBtn").href="/manutd/match/?id="+nxt.fixture.id; if(/1H|HT|2H|ET|P|LIVE/.test(nxt.fixture.status.short))document.getElementById("mcBtn").textContent="Live now · "+(nxt.goals.home==null?"":nxt.goals.home+"–"+nxt.goals.away)}
     var next=j.response.filter(function(m){return m.fixture.status.short==="NS"||m.fixture.status.short==="TBD"}).sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp}).slice(0,8);
     if(next.length){document.getElementById("upcoming").innerHTML=next.map(function(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home;
-      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'<br>'+MU.fmtUK(m.fixture.date)+' UK'+(m.fixture.status.short==="TBD"?" (TBC)":"")+'</span><span class="o">'+MU.crest(opp.name)+MU.esc(opp.name)+' <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r"></span></li>'}).join("")}
+      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'<br>'+MU.fmtUK(m.fixture.date)+' UK'+(m.fixture.status.short==="TBD"?" (TBC)":"")+'</span><span class="o"><a href="/manutd/match/?id='+m.fixture.id+'" style="color:inherit;text-decoration:none">'+MU.crest(opp.name)+MU.esc(opp.name)+'</a> <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r"></span></li>'}).join("")}
   }).catch(function(e){MU.apiDown(document.getElementById("last"),e)});
 })();
 </script></body></html>

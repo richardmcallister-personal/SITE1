@@ -48,7 +48,7 @@
   }).catch(function(e){MU.apiDown(document.getElementById("ucl"),e)});
   function li(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, st=m.fixture.status.short, done=st==="FT"||st==="AET"||st==="PEN";
     var gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home, res=done?(gf>ga?"W":gf<ga?"L":"D"):"";
-    return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'<br>'+(done?"":MU.fmtUK(m.fixture.date)+" UK")+'</span><span class="o">'+(MU.crest(opp.name)||'<img class="logo" src="'+opp.logo+'" alt="">')+MU.esc(opp.name)+' <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r">'+(done?gf+'–'+ga+' '+MU.form(res):'')+'</span></li>'}
+    return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'<br>'+(done?"":MU.fmtUK(m.fixture.date)+" UK")+'</span><span class="o"><a href="/manutd/match/?id='+m.fixture.id+'" style="color:inherit;text-decoration:none">'+(MU.crest(opp.name)||'<img class="logo" src="'+opp.logo+'" alt="">')+MU.esc(opp.name)+'</a> <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r">'+(done?gf+'–'+ga+' '+MU.form(res):'')+'</span></li>'}
   MU.api("fixtures").then(function(j){
     var all=j.response.slice().sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp});
     var done=all.filter(function(m){return /FT|AET|PEN/.test(m.fixture.status.short)}).reverse();

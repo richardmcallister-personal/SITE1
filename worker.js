@@ -31,6 +31,7 @@ const ROUTES = {
   "/api/players":       { ttl: 10800, path: (u) => `/players?team=${TEAM}&season=${season()}&page=${u.searchParams.get("page") || 1}` },
   "/api/player":        { ttl: 86400, path: (u) => `/players?id=${num(u, "id")}&season=${u.searchParams.get("season") || season()}` },
   "/api/season-fixtures": { ttl: 2592000, path: (u) => `/fixtures?team=${TEAM}&season=${num(u, "season")}` },   // historical seasons never change
+  "/api/match":         { ttl: 21600, live: true, path: (u) => `/fixtures?id=${num(u, "fixture")}` },   // one call: fixture + events + line-ups + stats
   "/api/sidelined":     { ttl: 86400, path: (u) => `/sidelined?player=${num(u, "id")}` },
   "/api/lineups":       { ttl: 86400, path: (u) => `/fixtures/lineups?fixture=${num(u, "fixture")}` },
   "/api/fixture-stats": { ttl: 86400, path: (u) => `/fixtures/statistics?fixture=${num(u, "fixture")}` },
@@ -74,6 +75,12 @@ export default {
 
     const key = "api:v3:" + url.pathname + url.search;
     const { body, fresh, age } = await load(env, key);
+    if (route.live && body) {
+      // Live window: from 90 minutes before kick-off until the match is finished, treat anything older than 60s as stale.
+      try { const j = JSON.parse(body), f = j.response && j.response[0]; if (f) { const ko = f.fixture.timestamp * 1000, st = f.fixture.status.short, now = Date.now();
+        const inWindow = (now > ko - 90 * 60000 && !/FT|AET|PEN|CANC|PST|ABD|AWD|WO/.test(st)) || /1H|HT|2H|ET|BT|P|LIVE|INT|SUSP/.test(st);
+        if (inWindow && age > 60) { ctx.waitUntil(refresh(env, key, route, url)); return answer(body, "kv-live-stale", age); } if (inWindow) return answer(body, "kv-live", age); } } catch (e) {}
+    }
     if (body && fresh) return answer(body, "kv-hit", age);
     if (body) { ctx.waitUntil(refresh(env, key, route, url)); return answer(body, "kv-stale", age); }
 

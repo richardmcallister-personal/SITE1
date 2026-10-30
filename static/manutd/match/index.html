@@ -1,0 +1,88 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · Match centre</title>
+<link rel="icon" href="/manutd/assets/devil.png">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>
+.score{background:var(--black);color:#fff;padding:26px 26px 22px;display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}
+.score .team{display:flex;align-items:center;gap:14px;font-size:clamp(18px,2.6vw,26px);font-weight:600} .score .team.r{justify-content:flex-end;text-align:right}
+.score .team img.crest{width:56px;height:56px;margin:0;background:#fff;border-radius:50%;padding:4px;box-sizing:border-box}
+.score .mid{text-align:center;min-width:150px} .score .big{font-weight:300;font-size:clamp(44px,7vw,72px);line-height:1;letter-spacing:-.02em;white-space:nowrap}
+.score .st{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:#bbb;margin-top:6px} .score .st.live{color:#fff} .score .st.live:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:8px;vertical-align:1px;animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.2}}
+.score .meta{font-size:13px;color:#bbb;margin-top:6px}
+.score .goals{font-size:13px;color:#ddd;margin-top:8px;line-height:1.5} .score .team.r .goals{text-align:right}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:26px}@media (max-width:820px){.cols{grid-template-columns:1fr}}
+.ev{list-style:none;margin:0;padding:0;font-size:14px} .ev li{display:grid;grid-template-columns:48px 1fr;gap:10px;padding:6px 0;border-bottom:1px solid var(--rule)} .ev .min{color:var(--muted);font-weight:500} .ev li.us{background:#fff3f3} .ev .who{font-weight:600} .ev small{color:var(--muted)}
+.bars{list-style:none;margin:0;padding:0;font-size:13px} .bars li{padding:7px 0;border-bottom:1px solid var(--rule)} .bars .lab{display:flex;justify-content:space-between;font-weight:500;margin-bottom:4px} .bars .lab span:nth-child(2){color:var(--muted);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.bars .bar{display:flex;height:8px;background:var(--tint)} .bars .bar i{display:block;height:100%} .bars .bar i.h{background:var(--ink)} .bars .bar i.a{background:var(--red)}
+.xi{font-size:14px;line-height:1.6} .xi b{display:block;font-weight:600;margin:10px 0 2px} .xi small{color:var(--muted)}
+.xi a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} .xi a.pl:hover{color:var(--red)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.note{font-size:13px;color:var(--muted);margin-top:10px}
+</style></head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small id="eyebrow">Match centre</small>Manchester<br>United</h1></a>
+  <div class="from" id="from">Match centre<span>&nbsp;</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+
+<div class="score" id="score"><div></div><div class="mid"><div class="big">—</div><div class="st">Loading</div></div><div></div></div>
+<div class="sheet">
+  <div class="actions" id="actions"></div>
+  <p class="note" id="note"></p>
+</div>
+<div class="sheet" id="body" style="display:none">
+  <div class="cols">
+    <div><h2>Events</h2><ul class="ev" id="events"></ul><h2 style="margin-top:22px">Statistics</h2><ul class="bars" id="stats"></ul></div>
+    <div><h2>Line-ups</h2><div class="xi" id="lineups"></div></div>
+  </div>
+</div>
+<footer class="mu">Live data from API-Football; refreshed every minute from 90 minutes before kick-off until the final whistle, hourly otherwise. Kick-offs shown in UK and Swedish time.</footer>
+</div>
+<script src="/manutd/mu.js"></script>
+<script>
+(function(){
+  MU.nav("Season");
+  var id=new URLSearchParams(location.search).get("id"), $=function(i){return document.getElementById(i)}, timer=null;
+  var LIVE=/1H|HT|2H|ET|BT|P|LIVE|INT|SUSP/, DONE=/FT|AET|PEN|CANC|PST|ABD|AWD|WO/;
+  function pl(p,team){return '<a class="pl" href="/manutd/player/?q='+encodeURIComponent(p.name)+'">'+MU.esc(p.name)+'</a>'}
+  function status(f){var s=f.fixture.status, ko=new Date(f.fixture.date);
+    if(LIVE.test(s.short)) return {cls:"live",txt:(s.short==="HT"?"Half-time":s.short==="P"?"Penalties":s.elapsed?s.elapsed+(s.extra?"+"+s.extra:"")+"′":s.long)};
+    if(DONE.test(s.short)) return {cls:"",txt:s.short==="AET"?"Full time (aet)":s.short==="PEN"?"Full time (pens)":s.short==="FT"?"Full time":s.long};
+    var ms=ko-new Date(); if(ms>0){var d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4); return {cls:"",txt:(d?d+"d ":"")+h+"h "+m+"m to kick-off"}}
+    return {cls:"",txt:s.long};
+  }
+  function render(j){
+    var f=j.response&&j.response[0]; if(!f){$("score").innerHTML='<div></div><div class="mid"><div class="big">—</div><div class="st">Fixture not found</div></div><div></div>';return}
+    var h=f.teams.home, a=f.teams.away, st=status(f), ko=f.fixture.date, isUs=function(t){return t.id===MU.TEAM};
+    document.title="Manchester United · "+h.name+" v "+a.name;
+    $("from").innerHTML="Match centre<span>"+MU.esc(f.league.name)+(f.league.round?" · "+MU.esc(f.league.round.replace("Regular Season - ","Matchweek ")):"")+"</span>";
+    var goals=function(team){return (f.events||[]).filter(function(e){return e.type==="Goal"&&e.team.id===team.id&&e.detail!=="Missed Penalty"}).map(function(e){return MU.esc(e.player.name)+" "+e.time.elapsed+(e.time.extra?"+"+e.time.extra:"")+"′"+(e.detail==="Penalty"?" (pen)":e.detail==="Own Goal"?" (og)":"")}).join("<br>")};
+    var scoreTxt=(f.goals.home==null?"":f.goals.home)+" – "+(f.goals.away==null?"":f.goals.away);
+    if(f.goals.home==null) scoreTxt=MU.fmtUK(ko);
+    $("score").innerHTML='<div><div class="team">'+MU.crest(h.name,56)+'<span>'+MU.esc(h.name)+'</span></div><div class="goals">'+goals(h)+'</div></div>'+
+      '<div class="mid"><div class="big">'+scoreTxt+'</div><div class="st '+st.cls+'">'+st.txt+'</div><div class="meta">'+MU.fmtDate(ko,{year:"numeric"})+' · '+MU.fmtUK(ko)+' UK / '+MU.fmtSE(ko)+' SE<br>'+MU.esc(f.fixture.venue.name||"")+(f.fixture.venue.city?', '+MU.esc(f.fixture.venue.city):'')+(f.score&&f.score.penalty&&f.score.penalty.home!=null?'<br>Penalties '+f.score.penalty.home+'–'+f.score.penalty.away:'')+(f.score&&f.score.halftime&&f.score.halftime.home!=null?'<br>HT '+f.score.halftime.home+'–'+f.score.halftime.away:'')+'</div></div>'+
+      '<div><div class="team r"><span>'+MU.esc(a.name)+'</span>'+MU.crest(a.name,56)+'</div><div class="goals" style="text-align:right">'+goals(a)+'</div></div>';
+    var day=ko.slice(0,10), acts='<a class="btn" href="/manutd/trips/">Plan the trip</a><a class="btn" href="/manutd/season/">Season</a>';
+    if(!DONE.test(f.fixture.status.short)) acts+='<a class="btn" href="/manutd/squad/">Pick your XI</a>';
+    $("actions").innerHTML=acts;
+    var ev=(f.events||[]).filter(function(e){return e.time.elapsed>=0}), lu=f.lineups||[], stt=f.statistics||[];
+    var has=ev.length||lu.length||stt.length; $("body").style.display=has?"":"none";
+    $("note").textContent=has?"":(new Date(ko)-new Date()>90*60000?"Line-ups appear about an hour before kick-off; events and statistics follow live.":"Waiting for the first data from the ground…");
+    $("events").innerHTML=ev.length?ev.map(function(e){var t=e.type==="Goal"?"⚽ "+(e.detail==="Own Goal"?"(og) ":e.detail==="Penalty"?"(pen) ":e.detail==="Missed Penalty"?"✗ penalty missed · ":"")+'<span class="who">'+pl(e.player,e.team)+'</span>'+(e.assist&&e.assist.name?" <small>("+MU.esc(e.assist.name)+")</small>":""):e.type==="Card"?(/Red/.test(e.detail)?"🟥 ":"🟨 ")+pl(e.player,e.team):e.type==="subst"?"↔ "+pl(e.assist&&e.assist.name?e.assist:{name:"?"},e.team)+" <small>for "+MU.esc(e.player.name)+"</small>":e.type==="Var"?"VAR · "+MU.esc(e.detail):MU.esc(e.detail||e.type); return '<li'+(isUs(e.team)?' class="us"':'')+'><span class="min">'+e.time.elapsed+(e.time.extra?"+"+e.time.extra:"")+'′</span><span>'+t+' <small>'+MU.esc(e.team.name)+'</small></span></li>'}).join(""):'<li><span class="min"></span><span><small>No events yet.</small></span></li>';
+    if(stt.length===2){var want=["Ball Possession","Total Shots","Shots on Goal","Shots off Goal","Blocked Shots","Corner Kicks","Fouls","Offsides","Yellow Cards","Red Cards","Passes %","expected_goals"];
+      var get=function(t,n){var s=(t.statistics||[]).filter(function(x){return x.type===n})[0]; return s?s.value:null};
+      $("stats").innerHTML=want.map(function(n){var A=get(stt[0],n),B=get(stt[1],n); if(A==null&&B==null)return ""; var na=parseFloat(String(A).replace("%",""))||0, nb=parseFloat(String(B).replace("%",""))||0, tot=na+nb||1; return '<li><div class="lab"><span>'+(A==null?"–":A)+'</span><span>'+n.replace("Ball ","").replace(" Kicks","s").replace("expected_goals","xG")+'</span><span>'+(B==null?"–":B)+'</span></div><div class="bar"><i class="h" style="width:'+(na/tot*100)+'%"></i><i class="a" style="width:'+(nb/tot*100)+'%"></i></div></li>'}).join("");
+    } else $("stats").innerHTML='<li><small style="color:var(--muted)">Statistics arrive once the match starts.</small></li>';
+    $("lineups").innerHTML=lu.length?lu.map(function(t){return '<b>'+MU.crest(t.team.name,20)+MU.esc(t.team.name)+(t.formation?' · '+t.formation:'')+(t.coach&&t.coach.name?' <small>· '+MU.esc(t.coach.name)+'</small>':'')+'</b>'+t.startXI.map(function(p){return (p.player.number?'<small>'+p.player.number+'</small> ':'')+(isUs(t.team)?pl(p.player,t.team):MU.esc(p.player.name))}).join(", ")+(t.substitutes&&t.substitutes.length?'<br><small>Bench: '+t.substitutes.map(function(p){return isUs(t.team)?pl(p.player,t.team):MU.esc(p.player.name)}).join(", ")+'</small>':'')}).join(""):'<small style="color:var(--muted)">Line-ups are published about an hour before kick-off.</small>';
+    // refresh cadence
+    clearTimeout(timer);
+    var near=new Date(ko)-new Date()<90*60000&&!DONE.test(f.fixture.status.short);
+    if(near||LIVE.test(f.fixture.status.short)) timer=setTimeout(load,60000); else if(!DONE.test(f.fixture.status.short)) timer=setTimeout(load,15*60000);
+  }
+  function load(){ try{sessionStorage.removeItem("mu:/api/match?fixture="+id+"&v=3")}catch(e){} MU.api("match",{fixture:id}).then(render).catch(function(e){$("score").querySelector(".st").textContent="Couldn't load: "+e.message}) }
+  if(!id){$("score").innerHTML='<div></div><div class="mid"><div class="big">—</div><div class="st">No fixture given</div></div><div></div>';return}
+  load();
+})();
+</script></body></html>
