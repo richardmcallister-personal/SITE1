@@ -17,12 +17,12 @@
   <div class="filters"><input id="q" placeholder="Find a club…" aria-label="Find a club"></div>
   <div id="list"></div>
 </div>
-<footer class="mu">League and FA Cup meetings: the match archive to 2024/25 (FA Cup to 2018/19), then the live feed from 2025/26. League Cup and European ties are listed on club pages from 2025/26 but not counted. <a href="/manutd/history/seasons/">All seasons</a></footer>
+<footer class="mu"><span id="stamp"></span> League and FA Cup meetings: the match archive to 2024/25 (FA Cup to 2018/19), then the live feed from 2025/26. League Cup and European ties are listed on club pages from 2025/26 but not counted. <a href="/manutd/history/seasons/">All seasons</a></footer>
 </div>
 <script src="/manutd/mu.js"></script>
 <script>
 (function(){
-  MU.nav("History"); var $=function(i){return document.getElementById(i)}, ROWS=[];
+  MU.nav("History"); MU.checked("clubs",document.getElementById("stamp"),"Last checked"); var $=function(i){return document.getElementById(i)}, ROWS=[];
   function render(){var q=$("q").value.toLowerCase(), rows=ROWS.filter(function(c){return c.name.toLowerCase().indexOf(q)>=0});
     $("list").innerHTML='<table class="mu"><thead><tr><th>Club</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th>United win rate</th><th>First</th><th>Last</th></tr></thead><tbody>'+rows.map(function(c){var pct=Math.round(100*c.w/c.p); return '<tr><td>'+MU.club(c.name)+'</td><td class="n">'+c.p+'</td><td class="n">'+c.w+'</td><td class="n">'+c.d+'</td><td class="n">'+c.l+'</td><td><span class="pct"><i style="width:'+pct+'%"></i></span>'+pct+'%</td><td>'+c.first+'</td><td>'+c.last+'</td></tr>'}).join("")+'</tbody></table>'}
   $("q").addEventListener("input",render);

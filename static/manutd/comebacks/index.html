@@ -29,12 +29,12 @@
   <p class="sub" id="count"></p>
   <div class="cards" id="cards"></div>
 </div>
-<footer class="mu">Event data from API-Football; classics from the club's records. "Two goals down" means United trailed by two or more and did not lose; "injury-time winner" is a winning goal in stoppage time; "ten men" is a United red card before the 75th minute in a match not lost.</footer>
+<footer class="mu"><span id="stamp"></span> Event data from API-Football; classics from the club's records. "Two goals down" means United trailed by two or more and did not lose; "injury-time winner" is a winning goal in stoppage time; "ten men" is a United red card before the 75th minute in a match not lost.</footer>
 </div>
 <script src="/manutd/mu.js"></script>
 <script>
 (function(){
-  MU.nav("History"); var $=function(i){return document.getElementById(i)};
+  MU.nav("History"); MU.checked("comebacks",document.getElementById("stamp"),"Last checked"); var $=function(i){return document.getElementById(i)};
   var TAGS={"two-down":"Two goals down","from-behind":"Came from behind","injury-time-winner":"Injury-time winner","late-winner":"Late winner","late-equaliser":"Late equaliser","ten-men":"Down to ten men","penalties":"Won on penalties","extra-time":"Extra time","thriller":"Seven-goal thrillers"};
   var tag="all", era="all", ALL=[];
   function eraOf(r){var y=parseInt(r.date,10); return y<1990?"Before 1990":y<2000?"1990s":y<2010?"2000s":y<2020?"2010s":"2020s"}

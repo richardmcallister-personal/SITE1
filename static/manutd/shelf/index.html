@@ -26,12 +26,12 @@
   <div class="filters" id="eras"></div>
   <div id="list"></div>
 </div>
-<footer class="mu">Publishers and platforms as at first release. Search links open the club's own YouTube channel, which carries most of the match footage referred to. <a href="/manutd/links/">Links</a></footer>
+<footer class="mu"><span id="stamp"></span> Publishers and platforms as at first release. Search links open the club's own YouTube channel, which carries most of the match footage referred to. <a href="/manutd/links/">Links</a></footer>
 </div>
 <script src="/manutd/mu.js"></script>
 <script>
 (function(){
-  MU.nav("Links"); var $=function(i){return document.getElementById(i)}, ALL=[], kind="all", era="all", done={};
+  MU.nav("Links"); MU.checked("shelf",document.getElementById("stamp"),"Last checked"); var $=function(i){return document.getElementById(i)}, ALL=[], kind="all", era="all", done={};
   var KIND={book:"Book",doc:"Documentary",film:"Film",pod:"Podcast"}, ERA={busby:["The Busby era","1945–1971: the Babes, Munich and the European Cup"],wilderness:["Between Busby and Ferguson","1971–1986: relegation, cups and the terraces"],ferguson:["The Ferguson years","1986–2013"],post:["Since 2013",""],all:["The whole story",""]};
   try{done=JSON.parse(localStorage.getItem("mu:shelf:done")||"{}")}catch(e){}
   function save(){try{localStorage.setItem("mu:shelf:done",JSON.stringify(done))}catch(e){}}

@@ -46,7 +46,9 @@ window.MU=(function(){
       if(f)return {ko:f.ko,conf:!!f.conf,src:"site"}; return {ko:m.fixture.date,conf:m.fixture.status.short!=="TBD",src:"api"} }
     return {ko:m.ko,conf:!!m.conf,src:"site"} }
   function prov(x){var c=x&&typeof x==="object"?x.conf:x; return c?"":'<span class="prov" title="Original Premier League slot — may move when that month\'s TV picks are announced">Provisional</span>'}
+  // "Last checked" stamps from status.json, written by the build scripts and the weekly scheduled task.
+  function checked(key,el,label){ if(!el)return; (checked._p=checked._p||fetch("/manutd/status.json").then(function(r){return r.json()}).catch(function(){return {}})).then(function(s){var x=s[key]; if(!x)return; var d=new Date(x.date+"T12:00:00Z"), age=Math.round((Date.now()-d)/864e5); el.innerHTML='<span class="stamp'+(age>35?' old':'')+'" title="'+esc(x.note||"")+'">'+(label||"Last checked")+' '+d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"})+(age>35?' · '+age+' days ago':'')+'</span>'}) }
   function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
   function formHtml(str){return '<span class="form">'+String(str||"").split("").map(function(c){return '<b class="'+c+'">'+c+'</b>'}).join("")+'</span>'}
-  return {TEAM:TEAM,nav:nav,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,esc:esc,form:formHtml};
+  return {TEAM:TEAM,nav:nav,checked:checked,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,esc:esc,form:formHtml};
 })();

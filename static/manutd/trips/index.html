@@ -235,6 +235,7 @@ var FIX=[
 ];
 // ---- away fixtures (same window). Colours are the host club's; ticket links are the United away page
 // (members, by away credits) and the host club's own ticket office. flights: direct from CPH unless noted.
+fetch("/manutd/status.json").then(function(r){return r.json()}).then(function(s){if(s.trips){var d=new Date(s.trips.date+"T12:00:00Z"); window.TRIPS_CHECKED=d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"})}}).catch(function(){});
 var MU_AWAY="https://tickets.manutd.com/en-GB/categories/away-tickets";
 var AWAY=[
  {opp:"Chelsea",away:true,comp:"Premier League",ko:"2026-10-31T12:30:00Z",venue:"Stamford Bridge",city:"London",col:"#034694",fg:"#fff",dest:"LOND",destNote:"London (LGW/STN/LHR); Fulham Broadway is on the District line",ug:1.3,og:1.5,glam:3,ticket:30,
@@ -462,7 +463,7 @@ function render(){
   $("flightCost").textContent=gbp(flightG);
   $("hotelLine").textContent=!nights?"No hotel (day trip)":!h?"No hotel priced for this night":hp.usd==null?h.n+" · no price released yet; Book shows the live rate":h.n+" · $"+hp.usd+"/night × "+nights;
   $("hotelCost").textContent=gbp(hotelG);
-  $("priceNote").textContent="Hotel prices are for this exact night ("+(h?fmtDate(new Date(h.night+"T12:00:00Z")):"")+"), cheapest room, 1 adult, checked 29–30 Oct 2026 (February–May fares are early-release and will move). Book opens the hotel on hotels.com with these dates pre-filled. Flights checked the same day.";
+  $("priceNote").textContent="Hotel prices are for this exact night ("+(h?fmtDate(new Date(h.night+"T12:00:00Z")):"")+"), cheapest room, 1 adult, checked "+(window.TRIPS_CHECKED||"29–30 Oct 2026")+" (February–May fares are early-release and will move). Book opens the hotel on hotels.com with these dates pre-filled. Flights checked the same day.";
   $("total").textContent=gbp(total);
   var fL=flightLink(f,nights), hL=hotelLink(f,nights), tL=ticketLink(f,blk?blk.code:null);
   $("bookFlight").href=fL; $("bn2").href=fL;

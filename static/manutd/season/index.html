@@ -27,12 +27,12 @@
     <div><h2>Remaining fixtures</h2><ul class="fxlist" id="fixtures"></ul></div>
   </div>
 </div>
-<footer class="mu">Tables and results from API-Football (hourly cache on this site's Worker). Last season's figures from the club's 2025/26 record: 3rd on 71 points, 20–11–7, Šeško and Mbeumo top scorers on 12.</footer>
+<footer class="mu"><span id="stamp"></span> Tables and results from API-Football (hourly cache on this site's Worker). Last season's figures from the club's 2025/26 record: 3rd on 71 points, 20–11–7, Šeško and Mbeumo top scorers on 12.</footer>
 </div>
 <script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script>
 <script>
 (function(){
-  MU.nav("Season");
+  MU.nav("Season"); MU.checked("fixtures",document.getElementById("stamp"),"Last checked");
   function table(rows,opts){
     return '<table class="mu"><thead><tr><th>#</th><th>Team</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th class="n">GD</th><th class="n">Pts</th><th>Form</th></tr></thead><tbody>'+
       rows.map(function(r){var cls=r.team.id===MU.TEAM?"us":""; var d=(r.description||"").toLowerCase(); if(/champions league/.test(d)&&!/qualif/.test(d))cls+=" ucl"; else if(/europa|conference/.test(d))cls+=" uel"; else if(/relegation/.test(d))cls+=" rel";

@@ -41,12 +41,12 @@
   <h3>Season by season</h3>
   <ul class="tl" id="tl"></ul>
 </div>
-<footer class="mu">Season figures from the Wikipedia season articles (CC BY-SA 4.0), all competitions; the current season is live from API-Football. Where two players share a number in one season (a transfer), both are listed. <a href="/manutd/history/">History</a></footer>
+<footer class="mu"><span id="stamp"></span> Season figures from the Wikipedia season articles (CC BY-SA 4.0), all competitions; the current season is live from API-Football. Where two players share a number in one season (a transfer), both are listed. <a href="/manutd/history/">History</a></footer>
 </div>
 <script src="/manutd/mu.js"></script>
 <script>
 (function(){
-  MU.nav("History"); var $=function(i){return document.getElementById(i)}, DATA={}, cur=parseInt(new URLSearchParams(location.search).get("n")||"7",10), CUR_SEASON=null;
+  MU.nav("History"); MU.checked("numbers",document.getElementById("stamp"),"Last checked"); var $=function(i){return document.getElementById(i)}, DATA={}, cur=parseInt(new URLSearchParams(location.search).get("n")||"7",10), CUR_SEASON=null;
   function seasons(){return Object.keys(DATA).sort()}
   function pl(r){return '<a href="/manutd/player/?'+(r.title?'p='+encodeURIComponent(r.title):'q='+encodeURIComponent(r.name))+'">'+MU.esc(r.name)+'</a>'}
   function show(n){

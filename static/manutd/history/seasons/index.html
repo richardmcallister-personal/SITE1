@@ -29,12 +29,12 @@ table.mu tr.d2 td{background:#fafafa}
   <div id="list"></div>
   <p class="key">No league football 1915–19 and 1939–46 (wartime regional competitions are not counted). FA Cup rounds from the match records to 2018/19 and from the live feed after that. League tables are computed from every result with the points rules of the day.</p>
 </div>
-<footer class="mu">Match records from the engsoccerdata archive and API-Football; season write-ups on each page from Wikipedia, CC BY-SA 4.0. <a href="/manutd/history/">Honours</a></footer>
+<footer class="mu"><span id="stamp"></span> Match records from the engsoccerdata archive and API-Football; season write-ups on each page from Wikipedia, CC BY-SA 4.0. <a href="/manutd/history/">Honours</a></footer>
 </div>
 <script src="/manutd/mu.js"></script>
 <script>
 (function(){
-  MU.nav("History");
+  MU.nav("History"); MU.checked("clubs",document.getElementById("stamp"),"Last checked");
   var $=function(i){return document.getElementById(i)};
   var TLOGO={"Premier League":"premier-league","First Division":"premier-league","FA Cup":"fa-cup","League Cup":"league-cup-carabao","Champions League":"champions-league","European Cup":"champions-league"};
   function ordinal(n){var o=["th","st","nd","rd"][n%10>3||Math.floor(n%100/10)===1?0:n%10]; return n+o}

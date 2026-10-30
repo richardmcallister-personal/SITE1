@@ -41,12 +41,12 @@
   <div class="filters" id="filters"><button data-f="all" aria-pressed="true">All</button><button data-f="L">League</button><button data-f="FAC">FA Cup</button><button data-f="OTH">League Cup & Europe</button><button data-f="H">At Old Trafford</button><button data-f="A">Away</button></div>
   <div id="list" class="res"></div>
 </div>
-<footer class="mu">Club profile from Wikipedia, CC BY-SA 4.0. Head-to-head figures are league and FA Cup meetings: the match archive to 2024/25 (FA Cup to 2018/19), then the live feed from 2025/26. League Cup and European ties appear from 2025/26 but are not counted. <a href="/manutd/history/seasons/">All seasons</a></footer>
+<footer class="mu"><span id="stamp"></span> Club profile from Wikipedia, CC BY-SA 4.0. Head-to-head figures are league and FA Cup meetings: the match archive to 2024/25 (FA Cup to 2018/19), then the live feed from 2025/26. League Cup and European ties appear from 2025/26 but are not counted. <a href="/manutd/history/seasons/">All seasons</a></footer>
 </div>
 <script src="/manutd/mu.js"></script>
 <script>
 (function(){
-  MU.nav("History");
+  MU.nav("History"); MU.checked("clubs",document.getElementById("stamp"),"Last checked");
   var $=function(i){return document.getElementById(i)}, name=new URLSearchParams(location.search).get("c")||"", slug=name.toLowerCase().replace(/f\.c\./g,"fc").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
   document.title="Manchester United · "+name; $("from").innerHTML="Club<span>"+MU.esc(name)+"</span>";
   function fmt(d){return MU.fmtDate(d+"T12:00:00Z",{year:"numeric"})}

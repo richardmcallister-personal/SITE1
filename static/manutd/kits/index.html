@@ -52,13 +52,13 @@
   <div class="filters"><label class="sub" style="margin:0">Era <select id="era" style="font:inherit;font-size:13px;padding:6px"></select></label></div>
   <div id="list"></div>
 </div>
-<footer class="mu">Kit images from the site's own archive. Manufacturer and sponsor by season from the club's kit history. Players shown for a season are the most-used from the season squad records (1993–94 onwards) or the trophy-season write-ups.</footer>
+<footer class="mu"><span id="stamp"></span> Kit images from the site's own archive. Manufacturer and sponsor by season from the club's kit history. Players shown for a season are the most-used from the season squad records (1993–94 onwards) or the trophy-season write-ups.</footer>
 </div>
 <div class="modal" id="modal"><div class="panel" id="panel"></div></div>
 <script src="/manutd/mu.js"></script>
 <script>
 (function(){
-  MU.nav("Shirts"); var $=function(i){return document.getElementById(i)};
+  MU.nav("Shirts"); MU.checked("kits",document.getElementById("stamp"),"Last checked"); var $=function(i){return document.getElementById(i)};
   var KITS=[], NUM={}, SEAS={}, CB=[], kind="all", mine="all", era="all", col={owned:[],wish:[],notes:{}}, key="";
   var MAKER=[[1878,"—"],[1975,"Admiral"],[1980,"Adidas"],[1992,"Umbro"],[2002,"Nike"],[2015,"Adidas"]];
   var SPON=[[1878,"—"],[1982,"Sharp"],[2000,"Vodafone"],[2006,"AIG"],[2010,"Aon"],[2014,"Chevrolet"],[2021,"TeamViewer"],[2024,"Snapdragon"]];
