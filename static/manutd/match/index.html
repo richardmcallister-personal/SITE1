@@ -17,7 +17,7 @@
 .bars{list-style:none;margin:0;padding:0;font-size:13px} .bars li{padding:7px 0;border-bottom:1px solid var(--rule)} .bars .lab{display:flex;justify-content:space-between;font-weight:500;margin-bottom:4px} .bars .lab span:nth-child(2){color:var(--muted);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
 .bars .bar{display:flex;height:8px;background:var(--tint)} .bars .bar i{display:block;height:100%} .bars .bar i.h{background:var(--ink)} .bars .bar i.a{background:var(--red)}
 .xi{font-size:14px;line-height:1.6} .xi b{display:block;font-weight:600;margin:10px 0 2px} .xi small{color:var(--muted)}
-.xi a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} .xi a.pl:hover{color:var(--red)}
+a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl:hover{color:var(--red)}
 .actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .note{font-size:13px;color:var(--muted);margin-top:10px}
 </style></head><body><div class="wrap">
@@ -46,7 +46,7 @@
   MU.nav("Season");
   var id=new URLSearchParams(location.search).get("id"), $=function(i){return document.getElementById(i)}, timer=null;
   var LIVE=/1H|HT|2H|ET|BT|P|LIVE|INT|SUSP/, DONE=/FT|AET|PEN|CANC|PST|ABD|AWD|WO/;
-  function pl(p,team){return '<a class="pl" href="/manutd/player/?q='+encodeURIComponent(p.name)+'">'+MU.esc(p.name)+'</a>'}
+  function pl(p,team){return team&&team.id===MU.TEAM?'<a class="pl" href="/manutd/player/?q='+encodeURIComponent(p.name)+'">'+MU.esc(p.name)+'</a>':MU.esc(p.name)}
   function status(f){var s=f.fixture.status, ko=new Date(f.fixture.date);
     if(LIVE.test(s.short)) return {cls:"live",txt:(s.short==="HT"?"Half-time":s.short==="P"?"Penalties":s.elapsed?s.elapsed+(s.extra?"+"+s.extra:"")+"′":s.long)};
     if(DONE.test(s.short)) return {cls:"",txt:s.short==="AET"?"Full time (aet)":s.short==="PEN"?"Full time (pens)":s.short==="FT"?"Full time":s.long};
