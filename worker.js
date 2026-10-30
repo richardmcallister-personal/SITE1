@@ -241,7 +241,7 @@ async function wiki(url, env, ctx) {
     if (!hit) return json({ error: "not found", q }, 404);
     title = hit;
   }
-  const key = "wiki:p:v8:" + title;
+  const key = "wiki:p:v9:" + title;
   const cached = url.searchParams.get("debug") ? null : await env.MU_CACHE.get(key);
   if (cached) return new Response(cached, { headers: headers("kv-hit") });
   const enc = encodeURIComponent(title.replace(/ /g, "_"));
