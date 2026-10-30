@@ -16,7 +16,7 @@
 .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:end;margin-bottom:12px}
 .controls label{display:flex;flex-direction:column;font-size:12px;color:var(--muted)} .controls select,.controls button{font:inherit;padding:7px 10px;border:2px solid var(--ink);background:#fff}
 .controls button{background:var(--ink);color:#fff;cursor:pointer;font-family:var(--head);font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
-.two{display:grid;grid-template-columns:1.1fr .9fr;gap:26px}@media (max-width:860px){.two{grid-template-columns:1fr}}
+.two{display:grid;grid-template-columns:1.1fr .9fr;gap:26px} .two>div>p.sub{min-height:40px;margin:0 0 8px!important}@media (max-width:860px){.two{grid-template-columns:1fr}}
 table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;font-weight:600;border-bottom:1px solid #c9c9c9} a.pl:hover{color:var(--red);border-bottom-color:var(--red)}
 .out{color:var(--red);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
 .bio{background:var(--tint);padding:16px 18px;display:none} .bio.on{display:block}
@@ -54,7 +54,7 @@ table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;
     </div>
     <div>
       <h2>Unavailable</h2>
-      <p class="sub" style="margin:0 0 8px">Injured, suspended or doubtful for the next match · live from API-Football.</p>
+      <p class="sub" style="margin:0 0 8px">Injured, suspended or doubtful · live from API-Football.</p>
       <div id="injuries"></div>
       <div class="bio" id="bio"></div>
     </div>
