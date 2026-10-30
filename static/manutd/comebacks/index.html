@@ -1,0 +1,63 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · The comeback collection</title>
+<link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 6px} .filters button{font:inherit;font-size:13px;padding:7px 12px;border:1px solid var(--rule);background:#fff;cursor:pointer} .filters button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)} .filters button b{font-family:var(--head);font-weight:400;margin-left:6px;color:var(--muted)} .filters button[aria-pressed="true"] b{color:#ccc}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px;margin-top:14px}
+.card{border:1px solid var(--rule);background:#fff;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.card .when{font-family:var(--head);font-weight:500;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.card .tie{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:600} .card .tie .sc{font-family:var(--head);font-weight:300;font-size:30px;margin-left:auto;white-space:nowrap}
+.card .tags{display:flex;flex-wrap:wrap;gap:5px} .tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;background:var(--tint);color:var(--ink)} .tag.hot{background:var(--red);color:#fff}
+.card .story{font-size:14px;line-height:1.5} .card .sc2{font-size:12px;color:var(--muted)}
+.card .links{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto} .card .links a{font-size:12px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:#fff;background:var(--ink);padding:6px 10px} .card .links a.red{background:var(--red)}
+.prog{display:flex;gap:2px;height:8px;margin:2px 0} .prog i{flex:1;background:#ddd} .prog i.u{background:#0a7a2f} .prog i.t{background:var(--red)}
+.era{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);grid-column:1/-1;margin-top:8px;border-bottom:1px solid var(--rule);padding-bottom:4px}
+</style>
+</head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>The comeback collection</small>Manchester<br>United</h1></a>
+  <div class="from">Comebacks<span>Something to watch after a miserable result</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+<div class="sheet">
+  <h2>Pick your poison</h2>
+  <p class="sub" style="margin:0 0 10px">Matches from 2010 onwards are classified automatically from the minute-by-minute events; the classics before that are curated. Each card links to the match centre or season page and to the club's own YouTube channel.</p>
+  <div class="filters" id="tags"></div>
+  <div class="filters" id="eras"></div>
+  <p class="sub" id="count"></p>
+  <div class="cards" id="cards"></div>
+</div>
+<footer class="mu">Event data from API-Football; classics from the club's records. "Two goals down" means United trailed by two or more and did not lose; "injury-time winner" is a winning goal in stoppage time; "ten men" is a United red card before the 75th minute in a match not lost.</footer>
+</div>
+<script src="/manutd/mu.js"></script>
+<script>
+(function(){
+  MU.nav("History"); var $=function(i){return document.getElementById(i)};
+  var TAGS={"two-down":"Two goals down","from-behind":"Came from behind","injury-time-winner":"Injury-time winner","late-winner":"Late winner","late-equaliser":"Late equaliser","ten-men":"Down to ten men","penalties":"Won on penalties","extra-time":"Extra time","thriller":"Seven-goal thrillers"};
+  var tag="all", era="all", ALL=[];
+  function eraOf(r){var y=parseInt(r.date,10); return y<1990?"Before 1990":y<2000?"1990s":y<2010?"2000s":y<2020?"2010s":"2020s"}
+  function scorersFromGoals(r){return (r.goals||[]).filter(function(g){return g.mine}).map(function(g){return g.player+" "+g.t+(g.x?"+"+g.x:"")+"′"+(g.pen?" (pen)":"")+(g.og?" (og)":"")}).join(", ")}
+  function autoStory(r){var s=[]; if(r.low)s.push((r.low.score)+" after "+r.low.t+"′"); var last=(r.goals||[])[r.goals.length-1]; if(last&&last.mine&&last.t>=85)s.push("winner "+last.player+" "+last.t+(last.x?"+"+last.x:"")+"′"); if(r.reds&&r.reds.length)s.push(r.reds[0].player+" sent off "+r.reds[0].t+"′"); if(r.pen)s.push("won on penalties"); return s.join(" · ")}
+  function prog(r){if(!r.goals||!r.goals.length)return ""; return '<div class="prog">'+r.goals.map(function(g){return '<i class="'+(g.mine?"u":"t")+'" title="'+g.t+'′ '+MU.esc(g.player)+'"></i>'}).join("")+'</div>'}
+  function card(r){var utd="Manchester United", h=r.home?utd:r.opp, a=r.home?r.opp:utd, yt="https://www.youtube.com/@manutd/search?query="+encodeURIComponent("Manchester United "+r.opp+" "+r.score.replace("–","-")+" "+r.date.slice(0,4));
+    return '<div class="card"><div class="when">'+MU.fmtDate(r.date+"T12:00:00Z",{year:"numeric"})+' · '+MU.comp(r.comp,16)+MU.esc(r.comp)+(r.round?' · '+MU.esc(r.round):'')+(r.venue?' · '+MU.esc(r.venue):'')+'</div>'+
+      '<div class="tie">'+MU.crest(r.opp,28)+'<span>'+(r.home?"United v "+MU.esc(r.opp):MU.esc(r.opp)+" v United")+'</span><span class="sc">'+r.score+(r.aet?'<small> aet</small>':'')+(r.pen?'<small> pens</small>':'')+'</span></div>'+
+      '<div class="tags">'+r.tags.map(function(t){return '<span class="tag'+(t==="two-down"||t==="injury-time-winner"?" hot":"")+'">'+(TAGS[t]||t)+'</span>'}).join("")+'</div>'+prog(r)+
+      '<div class="story">'+MU.esc(r.story||autoStory(r))+'</div><div class="sc2">'+MU.esc(r.scorers||scorersFromGoals(r))+'</div>'+
+      '<div class="links">'+(r.id?'<a href="/manutd/match/?id='+r.id+'">Match centre</a>':'')+'<a href="/manutd/history/season/?s='+r.season+'">'+r.season.replace("-","–")+' season</a><a class="red" href="'+yt+'" target="_blank" rel="noopener">Watch · United channel</a></div></div>'}
+  function render(){var rows=ALL.filter(function(r){return (tag==="all"||r.tags.indexOf(tag)>=0)&&(era==="all"||eraOf(r)===era)}), out="", e=null;
+    rows.forEach(function(r){var k=eraOf(r); if(k!==e){e=k; out+='<div class="era">'+k+'</div>'} out+=card(r)});
+    $("cards").innerHTML=out||'<p class="sub">Nothing matches that combination.</p>'; $("count").textContent=rows.length+" match"+(rows.length===1?"":"es");}
+  function chips(el,list,cur,set){el.innerHTML=list.map(function(x){return '<button data-v="'+x[0]+'" aria-pressed="'+(x[0]===cur)+'">'+x[1]+(x[2]!=null?'<b>'+x[2]+'</b>':'')+'</button>'}).join(""); el.addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; set(b.dataset.v); [].forEach.call(el.children,function(x){x.setAttribute("aria-pressed",x===b)}); render()})}
+  Promise.all([fetch("/manutd/comebacks/classics.json").then(function(r){return r.json()}),fetch("/manutd/comebacks/api.json").then(function(r){return r.ok?r.json():[]}).catch(function(){return []})]).then(function(res){
+    ALL=res[0].concat(res[1]).sort(function(a,b){return a.date<b.date?1:-1});
+    ALL.forEach(function(r){if(typeof r.season==="number")r.season=r.season+"-"+String(r.season+1).slice(2)});
+    var counts={}; ALL.forEach(function(r){r.tags.forEach(function(t){counts[t]=(counts[t]||0)+1})});
+    chips($("tags"),[["all","All",ALL.length]].concat(Object.keys(TAGS).filter(function(t){return counts[t]}).map(function(t){return [t,TAGS[t],counts[t]]})),"all",function(v){tag=v});
+    chips($("eras"),[["all","Every era"],["2020s","2020s"],["2010s","2010s"],["2000s","2000s"],["1990s","1990s"],["Before 1990","Before 1990"]],"all",function(v){era=v});
+    render();
+  });
+})();
+</script></body></html>
