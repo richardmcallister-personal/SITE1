@@ -133,7 +133,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
         if(w.error)throw new Error(w.error);
         var b=w.infobox||{};
         // People in the infobox get a page of their own: managers and scorers through the player pages, chairmen straight to Wikipedia.
-        var NAME=/((?:Sir )?(?:[A-Z]\. ?)*[A-Z][\w'’\-]+(?: (?:[A-Z]\. ?)*(?:van |de |di |O’|O')?[A-Z][\w'’\-]+){1,2})/g;
+        var NAME=/((?:[A-Z]\. ?){1,3}[A-Z][\w'’\-]+|(?:Sir )?[A-Z][\w'’\-]+(?: (?:van |de |di |O’|O')?[A-Z][\w'’\-]+){1,2})/g;
         function people(t,mode){return MU.esc(t||"").replace(NAME,function(n){return mode==="wiki"?'<a class="pl opp" href="https://en.wikipedia.org/wiki/Special:Search?search='+encodeURIComponent(n+" Manchester United")+'" target="_blank" rel="noopener">'+n+'</a>':'<a class="pl" href="/manutd/player/?q='+encodeURIComponent(n)+'">'+n+'</a>'})}
         var more=[["Manager",people(b.manager)],["Chairman",people(b.chairman,"wiki")],["Top scorer",people(b.seasonTopScorer||b.leagueTopScorer)]].concat((b.cups||[]).map(function(c){return [MU.esc(c.name),MU.esc(c.result)]})).concat([["Average attendance",MU.esc(b.averageAttendance)]]).filter(function(f){return f[1]});
         $("facts").innerHTML+=more.map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+f[1]+'</div></div>'}).join("");
