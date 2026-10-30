@@ -35,7 +35,7 @@ table.mu td.yrs{white-space:nowrap;color:var(--muted)}
 <div class="sheet" id="career" style="display:none">
   <div class="cols">
     <div><h2>Club career</h2><div id="clubs"></div><div id="youth"></div></div>
-    <div><h2>International</h2><div id="national"></div><div id="manager"></div><h2 style="margin-top:22px">On this site</h2><div class="seasons" id="onsite"></div></div>
+    <div><h2>International</h2><div id="national"></div><div id="manager"></div><h2 style="margin-top:22px">Honours with United</h2><p class="sub" id="honNote" style="margin:0 0 8px"></p><div class="seasons" id="honours"></div><h2 style="margin-top:22px">In the season write-ups</h2><div class="seasons" id="onsite"></div></div>
   </div>
 </div>
 <footer class="mu"><span id="attr">Profile text and career figures from Wikipedia, CC BY-SA 4.0.</span></footer>
@@ -81,7 +81,13 @@ table.mu td.yrs{white-space:nowrap;color:var(--muted)}
     Promise.all([fetch("/manutd/history/seasons.json").then(function(r){return r.json()}),fetch("/manutd/history/players.json").then(function(r){return r.json()})]).then(function(res){
       var S=res[0],P=res[1], keys=Object.keys(P).filter(function(k){return P[k]===j.title||P[k]===title});
       var hits=S.filter(function(s){var txt=[s.manager,s.captain,s.scorer].concat(s.matches.map(function(m){return m.scorers+" "+(m.lineup||"")})).join(" "); return keys.some(function(k){var kk=k.split("@")[0]; return new RegExp("(^|[^\\\\w'’.\\\\-])"+kk.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"(?![\\\\w'’\\\\-])").test(txt)})});
-      $("onsite").innerHTML=hits.length?hits.map(function(s){return '<a href="/manutd/history/season/?s='+s.id+'">'+s.title+' · '+s.trophies.join(", ")+'</a>'}).join(""):'<p class="sub">Not in a trophy-season write-up yet.</p>';
+      $("onsite").innerHTML=hits.length?hits.map(function(s){return '<a href="/manutd/history/season/?s='+s.id+'">'+s.title+' · '+s.trophies.join(", ")+'</a>'}).join(""):'<p class="sub">Not named in a trophy-season write-up.</p>';
+      // Honours: trophy seasons that fall inside the player's United years (from the career table).
+      var spans=utd.map(function(r){var m=(r.years||"").match(/(\d{4})\s*[–-]\s*(\d{4})?/); return m?[+m[1],m[2]?+m[2]:9999]:null}).filter(Boolean);
+      var won=S.filter(function(s){var y=parseInt(s.id,10); return spans.some(function(sp){return sp[0]<=y&&sp[1]>=y+1})});
+      var tally={}; won.forEach(function(s){s.trophies.forEach(function(t){tally[t]=(tally[t]||0)+1})});
+      $("honNote").textContent=won.length?Object.keys(tally).map(function(t){return tally[t]+"× "+t}).join(" · ")+" — seasons at the club in which United won a major trophy; a loan spell away in that season is not checked.":(utd.length?"No major trophy in his seasons at the club.":"");
+      $("honours").innerHTML=won.map(function(s){return '<a href="/manutd/history/season/?s='+s.id+'">'+s.title+' · '+s.trophies.join(", ")+'</a>'}).join("");
     }).catch(function(){});
   }).catch(function(e){$("top").innerHTML='<p class="sub">Couldn\'t load a profile for "'+MU.esc(title||q||"")+'" ('+MU.esc(e.message)+'). <a href="https://en.wikipedia.org/w/index.php?search='+encodeURIComponent((title||q||"")+" footballer")+'">Search Wikipedia</a></p>'});
 })();
