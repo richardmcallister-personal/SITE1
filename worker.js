@@ -106,7 +106,7 @@ export default {
         await refresh(env, key, route, url);
         await sleep(1200);
       }
-      const yk = "youth:v2:report", y = await load(env, yk);
+      const yk = "youth:v3:report", y = await load(env, yk);
       if (!y.body || y.age > YOUTH_TTL * 0.8) await buildYouth(env, 25).catch(() => {});
     })());
   },
@@ -221,7 +221,7 @@ async function wiki(url, env, ctx) {
   const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
   if (!title) {
     // Resolve an abbreviated name ("K. Mainoo") to an article title via search.
-    const qkey = "wiki:q:v3:" + q.toLowerCase();
+    const qkey = "wiki:q:v4:" + q.toLowerCase();
     let hit = await env.MU_CACHE.get(qkey);
     if (!hit) {
       const surname = q.replace(/^[A-Z]\. ?/, "").split(" ").pop();
@@ -232,7 +232,7 @@ async function wiki(url, env, ctx) {
       // carries an initial the title's first name must start with it; fall back to the plain surname match, then nothing.
       const ini = (q.match(/^([A-Z])\. ?/) || [])[1], sn = surname.toLowerCase(), base = (t) => t.replace(/\s*\(.*\)$/, "");
       const word = (t) => base(t).toLowerCase().split(/[\s-]+/).indexOf(sn) >= 0 && base(t).toLowerCase().split(/[\s-]+/).indexOf(sn) > 0;
-      const pick = list.filter((x) => word(x.title) && (!ini || base(x.title)[0].toUpperCase() === ini))[0] || list.filter((x) => word(x.title))[0] || (!ini ? list.filter((x) => x.title.toLowerCase().indexOf(sn) >= 0)[0] : null);
+      const pick = list.filter((x) => word(x.title) && (!ini || base(x.title)[0].toUpperCase() === ini))[0] || (!ini ? (list.filter((x) => word(x.title))[0] || list.filter((x) => x.title.toLowerCase().indexOf(sn) >= 0)[0]) : null);
       hit = pick ? pick.title : "";
       if (hit) ctx.waitUntil(env.MU_CACHE.put(qkey, hit, { expirationTtl: 30 * 86400 }));
     }
@@ -337,7 +337,7 @@ function wtClean(v) {
 // ---- Academy & loan watch: one composite report, cached in KV, rebuilt by the cron and on demand when stale.
 const YOUTH_TTL = 6 * 3600;
 async function youth(url, env, ctx) {
-  const key = "youth:v2:report";
+  const key = "youth:v3:report";
   const { body, fresh, age } = await load(env, key);
   if (body && fresh) return answer(body, "kv-hit", age);
   if (body) { ctx.waitUntil(buildYouth(env, 12).catch(() => {})); return answer(body, "kv-stale", age); }
@@ -384,7 +384,7 @@ async function buildYouth(env, limit) {
     const j = await viaCache(env, `/api/player?id=${w.id}`, B);
     const r = j.response && j.response[0];
     if (r) {
-      w.name = r.player.name; w.age = r.player.age; w.photo = r.player.photo; w.nationality = r.player.nationality; w.birth = r.player.birth && r.player.birth.date;
+      w.name = r.player.name; w.fullname = [r.player.firstname, r.player.lastname].filter(Boolean).join(" "); w.age = r.player.age; w.photo = r.player.photo; w.nationality = r.player.nationality; w.birth = r.player.birth && r.player.birth.date;
       w.season = (r.statistics || []).filter((x) => x.games && (x.games.appearences || x.games.minutes || x.games.lineups)).map((x) => ({ team: { id: x.team.id, name: x.team.name, logo: x.team.logo }, league: x.league.name, apps: x.games.appearences || 0, starts: x.games.lineups || 0, minutes: x.games.minutes || 0, position: x.games.position, rating: x.games.rating ? +x.games.rating : null, goals: x.goals.total || 0, assists: x.goals.assists || 0, conceded: x.goals.conceded, saves: x.goals.saves, yellow: (x.cards && x.cards.yellow) || 0, red: (x.cards && x.cards.red) || 0, benched: x.substitutes && x.substitutes.bench || 0 }));
       w.position = w.position || (w.season[0] && w.season[0].position) || "";
     } else w.season = [];
@@ -442,9 +442,9 @@ async function buildYouth(env, limit) {
   for (const w of watch) { w.utd.squads = bench[w.id] || 0; w.utd.firstThisSeason = first[w.id] || null; w.utd.firstStartThisSeason = firstStart[w.id] || null; }
   watch.sort((a, b) => (a.status === b.status ? (b.week.reduce((x, y) => x + y.minutes, 0) - a.week.reduce((x, y) => x + y.minutes, 0)) : a.status === "loan" ? -1 : 1));
   const out = JSON.stringify({ generated: new Date().toISOString(), season: S, window: { from: iso(d7), to: iso(today) }, players: watch });
-  await env.MU_CACHE.put("youth:v2:report", Math.floor(Date.now() / 1000) + "\n" + YOUTH_TTL + "\n" + out, { expirationTtl: YOUTH_TTL + KEEP });
+  await env.MU_CACHE.put("youth:v3:report", Math.floor(Date.now() / 1000) + "\n" + YOUTH_TTL + "\n" + out, { expirationTtl: YOUTH_TTL + KEEP });
   // weekly archive, one per ISO week, kept 90 days
-  const wk = isoWeek(today); await env.MU_CACHE.put("youth:v2:week:" + wk, out, { expirationTtl: 90 * 86400 });
+  const wk = isoWeek(today); await env.MU_CACHE.put("youth:v3:week:" + wk, out, { expirationTtl: 90 * 86400 });
   return out;
 }
 function isoWeek(d) { const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate())); const day = t.getUTCDay() || 7; t.setUTCDate(t.getUTCDate() + 4 - day); const y0 = new Date(Date.UTC(t.getUTCFullYear(), 0, 1)); return t.getUTCFullYear() + "-W" + String(Math.ceil(((t - y0) / 86400000 + 1) / 7)).padStart(2, "0"); }
