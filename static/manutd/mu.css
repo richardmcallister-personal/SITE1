@@ -77,7 +77,7 @@ a.chip{text-decoration:none} a.chip:hover{background:var(--black);color:var(--on
 @media (max-width:640px){.fxlist li{grid-template-columns:90px 1fr auto}.sheet{padding:16px}}
 
 /* ---- phones: tables scroll inside their panel instead of widening the page ---- */
-html,body{overflow-x:hidden}
+html,body{overflow-x:clip}
 .sheet{overflow-x:auto;-webkit-overflow-scrolling:touch}
 @media (max-width:640px){
   table.mu{font-size:13px} table.mu th,table.mu td{padding:6px 5px}
@@ -143,3 +143,13 @@ small.tz{display:block;font-size:11px;color:var(--muted);letter-spacing:.02em;fo
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
 /* theme switch (MU.theme puts it in the footer) */
 .themesw{display:inline-flex;gap:0;border:1px solid var(--rule);border-radius:8px;overflow:hidden;margin-left:10px;vertical-align:middle} .themesw button{font:inherit;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:4px 9px;border:0;background:var(--paper);color:var(--muted);cursor:pointer} .themesw button[aria-pressed="true"]{background:var(--black);color:var(--on-black)}
+
+/* Section pills: a sticky row of jump links (player page) or, with .tabs, phone tabs that show one section at a time (season page). */
+.pills{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px;margin-top:12px;position:sticky;top:0;z-index:5;background:var(--bg);scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.pills::-webkit-scrollbar{display:none}
+.pills a{flex:0 0 auto;padding:7px 14px;border-radius:999px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);font-weight:600;font-size:13px;text-decoration:none;white-space:nowrap}
+.pills a.on{background:var(--black);color:var(--on-black);border-color:var(--black)}
+.pills a small{font-weight:400;color:inherit;opacity:.7;margin-left:4px}
+[id]{scroll-margin-top:64px}
+@media (max-width:640px){.pills{top:0} .tabbed [data-tab]{display:none} .tabbed [data-tab].on{display:block} .tabbed .two{display:block}}
+@media (display-mode:standalone) and (max-width:640px){.pills{top:0}}

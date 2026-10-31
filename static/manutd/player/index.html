@@ -59,6 +59,7 @@ table.mu td.yrs{white-space:nowrap;color:var(--muted)}
 </header>
 <nav class="munav" aria-label="Sections"></nav>
 
+<nav class="pills" id="pills" aria-label="Sections" hidden></nav>
 <div class="sheet" id="top"><p class="sub">Loading…</p></div>
 <div class="sheet" id="moments" style="display:none">
   <h2>Moments</h2>
@@ -87,6 +88,11 @@ table.mu td.yrs{white-space:nowrap;color:var(--muted)}
 <script>
 (function(){
   MU.nav("History");
+  function pills(){var vis=function(id){var e=document.getElementById(id); return e&&e.offsetParent!==null}, it=[{id:"top",label:"Profile"}];
+    if(vis("arch"))it.push({id:"arch",label:"Archive"}); if(vis("career"))it.push({id:"career",label:"Career"}); var g=document.getElementById("archGoals"); if(g&&g.innerHTML&&vis("arch"))it.push({id:"archGoals",label:"Every goal"}); if(vis("moments"))it.push({id:"moments",label:"Moments"});
+    var sig=it.map(function(i){return i.id}).join(); if(sig===pills.last)return; pills.last=sig; MU.pills(document.getElementById("pills"),it)}
+  var pillsTimer; function repills(){clearTimeout(pillsTimer); pillsTimer=setTimeout(pills,50)}
+  new MutationObserver(repills).observe(document.querySelector("main")||document.body,{attributes:true,subtree:true,attributeFilter:["style","hidden"],childList:true});
   var qs=new URLSearchParams(location.search), title=qs.get("p"), q=qs.get("q"), $=function(i){return document.getElementById(i)};
   function fmtDate(d){if(!d)return ""; var m=d.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(!m)return d; var t=new Date(Date.UTC(+m[1],+m[2]-1,+m[3])); return t.toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric",timeZone:"UTC"})}
   function age(d){var m=(d||"").match(/^(\d{4})-(\d{2})-(\d{2})$/); if(!m)return ""; var b=new Date(Date.UTC(+m[1],+m[2]-1,+m[3])), n=new Date(); var a=n.getUTCFullYear()-b.getUTCFullYear(); if(n.getUTCMonth()<b.getUTCMonth()||(n.getUTCMonth()===b.getUTCMonth()&&n.getUTCDate()<b.getUTCDate()))a--; return a}

@@ -145,6 +145,20 @@ window.MU=(function(){
     [f.teams.home,f.teams.away].forEach(function(t,i){var mine=ev.filter(function(e){return e.team.id===t.id}), allowed=i?f.goals.away:f.goals.home; if(allowed==null)allowed=mine.length; var extra=mine.length-allowed; mine.forEach(function(e){e.ok=true});
       if(extra>0){var pool=mine.filter(function(e){return !(e.player&&e.player.name)}).concat(mine.filter(function(e){return e.player&&e.player.name}).reverse()); pool.slice(0,extra).forEach(function(e){e.ok=false})}});
     return ev}
+  // Section pills. pills(el, items) renders [{id,label,count}] as jump links and highlights the section in view;
+  // tabs(el, items, def) does the same but on phones (≤640px) shows only the chosen section, remembers it, and honours #hash.
+  function pills(el,items){el.innerHTML=items.map(function(i){return '<a href="#'+i.id+'">'+esc(i.label)+(i.count!=null?' <small>'+i.count+'</small>':'')+'</a>'}).join(""); if(!items.length){el.hidden=true;return} el.hidden=false;
+    var links=[].slice.call(el.querySelectorAll("a")), secs=items.map(function(i){return document.getElementById(i.id)});
+    function mark(){var y=window.scrollY+90, on=0, best=-Infinity; secs.forEach(function(s,i){if(!s||s.offsetParent===null)return; var t=s.getBoundingClientRect().top+window.scrollY; if(t<=y&&t>best){best=t;on=i}}); links.forEach(function(a,i){a.classList.toggle("on",i===on)})}
+    window.addEventListener("scroll",mark,{passive:true}); mark()}
+  function tabs(el,items,def){var phone=function(){return window.matchMedia("(max-width:640px)").matches}, wrap=el.parentNode, key="tab:"+location.pathname;
+    el.innerHTML=items.map(function(i){return '<a href="#'+i.id+'" data-t="'+i.id+'">'+esc(i.label)+'</a>'}).join(""); wrap.classList.add("tabbed");
+    function show(id,push){items.forEach(function(i){var s=document.querySelector('[data-tab="'+i.id+'"]'); if(s)s.classList.toggle("on",i.id===id)}); [].slice.call(el.querySelectorAll("a")).forEach(function(a){a.classList.toggle("on",a.getAttribute("data-t")===id)}); try{localStorage.setItem(key,id)}catch(e){} if(push)history.replaceState(null,"","#"+id)}
+    var start=(location.hash||"").slice(1); if(!items.some(function(i){return i.id===start})){try{start=localStorage.getItem(key)}catch(e){} if(!items.some(function(i){return i.id===start}))start=def||items[0].id}
+    show(start,false);
+    el.addEventListener("click",function(ev){var a=ev.target.closest("a"); if(!a)return; var id=a.getAttribute("data-t"); if(phone()){ev.preventDefault(); show(id,true); window.scrollTo({top:0,behavior:"smooth"})} else show(id,false)});
+    window.addEventListener("hashchange",function(){var id=location.hash.slice(1); if(items.some(function(i){return i.id===id}))show(id,false)});
+    if(!phone())pills(el,items)}
   function scorers(sc){if(!sc||!sc.length)return ""; return sc.map(function(x){var fl=x[3]||"", og=fl.indexOf("o")>=0; return (x[1]&&!og?'<a class="pl" href="/manutd/player/?p='+encodeURIComponent(x[1])+'">'+esc(x[0])+'</a>':esc(x[0]))+(x[2]>1?' '+x[2]:'')+(fl.indexOf("p")>=0?' <i>pen</i>':'')+(og?' <i>og</i>':'')}).join(", ")}
   // links for an archived match row: the site's match centre (feed id, 2010/11 on), the match report the season article cites, else the season article itself
   function mlinks(m){var out=[]; if(m.id)out.push('<a class="chip" href="/manutd/match/?id='+m.id+'">Match centre</a>');
@@ -153,5 +167,5 @@ window.MU=(function(){
     return out.join("")}
   function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
   function formHtml(str){return '<span class="form">'+String(str||"").split("").map(function(c){return '<b class="'+c+'">'+c+'</b>'}).join("")+'</span>'}
-  return {TEAM:TEAM,nav:nav,theme:theme,scorers:scorers,goalEvents:goalEvents,mlinks:mlinks,search:search,hit:hit,KIND:KIND,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,fmtLocal:fmtLocal,fmtKO:fmtKO,fmtKOText:fmtKOText,TZ:TZ,IN_UK:IN_UK,esc:esc,form:formHtml};
+  return {TEAM:TEAM,nav:nav,theme:theme,pills:pills,tabs:tabs,scorers:scorers,goalEvents:goalEvents,mlinks:mlinks,search:search,hit:hit,KIND:KIND,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,fmtLocal:fmtLocal,fmtKO:fmtKO,fmtKOText:fmtKOText,TZ:TZ,IN_UK:IN_UK,esc:esc,form:formHtml};
 })();
