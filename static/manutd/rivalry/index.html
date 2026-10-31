@@ -39,6 +39,7 @@ table.mu tr.hl td{font-weight:600}
 </div>
 <div class="sheet">
   <h2>Recent meetings</h2>
+  <p class="sub" style="margin:0 0 8px">Each match links to the site's match centre (events and line-ups, 2010/11 on) and to the report the Wikipedia season article cites — BBC or manutd.com for most games since 1999 — or, before that, to the season article itself.</p>
   <div id="recent" class="res"></div>
   <p class="sub" style="margin:10px 0 0">Every meeting, with filters, is on the <a id="clubLink" href="#">club page</a>.</p>
 </div>
@@ -84,7 +85,7 @@ table.mu tr.hl td{font-weight:600}
     var top=Object.values(tot).sort(function(x,y){return y.g-x.g||x.n.localeCompare(y.n)}).slice(0,12);
     fetch("/manutd/history/players_index.json").then(function(r){return r.json()}).catch(function(){return []}).then(function(PI){var full={}; PI.forEach(function(p){full[p.t]=p.n}); top.forEach(function(t){if(full[t.t])t.n=full[t.t]});
     $("scorers").innerHTML=top.length?'<table class="mu"><thead><tr><th>#</th><th>Player</th><th class="n">Goals</th><th class="n">Games scored in</th><th>Years</th></tr></thead><tbody>'+top.map(function(t,i){return '<tr'+(i===0?' class="hl"':'')+'><td>'+(i+1)+'</td><td><a class="pl" href="/manutd/player/?p='+encodeURIComponent(t.t)+'">'+MU.esc(t.n)+'</a></td><td class="n">'+t.g+'</td><td class="n">'+t.games+'</td><td class="yrs">'+t.first.slice(0,4)+(t.last.slice(0,4)!==t.first.slice(0,4)?'–'+t.last.slice(0,4):'')+'</td></tr>'}).join("")+'</tbody></table>':'<p class="sub">No scorer data for this fixture.</p>'});
-    $("recent").innerHTML='<ul class="fxlist">'+M.slice(-12).reverse().map(function(m){var r=res(m), note=(m.c!=="L"?(m.div||"")+(m.r?" · "+m.r:""):m.div||"")+" · "+sp(m.s); return '<li class="'+(m.h?"home":"away")+'"><span class="d">'+fmt(m.d)+'</span><span class="o">'+(m.h?"United v "+MU.esc(club):MU.esc(club)+" v United")+'<small>'+MU.esc(note)+'</small>'+(m.sc?'<span class="sc">'+MU.scorers(m.sc)+'</span>':'')+'</span><span class="r">'+(m.id?'<a href="/manutd/match/?id='+m.id+'" style="color:inherit;text-decoration:none">':'')+m.gf+'–'+m.ga+(m.id?'</a>':'')+(m.aet?'<small> aet</small>':'')+(m.pens?'<small> p '+m.pens+'</small>':'')+' '+MU.form(r)+'</span></li>'}).join("")+'</ul>';
+    $("recent").innerHTML='<ul class="fxlist">'+M.slice(-12).reverse().map(function(m){var r=res(m), note=(m.c!=="L"?(m.div||"")+(m.r?" · "+m.r:""):m.div||"")+" · "+sp(m.s); return '<li class="'+(m.h?"home":"away")+'"><span class="d">'+fmt(m.d)+'</span><span class="o">'+(m.h?"United v "+MU.esc(club):MU.esc(club)+" v United")+'<small>'+MU.esc(note)+'</small>'+(m.sc?'<span class="sc">'+MU.scorers(m.sc)+'</span>':'')+'<span class="links">'+MU.mlinks(m)+'</span></span><span class="r">'+(m.id?'<a href="/manutd/match/?id='+m.id+'" style="color:inherit;text-decoration:none">':'')+m.gf+'–'+m.ga+(m.id?'</a>':'')+(m.aet?'<small> aet</small>':'')+(m.pens?'<small> p '+m.pens+'</small>':'')+' '+MU.form(r)+'</span></li>'}).join("")+'</ul>';
   });
 })();
 </script></body></html>

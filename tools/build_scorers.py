@@ -35,6 +35,7 @@ def scorers(cell):
         flags = ('p' if re.search(r'pen', rest, re.I) else '') + ('o' if re.search(r'o\.g\.|own goal', rest, re.I) else '')
         out.append([name, title, goals, flags])
     return out
+REPS = {}   # date -> match report URL from the result cell or the row's reference (BBC, manutd.com, archived pages)
 def parse(wt):
     rows = {}
     for tbl in re.findall(r'\{\|[\s\S]*?\n\|\}', wt):
@@ -43,7 +44,7 @@ def parse(wt):
         hdr = [re.sub(r'^.*?\|(?!\|)', '', h) if '|' in h and '[[' not in h else h for h in hdr]   # scope="col"| prefixes
         hdr = [h for h in hdr if h]
         if not any('scorer' in h for h in hdr): continue
-        si = [i for i, h in enumerate(hdr) if 'scorer' in h][0]
+        si = [i for i, h in enumerate(hdr) if 'scorer' in h][0]; ri = [i for i, h in enumerate(hdr) if 'result' in h]
         for row in tbl.split('\n|-')[1:]:
             cells = [c.strip() for c in re.split(r'\n\|(?!\})', '\n' + row.strip())[1:]]
             cells = [c for c in cells if not c.startswith('-')]
@@ -52,6 +53,9 @@ def parse(wt):
             if not d: continue
             sc = scorers(cells[si])
             if sc: rows[d] = sc
+            u = re.search(r'\[(https?://[^\s\]]+)\s+\d+\s*[–-]\s*\d+', cells[ri[0]]) if ri and ri[0] < len(cells) else None
+            if not u: u = re.search(r'<ref[^>]*>[\s\S]*?\|\s*url\s*=\s*(https?://[^\s|}]+)', row)
+            if u and 'wikipedia.org' not in u.group(1): REPS[d] = u.group(1)
     return rows
 def stitle(y): return f"{y}–{str(y + 1) if y % 100 == 99 else str(y + 1)[2:]} {'Newton Heath' if y < 1902 else 'Manchester United'} F.C. season"
 M = {}   # every competitive match in the archive, so friendlies in the articles are ignored
@@ -65,6 +69,8 @@ old = json.load(open(OUT)) if os.path.exists(OUT) else {}
 # season boundaries: keep rows for seasons whose article is unchanged
 def season_of(d): y = int(d[:4]); return y if int(d[5:7]) >= 7 else y - 1
 keep = {d: v for d, v in old.items() if stitle(season_of(d)) not in todo}
+RP = os.path.join(ROOT, "tools", "data", "reports.json"); oldrep = json.load(open(RP)) if os.path.exists(RP) else {}
+reps = {d: v for d, v in oldrep.items() if stitle(season_of(d)) not in todo}
 print(len(todo), "of", len(YEARS), "season articles changed"); done = []
 for y in YEARS:
     T = stitle(y)
@@ -72,8 +78,8 @@ for y in YEARS:
     try: wt = wiki_raw(T, revs.get(T))
     except Exception as e: print("no article", y, e); continue
     if not isinstance(wt, str): continue
-    r = {d: v for d, v in parse(wt).items() if d in M}; keep.update(r); done.append(T); print(y, len(r), "matches with scorers"); time.sleep(0.3)
-save_revs(STATE, revs, done)
+    REPS.clear(); r = {d: v for d, v in parse(wt).items() if d in M}; keep.update(r); reps.update({d: u for d, u in REPS.items() if d in M}); done.append(T); print(y, len(r), "matches with scorers"); time.sleep(0.3)
+save_revs(STATE, revs, done); json.dump(dict(sorted(reps.items())), open(RP, 'w'), indent=0)
 # the live feed covers 2025/26 on through the events route — not duplicated here
 dump(dict(sorted(keep.items())), OUT)
 # write the scorers into the match rows the pages read (season files and cups.json), as sc=[[name, title, goals, flags], ...]
@@ -82,10 +88,12 @@ for f in sorted(os.listdir(H + '/data')):
     for m in d['results']:
         sc = keep.get(m['d'])
         if sc and m.get('sc') != sc: m['sc'] = sc; ch = True
+        if reps.get(m['d']) and m.get('rep') != reps[m['d']]: m['rep'] = reps[m['d']]; ch = True
     if ch: dump(d, H + '/data/' + f)
 cp = os.path.join(ROOT, "tools", "data", "cups.json"); cups = json.load(open(cp))
 for r in cups:
     if keep.get(r['d']): r['sc'] = keep[r['d']]
+    if reps.get(r['d']): r['rep'] = reps[r['d']]
 json.dump(cups, open(cp, 'w'), ensure_ascii=False, separators=(',', ':'))
 # ---- index by player
 idx = {}

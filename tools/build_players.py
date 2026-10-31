@@ -39,7 +39,7 @@ for d, m in M.items():   # scorers sit on the match rows (build_scorers.py / bui
         if 'o' in fl or not title: continue
         p = get_p(title, name); row = p['seasons'].setdefault(m['s'], {})
         row['goals'] = row.get('goals', 0) + g; row.setdefault('bycomp', {}); row['bycomp'][m['c']] = row['bycomp'].get(m['c'], 0) + g
-        p['goals'].append(dict(d=d, o=m['o'], h=m['h'], c=m['c'], gf=m['gf'], ga=m['ga'], s=m['s'], g=g, p='p' in fl, **({'id': m['id']} if m.get('id') else {})))
+        p['goals'].append(dict(d=d, o=m['o'], h=m['h'], c=m['c'], gf=m['gf'], ga=m['ga'], s=m['s'], g=g, p='p' in fl, **({'id': m['id']} if m.get('id') else {}), **({'rep': m['rep']} if m.get('rep') else {})))
 # finals
 for f in json.load(open(os.path.join(STATIC, "numbers", "finals.json"))):
     for i, x in enumerate(f['xi'] + f['subs']):

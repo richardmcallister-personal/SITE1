@@ -64,6 +64,7 @@ footer.mu a{color:#fff}
 .fxlist li.home .o:before{content:"HOME";background:var(--red);color:#fff}
 .chip{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;background:var(--tint);color:var(--ink);margin-left:6px}
 .chip.red{background:var(--red);color:#fff}
+a.chip{text-decoration:none} a.chip:hover{background:var(--ink);color:#fff} .links{display:block;margin-top:3px} .links .chip{margin:0 6px 0 0}
 @media (max-width:640px){.fxlist li{grid-template-columns:90px 1fr auto}.sheet{padding:16px}}
 
 /* ---- phones: tables scroll inside their panel instead of widening the page ---- */
