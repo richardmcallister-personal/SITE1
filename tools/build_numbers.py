@@ -53,7 +53,7 @@ def parse(wt):
     return out
 res = json.load(open(OUT)) if os.path.exists(OUT) else {}
 Y = season_now()
-STATE = os.path.join(ROOT, "tools", "data", "wiki_revs.json")
+STATE = os.path.join(ROOT, "tools", "data", "wiki_revs_numbers.json")
 def stitle(y): return f"{y}–{str(y + 1) if y % 100 == 99 else str(y + 1)[2:]} Manchester United F.C. season"
 YEARS = list(range(1993, Y + 1)); todo, revs = wiki_changed([stitle(y) for y in YEARS], STATE)
 print(len(todo), "of", len(YEARS), "season articles changed"); done = []

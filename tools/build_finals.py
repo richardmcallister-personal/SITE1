@@ -17,7 +17,7 @@ def date(t):
     sd = re.search(r'\{\{[Ss]tart date\|(\d{4})\|(\d{1,2})\|(\d{1,2})', t)
     if sd: return f"{sd.group(1)}-{int(sd.group(2)):02d}-{int(sd.group(3)):02d}"
     m = re.search(r'(\d{1,2}) (\w+) (\d{4})', t); return f"{m.group(3)}-{MON[m.group(2)]:02d}-{int(m.group(1)):02d}" if m and m.group(2) in MON else None
-OUT = os.path.join(STATIC, "numbers", "finals.json"); STATE = os.path.join(ROOT, "tools", "data", "wiki_revs.json")
+OUT = os.path.join(STATIC, "numbers", "finals.json"); STATE = os.path.join(ROOT, "tools", "data", "wiki_revs_finals.json")
 todo, revs = wiki_changed(FINALS, STATE); old = json.load(open(OUT)) if os.path.exists(OUT) else []
 out = [r for r in old if r['title'].replace(' (replay)', '') not in todo]; done = []
 print(len(todo), "of", len(FINALS), "final articles changed")

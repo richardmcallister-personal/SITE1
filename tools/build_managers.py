@@ -21,7 +21,7 @@ def when(t, end=False):
     if m and m.group(2) in MON: return f"{m.group(3)}-{MON[m.group(2)]:02d}-{int(m.group(1)):02d}"
     return None
 NAT = {'ENG': 'England', 'SCO': 'Scotland', 'WAL': 'Wales', 'NIR': 'Northern Ireland', 'IRL': 'Ireland', 'POR': 'Portugal', 'NED': 'Netherlands', 'NOR': 'Norway', 'GER': 'Germany'}
-_t = "List of Manchester United F.C. managers"; _todo, _revs = wiki_changed([_t], os.path.join(ROOT, "tools", "data", "wiki_revs.json")); wt = wiki_raw(_t, _revs.get(_t))
+_t = "List of Manchester United F.C. managers"; _todo, _revs = wiki_changed([_t], os.path.join(ROOT, "tools", "data", "wiki_revs_managers.json")); wt = wiki_raw(_t, _revs.get(_t))
 tbl = wt[wt.index('{|', wt.index('==Managers') if '==Managers' in wt else 0):]; tbl = tbl[:tbl.index('\n|}') + 3]
 mgrs = []
 for row in tbl.split('\n|-')[1:]:

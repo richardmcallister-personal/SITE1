@@ -16,3 +16,11 @@ Everything here talks to the live site's Worker (manutd.wiki), never to API-Foot
 
 Each script stamps `static/manutd/status.json` with the date it last ran; pages show that as "last checked".
 `fixtures.js` (kick-off dates, confirmed/provisional) and `trips/` prices are maintained by the weekly scheduled task, which also runs `update.sh` and commits.
+
+## Incremental Wikipedia parsing
+
+`build_cups.py`, `build_numbers.py`, `build_finals.py` and `build_managers.py` ask the Worker's `/wiki-rev` route for the current
+revision id of every article they depend on (50 titles per call) and compare it with `tools/data/wiki_revs_<script>.json`.
+Only new or changed articles are fetched and re-parsed; rows from unchanged articles are kept from the previous output.
+`/wiki-raw?title=…&rev=N` keys the KV cache on the revision, so a changed article is never served stale. A weekly run with
+nothing changed on Wikipedia costs a handful of revision lookups and no article fetches. Delete the state file to force a full rebuild.

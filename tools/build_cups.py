@@ -68,7 +68,7 @@ def parse_boxes(seg, code, name, sid):
         rows.append(dict(d=d, c=code, h=home, o=(t2 if home else t1), gf=gf, ga=ga, s=sid, div=name, r=clean(f.get('round', ''))))
     return rows
 Y = season_now()
-STATE = os.path.join(ROOT, "tools", "data", "wiki_revs.json")
+STATE = os.path.join(ROOT, "tools", "data", "wiki_revs_cups.json")
 def stitle(y): return f"{y}–{str(y + 1) if y % 100 == 99 else str(y + 1)[2:]} Manchester United F.C. season"
 YEARS = list(range(1956, 2021))   # archive ends 2024/25; the live feed covers cups from 2021/22 and build_clubs.py the seasons after
 todo, revs = wiki_changed([stitle(y) for y in YEARS], STATE)
