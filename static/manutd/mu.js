@@ -12,8 +12,15 @@ window.MU=(function(){
     setTimeout(function(){d.classList.add("out"); setTimeout(function(){d.remove()},500)},900)}catch(e){}})();
   function nav(active){
     var el=document.querySelector("nav.munav"); if(!el)return;
+    document.querySelectorAll("header.mu h1 br").forEach(function(br){br.replaceWith(" ")});   // the wordmark sits on one line now
     el.innerHTML=NAV.map(function(n){return '<a href="'+n[0]+'"'+(n[1]===active?' aria-current="page"':'')+'>'+n[1]+'</a>'}).join("")+'<form class="musearch" role="search" action="/manutd/search/"><input type="search" name="q" placeholder="Search players, clubs, seasons, kits…" aria-label="Search the site" autocomplete="off"><div class="hits" hidden></div></form>';
     searchBox(el.querySelector(".musearch"));
+    // phone tab bar: five destinations, the current one lit
+    var TABS=[["/manutd/","Match",'<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/>',["Hub"]],["/manutd/season/","Season",'<path d="M4 6h16M4 12h16M4 18h10"/>',["Season"]],["/manutd/history/","History",'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',["History"]],["/manutd/kits/","Shirts",'<path d="M8 4 4 7l2 4 2-1v10h8V10l2 1 2-4-4-3a4 4 0 0 1-8 0Z"/>',["Shirts"]],["/manutd/#more","More",'<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>',["Trips","Squad","Academy","Links"]]];
+    var old=document.querySelector("nav.mutabs"); if(old)old.remove();
+    var t=document.createElement("nav"); t.className="mutabs"; t.setAttribute("aria-label","Sections");
+    t.innerHTML=TABS.map(function(x){return '<a href="'+x[0]+'"'+(x[3].indexOf(active)>=0?' aria-current="page"':'')+'><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+x[2]+'</svg>'+x[1]+'</a>'}).join("");
+    document.body.appendChild(t);
   }
   // ---- Site search: /manutd/search.json is [title, kind, url, subtitle, aliases]; loaded on first keystroke, matched client-side.
   var IDX=null, KIND={player:"Player",manager:"Manager",club:"Club",season:"Season",kit:"Kit",ground:"Ground",book:"Book",doc:"Documentary",film:"Film",pod:"Podcast",match:"Match",page:"Section"};
