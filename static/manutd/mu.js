@@ -9,7 +9,7 @@ window.MU=(function(){
   }
   // ---- Site search: /manutd/search.json is [title, kind, url, subtitle, aliases]; loaded on first keystroke, matched client-side.
   var IDX=null, KIND={player:"Player",manager:"Manager",club:"Club",season:"Season",kit:"Kit",ground:"Ground",book:"Book",doc:"Documentary",film:"Film",pod:"Podcast",match:"Match",page:"Section"};
-  function fold(t){return String(t||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[’']/g,"").replace(/[–—]/g,"-")}
+  function fold(t){return String(t||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/æ/g,"ae").replace(/ø/g,"o").replace(/ß/g,"ss").replace(/[đð]/g,"d").replace(/ł/g,"l").replace(/þ/g,"th").replace(/[’']/g,"").replace(/[–—]/g,"-")}
   function loadIndex(){return IDX||(IDX=fetch("/manutd/search.json").then(function(r){return r.json()}).then(function(j){return j.map(function(e){return {t:e[0],k:e[1],u:e[2],s:e[3]||"",a:e[4]||[],f:fold(e[0]),fa:(e[4]||[]).map(fold),fs:fold(e[3]||"")}})}))}
   function search(q,n){
     var terms=fold(q).split(/\s+/).filter(Boolean); if(!terms.length)return Promise.resolve([]);
@@ -18,13 +18,13 @@ window.MU=(function(){
       ix.forEach(function(e){
         var sc=0;
         for(var i=0;i<terms.length;i++){var t=terms[i], w=0;
-          if(e.f===t)w=100; else if(e.f.indexOf(t)===0)w=60; else if(e.f.indexOf(" "+t)>=0)w=50; else if(e.f.indexOf(t)>=0)w=30;
+          if(e.f===t)w=100; else if(e.f.split(/[\s,]+/).indexOf(t)>=0)w=70; else if(e.f.indexOf(t)===0)w=60; else if(e.f.indexOf(" "+t)>=0)w=50; else if(e.f.indexOf(t)>=0)w=30;
           else if(e.fa.some(function(a){return a===t}))w=80; else if(e.fa.some(function(a){return a.indexOf(t)>=0}))w=35;
           else if(e.fs.indexOf(t)>=0)w=10;
           if(!w){sc=0;break} sc+=w}
-        if(sc){ if(e.k==="player"||e.k==="manager"||e.k==="club")sc+=5; if(e.k==="kit")sc-=8; out.push({e:e,sc:sc}) }
+        if(sc){ if(e.k==="player"||e.k==="manager"||e.k==="club")sc+=15; else if(e.k==="season"||e.k==="ground")sc+=8; if(e.k==="kit")sc-=8; out.push({e:e,sc:sc}) }
       });
-      out.sort(function(a,b){return b.sc-a.sc||a.e.t.localeCompare(b.e.t)});
+      out.sort(function(a,b){return b.sc-a.sc||a.e.t.length-b.e.t.length||a.e.t.localeCompare(b.e.t)});
       return out.slice(0,n||8).map(function(x){return x.e});
     });
   }
