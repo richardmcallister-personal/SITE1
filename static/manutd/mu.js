@@ -6,6 +6,10 @@ window.MU=(function(){
   function wrapTables(root){(root||document).querySelectorAll("table.mu").forEach(function(t){if(t.parentElement&&t.parentElement.classList.contains("tw"))return; var w=document.createElement("div"); w.className="tw"; t.parentNode.insertBefore(w,t); w.appendChild(t)})}
   if(window.MutationObserver){new MutationObserver(function(ms){var hit=false; ms.forEach(function(m){if(m.addedNodes.length)hit=true}); if(hit)wrapTables()}).observe(document.documentElement,{childList:true,subtree:true})}
   document.addEventListener("DOMContentLoaded",function(){wrapTables()});
+  // Installed app: a short crest splash on the first page of a session, carrying on from the iOS launch image.
+  (function(){try{var sa=window.navigator.standalone===true||matchMedia("(display-mode: standalone)").matches; if(!sa||sessionStorage.getItem("mu:splash"))return; sessionStorage.setItem("mu:splash","1");
+    var d=document.createElement("div"); d.className="splash"; d.innerHTML='<img src="/manutd/assets/crest.png" alt="">'; (document.body||document.documentElement).appendChild(d);
+    setTimeout(function(){d.classList.add("out"); setTimeout(function(){d.remove()},500)},900)}catch(e){}})();
   function nav(active){
     var el=document.querySelector("nav.munav"); if(!el)return;
     el.innerHTML=NAV.map(function(n){return '<a href="'+n[0]+'"'+(n[1]===active?' aria-current="page"':'')+'>'+n[1]+'</a>'}).join("")+'<form class="musearch" role="search" action="/manutd/search/"><input type="search" name="q" placeholder="Search players, clubs, seasons, kits…" aria-label="Search the site" autocomplete="off"><div class="hits" hidden></div></form>';

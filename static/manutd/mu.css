@@ -100,3 +100,9 @@ a.cl{color:inherit;text-decoration:none;border-bottom:1px dotted #bbb} a.cl:hove
 .sc{display:block;font-size:12px;color:var(--muted);font-weight:400;margin-top:1px} .sc a{color:inherit;text-decoration:none;border-bottom:1px dotted #aaa} .sc i{font-style:normal;font-size:10px;letter-spacing:.06em;text-transform:uppercase}
 
 small.tz{display:block;font-size:11px;color:var(--muted);letter-spacing:.02em;font-weight:400} small.tz.inl{display:inline;margin-left:5px}
+
+/* Installed to the Home Screen: a translucent status bar means the red header runs under it, so push the header down by the notch height. */
+@media (display-mode: standalone){ header.mu{padding-top:calc(env(safe-area-inset-top,0px) + 14px)} }
+.splash{position:fixed;inset:0;z-index:999;background:#da020e;display:flex;align-items:center;justify-content:center;transition:opacity .45s ease;pointer-events:none}
+.splash img{width:34vmin;max-width:220px;height:auto;animation:splashIn .5s ease-out both} .splash.out{opacity:0}
+@keyframes splashIn{from{transform:scale(.92);opacity:.6}to{transform:scale(1);opacity:1}}
