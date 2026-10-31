@@ -4,7 +4,42 @@ window.MU=(function(){
   var NAV=[["/manutd/","Hub"],["/manutd/trips/","Trips"],["/manutd/season/","Season"],["/manutd/squad/","Squad"],["/manutd/youth/","Academy"],["/manutd/kits/","Shirts"],["/manutd/history/","History"],["/manutd/links/","Links"]];
   function nav(active){
     var el=document.querySelector("nav.munav"); if(!el)return;
-    el.innerHTML=NAV.map(function(n){return '<a href="'+n[0]+'"'+(n[1]===active?' aria-current="page"':'')+'>'+n[1]+'</a>'}).join("");
+    el.innerHTML=NAV.map(function(n){return '<a href="'+n[0]+'"'+(n[1]===active?' aria-current="page"':'')+'>'+n[1]+'</a>'}).join("")+'<form class="musearch" role="search" action="/manutd/search/"><input type="search" name="q" placeholder="Search players, clubs, seasons, kits…" aria-label="Search the site" autocomplete="off"><div class="hits" hidden></div></form>';
+    searchBox(el.querySelector(".musearch"));
+  }
+  // ---- Site search: /manutd/search.json is [title, kind, url, subtitle, aliases]; loaded on first keystroke, matched client-side.
+  var IDX=null, KIND={player:"Player",manager:"Manager",club:"Club",season:"Season",kit:"Kit",ground:"Ground",book:"Book",doc:"Documentary",film:"Film",pod:"Podcast",match:"Match",page:"Section"};
+  function fold(t){return String(t||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[’']/g,"").replace(/[–—]/g,"-")}
+  function loadIndex(){return IDX||(IDX=fetch("/manutd/search.json").then(function(r){return r.json()}).then(function(j){return j.map(function(e){return {t:e[0],k:e[1],u:e[2],s:e[3]||"",a:e[4]||[],f:fold(e[0]),fa:(e[4]||[]).map(fold),fs:fold(e[3]||"")}})}))}
+  function search(q,n){
+    var terms=fold(q).split(/\s+/).filter(Boolean); if(!terms.length)return Promise.resolve([]);
+    return loadIndex().then(function(ix){
+      var out=[];
+      ix.forEach(function(e){
+        var sc=0;
+        for(var i=0;i<terms.length;i++){var t=terms[i], w=0;
+          if(e.f===t)w=100; else if(e.f.indexOf(t)===0)w=60; else if(e.f.indexOf(" "+t)>=0)w=50; else if(e.f.indexOf(t)>=0)w=30;
+          else if(e.fa.some(function(a){return a===t}))w=80; else if(e.fa.some(function(a){return a.indexOf(t)>=0}))w=35;
+          else if(e.fs.indexOf(t)>=0)w=10;
+          if(!w){sc=0;break} sc+=w}
+        if(sc){ if(e.k==="player"||e.k==="manager"||e.k==="club")sc+=5; if(e.k==="kit")sc-=8; out.push({e:e,sc:sc}) }
+      });
+      out.sort(function(a,b){return b.sc-a.sc||a.e.t.localeCompare(b.e.t)});
+      return out.slice(0,n||8).map(function(x){return x.e});
+    });
+  }
+  function hit(e,q){var re=q?new RegExp("("+fold(q).split(/\s+/).filter(Boolean).map(function(t){return t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}).join("|")+")","ig"):null;
+    var t=esc(e.t); if(re)t=t.replace(re,"<mark>$1</mark>");
+    return '<a href="'+e.u+'"><span class="k">'+(KIND[e.k]||e.k)+'</span><span class="t">'+t+(e.s?'<small>'+esc(e.s)+'</small>':'')+'</span></a>'}
+  function searchBox(form){
+    if(!form)return; var inp=form.querySelector("input"), box=form.querySelector(".hits"), sel=-1, last="";
+    function render(list,q){box.innerHTML=list.map(function(e){return hit(e,q)}).join("")+(list.length?'<a class="all" href="/manutd/search/?q='+encodeURIComponent(q)+'">All results for “'+esc(q)+'” →</a>':'<span class="none">Nothing matches “'+esc(q)+'”</span>'); box.hidden=false; sel=-1}
+    inp.addEventListener("input",function(){var q=inp.value.trim(); last=q; if(q.length<2){box.hidden=true;return} search(q,8).then(function(l){if(q===last)render(l,q)})});
+    inp.addEventListener("focus",function(){if(inp.value.trim().length>=2&&box.innerHTML)box.hidden=false});
+    inp.addEventListener("keydown",function(ev){var as=box.querySelectorAll("a"); if(ev.key==="ArrowDown"||ev.key==="ArrowUp"){ev.preventDefault(); if(!as.length)return; sel=(sel+(ev.key==="ArrowDown"?1:-1)+as.length)%as.length; as.forEach(function(a,i){a.classList.toggle("sel",i===sel)}); as[sel].scrollIntoView({block:"nearest"})}
+      else if(ev.key==="Enter"&&sel>=0&&as[sel]){ev.preventDefault(); location.href=as[sel].href} else if(ev.key==="Escape"){box.hidden=true}});
+    document.addEventListener("click",function(ev){if(!form.contains(ev.target))box.hidden=true});
+    document.addEventListener("keydown",function(ev){if(ev.key==="/"&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){ev.preventDefault(); inp.focus()}});
   }
   // GET /api/<name>?..., cached in sessionStorage for 30 min so page hops don't re-hit the Worker.
   function api(name,params){
@@ -71,5 +106,5 @@ window.MU=(function(){
       '<div class="rg"><div><h4>How it went</h4>'+(tl?'<ul class="tl">'+tl+'</ul>':'<p class="sub">No goals.</p>')+'</div><div><h4>Stood out</h4>'+(stars.length?'<ul class="stars">'+stars.map(function(p){var g=p.statistics[0]; return '<li><img src="/img/player/'+p.player.id+'.png" alt="" onerror="this.style.visibility=\'hidden\'"><span><a class="pl" href="/manutd/player/?q='+encodeURIComponent(p.player.name)+'">'+esc(p.player.name)+'</a><small>'+g.games.minutes+'′'+(g.goals.total?' · '+g.goals.total+' goal'+(g.goals.total>1?'s':''):'')+(g.goals.assists?' · '+g.goals.assists+' assist'+(g.goals.assists>1?'s':''):'')+(g.goals.saves?' · '+g.goals.saves+' saves':'')+'</small></span><b>'+(+g.games.rating).toFixed(1)+'</b></li>'}).join("")+'</ul>':'<p class="sub">Ratings not published for this match.</p>')+'</div></div>'+(opt.link!==false?'<p class="sub" style="margin-top:8px"><a href="/manutd/match/?id='+f.fixture.id+'">Full match centre →</a></p>':'')+'</div>'}
   function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
   function formHtml(str){return '<span class="form">'+String(str||"").split("").map(function(c){return '<b class="'+c+'">'+c+'</b>'}).join("")+'</span>'}
-  return {TEAM:TEAM,nav:nav,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,esc:esc,form:formHtml};
+  return {TEAM:TEAM,nav:nav,search:search,hit:hit,KIND:KIND,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,esc:esc,form:formHtml};
 })();

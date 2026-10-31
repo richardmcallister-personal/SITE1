@@ -1,0 +1,45 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · Search</title>
+<link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>
+.big{display:flex;gap:8px;margin:0 0 14px} .big input{flex:1;font:inherit;font-size:18px;padding:10px 14px;border:2px solid var(--ink);outline:none} .big input:focus{border-color:var(--red)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px} .filters button{font:inherit;font-size:13px;padding:6px 12px;border:1px solid var(--rule);background:#fff;cursor:pointer} .filters button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)} .filters button small{color:inherit;opacity:.7;margin-left:4px}
+.res a{display:grid;grid-template-columns:100px 1fr;gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--rule);color:var(--ink);text-decoration:none} .res a:hover .t{text-decoration:underline}
+.res .k{font-family:var(--head);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding-top:3px} .res .t{font-weight:600;font-size:16px} .res .t small{display:block;font-weight:400;color:var(--muted);font-size:13px} .res mark{background:#fff0a8;color:inherit}
+@media (max-width:640px){.res a{grid-template-columns:80px 1fr}}
+</style>
+</head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Players, managers, clubs, seasons, kits, grounds</small>Manchester<br>United</h1></a>
+  <div class="from">Search<span id="from">Everything on the site</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+<div class="sheet">
+  <form class="big" id="f" role="search"><input id="q" type="search" name="q" placeholder="Try “Keane”, “Liverpool”, “1999”, “away kit 1990”, “Anfield”" aria-label="Search" autofocus autocomplete="off"></form>
+  <div class="filters" id="filters"></div>
+  <p class="sub" id="note" style="margin:0 0 8px"></p>
+  <div class="res" id="res"></div>
+</div>
+<footer class="mu"><span id="stamp"></span> The index covers every page and deep link on the site: players from the squad lists and finals, managers, clubs, seasons, kits, grounds, the bookshelf and the classic matches. Press <kbd>/</kbd> anywhere on the site to jump to the search box.</footer>
+</div>
+<script src="/manutd/mu.js"></script>
+<script>
+(function(){
+  MU.nav(""); MU.checked("search",document.getElementById("stamp"),"Index built"); var $=function(i){return document.getElementById(i)}, kind="all", LAST=[], q0=new URLSearchParams(location.search).get("q")||"";
+  $("q").value=q0; var navIn=document.querySelector("nav.munav .musearch"); if(navIn)navIn.style.display="none";
+  function render(){
+    var list=kind==="all"?LAST:LAST.filter(function(e){return e.k===kind}), q=$("q").value.trim();
+    var counts={}; LAST.forEach(function(e){counts[e.k]=(counts[e.k]||0)+1});
+    $("filters").innerHTML=LAST.length?'<button data-k="all" aria-pressed="'+(kind==="all")+'">All<small>'+LAST.length+'</small></button>'+Object.keys(counts).sort(function(a,b){return counts[b]-counts[a]}).map(function(k){return '<button data-k="'+k+'" aria-pressed="'+(kind===k)+'">'+(MU.KIND[k]||k)+'<small>'+counts[k]+'</small></button>'}).join(""):"";
+    $("note").textContent=q.length<2?"Type at least two characters.":LAST.length?list.length+" result"+(list.length===1?"":"s")+" for “"+q+"”":"Nothing matches “"+q+"”. Names are matched as written on Wikipedia; try a surname on its own.";
+    $("res").innerHTML=list.map(function(e){return MU.hit(e,q)}).join("");
+    history.replaceState(null,"","?q="+encodeURIComponent(q)); document.title="Manchester United · Search"+(q?" · "+q:"");
+  }
+  function go(){var q=$("q").value.trim(); if(q.length<2){LAST=[]; render(); return} MU.search(q,200).then(function(l){LAST=l; if(!l.some(function(e){return e.k===kind}))kind="all"; render()})}
+  $("q").addEventListener("input",go); $("f").addEventListener("submit",function(e){e.preventDefault(); go()});
+  $("filters").addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; kind=b.dataset.k; render()});
+  go();
+})();
+</script></body></html>
