@@ -54,9 +54,11 @@ export default {
     const WIKI = /(^|\.)manutd\.wiki$/.test(url.hostname);
     if (url.hostname === "www.manutd.wiki") return Response.redirect("https://manutd.wiki" + url.pathname + url.search, 301);
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + (WIKI ? "/trips/" : "/manutd/trips/"), 301);
+    const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|wiki-rev|wiki-page|collection|cover|push)(\/|$)/;
+    // Preview deployments (dev.manutd.wiki) carry no key, KV or crons: every data call goes to the live Worker.
+    if (env.UPSTREAM && SERVICE.test(url.pathname)) return fetch(new Request(env.UPSTREAM + url.pathname + url.search, request));
     if (WIKI) {
       // Clean URLs on the club domain: the site lives under /manutd/ in the repo; serve it at the root here.
-      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|wiki-rev|wiki-page|collection|cover|push)(\/|$)/;
       if (url.pathname.startsWith("/manutd/")) return Response.redirect(url.origin + url.pathname.slice(7) + url.search, 301);
       if (!SERVICE.test(url.pathname)) {
         const inner = new URL(url.toString()); inner.pathname = "/manutd" + (url.pathname === "/" ? "/" : url.pathname);
