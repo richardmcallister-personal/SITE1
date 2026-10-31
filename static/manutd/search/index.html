@@ -48,6 +48,7 @@
 .res a{display:grid;grid-template-columns:100px 1fr;gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--rule);color:var(--ink);text-decoration:none} .res a:hover .t{text-decoration:underline}
 .res .k{font-family:var(--head);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);padding-top:3px} .res .t{font-weight:600;font-size:16px} .res .t small{display:block;font-weight:400;color:var(--muted);font-size:13px} .res mark{background:#fff0a8;color:inherit}
 @media (max-width:640px){.res a{grid-template-columns:80px 1fr}}
+.res h2.grp{font-family:var(--head);font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin:18px 0 6px;padding:0;border:0} .res h2.grp:first-child{margin-top:4px} .res h2.grp small{color:var(--muted);font-weight:400;letter-spacing:0}
 </style>
 </head><body><div class="wrap">
 <header class="mu">
@@ -69,14 +70,16 @@
   MU.nav(""); MU.checked("search",document.getElementById("stamp"),"Index built"); var $=function(i){return document.getElementById(i)}, kind="all", LAST=[], q0=new URLSearchParams(location.search).get("q")||"";
   $("q").value=q0; var navIn=document.querySelector("nav.munav .musearch"); if(navIn)navIn.style.display="none";
   function render(){
-    var list=kind==="all"?LAST:LAST.filter(function(e){return e.k===kind}), q=$("q").value.trim();
-    var counts={}; LAST.forEach(function(e){counts[e.k]=(counts[e.k]||0)+1});
-    $("filters").innerHTML=LAST.length?'<button data-k="all" aria-pressed="'+(kind==="all")+'">All<small>'+LAST.length+'</small></button>'+Object.keys(counts).sort(function(a,b){return counts[b]-counts[a]}).map(function(k){return '<button data-k="'+k+'" aria-pressed="'+(kind===k)+'">'+(MU.KIND[k]||k)+'<small>'+counts[k]+'</small></button>'}).join(""):"";
-    $("note").textContent=q.length<2?"Type at least two characters.":LAST.length?list.length+" result"+(list.length===1?"":"s")+" for “"+q+"”":"Nothing matches “"+q+"”. Names are matched as written on Wikipedia; try a surname on its own.";
-    $("res").innerHTML=list.map(function(e){return MU.hit(e,q)}).join("");
+    var q=$("q").value.trim(), grp=function(e){return MU.GROUP[e.k]||"Other"};
+    var counts={}; LAST.forEach(function(e){var g=grp(e); counts[g]=(counts[g]||0)+1});
+    var groups=MU.GORDER.filter(function(g){return counts[g]}).concat(Object.keys(counts).filter(function(g){return MU.GORDER.indexOf(g)<0}));
+    $("filters").innerHTML=LAST.length?'<button data-k="all" aria-pressed="'+(kind==="all")+'">All<small>'+LAST.length+'</small></button>'+groups.map(function(g){return '<button data-k="'+g+'" aria-pressed="'+(kind===g)+'">'+g+'<small>'+counts[g]+'</small></button>'}).join(""):"";
+    var shown=kind==="all"?groups:groups.filter(function(g){return g===kind}), total=0;
+    $("res").innerHTML=shown.map(function(g){var list=LAST.filter(function(e){return grp(e)===g}); total+=list.length; return '<h2 class="grp">'+g+' <small>'+list.length+'</small></h2>'+list.map(function(e){return MU.hit(e,q)}).join("")}).join("");
+    $("note").textContent=q.length<2?"Type at least two characters.":LAST.length?total+" result"+(total===1?"":"s")+" for “"+q+"”"+(kind==="all"?", grouped":""):"Nothing matches “"+q+"”. Names are matched as written on Wikipedia; try a surname on its own.";
     history.replaceState(null,"","?q="+encodeURIComponent(q)); document.title="Manchester United · Search"+(q?" · "+q:"");
   }
-  function go(){var q=$("q").value.trim(); if(q.length<2){LAST=[]; render(); return} MU.search(q,200).then(function(l){LAST=l; if(!l.some(function(e){return e.k===kind}))kind="all"; render()})}
+  function go(){var q=$("q").value.trim(); if(q.length<2){LAST=[]; render(); return} MU.search(q,200).then(function(l){LAST=l; if(!l.some(function(e){return (MU.GROUP[e.k]||"Other")===kind}))kind="all"; render()})}
   $("q").addEventListener("input",go); $("f").addEventListener("submit",function(e){e.preventDefault(); go()});
   $("filters").addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; kind=b.dataset.k; render()});
   go();

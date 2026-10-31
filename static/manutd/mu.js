@@ -32,7 +32,7 @@ window.MU=(function(){
     document.body.appendChild(t);
   }
   // ---- Site search: /manutd/search.json is [title, kind, url, subtitle, aliases]; loaded on first keystroke, matched client-side.
-  var IDX=null, KIND={player:"Player",manager:"Manager",club:"Club",season:"Season",kit:"Kit",ground:"Ground",book:"Book",doc:"Documentary",film:"Film",pod:"Podcast",match:"Match",page:"Section"};
+  var IDX=null, GROUP={player:"Players",manager:"Managers",club:"Clubs",season:"Seasons",match:"Matches",kit:"Kits",ground:"Grounds",book:"Media",doc:"Media",film:"Media",pod:"Media",page:"Sections"}, GORDER=["Players","Managers","Clubs","Seasons","Matches","Media","Kits","Grounds","Sections"], KIND={player:"Player",manager:"Manager",club:"Club",season:"Season",kit:"Kit",ground:"Ground",book:"Book",doc:"Documentary",film:"Film",pod:"Podcast",match:"Match",page:"Section"};
   function fold(t){return String(t||"").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/æ/g,"ae").replace(/ø/g,"o").replace(/ß/g,"ss").replace(/[đð]/g,"d").replace(/ł/g,"l").replace(/þ/g,"th").replace(/[’']/g,"").replace(/[–—]/g,"-")}
   function loadIndex(){return IDX||(IDX=fetch("/manutd/search.json").then(function(r){return r.json()}).then(function(j){return j.map(function(e){return {t:e[0],k:e[1],u:e[2],s:e[3]||"",a:e[4]||[],f:fold(e[0]),fa:(e[4]||[]).map(fold),fs:fold(e[3]||"")}})}))}
   function search(q,n){
@@ -46,7 +46,11 @@ window.MU=(function(){
           else if(e.fa.some(function(a){return a===t}))w=80; else if(e.fa.some(function(a){return a.indexOf(t)>=0}))w=35;
           else if(e.fs.indexOf(t)>=0)w=10;
           if(!w){sc=0;break} sc+=w}
-        if(sc){ if(e.k==="player"||e.k==="manager"||e.k==="club")sc+=15; else if(e.k==="season"||e.k==="ground")sc+=8; if(e.k==="kit")sc-=8; out.push({e:e,sc:sc}) }
+        if(sc){ var person=e.k==="player"||e.k==="manager";
+          // a person's surname typed on its own is as good as an exact title ("rooney" → Wayne Rooney before the documentary)
+          if(person&&terms.length===1&&e.f.split(/[\s,]+/).indexOf(terms[0])>=0)sc=Math.max(sc,100);
+          if(person)sc+=35; else if(e.k==="club")sc+=15; else if(e.k==="season"||e.k==="ground")sc+=8; else if(e.k==="kit")sc-=8; else if(/^(book|doc|film|pod)$/.test(e.k))sc-=10;
+          out.push({e:e,sc:sc}) }
       });
       out.sort(function(a,b){return b.sc-a.sc||a.e.t.length-b.e.t.length||a.e.t.localeCompare(b.e.t)});
       return out.slice(0,n||8).map(function(x){return x.e});
@@ -72,7 +76,7 @@ window.MU=(function(){
     var url="/api/"+name+q, key="mu:"+url;
     try{var c=JSON.parse(sessionStorage.getItem(key)||"null"); if(c&&Date.now()-c.t<18e5)return Promise.resolve(c.v)}catch(e){}
     if(api._inflight[url])return api._inflight[url];
-    return api._inflight[url]=fetch(url).then(function(r){return r.json()}).then(function(j){
+    return api._inflight[url]=fetch(url).then(function(r){var age=parseInt(r.headers.get("x-age")||"0",10)||0; return r.json().then(function(j){if(j&&typeof j==="object")j._fetched=Date.now()-age*1000; return j})}).then(function(j){
       if(j.errors&&Object.keys(j.errors).length){var e=new Error(JSON.stringify(j.errors)); e.api=true; throw e}
       if(j.message)throw Object.assign(new Error(j.message),{api:true});
       try{sessionStorage.setItem(key,JSON.stringify({t:Date.now(),v:j}))}catch(e){}
@@ -159,6 +163,19 @@ window.MU=(function(){
     el.addEventListener("click",function(ev){var a=ev.target.closest("a"); if(!a)return; var id=a.getAttribute("data-t"); if(phone()){ev.preventDefault(); show(id,true); window.scrollTo({top:0,behavior:"smooth"})} else show(id,false)});
     window.addEventListener("hashchange",function(){var id=location.hash.slice(1); if(items.some(function(i){return i.id===id}))show(id,false)});
     if(!phone())pills(el,items)}
+  // Team news from the injuries feed, reconciled. The feed lists a player once per fixture he was flagged for and the order is
+  // not by date, so the newest flag per player wins; a player who then started or came on in a match played on or after his
+  // flag is "back" (with the minute), not injured. Returns {list, out, doubts, back, asOf, fetched}.
+  function injuries(j,matches){var rows=(j&&j.response||[]).filter(function(x){return x.player&&x.fixture&&x.fixture.date}).sort(function(a,b){return b.fixture.date.localeCompare(a.fixture.date)});
+    var seen={}, list=[]; rows.forEach(function(x){if(seen[x.player.id])return; seen[x.player.id]=1; list.push(x)});
+    var cut=Date.now()-7*864e5; list=list.filter(function(x){return new Date(x.fixture.date)>cut});
+    (matches||[]).forEach(function(f){if(!f||!f.fixture)return; var d=f.fixture.date, on={};
+      (f.lineups||[]).forEach(function(l){if(l.team.id!==TEAM)return; (l.startXI||[]).forEach(function(p){on[p.player.id]="started"})});
+      (f.events||[]).forEach(function(e){if(e.type==="subst"&&e.team.id===TEAM&&e.assist&&e.assist.id)on[e.assist.id]="came on "+e.time.elapsed+"'"});
+      list.forEach(function(x){if(on[x.player.id]&&d>=x.fixture.date.slice(0,10)){var opp=f.teams.home.id===TEAM?f.teams.away.name:f.teams.home.name; x.back={what:on[x.player.id],opp:opp,date:d}}})});
+    var out=list.filter(function(x){return !x.back&&/Missing/i.test(x.player.type||"")}), doubts=list.filter(function(x){return !x.back&&!/Missing/i.test(x.player.type||"")}), back=list.filter(function(x){return x.back});
+    return {list:list.filter(function(x){return !x.back}),out:out,doubts:doubts,back:back,asOf:list.length?list[0].fixture.date:null,fetched:j&&j._fetched||null}}
+  function ago(t){if(!t)return ""; var m=Math.round((Date.now()-t)/60000); if(m<1)return "just now"; if(m<60)return m+" min ago"; var h=Math.round(m/60); if(h<48)return h+" h ago"; return Math.round(h/24)+" days ago"}
   function scorers(sc){if(!sc||!sc.length)return ""; return sc.map(function(x){var fl=x[3]||"", og=fl.indexOf("o")>=0; return (x[1]&&!og?'<a class="pl" href="/manutd/player/?p='+encodeURIComponent(x[1])+'">'+esc(x[0])+'</a>':esc(x[0]))+(x[2]>1?' '+x[2]:'')+(fl.indexOf("p")>=0?' <i>pen</i>':'')+(og?' <i>og</i>':'')}).join(", ")}
   // links for an archived match row: the site's match centre (feed id, 2010/11 on), the match report the season article cites, else the season article itself
   function mlinks(m){var out=[]; if(m.id)out.push('<a class="chip" href="/manutd/match/?id='+m.id+'">Match centre</a>');
@@ -167,5 +184,5 @@ window.MU=(function(){
     return out.join("")}
   function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
   function formHtml(str){return '<span class="form">'+String(str||"").split("").map(function(c){return '<b class="'+c+'">'+c+'</b>'}).join("")+'</span>'}
-  return {TEAM:TEAM,nav:nav,theme:theme,pills:pills,tabs:tabs,scorers:scorers,goalEvents:goalEvents,mlinks:mlinks,search:search,hit:hit,KIND:KIND,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,fmtLocal:fmtLocal,fmtKO:fmtKO,fmtKOText:fmtKOText,TZ:TZ,IN_UK:IN_UK,esc:esc,form:formHtml};
+  return {TEAM:TEAM,nav:nav,theme:theme,injuries:injuries,ago:ago,GROUP:GROUP,GORDER:GORDER,pills:pills,tabs:tabs,scorers:scorers,goalEvents:goalEvents,mlinks:mlinks,search:search,hit:hit,KIND:KIND,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,fmtLocal:fmtLocal,fmtKO:fmtKO,fmtKOText:fmtKOText,TZ:TZ,IN_UK:IN_UK,esc:esc,form:formHtml};
 })();

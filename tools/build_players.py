@@ -10,6 +10,10 @@ def slug(t):
     return re.sub(r'[^a-z0-9]+', '-', unicodedata.normalize('NFKD', t).encode('ascii', 'ignore').decode()).strip('-')
 # matches: date -> match (archive + cups + live seasons)
 M = {}
+GAPS = {}   # season id -> archive rows where United scored but no scorers are recorded
+for f in sorted(glob.glob(H + '/data/*.json')):
+    _s = os.path.basename(f)[:-5]; _d = json.load(open(f)); _rows = _d['results'] if isinstance(_d, dict) else _d
+    GAPS[_s] = [r for r in _rows if r.get('gf', 0) > 0 and not r.get('sc')]
 for f in sorted(glob.glob(H + '/data/*.json')):
     d = json.load(open(f))
     for m in d['results']: M[m['d']] = dict(m, s=d['id'], div=d['div'] if m['c'] == 'L' else 'FA Cup')
@@ -58,9 +62,11 @@ for p in P.values():
     p['managers'] = [dict(name=m['name'], slug=m['slug'], role=m['role']) for m in MG if m['from'] and m['from'] <= hi and (m['to'] is None or m['to'] >= lo)]
     p['goals'].sort(key=lambda g: g['d']); p['finals'].sort(key=lambda f: f['d'])
     p['total_goals'] = sum(g['g'] for g in p['goals']); p['hat_tricks'] = [g for g in p['goals'] if g['g'] >= 3]
+    # scoring matches in the player's United seasons with no scorer recorded: the goal total can be short by that many
+    p['gaps'] = [dict(s=s, d=r['d'], o=r['o'], gf=r['gf']) for s in sorted(p['seasons']) for r in GAPS.get(s, [])]
     p['apps'] = (sum(r.get('apps', 0) for r in p['seasons'].values()) or None) if p['first'] >= '1993-94' else None   # squad lists start 1993/94, so earlier careers have no full apps figure
     dump(p, os.path.join(OUT, p['slug'] + '.json'))
-index = [dict(t=p['title'], n=p['name'], slug=p['slug'], g=p['total_goals'], apps=p['apps'], first=p.get('first'), last=p.get('last'), ht=len(p['hat_tricks']), seasons=len(p['seasons']) or len({g['s'] for g in p['goals']})) for p in P.values() if p.get('first')]
+index = [dict(t=p['title'], n=p['name'], slug=p['slug'], g=p['total_goals'], gaps=len(p['gaps']) or None, apps=p['apps'], first=p.get('first'), last=p.get('last'), ht=len(p['hat_tricks']), seasons=len(p['seasons']) or len({g['s'] for g in p['goals']})) for p in P.values() if p.get('first')]
 index.sort(key=lambda r: (-r['g'], r['t'])); dump(index, os.path.join(H, "players_index.json"))
 # tidy: remove files for players no longer present
 have = {p['slug'] for p in P.values()}

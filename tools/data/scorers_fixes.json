@@ -1,0 +1,53 @@
+{
+"_note": "Hand-checked scorers for archive rows whose date differs from the season article's by a day or two, so the parser cannot match them. Keyed by the archive date; same shape as sc. Merged by build_scorers.py after parsing.",
+"1959-02-14": [
+[
+"Bradley",
+"Warren Bradley (footballer)",
+2,
+""
+],
+[
+"Goodwin",
+"Freddie Goodwin",
+1,
+""
+],
+[
+"Scanlon",
+"Albert Scanlon",
+1,
+""
+]
+],
+"1961-01-16": [
+[
+"Pearson",
+"Mark Pearson (footballer)",
+1,
+""
+],
+[
+"Stiles",
+"Nobby Stiles",
+1,
+""
+]
+],
+"1986-10-26": [
+[
+"Stapleton",
+"Frank Stapleton",
+1,
+""
+]
+],
+"1987-10-25": [
+[
+"Gibson",
+"Colin Gibson (footballer, born 1960)",
+1,
+""
+]
+]
+}

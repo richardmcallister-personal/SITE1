@@ -79,6 +79,8 @@ for y in YEARS:
     except Exception as e: print("no article", y, e); continue
     if not isinstance(wt, str): continue
     REPS.clear(); r = {d: v for d, v in parse(wt).items() if d in M}; keep.update(r); reps.update({d: u for d, u in REPS.items() if d in M}); done.append(T); print(y, len(r), "matches with scorers"); time.sleep(0.3)
+FX = os.path.join(ROOT, "tools", "data", "scorers_fixes.json")   # hand-checked rows the parser cannot match (date off by a day or two)
+if os.path.exists(FX): keep.update({d: v for d, v in json.load(open(FX)).items() if d in M})
 save_revs(STATE, revs, done); json.dump(dict(sorted(reps.items())), open(RP, 'w'), indent=0)
 # the live feed covers 2025/26 on through the events route — not duplicated here
 dump(dict(sorted(keep.items())), OUT)
