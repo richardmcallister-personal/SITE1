@@ -41,28 +41,11 @@
 
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
 <style>
+.wrap{--good:var(--ink);--warn:var(--red);--bad:var(--red)}
 /* Layout: a matchday programme — one fixture rail on top, then a two-column decision sheet (your trip and costs | the oracle's reading). */
 /* Layout: Stretford End — solid red page, white playing surface, black ticker; Anton display, Archivo body. */
-:root{
-  --bg:#da020e; --paper:#ffffff; --ink:#111111; --muted:#5a5a5a; --rule:#dcdcdc;
-  --red:#da020e; --red-ink:#ffffff; --black:#111111; --good:#111111; --warn:#da020e; --bad:#da020e; --tint:#f2f2f2;
-  --display:Anton,Impact,"Arial Narrow",sans-serif; --body:Archivo,"Segoe UI",Helvetica,Arial,sans-serif;
-}
-*{box-sizing:border-box}
-body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;margin:0;
-  padding-block:0 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.wrap{max-width:1080px;margin:0 auto}
-header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:18px;padding-block:26px 18px;color:#fff}
-.brand{display:flex;align-items:center;gap:18px;min-width:0}
-.brand img{width:96px;height:auto;flex:0 0 auto}
-@media (max-width:480px){.brand img{width:64px}}
-h1{font-family:var(--display);font-weight:400;font-size:clamp(44px,7.5vw,84px);line-height:.9;margin:0;letter-spacing:.01em;text-transform:uppercase;text-wrap:balance;color:#fff}
-h1 small{display:block;font-family:var(--body);font-size:.2em;letter-spacing:.22em;color:#fff;opacity:.85;font-weight:500;margin-bottom:6px}
-.from{font-family:var(--body);font-weight:500;font-size:14px;letter-spacing:.14em;line-height:1.15;text-transform:uppercase;color:#fff;text-align:right}
-.from span{display:block;font-family:var(--body);font-size:13px;text-transform:none;opacity:.9;margin-top:6px}
-h2{font-family:var(--body);font-weight:600;font-size:15px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink);margin:0 0 10px;border-bottom:2px solid var(--ink);padding-bottom:6px;display:inline-block}
-.wrap > h2, .panel > h2{color:var(--ink);border-bottom-color:var(--ink)}
 .rail{display:flex;gap:0;overflow-x:auto;padding-block:0;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;background:var(--black);margin-top:10px}
 .fx{flex:0 0 200px;height:156px;display:flex;flex-direction:column;scroll-snap-align:start;text-align:left;background:var(--black);border:0;border-right:1px solid #333;border-radius:0;padding:12px 14px 12px;cursor:pointer;color:#fff;font:inherit;overflow:hidden}
 .fx:hover{background:#222} .fx[aria-pressed="true"]{background:#fff;color:var(--ink)}
@@ -129,7 +112,7 @@ input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{ou
 button.btn,.bookrow a.btn{font-family:var(--body);font-weight:600;font-size:13px;letter-spacing:.12em;text-transform:uppercase;background:var(--black);color:#fff;border:0;border-radius:0;padding:9px 14px;cursor:pointer}
 button.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--ink)}
 .note{font-size:13px;color:var(--muted);margin:14px 0 0;max-width:70ch}
-.pick{display:flex;gap:8px;align-items:center;min-width:0}
+.pick{display:flex;flex-wrap:nowrap;gap:8px;align-items:center;min-width:0;margin:0}
 .pick select{flex:1 1 auto;min-width:0}
 a.book{flex:0 0 auto;font-family:var(--body);font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#fff;background:var(--red);text-decoration:none;border-radius:0;padding:8px 12px;white-space:nowrap}
 a.book[aria-disabled="true"]{opacity:.4;pointer-events:none}
@@ -144,22 +127,17 @@ a.book[aria-disabled="true"]{opacity:.4;pointer-events:none}
 .viewer-fallback{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:18px;text-align:center;font-size:14px;color:#ddd}
 .viewer.failed .viewer-fallback{display:flex}
 .viewer.failed iframe{visibility:hidden}
-footer{margin-top:28px;font-size:13px;color:#fff;opacity:.9;max-width:80ch}
 .prov{display:inline-block;font-family:var(--body);font-weight:600;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#7a5a00;background:#fff4c2;border:1px solid #e6c84a;border-radius:3px;padding:0 5px;margin-left:4px;vertical-align:middle}
 
-nav.munav{display:flex;gap:0;background:#111;overflow-x:auto;margin:0}
-nav.munav a{flex:1 0 auto;font-family:var(--body);font-weight:500;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#fff;text-decoration:none;padding:12px 18px;border-right:1px solid #333;white-space:nowrap;text-align:center}
-nav.munav a:hover{background:#222} nav.munav a[aria-current="page"]{background:#fff;color:var(--ink)}
-header .brand a{color:#fff;text-decoration:none}
-small.tz{display:block;font-size:11px;color:var(--muted,#666);letter-spacing:.02em;font-weight:400} small.tz.inl{display:inline;margin-left:5px}
+.rail{border-radius:var(--radius);overflow:hidden;margin-top:12px} .sheet{margin-top:12px} .verdict{border-radius:var(--radius)} .viewer{border-radius:var(--radius)} .total{border-radius:8px} input,select{border-radius:8px} .fx{background:var(--black);color:var(--on-black)} .fx .d,.fx .k{color:var(--muted-on-black)} .fx[aria-pressed="true"]{background:var(--paper);color:var(--ink)} .total{background:var(--black);color:var(--on-black)} .stat:nth-child(2){background:var(--black);color:var(--on-black)} .dot.good{background:var(--ink)} .awayTickets a{background:var(--tint);color:var(--ink)} .awayTickets a:hover{background:var(--rule)} .viewer-fallback{color:var(--muted)}
 </style>
 
 </head><body><a class="skip" href="#main-content">Skip to main content</a><div class="wrap">
-<header>
-  <div class="brand"><img src="/manutd/assets/crest-88.webp" srcset="/manutd/assets/crest-44.webp 44w, /manutd/assets/crest-88.webp 88w, /manutd/assets/crest-132.webp 132w" sizes="44px" alt="Manchester United crest" width="44" height="45" decoding="async"><h1><small>Trip planner · home and away</small><a href="/manutd/">Manchester<br>United</a></h1></div>
-  <div class="from">Tickets · flights<br>· hotels<span>Vellinge → CPH → MAN · GBP · kick-offs in your time</span></div>
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest-88.webp" srcset="/manutd/assets/crest-44.webp 44w, /manutd/assets/crest-88.webp 88w, /manutd/assets/crest-132.webp 132w" sizes="44px" alt="Manchester United crest" width="44" height="45" decoding="async"><h1><small id="eyebrow">Trip planner · home and away</small>Manchester<br>United</h1></a>
+  <div class="from" id="from">Tickets · flights · hotels<span>Vellinge → CPH → MAN · GBP · kick-offs in your time</span></div>
 </header>
-<nav class="munav" aria-label="Sections"><a href="/manutd/">Hub</a><a href="/manutd/trips/" aria-current="page">Trips</a><a href="/manutd/season/">Season</a><a href="/manutd/squad/">Squad</a><a href="/manutd/youth/">Academy</a><a href="/manutd/kits/">Shirts</a><a href="/manutd/history/">History</a><a href="/manutd/links/">Links</a></nav>
+<nav class="munav" aria-label="Sections"></nav>
 <main id="main-content" tabindex="-1">
 
 <h2 style="margin-top:22px">Pick a fixture</h2>
@@ -226,9 +204,10 @@ small.tz{display:block;font-size:11px;color:var(--muted,#666);letter-spacing:.02
 
 </div>
 
-<footer>Away fixtures, allocations and ballot dates read from the away-tickets page on tickets.manutd.com on 29 Oct 2026; away kick-off dates are the TV-selected ones and may still move. Home fixtures, kick-offs and seat availability read from tickets.manutd.com on 29 Oct 2026 (1 adult, logged in as an Official Member); blocks sell out and get released, so check before booking. Flight and hotel prices were checked on SlickTrip on 29 Oct 2026 for 1 adult and will have moved; round-trip fares are "from" prices pairing the named outbound with its cheapest return. Hotels are 4-star and up only (Hotel Football, the Marriott family, the high-end city hotels and those near the ground); prices are for the exact fixture night, cheapest room, 1 adult, and the hotel's own page shows the live rate and all sellers. Weather is the Open-Meteo forecast inside 16 days, otherwise Manchester's seasonal averages. Hosted versions of this page fetch live weather; some embedded viewers block it.</footer>
+<footer class="mu">Away fixtures, allocations and ballot dates read from the away-tickets page on tickets.manutd.com on 29 Oct 2026; away kick-off dates are the TV-selected ones and may still move. Home fixtures, kick-offs and seat availability read from tickets.manutd.com on 29 Oct 2026 (1 adult, logged in as an Official Member); blocks sell out and get released, so check before booking. Flight and hotel prices were checked on SlickTrip on 29 Oct 2026 for 1 adult and will have moved; round-trip fares are "from" prices pairing the named outbound with its cheapest return. Hotels are 4-star and up only (Hotel Football, the Marriott family, the high-end city hotels and those near the ground); prices are for the exact fixture night, cheapest room, 1 adult, and the hotel's own page shows the live rate and all sellers. Weather is the Open-Meteo forecast inside 16 days, otherwise Manchester's seasonal averages. Hosted versions of this page fetch live weather; some embedded viewers block it.</footer>
 </div>
 
+<script src="/manutd/mu.js"></script><script>MU.nav("Trips");</script>
 <script src="/manutd/fixtures.js"></script><script>
 (function(){
 // ---- data -------------------------------------------------------------

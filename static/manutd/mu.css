@@ -8,7 +8,7 @@
 body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;margin:0;padding:0 max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
 .wrap{max-width:1080px;margin:0 auto}
 /* The red band: header and nav share it, full-bleed on a grey ground */
-header.mu{background:var(--red);box-shadow:0 0 0 100vmax var(--red);clip-path:inset(0 -100vmax)} nav.munav{background:var(--red);box-shadow:0 0 0 100vmax var(--red);clip-path:inset(0 -100vmax -100vh -100vmax)}
+header.mu,nav.munav{position:relative;z-index:20;background:transparent} header.mu::before,nav.munav::before{content:"";position:absolute;top:0;bottom:0;left:-100vmax;right:-100vmax;background:var(--red);z-index:-1}
 header.mu{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;padding:16px 0 6px;color:#fff}
 .brand{display:flex;align-items:center;gap:12px;min-width:0;color:#fff;text-decoration:none}
 .brand img{width:44px;height:auto;flex:0 0 auto}

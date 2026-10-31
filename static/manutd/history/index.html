@@ -44,10 +44,11 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
 <link rel="stylesheet" href="/manutd/mu.css">
 <style>
-.honours{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px}
-.honours div{background:var(--black);color:var(--on-black);padding:14px 16px}
+.honours{display:grid;grid-template-columns:repeat(auto-fit,minmax(124px,1fr));grid-auto-rows:1fr;gap:12px;margin-top:12px}
+@media (max-width:640px){.honours{grid-template-columns:repeat(2,1fr);gap:8px}}
+.honours div{background:var(--black);color:var(--on-black);padding:14px 16px;border-radius:var(--radius);display:flex;flex-direction:column;justify-content:space-between;gap:8px}
 .honours b{display:block;font-family:var(--head);font-weight:300;font-size:46px;line-height:1}
-.honours span{font-family:var(--head);font-weight:500;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-on-black)}
+.honours span{font-family:var(--head);font-weight:500;font-size:10px;letter-spacing:.1em;line-height:1.3;text-transform:uppercase;color:var(--muted-on-black)}
 .years{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}
 .years a,.years span{font-family:var(--head);font-weight:500;font-size:13px;letter-spacing:.02em;padding:4px 9px;background:var(--tint);color:var(--ink);text-decoration:none}
 .years a:hover{background:var(--black);color:var(--on-black)}
