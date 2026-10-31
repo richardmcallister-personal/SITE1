@@ -10,6 +10,10 @@
 .prof .nm{font-size:clamp(26px,4vw,40px);font-weight:600;line-height:1.05;margin:0 0 4px}
 .prof .desc{color:var(--muted);font-size:15px;margin:0 0 14px}
 .facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:4px;margin-bottom:16px}
+.h2h{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px;margin:0 0 14px} .h2h div{background:#fff;border:1px solid var(--rule);padding:10px;text-align:center} .h2h b{display:block;font-family:var(--head);font-weight:300;font-size:28px;line-height:1} .h2h span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)} .h2h small{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 14px} .chips a{border:1px solid var(--rule);padding:5px 10px;font-size:13px;color:var(--ink);text-decoration:none} .chips a small{color:var(--muted)}
+.gl{list-style:none;margin:0;padding:0;font-size:13px} .gl li{display:grid;grid-template-columns:86px 1fr auto;gap:10px;padding:5px 0;border-bottom:1px solid var(--rule)} .gl .d{color:var(--muted)} .gl .r{font-family:var(--head);font-size:15px;white-space:nowrap} .gl .sea{font-family:var(--head);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:12px 0 2px} .gl .ht{color:var(--red);font-weight:600}
+details.more summary{cursor:pointer;font-size:13px;color:var(--red);margin:6px 0}
 .facts div{background:var(--tint);padding:10px 12px} .facts .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:var(--muted)} .facts .v{font-size:15px;margin-top:2px}
 .lead{font-size:16px;line-height:1.6;max-width:78ch}
 table.mu td.yrs{white-space:nowrap;color:var(--muted)}
@@ -31,6 +35,15 @@ table.mu td.yrs{white-space:nowrap;color:var(--muted)}
   <p class="sub" style="margin:0 0 10px">Official channels only — searches open the club's and the national associations' own YouTube channels for this player.</p>
   <div class="mlinks" id="mlinks"></div>
   <div id="gallery"></div>
+</div>
+<div class="sheet" id="arch" hidden>
+  <h2>At United, from the archive</h2>
+  <p class="sub" id="archNote" style="margin:0 0 10px"></p>
+  <div class="h2h" id="archStats"></div>
+  <div class="cols">
+    <div><div id="archSeasons"></div><div id="archFinals"></div></div>
+    <div><div id="archMgrs"></div><div id="archGoals"></div></div>
+  </div>
 </div>
 <div class="sheet" id="career" style="display:none">
   <div class="cols">
@@ -74,14 +87,29 @@ table.mu td.yrs{white-space:nowrap;color:var(--muted)}
     var gal=(j.images||[]).filter(function(im){return im.thumb!==j.thumbnail});
     $("gallery").innerHTML=gal.length?'<h3>Photographs from the article</h3><div class="gal">'+gal.map(function(im){return '<a href="'+im.url+'" target="_blank" rel="noopener" title="'+MU.esc(im.title)+'"><img src="'+im.thumb+'" alt="" loading="lazy"></a>'}).join("")+'</div>':"";
     $("clubs").innerHTML='<p class="sub" style="margin:0 0 6px">Apps and goals in the club table are domestic league only (Wikipedia\'s convention); cups and Europe are not counted here.</p>'+table(b.clubs,["years","clubs","caps","goals"],["Years","Club","League apps","League goals"]);
-    // All-competitions totals for United from the season squad records (1993–94 onwards)
-    fetch("/manutd/numbers/numbers.json").then(function(r){return r.json()}).then(function(N){
-      var rows=[]; Object.keys(N).sort().forEach(function(sn){N[sn].forEach(function(x){if(x.title===j.title||x.name===name)rows.push(Object.assign({s:sn},x))})});
-      if(!rows.length)return;
-      var apps=rows.reduce(function(a,x){return a+x.apps},0), goals=rows.reduce(function(a,x){return a+x.goals},0), nums=rows.map(function(x){return x.no}).filter(function(v,i,a){return a.indexOf(v)===i});
-      var first=rows[0].s, last=rows[rows.length-1].s, covered=parseInt(first,10)>1993||!utd.length?"":(utd.some(function(r){return parseInt(r.years,10)<1993})?" · seasons before 1993–94 not counted":"");
-      $("clubs").insertAdjacentHTML("beforeend",'<div class="facts" style="margin-top:10px"><div><div class="k">United · all competitions</div><div class="v">'+apps+' apps, '+goals+' goals <small style="color:var(--muted)">('+first.replace("-","–")+(last!==first?' – '+last.replace("-","–"):'')+covered+')</small></div></div><div><div class="k">Shirt number'+(nums.length>1?'s':'')+'</div><div class="v">'+nums.map(function(n){return '<a class="pl" href="/manutd/numbers/?n='+n+'">'+n+'</a>'}).join(", ")+'</div></div></div>');
-    }).catch(function(){});
+    // Everything the site's own archive knows about him: seasons, numbers, every goal, finals, managers.
+    (function(){
+      var slug=j.title.toLowerCase().replace(/ø/g,"o").replace(/æ/g,"ae").replace(/ß/g,"ss").replace(/ł/g,"l").replace(/[đð]/g,"d").replace(/þ/g,"th").normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+      fetch("/manutd/history/players/"+slug+".json").then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(A){
+        var CN={L:"League",FAC:"FA Cup",LC:"League Cup",UCL:"Europe",UEL:"Europe",CWC:"Europe",SC:"Super Cup",ICC:"Intercontinental",CWCup:"Club World Cup",CS:"Shield",OTH:"Other"}, ORD=["L","FAC","LC","UCL","UEL","CWC","SC","ICC","CWCup","CS","OTH"];
+        var seasons=Object.keys(A.seasons).sort(), hasApps=seasons.some(function(k){return A.seasons[k].apps}), pens=A.goals.filter(function(g){return g.p}).length, starts=A.finals.filter(function(f){return f.start}).length;
+        var sp=function(x){return x.replace("-","–")}, fmt=function(d){return MU.fmtDate(d+"T12:00:00Z",{year:"numeric",weekday:undefined})};
+        $("arch").hidden=false;
+        $("archNote").textContent=(A.first?sp(A.first.slice(0,7)).replace(/-\d\d$/,"")+" to "+A.last.slice(0,4)+". ":"")+(hasApps?"Appearances from the season squad lists (1993/94 on); ":"Appearances before 1993/94 are not in the archive; ")+"goals from the match-by-match scorers in the season articles, all competitions, with the Shield included.";
+        var stats=["<b>"+(A.apps||"—")+"</b><span>Apps</span>"+(hasApps?"":"<small>not archived</small>"),"<b>"+A.total_goals+"</b><span>Goals</span>"+(pens?"<small>"+pens+" from the spot</small>":""),"<b>"+(seasons.length||Object.keys(A.goals.reduce(function(a,g){a[g.s]=1;return a},{})).length)+"</b><span>Seasons</span>",
+          A.hat_tricks.length?"<b>"+A.hat_tricks.length+"</b><span>Hat-tricks</span>":"", A.finals.length?"<b>"+starts+"</b><span>Finals started</span>"+(A.finals.length>starts?"<small>+"+(A.finals.length-starts)+" on the bench</small>":""):"", A.nos.length?"<b>"+A.nos.join(", ")+"</b><span>Shirt number"+(A.nos.length>1?"s":"")+"</span>":""].filter(Boolean);
+        $("archStats").innerHTML=stats.map(function(x){return "<div>"+x+"</div>"}).join("");
+        if(seasons.length){ var comps=[]; seasons.forEach(function(k){Object.keys(A.seasons[k].bycomp||{}).forEach(function(c){if(comps.indexOf(c)<0)comps.push(c)})}); comps.sort(function(a,b){return ORD.indexOf(a)-ORD.indexOf(b)});
+          $("archSeasons").innerHTML='<h3>Season by season</h3><table class="mu"><thead><tr><th>Season</th>'+(hasApps?'<th class="n">No.</th><th>Pos</th><th class="n">Apps</th>':'')+'<th class="n">Goals</th>'+comps.map(function(c){return '<th class="n">'+(CN[c]||c)+'</th>'}).join("")+'</tr></thead><tbody>'+seasons.map(function(k){var r=A.seasons[k]; return '<tr><td class="yrs"><a href="/manutd/history/season/?s='+k+'">'+sp(k)+'</a></td>'+(hasApps?'<td class="n">'+((r.no||[]).join(", ")||"—")+'</td><td>'+(r.pos||"")+'</td><td class="n">'+(r.apps!=null?r.apps:"—")+'</td>':'')+'<td class="n"><b>'+(r.goals||0)+'</b></td>'+comps.map(function(c){return '<td class="n">'+((r.bycomp||{})[c]||"")+'</td>'}).join("")+'</tr>'}).join("")+'</tbody></table>'}
+        if(A.finals.length)$("archFinals").innerHTML='<h3 style="margin-top:18px">Finals</h3><ul class="gl">'+A.finals.map(function(f){var res=f.gf>f.ga?"W":f.gf<f.ga?"L":"D"; return '<li><span class="d">'+f.d.slice(0,4)+'</span><span>'+MU.esc(f.comp)+' v '+MU.club(f.o)+' <small style="color:var(--muted)">'+(f.start?(f.no?"No. "+f.no+" · ":"")+MU.esc(f.pos||"")+(f.cap?" · captain":"")+(f.sub?" · off "+f.sub+"'":""):"bench"+(f.sub?" · on "+f.sub+"'":""))+'</small></span><span class="r">'+f.gf+'–'+f.ga+' '+MU.form(res)+'</span></li>'}).join("")+'</ul>';
+        if(A.managers.length)$("archMgrs").innerHTML='<h3>Played under</h3><div class="chips">'+A.managers.map(function(m){return '<a href="/manutd/manager/?m='+m.slug+'">'+MU.esc(m.name)+(m.role?' <small>('+MU.esc(m.role)+')</small>':'')+'</a>'}).join("")+'</div>';
+        if(A.goals.length){ var sea=null, out=''; A.goals.slice().reverse().forEach(function(g){ if(g.s!==sea){sea=g.s; out+='<li class="sea" style="display:block;border:0">'+sp(sea)+'</li>'} var res=g.gf>g.ga?"W":g.gf<g.ga?"L":"D"; out+='<li><span class="d">'+fmt(g.d)+'</span><span>'+(g.h?"v ":"at ")+MU.club(g.o)+' <small style="color:var(--muted)">'+(CN[g.c]||g.c)+'</small>'+(g.g>1?' <span class="ht">×'+g.g+'</span>':'')+(g.p?' <small style="color:var(--muted)">pen</small>':'')+'</span><span class="r">'+(g.id?'<a href="/manutd/match/?id='+g.id+'" style="color:inherit;text-decoration:none">':'')+g.gf+'–'+g.ga+(g.id?'</a>':'')+' '+MU.form(res)+'</span></li>'});
+          var ht=A.hat_tricks.length?'<p class="sub" style="margin:0 0 6px">Hat-tricks: '+A.hat_tricks.map(function(g){return (g.g>3?g.g+" v ":"v ")+g.o+" ("+g.s.replace("-","–")+")"}).join("; ")+'.</p>':'';
+          $("archGoals").innerHTML='<h3>Every goal · '+A.total_goals+'</h3>'+ht+(A.goals.length>25?'<details class="more"><summary>Show all '+A.goals.length+' scoring games</summary><ul class="gl">'+out+'</ul></details>':'<ul class="gl">'+out+'</ul>')}
+        // keep the all-competitions line under the Wikipedia club table too
+        if(hasApps)$("clubs").insertAdjacentHTML("beforeend",'<div class="facts" style="margin-top:10px"><div><div class="k">United · all competitions</div><div class="v">'+A.apps+' apps, '+A.total_goals+' goals <small style="color:var(--muted)">(from the archive, see above)</small></div></div></div>');
+      }).catch(function(){});
+    })();
     $("youth").innerHTML=b.youth&&b.youth.length?'<h3>Youth</h3>'+table(b.youth,["years","clubs"],["Years","Club"]):"";
     $("national").innerHTML=table(b.national,["years","team","caps","goals"],["Years","Team","Caps","Goals"]);
     $("manager").innerHTML=b.manager&&b.manager.length?'<h3>Managerial career</h3>'+table(b.manager,["years","clubs"],["Years","Club"]):"";

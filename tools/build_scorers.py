@@ -17,14 +17,20 @@ def scorers(cell):
     """'[[Mark Hughes|Hughes]] (2) 50', 75', [[Kyle Walker|Walker]] 22' ([[Own goal|o.g.]])' -> rows."""
     cell = strip(cell)
     # split on commas that sit before a link (minutes have their own commas)
-    parts = re.split(r',\s*(?=\[\[)', cell); out = []
+    cell = re.sub(r'\[\[[^\]]*\]\]', lambda m: m.group(0).replace(',', '\x00'), cell)   # commas inside links ("John Aston, Sr.") are not separators
+    cell = re.sub(r'\{\{[Gg]oal\|([^{}]*)\}\}', lambda m: ' '.join(a.strip() + "'" if a.strip().replace('+', '').isdigit() else ('pen.' if 'pen' in a else '') for a in m.group(1).split('|')[::1]), cell)
+    parts = [x.replace('\x00', ',') for x in re.split(r",\s*(?=\[\[|[A-Z]|'')", cell)]; out = []
     for p in parts:
         m = re.search(r'\[\[([^\]|]+)(?:\|([^\]]+))?\]\]', p)
-        if not m: continue
-        title, name = m.group(1).strip(), (m.group(2) or m.group(1)).strip()
-        if re.search(r'own goal|o\.g\.|penalty', title, re.I): continue
-        rest = p[m.end():]
-        n = re.search(r'^\s*\((\d+)\)', rest); mins = re.findall(r"\d+(?:\+\d+)?'", rest)
+        if m and re.search(r'own goal|o\.g\.|penalty', m.group(1), re.I): m = None   # the only link is the o.g./pen. gloss; the name is plain text
+        if m: title, name = m.group(1).strip(), (m.group(2) or m.group(1)).strip(); rest = p[m.end():]
+        else:
+            nm = re.match(r"\s*([A-Z][\w'’.\- ]*?)(?=\s*(?:\(|\d|\[\[|$))", re.sub(r'\{\{[^{}]*\}\}', '', p))
+            if not nm or not nm.group(1).strip():
+                if re.search(r'own goal|o\.g\.', p, re.I): out.append(['own goal', '', 1, 'o'])   # unnamed own goal
+                continue
+            name = title = nm.group(1).strip(); rest = p[nm.end():]
+        n = re.search(r'^\s*\((\d+)\b', rest); mins = re.findall(r"\d+(?:\+\d+)?'", rest)
         goals = int(n.group(1)) if n else (len(mins) if mins else 1)
         flags = ('p' if re.search(r'pen', rest, re.I) else '') + ('o' if re.search(r'o\.g\.|own goal', rest, re.I) else '')
         out.append([name, title, goals, flags])
@@ -33,7 +39,8 @@ def parse(wt):
     rows = {}
     for tbl in re.findall(r'\{\|[\s\S]*?\n\|\}', wt):
         head = tbl.split('\n|-')[0] + ('\n|-' + tbl.split('\n|-')[1] if '\n|-' in tbl and '!' in tbl.split('\n|-')[1][:200] else '')
-        hdr = [re.sub(r'<[^>]+>|\{\{[^{}]*\}\}', ' ', h).strip().lower() for h in re.findall(r'\n!\s*(?:scope="col"\s*\|)?\s*([^\n]*)', head)]
+        hdr = [re.sub(r'<!--.*?-->|<[^>]+>|\{\{[^{}]*\}\}', ' ', h).strip().lower() for line in re.findall(r'\n!\s*([^\n]*)', head) for h in re.split(r'!!', line)]
+        hdr = [re.sub(r'^.*?\|(?!\|)', '', h) if '|' in h and '[[' not in h else h for h in hdr]   # scope="col"| prefixes
         hdr = [h for h in hdr if h]
         if not any('scorer' in h for h in hdr): continue
         si = [i for i, h in enumerate(hdr) if 'scorer' in h][0]
@@ -69,6 +76,17 @@ for y in YEARS:
 save_revs(STATE, revs, done)
 # the live feed covers 2025/26 on through the events route — not duplicated here
 dump(dict(sorted(keep.items())), OUT)
+# write the scorers into the match rows the pages read (season files and cups.json), as sc=[[name, title, goals, flags], ...]
+for f in sorted(os.listdir(H + '/data')):
+    d = json.load(open(H + '/data/' + f)); ch = False
+    for m in d['results']:
+        sc = keep.get(m['d'])
+        if sc and m.get('sc') != sc: m['sc'] = sc; ch = True
+    if ch: dump(d, H + '/data/' + f)
+cp = os.path.join(ROOT, "tools", "data", "cups.json"); cups = json.load(open(cp))
+for r in cups:
+    if keep.get(r['d']): r['sc'] = keep[r['d']]
+json.dump(cups, open(cp, 'w'), ensure_ascii=False, separators=(',', ':'))
 # ---- index by player
 idx = {}
 for d, sc in keep.items():

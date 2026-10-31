@@ -28,7 +28,7 @@
 "note": "445 kits"
 },
 "onthisday": {
-"date": "2026-10-30",
+"date": "2026-10-31",
 "note": "6015 matches across 315 days"
 },
 "grounds": {
@@ -44,7 +44,7 @@
 "note": "33 managers; 6015 matches assigned"
 },
 "records": {
-"date": "2026-10-30",
+"date": "2026-10-31",
 "note": "6015 matches, 122 seasons"
 },
 "finals": {
@@ -53,10 +53,18 @@
 },
 "search": {
 "date": "2026-10-31",
-"note": "1406 entries"
+"note": "1694 entries"
 },
 "pace": {
 "date": "2026-10-31",
 "note": "122 seasons"
+},
+"scorers": {
+"date": "2026-10-31",
+"note": "10117 goals by 540 players"
+},
+"players": {
+"date": "2026-10-31",
+"note": "752 players"
 }
 }

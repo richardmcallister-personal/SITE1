@@ -15,7 +15,7 @@ for f in glob.glob(H + '/clubs/*.json'):
         if r['s'] >= '2025-26': matches.setdefault(r['d'], r)
 ms = sorted(matches.values(), key=lambda r: r['d'])
 for m in ms: m['res'] = 'W' if m['gf'] > m['ga'] else 'L' if m['gf'] < m['ga'] else 'D'
-def slim(m): return {k: m[k] for k in ('d', 'c', 'h', 'o', 'gf', 'ga', 's', 'div') if k in m} | ({'r': m['r']} if m.get('r') else {}) | ({'id': m['id']} if m.get('id') else {})
+def slim(m): return {k: m[k] for k in ('d', 'c', 'h', 'o', 'gf', 'ga', 's', 'div', 'sc') if k in m} | ({'r': m['r']} if m.get('r') else {}) | ({'id': m['id']} if m.get('id') else {})
 L = [m for m in ms if m['c'] == 'L']
 RUN = [m for m in ms if m['c'] not in ('CS', 'SC')]   # runs follow the usual convention of leaving out the one-off Shield and Super Cup matches
 def top(rows, key, n=10, rev=True): return [slim(m) for m in sorted(rows, key=key, reverse=rev)[:n]]
@@ -78,5 +78,30 @@ byd = collections.defaultdict(list)
 for m in ms: byd[m['d'][:3] + '0s'].append(m)
 out['decades'] = [dict(dec=k, p=len(r), w=sum(1 for m in r if m['res'] == 'W'), d=sum(1 for m in r if m['res'] == 'D'), l=sum(1 for m in r if m['res'] == 'L'), gf=sum(m['gf'] for m in r), ga=sum(m['ga'] for m in r)) for k, r in sorted(byd.items())]
 out['all'] = dict(p=len(ms), w=sum(1 for m in ms if m['res'] == 'W'), d=sum(1 for m in ms if m['res'] == 'D'), l=sum(1 for m in ms if m['res'] == 'L'), gf=sum(m['gf'] for m in ms), ga=sum(m['ga'] for m in ms))
+# ---- goalscorers (from build_players.py / build_scorers.py)
+PI = json.load(open(H + '/players_index.json')) if os.path.exists(H + '/players_index.json') else []
+by_season = collections.defaultdict(lambda: collections.defaultdict(int)); by_season_league = collections.defaultdict(lambda: collections.defaultdict(int)); hts = []
+names = {}
+for m in ms:
+    for name, title, g, fl in m.get('sc', []):
+        if 'o' in fl or not title: continue
+        names[title] = name; by_season[m['s']][title] += g
+        if m['c'] == 'L': by_season_league[m['s']][title] += g
+        if g >= 3: hts.append(dict(d=m['d'], o=m['o'], h=m['h'], c=m['c'], gf=m['gf'], ga=m['ga'], s=m['s'], g=g, t=title, n=name))
+PN = {r['t']: r for r in PI}
+def pname(t): r = PN.get(t); return (r['n'] if r else names.get(t, t))
+def pslug(t): r = PN.get(t); return r['slug'] if r else re.sub(r'[^a-z0-9]+', '-', t.lower()).strip('-')
+import re
+season_tops = sorted([dict(s=s_, t=t, n=pname(t), slug=pslug(t), g=g) for s_, d in by_season.items() for t, g in d.items()], key=lambda r: (-r['g'], r['s']))
+league_tops = sorted([dict(s=s_, t=t, n=pname(t), slug=pslug(t), g=g) for s_, d in by_season_league.items() for t, g in d.items()], key=lambda r: (-r['g'], r['s']))
+top_each = {s_: max(d.items(), key=lambda kv: kv[1]) for s_, d in by_season.items()}
+out['scorers'] = dict(
+    alltime=[dict(t=r['t'], n=r['n'], slug=r['slug'], g=r['g'], apps=r['apps'], first=r['first'][:4], last=r['last'][:4], ht=r['ht']) for r in PI[:30]],
+    season=season_tops[:25], season_league=league_tops[:25],
+    hat_tricks=sorted([dict(t=r['t'], n=r['n'], slug=r['slug'], ht=r['ht']) for r in PI if r['ht']], key=lambda r: -r['ht'])[:20],
+    biggest_hauls=sorted(hts, key=lambda h: (-h['g'], h['d']))[:15],
+    top_by_season=[dict(s=s_, t=t, n=pname(t), slug=pslug(t), g=g) for s_, (t, g) in sorted(top_each.items())],
+    goals=sum(sum(d.values()) for d in by_season.values()), matches_with=sum(1 for m in ms if m.get('sc')), matches_scored=sum(1 for m in ms if m['gf'] > 0),
+)
 dump(out, os.path.join(H, "records.json")); stamp("records", f"{len(ms)} matches, {len(S)} seasons")
 print(len(ms), "matches"); print("unbeaten", out['runs']['unbeaten'][0]['n'], out['runs']['unbeaten'][0]['fr'], out['runs']['unbeaten'][0]['to']); print("win", out['wins'][0]); print("defeat", out['defeats'][0]); print("most goals", out['seasons']['most_goals'][0]['s'], out['seasons']['most_goals'][0]['gf'])
