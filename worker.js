@@ -56,7 +56,7 @@ export default {
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + (WIKI ? "/trips/" : "/manutd/trips/"), 301);
     if (WIKI) {
       // Clean URLs on the club domain: the site lives under /manutd/ in the repo; serve it at the root here.
-      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|wiki-rev|wiki-page|collection|cover)(\/|$)/;
+      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|wiki-rev|wiki-page|collection|cover|push)(\/|$)/;
       if (url.pathname.startsWith("/manutd/")) return Response.redirect(url.origin + url.pathname.slice(7) + url.search, 301);
       if (!SERVICE.test(url.pathname)) {
         const inner = new URL(url.toString()); inner.pathname = "/manutd" + (url.pathname === "/" ? "/" : url.pathname);
@@ -79,6 +79,7 @@ export default {
     if (url.pathname === "/wiki-rev") return wikiRev(url, env, ctx);
     if (url.pathname === "/wiki-page") return wikiPage(url, env, ctx);
     if (url.pathname === "/cover") return cover(url, env, ctx);
+    if (url.pathname.startsWith("/push/")) { try { return await push(request, url, env, ctx); } catch (e) { return json({ error: "push: " + (e && e.message || e) }, 500); } }
     if (url.pathname === "/collection") { try { return await collection(request, url, env); } catch (e) { return json({ error: "collection: " + (e && e.message || e) }, 500); } }
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
 
@@ -105,6 +106,7 @@ export default {
 
   // Hourly warm-up (wrangler.jsonc → triggers.crons). Sequential, spaced, so it never trips the per-minute cap.
   async scheduled(event, env, ctx) {
+    if (event.cron === "* * * * *") { ctx.waitUntil(pushTick(env).catch((e) => console.log("pushTick", e && e.message))); return; }
     ctx.waitUntil((async () => {
       for (const p of WARM) {
         const url = new URL("https://site1.local" + p);
@@ -557,6 +559,114 @@ async function wikiRev(url, env, ctx) {
   for (const x of (j.query && j.query.normalized) || []) back[x.to] = back[x.to] || x.from;
   for (const p of Object.values((j.query && j.query.pages) || {})) { const rev = p.revisions && p.revisions[0] ? p.revisions[0].revid : null; out[p.title] = rev; if (back[p.title]) out[back[p.title]] = rev; }
   return json(out);
+}
+
+// ---- Match alerts: Web Push (RFC 8291 / RFC 8188, VAPID) done with WebCrypto, no library.
+// Subscriptions live in KV under push:sub:<sha256 of endpoint>; the VAPID key pair is generated once and kept in KV too.
+// A minute cron (pushTick) watches the next fixture from an hour before kick-off to the final whistle and sends
+// kick-off reminders, team news, goals, half-time and full-time according to each subscriber's preferences.
+const b64u = { enc: (b) => btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""), dec: (s) => { s = s.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "="; return Uint8Array.from(atob(s), (c) => c.charCodeAt(0)); } };
+const cat = (...as) => { const n = as.reduce((t, a) => t + a.length, 0), out = new Uint8Array(n); let o = 0; for (const a of as) { out.set(a, o); o += a.length; } return out; };
+const te = (s) => new TextEncoder().encode(s);
+async function vapidKeys(env) {
+  let j = await env.MU_CACHE.get("push:vapid", "json"); if (j) return j;
+  const kp = await crypto.subtle.generateKey({ name: "ECDSA", namedCurve: "P-256" }, true, ["sign", "verify"]);
+  j = { pub: b64u.enc(await crypto.subtle.exportKey("raw", kp.publicKey)), priv: await crypto.subtle.exportKey("jwk", kp.privateKey) };
+  await env.MU_CACHE.put("push:vapid", JSON.stringify(j)); return j;
+}
+async function vapidHeader(env, endpoint) {
+  const k = await vapidKeys(env), aud = new URL(endpoint).origin;
+  const hdr = b64u.enc(te(JSON.stringify({ typ: "JWT", alg: "ES256" }))), body = b64u.enc(te(JSON.stringify({ aud, exp: Math.floor(Date.now() / 1000) + 12 * 3600, sub: "mailto:richardmcallister@gmail.com" })));
+  const key = await crypto.subtle.importKey("jwk", k.priv, { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"]);
+  const sig = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, key, te(hdr + "." + body));
+  return `vapid t=${hdr}.${body}.${b64u.enc(sig)}, k=${k.pub}`;
+}
+async function hkdf(salt, ikm, info, len) { const k = await crypto.subtle.importKey("raw", ikm, "HKDF", false, ["deriveBits"]); return new Uint8Array(await crypto.subtle.deriveBits({ name: "HKDF", hash: "SHA-256", salt, info }, k, len * 8)); }
+async function encryptPayload(sub, payload) {
+  const ua = b64u.dec(sub.keys.p256dh), auth = b64u.dec(sub.keys.auth);
+  const local = await crypto.subtle.generateKey({ name: "ECDH", namedCurve: "P-256" }, true, ["deriveBits"]);
+  const localPub = new Uint8Array(await crypto.subtle.exportKey("raw", local.publicKey));
+  const uaKey = await crypto.subtle.importKey("raw", ua, { name: "ECDH", namedCurve: "P-256" }, false, []);
+  const shared = new Uint8Array(await crypto.subtle.deriveBits({ name: "ECDH", public: uaKey }, local.privateKey, 256));
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  const ikm = await hkdf(auth, shared, cat(te("WebPush: info\0"), ua, localPub), 32);
+  const cek = await hkdf(salt, ikm, te("Content-Encoding: aes128gcm\0"), 16), nonce = await hkdf(salt, ikm, te("Content-Encoding: nonce\0"), 12);
+  const key = await crypto.subtle.importKey("raw", cek, "AES-GCM", false, ["encrypt"]);
+  const ct = new Uint8Array(await crypto.subtle.encrypt({ name: "AES-GCM", iv: nonce }, key, cat(te(payload), new Uint8Array([2]))));
+  return cat(salt, new Uint8Array([0, 0, 16, 0]), new Uint8Array([65]), localPub, ct);   // header: salt | rs=4096 | idlen=65 | local public key
+}
+async function sendPush(env, rec, msg) {
+  const sub = rec.sub, body = await encryptPayload(sub, JSON.stringify(msg));
+  const r = await fetch(sub.endpoint, { method: "POST", headers: { "content-encoding": "aes128gcm", "content-type": "application/octet-stream", "ttl": String(msg.ttl || 3600), "urgency": "high", "authorization": await vapidHeader(env, sub.endpoint) }, body });
+  if (r.status === 404 || r.status === 410) { await env.MU_CACHE.delete(rec.key); return "gone"; }
+  return r.status;
+}
+async function subKey(endpoint) { const h = await crypto.subtle.digest("SHA-256", te(endpoint)); return "push:sub:" + [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, "0")).join(""); }
+async function allSubs(env) {
+  const out = []; let cursor;
+  do { const l = await env.MU_CACHE.list({ prefix: "push:sub:", cursor }); for (const k of l.keys) { const v = await env.MU_CACHE.get(k.name, "json"); if (v && v.sub) out.push({ key: k.name, ...v }); } cursor = l.list_complete ? null : l.cursor; } while (cursor);
+  return out;
+}
+async function push(request, url, env, ctx) {
+  const p = url.pathname;
+  if (p === "/push/key") return json({ key: (await vapidKeys(env)).pub });
+  if (request.method !== "POST") return json({ error: "POST" }, 405);
+  const b = await request.json().catch(() => ({}));
+  if (p === "/push/subscribe") {
+    if (!b.sub || !b.sub.endpoint || !b.sub.keys) return json({ error: "subscription required" }, 400);
+    const prefs = Object.assign({ goals: true, lineups: true, kickoff: true, result: true }, b.prefs || {});
+    const key = await subKey(b.sub.endpoint), old = await env.MU_CACHE.get(key, "json");
+    await env.MU_CACHE.put(key, JSON.stringify({ sub: b.sub, prefs, created: old ? old.created : Date.now(), seen: Date.now(), ua: (request.headers.get("user-agent") || "").slice(0, 120) }));
+    return json({ ok: true, prefs });
+  }
+  if (p === "/push/unsubscribe") { if (b.endpoint) await env.MU_CACHE.delete(await subKey(b.endpoint)); return json({ ok: true }); }
+  if (p === "/push/test") {
+    if (!b.endpoint) return json({ error: "endpoint required" }, 400);
+    const rec = await env.MU_CACHE.get(await subKey(b.endpoint), "json"); if (!rec) return json({ error: "not subscribed" }, 404);
+    const st = await sendPush(env, { key: await subKey(b.endpoint), ...rec }, { title: "Match alerts are on", body: "You'll hear about team news, goals and the final score. This is a test.", url: "/", tag: "test" });
+    return json({ ok: st === 201 || st === 200, status: st });
+  }
+  return json({ error: "unknown" }, 404);
+}
+// The fixture to watch: the next one not yet finished, from the cached fixture list (no API call outside the match window).
+async function pushTick(env) {
+  const now = Date.now(); let fx = await load(env, "api:v3:/api/fixtures?v=3");
+  if (!fx.body) fx = await load(env, "api:v3:/api/fixtures");
+  if (!fx.body) { const r = await refresh(env, "api:v3:/api/fixtures?v=3", ROUTES["/api/fixtures"], new URL("https://site1.local/api/fixtures?v=3")); if (!r.ok) return; fx = { body: r.body }; }
+  const list = JSON.parse(fx.body).response || [], next = list.filter((m) => !/FT|AET|PEN|CANC|PST|ABD|AWD|WO/.test(m.fixture.status.short)).sort((a, b) => a.fixture.timestamp - b.fixture.timestamp)[0];
+  if (!next) return;
+  const ko = next.fixture.timestamp * 1000, id = next.fixture.id;
+  if (now < ko - 65 * 60000 || now > ko + 3.5 * 3600000) return;
+  const subs = await allSubs(env); if (!subs.length) return;
+  const sk = "push:state:" + id, state = (await env.MU_CACHE.get(sk, "json")) || { sent: {} };
+  const home = next.teams.home.id === TEAM, opp = (home ? next.teams.away : next.teams.home).name, name = (h, a) => home ? "United " + h + "–" + a + " " + opp : opp + " " + h + "–" + a + " United";
+  const out = []; const fan = (pref, msg) => out.push({ pref, msg: Object.assign({ url: "/match/?id=" + id, tag: "m" + id, ko: next.fixture.date, opp, home, comp: next.league.name }, msg) });
+  // kick-off reminder, an hour before
+  if (!state.sent.kickoff && now >= ko - 62 * 60000 && now < ko - 45 * 60000) { state.sent.kickoff = 1; fan("kickoff", { title: (home ? "United v " + opp : opp + " v United") + " in an hour", body: next.league.name + " · " + (next.fixture.venue && next.fixture.venue.name || ""), kind: "kickoff" }); }
+  // live detail: one feed call a minute, shared with the match page's cache
+  const key = "api:v3:/api/match?fixture=" + id + "&v=3", route = ROUTES["/api/match"]; let m = await load(env, key);
+  if (!m.body || m.age > 50) { const r = await refresh(env, key, route, new URL("https://site1.local/api/match?fixture=" + id + "&v=3")); if (r.ok) m = { body: r.body }; }
+  const f = m.body ? (JSON.parse(m.body).response || [])[0] : null;
+  if (f) {
+    const st = f.fixture.status.short, g = f.goals;
+    if (!state.sent.lineups && (f.lineups || []).length === 2) {
+      state.sent.lineups = 1; const us = f.lineups.find((l) => l.team.id === TEAM);
+      if (us) fan("lineups", { title: "Team news: United XI", body: (us.formation ? us.formation + " · " : "") + us.startXI.map((x) => x.player.name.split(" ").pop()).join(", "), kind: "lineups" });
+    }
+    for (const e of f.events || []) {
+      if (e.type !== "Goal" || e.detail === "Missed Penalty" || e.time.elapsed == null) continue;
+      const eid = "g" + e.team.id + "-" + (e.player && e.player.id) + "-" + e.time.elapsed + "+" + (e.time.extra || 0);
+      if (state.sent[eid]) continue; state.sent[eid] = 1;
+      const us = e.team.id === TEAM, minute = e.time.elapsed + (e.time.extra ? "+" + e.time.extra : "") + "'";
+      // running score after this goal, counted from the events so far
+      const sofar = (f.events || []).filter((x) => x.type === "Goal" && x.detail !== "Missed Penalty" && (x.time.elapsed < e.time.elapsed || (x.time.elapsed === e.time.elapsed && (x.time.extra || 0) <= (e.time.extra || 0)))), hg = sofar.filter((x) => x.team.id === f.teams.home.id).length, ag = sofar.length - hg;
+      fan("goals", { title: (us ? "GOAL! " : "") + name(hg, ag), body: (e.player && e.player.name || "") + " " + minute + (e.detail === "Penalty" ? " (pen)" : e.detail === "Own Goal" ? " (og)" : "") + (e.assist && e.assist.name ? " · assist " + e.assist.name : ""), kind: us ? "goal" : "goal-against" });
+    }
+    if (!state.sent.ht && st === "HT") { state.sent.ht = 1; fan("result", { title: "Half-time: " + name(g.home, g.away), body: next.league.name, kind: "ht" }); }
+    if (!state.sent.ft && /FT|AET|PEN/.test(st)) { state.sent.ft = 1; const pen = st === "PEN" && f.score && f.score.penalty ? " · " + f.score.penalty.home + "–" + f.score.penalty.away + " on penalties" : ""; const w = g.home === g.away ? (st === "PEN" ? "" : "Draw") : ((g.home > g.away) === home ? "United win" : "United lose"); fan("result", { title: "Full-time: " + name(g.home, g.away) + (st === "AET" ? " (aet)" : ""), body: (w ? w + pen + " · " : "") + next.league.name, kind: "ft", ttl: 86400 }); }
+  }
+  await env.MU_CACHE.put(sk, JSON.stringify(state), { expirationTtl: 2 * 86400 });
+  for (const o of out) for (const s of subs) { if (s.prefs && s.prefs[o.pref] === false) continue; try { await sendPush(env, s, o.msg); } catch (e) { console.log("push fail", e && e.message); } }
 }
 
 // ---- Shirt collection: owned / wishlist / notes, stored in KV under a hash of the owner's passphrase.

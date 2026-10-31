@@ -15,7 +15,7 @@
     { "binding": "MU_CACHE", "id": "d1d3669e50bd4a61aeec70e94738fc30" }
   ],
   "triggers": {
-    "crons": ["7 * * * *"]
+    "crons": ["7 * * * *", "* * * * *"]
   },
   "observability": {
     "enabled": true

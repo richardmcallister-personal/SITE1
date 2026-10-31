@@ -3,6 +3,7 @@
 <link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
 <link rel="stylesheet" href="/manutd/mu.css">
+<style>.alertRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap} .prefs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px 18px;margin:12px 0 0;font-size:14px} .prefs label{display:flex;gap:8px;align-items:center} .prefs input{width:16px;height:16px;accent-color:var(--red)} #alertStatus{font-size:13px}</style>
 <style>
 .hero{display:grid;grid-template-columns:1.2fr 1fr;gap:4px;margin-top:10px}
 @media (max-width:760px){.hero{grid-template-columns:1fr}}
@@ -72,9 +73,52 @@
   <ul class="fxlist" id="upcoming"></ul>
 </div>
 
+<div class="sheet" style="margin-top:4px" id="alerts">
+  <h2>Match alerts</h2>
+  <p class="sub" id="alertNote" style="margin:0 0 10px">Team news an hour before kick-off, every goal as it goes in, half-time and the final score — pushed to this device.</p>
+  <div class="alertRow"><button class="btn red" id="alertBtn" type="button">Turn on alerts</button><button class="btn" id="alertTest" type="button" hidden>Send a test</button><span id="alertStatus" class="sub"></span></div>
+  <div class="prefs" id="alertPrefs" hidden>
+    <label><input type="checkbox" data-p="kickoff" checked> Kick-off reminder, an hour before</label>
+    <label><input type="checkbox" data-p="lineups" checked> Team news when the line-ups are out</label>
+    <label><input type="checkbox" data-p="goals" checked> Goals, both ends</label>
+    <label><input type="checkbox" data-p="result" checked> Half-time and full-time</label>
+  </div>
+  <p class="sub" id="alertHint" style="margin:8px 0 0" hidden></p>
+</div>
+
 <footer class="mu">Fixture dates from tickets.manutd.com (home) and the TV-selected lists (away) on 29 Oct 2026. Live table, results and form from API-Football via this site's own Worker; nothing is fetched from the user's browser except this site and flag images.</footer>
 </div>
 <script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script>
+<script>
+// Match alerts: service worker + Web Push. Needs the site installed to the Home Screen on iPhone (Safari rule); works straight away in Chrome/Edge/Firefox.
+(function(){
+  var $=function(i){return document.getElementById(i)}, btn=$("alertBtn"), test=$("alertTest"), st=$("alertStatus"), prefsBox=$("alertPrefs"), hint=$("alertHint");
+  var ios=/iP(hone|ad|od)/.test(navigator.userAgent), standalone=window.navigator.standalone===true||matchMedia("(display-mode: standalone)").matches;
+  var ok="serviceWorker" in navigator&&"PushManager" in window&&"Notification" in window;
+  if(!/(^|\.)manutd\.wiki$/.test(location.hostname)){ btn.disabled=true; hint.hidden=false; hint.innerHTML='Alerts are set up from <a href="https://manutd.wiki/">manutd.wiki</a>.'; return }
+  function say(t){st.textContent=t}
+  function prefs(){var o={}; prefsBox.querySelectorAll("input").forEach(function(c){o[c.dataset.p]=c.checked}); return o}
+  function b64(s){s=s.replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4)s+="="; var r=atob(s), a=new Uint8Array(r.length); for(var i=0;i<r.length;i++)a[i]=r.charCodeAt(i); return a}
+  function sw(){return navigator.serviceWorker.register("/sw.js",{scope:"/"})}
+  function sendSub(sub){return fetch("/push/subscribe",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({sub:sub.toJSON(),prefs:prefs()})}).then(function(r){return r.json()})}
+  function state(sub){ if(sub){btn.textContent="Turn off alerts"; test.hidden=false; prefsBox.hidden=false; say("On for this device."); try{localStorage.setItem("mu:alerts","1")}catch(e){}} else {btn.textContent="Turn on alerts"; test.hidden=true; prefsBox.hidden=true; say(""); try{localStorage.removeItem("mu:alerts")}catch(e){}} }
+  if(!ok){ btn.disabled=true; if(ios&&!standalone){hint.hidden=false; hint.innerHTML="On iPhone, alerts need the site on your Home Screen first: tap <b>Share</b> → <b>Add to Home Screen</b>, then open it from there and turn alerts on."} else say("This browser can't receive push notifications."); return }
+  if(ios&&!standalone){hint.hidden=false; hint.innerHTML="On iPhone, alerts only work from the Home Screen app: tap <b>Share</b> → <b>Add to Home Screen</b>, open it from there, then turn alerts on."}
+  sw().then(function(reg){return reg.pushManager.getSubscription()}).then(function(sub){ state(sub); if(sub){ try{var p=JSON.parse(localStorage.getItem("mu:alerts:prefs")||"null"); if(p)prefsBox.querySelectorAll("input").forEach(function(c){if(c.dataset.p in p)c.checked=!!p[c.dataset.p]})}catch(e){} } }).catch(function(){});
+  btn.addEventListener("click",function(){
+    btn.disabled=true;
+    sw().then(function(reg){return reg.pushManager.getSubscription().then(function(sub){
+      if(sub){ return fetch("/push/unsubscribe",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({endpoint:sub.endpoint})}).then(function(){return sub.unsubscribe()}).then(function(){state(null)}) }
+      return Notification.requestPermission().then(function(perm){
+        if(perm!=="granted"){say("Permission wasn't given — check the browser's site settings if you want to change that."); return}
+        return fetch("/push/key").then(function(r){return r.json()}).then(function(k){return reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64(k.key)})}).then(function(sub){return sendSub(sub).then(function(){state(sub)})});
+      });
+    })}).catch(function(e){say("Couldn't turn alerts on: "+(e&&e.message||e))}).then(function(){btn.disabled=false});
+  });
+  prefsBox.addEventListener("change",function(){ try{localStorage.setItem("mu:alerts:prefs",JSON.stringify(prefs()))}catch(e){} sw().then(function(reg){return reg.pushManager.getSubscription()}).then(function(sub){if(sub)return sendSub(sub).then(function(){say("Saved.")})}) });
+  test.addEventListener("click",function(){ sw().then(function(reg){return reg.pushManager.getSubscription()}).then(function(sub){ if(!sub)return; return fetch("/push/test",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({endpoint:sub.endpoint})}).then(function(r){return r.json()}).then(function(j){say(j.ok?"Test sent — it should arrive in a moment.":"The push service answered "+j.status+".")}) }) });
+})();
+</script>
 <script>
 (function(){
   MU.nav("Hub");
