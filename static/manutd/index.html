@@ -184,7 +184,7 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
   }
   function cardLive(m,f){ // m: feed fixture with events (may be null events)
     var home=m.teams.home.id===MU.TEAM, st=m.fixture.status, live=/1H|HT|2H|ET|P|BT|LIVE/.test(st.short), done=/FT|AET|PEN/.test(st.short);
-    var sc=(f&&f.events||[]).filter(function(e){return e.type==="Goal"&&e.detail!=="Missed Penalty"}), us=sc.filter(function(e){return e.team.id===MU.TEAM}), them=sc.filter(function(e){return e.team.id!==MU.TEAM});
+    var sc=MU.goalEvents(f).filter(function(e){return e.ok}), us=sc.filter(function(e){return e.team.id===MU.TEAM}), them=sc.filter(function(e){return e.team.id!==MU.TEAM});
     var line=function(list){return list.map(function(e){return e.player.name.split(" ").pop()+" "+e.time.elapsed+(e.time.extra?"+"+e.time.extra:"")+"'"+(e.detail==="Penalty"?" pen":e.detail==="Own Goal"?" og":"")}).join(", ")};
     $("matchSheet").innerHTML='<div class="k"><span>'+(live?"Live":"Full-time")+' · '+MU.esc(m.league.name)+'</span><span class="pill'+(live?' live':'')+'">'+(live?(st.elapsed!=null?st.elapsed+"'":st.long):MU.fmtDate(m.fixture.date))+'</span></div>'+
       '<div class="vs"><div class="team">'+MU.crest(m.teams.home.name,56)+MU.esc(m.teams.home.name)+'</div><div class="score">'+m.goals.home+'–'+m.goals.away+(st.short==="PEN"&&m.score.penalty?'<small>'+m.score.penalty.home+'–'+m.score.penalty.away+' pens</small>':'')+'</div><div class="team">'+MU.crest(m.teams.away.name,56)+MU.esc(m.teams.away.name)+'</div></div>'+
