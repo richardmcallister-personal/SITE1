@@ -91,6 +91,7 @@ table.mu td.yrs{white-space:nowrap;color:var(--muted)}
   function pills(){var vis=function(id){var e=document.getElementById(id); return e&&e.offsetParent!==null}, it=[{id:"top",label:"Profile"}];
     if(vis("arch"))it.push({id:"arch",label:"Archive"}); if(vis("career"))it.push({id:"career",label:"Career"}); var g=document.getElementById("archGoals"); if(g&&g.innerHTML&&vis("arch"))it.push({id:"archGoals",label:"Every goal"}); if(vis("moments"))it.push({id:"moments",label:"Moments"});
     var sig=it.map(function(i){return i.id}).join(); if(sig===pills.last)return; pills.last=sig; MU.pills(document.getElementById("pills"),it)}
+  document.getElementById("pills").addEventListener("click",function(e){var a=e.target.closest("a"); if(a&&a.getAttribute("href")==="#archGoals"){var d=document.querySelector("#archGoals details"); if(d)d.open=true}});
   var pillsTimer; function repills(){clearTimeout(pillsTimer); pillsTimer=setTimeout(pills,50)}
   new MutationObserver(repills).observe(document.querySelector("main")||document.body,{attributes:true,subtree:true,attributeFilter:["style","hidden"],childList:true});
   var qs=new URLSearchParams(location.search), title=qs.get("p"), q=qs.get("q"), $=function(i){return document.getElementById(i)};
