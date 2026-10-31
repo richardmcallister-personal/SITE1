@@ -56,11 +56,12 @@ for p in P.values():
     spans = [season_span(s) for s in p['seasons']] + [(d, d) for d in dates]
     if not spans: continue
     lo, hi = min(a for a, b in spans), max(b for a, b in spans)
-    p['first'], p['last'] = lo[:4] if not p['seasons'] else min(min(p['seasons']), lo[:7])[:7], hi[:7]
+    def sid_of(d): y = int(d[:4]); y = y if int(d[5:7]) >= 7 else y - 1; return f"{y}-{str(y + 1)[2:]}"
+    p['first'], p['last'] = sid_of(lo), sid_of(hi)   # season ids
     p['managers'] = [dict(name=m['name'], slug=m['slug'], role=m['role']) for m in MG if m['from'] and m['from'] <= hi and (m['to'] is None or m['to'] >= lo)]
     p['goals'].sort(key=lambda g: g['d']); p['finals'].sort(key=lambda f: f['d'])
     p['total_goals'] = sum(g['g'] for g in p['goals']); p['hat_tricks'] = [g for g in p['goals'] if g['g'] >= 3]
-    p['apps'] = sum(r.get('apps', 0) for r in p['seasons'].values()) or None
+    p['apps'] = (sum(r.get('apps', 0) for r in p['seasons'].values()) or None) if p['first'] >= '1993-94' else None   # squad lists start 1993/94, so earlier careers have no full apps figure
     dump(p, os.path.join(OUT, p['slug'] + '.json'))
 index = [dict(t=p['title'], n=p['name'], slug=p['slug'], g=p['total_goals'], apps=p['apps'], first=p.get('first'), last=p.get('last'), ht=len(p['hat_tricks']), seasons=len(p['seasons']) or len({g['s'] for g in p['goals']})) for p in P.values() if p.get('first')]
 index.sort(key=lambda r: (-r['g'], r['t'])); dump(index, os.path.join(H, "players_index.json"))

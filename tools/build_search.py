@@ -31,7 +31,7 @@ for key, r in P.items():
     add(r['name'], 'player', u, ' · '.join(b for b in bits if b), [re.sub(r'\s*\(.*\)$', '', r['title'] or '')])
 for r in json.load(open(H + '/players_index.json')):
     if any(e[1] == 'player' and e[2].endswith('p=' + urllib.parse.quote(r['t'])) for e in E): continue
-    if r['g'] >= 1: add(r['n'], 'player', '/manutd/player/?p=' + urllib.parse.quote(r['t']), f"{r['first'][:4]}–{r['last'][:4]} · {r['g']} goal{'s' if r['g'] != 1 else ''} in the archive" + (f", {r['ht']} hat-trick{'s' if r['ht'] > 1 else ''}" if r['ht'] else ''))
+    if r['g'] >= 1: add(r['n'], 'player', '/manutd/player/?p=' + urllib.parse.quote(r['t']), f"{r['first'][:4]}–{int(r['last'][:4]) + 1} · {r['g']} goal{'s' if r['g'] != 1 else ''} in the archive" + (f", {r['ht']} hat-trick{'s' if r['ht'] > 1 else ''}" if r['ht'] else ''))
 # managers
 for m in json.load(open(H + '/managers.json')):
     add(m['name'] + (f" ({m['role']})" if m['role'] else ''), 'manager', '/manutd/manager/?m=' + m['slug'], f"{m['from'][:4]}–{m['to'][:4] if m['to'] else 'now'} · {m['rec']['p']} matches" + (' · ' + ', '.join(m['honours'][:2]) if m['honours'] else ''))

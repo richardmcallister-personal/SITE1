@@ -96,7 +96,7 @@ season_tops = sorted([dict(s=s_, t=t, n=pname(t), slug=pslug(t), g=g) for s_, d 
 league_tops = sorted([dict(s=s_, t=t, n=pname(t), slug=pslug(t), g=g) for s_, d in by_season_league.items() for t, g in d.items()], key=lambda r: (-r['g'], r['s']))
 top_each = {s_: max(d.items(), key=lambda kv: kv[1]) for s_, d in by_season.items()}
 out['scorers'] = dict(
-    alltime=[dict(t=r['t'], n=r['n'], slug=r['slug'], g=r['g'], apps=r['apps'], first=r['first'][:4], last=r['last'][:4], ht=r['ht']) for r in PI[:30]],
+    alltime=[dict(t=r['t'], n=r['n'], slug=r['slug'], g=r['g'], apps=r['apps'], first=r['first'][:4], last=str(int(r['last'][:4]) + 1), ht=r['ht']) for r in PI[:30]],
     season=season_tops[:25], season_league=league_tops[:25],
     hat_tricks=sorted([dict(t=r['t'], n=r['n'], slug=r['slug'], ht=r['ht']) for r in PI if r['ht']], key=lambda r: -r['ht'])[:20],
     biggest_hauls=sorted(hts, key=lambda h: (-h['g'], h['d']))[:15],
