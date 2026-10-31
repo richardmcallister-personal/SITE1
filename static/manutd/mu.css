@@ -160,3 +160,8 @@ small.tz{display:block;font-size:11px;color:var(--muted);letter-spacing:.02em;fo
 main#main-content{scroll-margin-top:72px;outline:none}
 nav.munav .hits a:focus{outline:3px solid var(--red-ink);outline-offset:-3px;background:var(--tint)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* cookie consent bar */
+.consent{position:fixed;left:12px;right:12px;bottom:12px;z-index:60;background:var(--paper);color:var(--ink);border:1px solid var(--rule);border-radius:var(--radius);box-shadow:0 10px 30px rgba(0,0,0,.25);padding:14px 16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;max-width:720px;margin:0 auto}
+.consent p{margin:0;font-size:14px;flex:1 1 320px} .consent .acts{display:flex;gap:8px} .consent .btn{padding:9px 14px;font-size:13px}
+@media (max-width:640px){.consent{bottom:calc(66px + env(safe-area-inset-bottom,0px))}}
+footer.mu .cookies{font:inherit;font-size:12px;color:var(--ink);background:none;border:0;padding:0;text-decoration:underline;cursor:pointer}

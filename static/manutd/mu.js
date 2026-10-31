@@ -19,6 +19,17 @@ window.MU=(function(){
     var d=document.createElement("span"); d.className="themesw"; d.setAttribute("role","group"); d.setAttribute("aria-label","Appearance"); d.innerHTML=["auto","light","dark"].map(function(m){return '<button type="button" data-m="'+m+'" aria-pressed="'+(m===cur)+'">'+m+'</button>'}).join("");
     d.addEventListener("click",function(e){var b=e.target.closest("button"); if(b)theme(b.dataset.m)}); f.appendChild(document.createTextNode(" Appearance:")); f.appendChild(d)}
   document.addEventListener("DOMContentLoaded",themeSwitch);
+  // Cookie consent for analytics (Consent Mode v2). Nothing is stored or sent to Google until "Accept"; "No thanks" keeps
+  // the denied default and remembers that. A "Cookies" control in the footer reopens the choice.
+  function consentGet(){try{return localStorage.getItem("mu:consent")||""}catch(e){return ""}}
+  function consentSet(v){try{localStorage.setItem("mu:consent",v)}catch(e){} if(window.gtag)gtag("consent","update",{analytics_storage:v==="granted"?"granted":"denied"}); var b=document.getElementById("consent"); if(b)b.remove()}
+  function consentBar(){if(document.getElementById("consent"))return; var d=document.createElement("div"); d.id="consent"; d.className="consent"; d.setAttribute("role","region"); d.setAttribute("aria-label","Cookies");
+    d.innerHTML='<p>This site uses Google Analytics to count visits. No ads, nothing personal — just which pages get read. <a href="https://policies.google.com/technologies/cookies" target="_blank" rel="noopener">How Google uses the data</a>.</p><div class="acts"><button type="button" class="btn" data-c="granted">Accept</button><button type="button" class="btn ghost" data-c="denied">No thanks</button></div>';
+    d.addEventListener("click",function(e){var b=e.target.closest("button"); if(b)consentSet(b.dataset.c)}); document.body.appendChild(d)}
+  var EEA="AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,IS,LI,NO,GB,CH".split(",");
+  function consentNeeded(){var m=document.querySelector('meta[name="mu-country"]'), cc=m?m.content:""; return !cc||EEA.indexOf(cc)>=0}
+  document.addEventListener("DOMContentLoaded",function(){if(consentNeeded()&&!consentGet())consentBar(); var f=document.querySelector("footer.mu"); if(f&&!f.querySelector(".cookies")){var a=document.createElement("button"); a.type="button"; a.className="cookies"; a.textContent="Cookies"; a.addEventListener("click",function(){consentBar()}); f.appendChild(document.createTextNode(" · ")); f.appendChild(a)}});
+
   function nav(active){
     var el=document.querySelector("nav.munav"); if(!el)return;
     document.querySelectorAll("header.mu h1 br").forEach(function(br){br.replaceWith(" ")});   // the wordmark sits on one line now

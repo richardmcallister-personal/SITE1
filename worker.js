@@ -65,7 +65,8 @@ export default {
         const res = await env.ASSETS.fetch(new Request(inner.toString(), request));
         const ct = res.headers.get("content-type") || "";
         if (/text\/html|javascript|application\/json/.test(ct)) {
-          const body = (await res.text()).replace(/(["'(])\/manutd\//g, "$1/");
+          let body = (await res.text()).replace(/(["'(])\/manutd\//g, "$1/");
+          if (/text\/html/.test(ct)) body = body.replace("<head>", '<head><meta name="mu-country" content="' + ((request.cf && request.cf.country) || "").replace(/[^A-Z]/g, "") + '">');
           const h = new Headers(res.headers); h.delete("content-length");
           return new Response(body, { status: res.status, headers: h });
         }
