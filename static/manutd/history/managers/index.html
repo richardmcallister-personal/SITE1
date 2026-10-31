@@ -1,4 +1,4 @@
-<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Manchester United · Managers</title>
 <link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -46,18 +46,20 @@
 <style>
 table.mu td.role{color:var(--muted);font-size:12px} table.mu td.hon{font-size:13px;max-width:34ch} table.mu td.hon small{color:var(--muted)}
 @media (max-width:640px){table.mu td.hon,table.mu th.hon{display:none}}</style>
-</head><body><div class="wrap">
+</head><body><a class="skip" href="#main-content">Skip to main content</a><div class="wrap">
 <header class="mu">
-  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Every manager since 1889</small>Manchester<br>United</h1></a>
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest-88.webp" srcset="/manutd/assets/crest-44.webp 44w, /manutd/assets/crest-88.webp 88w, /manutd/assets/crest-132.webp 132w" sizes="44px" alt="Manchester United crest" width="44" height="45" decoding="async"><h1><small>Every manager since 1889</small>Manchester<br>United</h1></a>
   <div class="from">History<span>Managers</span></div>
 </header>
 <nav class="munav" aria-label="Sections"></nav>
+<main id="main-content" tabindex="-1">
 <div class="sheet">
   <h2>Every manager</h2>
   <p class="sub" style="margin:0 0 10px">Tenure and honours from Wikipedia's list of managers; played, won, drawn and lost computed from the match archive for the dates each man was in charge. Each manager has a page with his record season by season.</p>
   <div class="filters" id="filters"><button data-f="all" aria-pressed="true">All spells</button><button data-f="perm">Permanent only</button><button data-f="date">Newest first</button></div>
   <div id="list"></div>
 </div>
+</main>
 <footer class="mu"><span id="stamp"></span> List of managers from Wikipedia, CC BY-SA 4.0. Records are competitive matches only (league, FA Cup, League Cup, Europe and other cups); wartime and pre-League games are not in the archive, which is why Albut, Busby and others fall short of the published totals shown in grey. <a href="/manutd/history/seasons/">All seasons</a></footer>
 </div>
 <script src="/manutd/mu.js"></script>

@@ -1,4 +1,4 @@
-<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Manchester United · Match centre</title>
 <link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -48,9 +48,9 @@
 .score .team{display:flex;align-items:center;gap:14px;font-size:clamp(18px,2.6vw,26px);font-weight:600} .score .team.r{justify-content:flex-end;text-align:right}
 .score .team img.crest{width:56px;height:56px;margin:0;background:var(--paper);border-radius:50%;padding:4px;box-sizing:border-box}
 .score .mid{text-align:center;min-width:150px} .score .big{font-weight:300;font-size:clamp(44px,7vw,72px);line-height:1;letter-spacing:-.02em;white-space:nowrap}
-.score .st{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:var(--muted);margin-top:6px} .score .st.live{color:#fff} .score .st.live:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:8px;vertical-align:1px;animation:blink 1.2s infinite}
+.score .st{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:var(--muted-on-black);margin-top:6px} .score .st.live{color:#fff} .score .st.live:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:8px;vertical-align:1px;animation:blink 1.2s infinite}
 @keyframes blink{50%{opacity:.2}}
-.score .meta{font-size:13px;color:var(--muted);margin-top:6px}
+.score .meta{font-size:13px;color:var(--muted-on-black);margin-top:6px}
 .score .goals{font-size:13px;color:#ddd;margin-top:8px;line-height:1.5} .score .team.r .goals{text-align:right}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px}@media (max-width:820px){.cols{grid-template-columns:1fr}}
 .ev{list-style:none;margin:0;padding:0;font-size:14px} .ev li{display:grid;grid-template-columns:48px 1fr;gap:10px;padding:6px 0;border-bottom:1px solid var(--rule)} .ev .min{color:var(--muted);font-weight:500} .ev li.us{background:#fff3f3} .ev .who{font-weight:600} .ev small{color:var(--muted)}
@@ -62,12 +62,14 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
 .note{font-size:13px;color:var(--muted);margin-top:10px}
 @media (max-width:640px){.score{grid-template-columns:1fr;gap:10px;padding:18px 16px;text-align:center} .score .team,.score .team.r{justify-content:center;text-align:center;flex-direction:column;gap:6px;font-size:18px} .score .team.r{flex-direction:column-reverse} .score .goals,.score .team.r+.goals{text-align:center!important} .score .mid{order:-1}}
 .ev .ruled{font-weight:700;color:var(--muted);text-decoration:line-through}
-</style></head><body><div class="wrap">
+#score{min-height:400px} @media (min-width:641px){#score{min-height:210px}}
+</style></head><body><a class="skip" href="#main-content">Skip to main content</a><div class="wrap">
 <header class="mu">
-  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small id="eyebrow">Match centre</small>Manchester<br>United</h1></a>
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest-88.webp" srcset="/manutd/assets/crest-44.webp 44w, /manutd/assets/crest-88.webp 88w, /manutd/assets/crest-132.webp 132w" sizes="44px" alt="Manchester United crest" width="44" height="45" decoding="async"><h1><small id="eyebrow">Match centre</small>Manchester<br>United</h1></a>
   <div class="from" id="from">Match centre<span>&nbsp;</span></div>
 </header>
 <nav class="munav" aria-label="Sections"></nav>
+<main id="main-content" tabindex="-1">
 
 <div class="score" id="score"><div></div><div class="mid"><div class="big">—</div><div class="st">Loading</div></div><div></div></div>
 <div class="sheet">
@@ -75,12 +77,14 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
   <p class="note" id="note"></p>
 </div>
 <div class="sheet" id="reportSheet" style="display:none"><div id="report"></div></div>
+<div class="sheet" id="bodyWait" aria-hidden="true" style="min-height:70vh"></div>
 <div class="sheet" id="body" style="display:none">
   <div class="cols">
     <div><h2>Events</h2><ul class="ev" id="events"></ul><h2 style="margin-top:22px">Statistics</h2><ul class="bars" id="stats"></ul></div>
     <div><h2>Line-ups</h2><div class="xi" id="lineups"></div></div>
   </div>
 </div>
+</main>
 <footer class="mu">Live data from API-Football; refreshed every minute from 90 minutes before kick-off until the final whistle, hourly otherwise. Kick-offs are shown in your own time zone, with UK time beneath.</footer>
 </div>
 <script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script>
@@ -112,7 +116,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
     if(!DONE.test(f.fixture.status.short)) acts+='<a class="btn" href="/manutd/squad/">Pick your XI</a>';
     $("actions").innerHTML=acts;
     var ev=(f.events||[]).filter(function(e){return e.time.elapsed>=0}), lu=f.lineups||[], stt=f.statistics||[];
-    var has=ev.length||lu.length||stt.length; $("body").style.display=has?"":"none";
+    var has=ev.length||lu.length||stt.length; $("body").style.display=has?"":"none"; $("bodyWait").style.display="none";
     $("note").textContent=has?"":(new Date(ko)-new Date()>90*60000?"Line-ups appear about an hour before kick-off; events and statistics follow live.":"Waiting for the first data from the ground…");
     $("events").innerHTML=ev.length?ev.map(function(e){var live=/1H|HT|2H|ET|P|BT|LIVE/.test(f.fixture.status.short), recent=live&&f.fixture.status.elapsed!=null&&f.fixture.status.elapsed-e.time.elapsed<=4; var t=ruled(e)?'<span class="ruled">'+MU.esc(e.team.name)+' goal</span> <small>'+(recent?"being checked by VAR — not given yet, score unchanged":"ruled out — not given, score unchanged")+'</small>':e.type==="Goal"?"⚽ "+(e.detail==="Own Goal"?"(og) ":e.detail==="Penalty"?"(pen) ":e.detail==="Missed Penalty"?"✗ penalty missed · ":"")+'<span class="who">'+pl(e.player,e.team)+'</span>'+(e.assist&&e.assist.name?" <small>("+MU.esc(e.assist.name)+")</small>":""):e.type==="Card"?(/Red/.test(e.detail)?"🟥 ":"🟨 ")+pl(e.player,e.team):e.type==="subst"?"↔ "+pl(e.assist&&e.assist.name?e.assist:{name:"?"},e.team)+" <small>for "+MU.esc(e.player.name)+"</small>":e.type==="Var"?"VAR · "+MU.esc(e.detail):MU.esc(e.detail||e.type); return '<li'+(isUs(e.team)?' class="us"':'')+'><span class="min">'+e.time.elapsed+(e.time.extra?"+"+e.time.extra:"")+'′</span><span>'+t+(ruled(e)?'':' <small>'+MU.esc(e.team.name)+'</small>')+'</span></li>'}).join(""):'<li><span class="min"></span><span><small>No events yet.</small></span></li>';
     if(stt.length===2){var want=["Ball Possession","Total Shots","Shots on Goal","Shots off Goal","Blocked Shots","Corner Kicks","Fouls","Offsides","Yellow Cards","Red Cards","Passes %","expected_goals"];

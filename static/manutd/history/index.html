@@ -1,4 +1,4 @@
-<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Manchester United · History</title>
 <link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -47,7 +47,7 @@
 .honours{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px}
 .honours div{background:var(--black);color:var(--on-black);padding:14px 16px}
 .honours b{display:block;font-family:var(--head);font-weight:300;font-size:46px;line-height:1}
-.honours span{font-family:var(--head);font-weight:500;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.honours span{font-family:var(--head);font-weight:500;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-on-black)}
 .years{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}
 .years a,.years span{font-family:var(--head);font-weight:500;font-size:13px;letter-spacing:.02em;padding:4px 9px;background:var(--tint);color:var(--ink);text-decoration:none}
 .years a:hover{background:var(--black);color:var(--on-black)}
@@ -55,12 +55,13 @@
 .match .score{font-family:var(--head);font-weight:300;font-size:34px;line-height:1} .match .score small{display:block;font-size:11px;font-weight:500;letter-spacing:.08em;color:var(--muted);margin-top:4px}
 .match h3{margin:0 0 2px;font-size:15px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--ink)} .match p{margin:2px 0;font-size:14px} .match .sub a{color:var(--ink)}
 @media (max-width:520px){.match{grid-template-columns:1fr}}
-</style></head><body><div class="wrap">
+</style></head><body><a class="skip" href="#main-content">Skip to main content</a><div class="wrap">
 <header class="mu">
-  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Honours &amp; the matches that won them</small>Manchester<br>United</h1></a>
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest-88.webp" srcset="/manutd/assets/crest-44.webp 44w, /manutd/assets/crest-88.webp 88w, /manutd/assets/crest-132.webp 132w" sizes="44px" alt="Manchester United crest" width="44" height="45" decoding="async"><h1><small>Honours &amp; the matches that won them</small>Manchester<br>United</h1></a>
   <div class="from">History<span>Newton Heath 1878 · Manchester United 1902</span></div>
 </header>
 <nav class="munav" aria-label="Sections"></nav>
+<main id="main-content" tabindex="-1">
 
 <div class="honours">
   <div><b>20</b><span>League titles</span></div><div><b>13</b><span>FA Cups</span></div><div><b>6</b><span>League Cups</span></div><div><b>3</b><span>European Cups</span></div><div><b>1</b><span>Europa League</span></div><div><b>1</b><span>Cup Winners' Cup</span></div><div><b>2</b><span>World titles</span></div><div><b>21</b><span>Community Shields</span></div>
@@ -102,6 +103,7 @@
   <div id="matches"></div>
 </div>
 
+</main>
 <footer class="mu">Honours as recognised by the club. Scorers and dates from the club's and competitions' records.</footer>
 </div>
 <script src="/manutd/mu.js"></script>

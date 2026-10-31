@@ -1,4 +1,4 @@
-<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Manchester United · The comeback collection</title>
 <link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -54,12 +54,13 @@
 .prog{display:flex;gap:2px;height:8px;margin:2px 0} .prog i{flex:1;background:#ddd} .prog i.u{background:var(--win)} .prog i.t{background:var(--red)}
 .era{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);grid-column:1/-1;margin-top:8px;border-bottom:1px solid var(--rule);padding-bottom:4px}
 </style>
-</head><body><div class="wrap">
+</head><body><a class="skip" href="#main-content">Skip to main content</a><div class="wrap">
 <header class="mu">
-  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>The comeback collection</small>Manchester<br>United</h1></a>
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest-88.webp" srcset="/manutd/assets/crest-44.webp 44w, /manutd/assets/crest-88.webp 88w, /manutd/assets/crest-132.webp 132w" sizes="44px" alt="Manchester United crest" width="44" height="45" decoding="async"><h1><small>The comeback collection</small>Manchester<br>United</h1></a>
   <div class="from">Comebacks<span>Something to watch after a miserable result</span></div>
 </header>
 <nav class="munav" aria-label="Sections"></nav>
+<main id="main-content" tabindex="-1">
 <div class="sheet">
   <h2>Pick your poison</h2>
   <p class="sub" style="margin:0 0 10px">Matches from 2010 onwards are classified automatically from the minute-by-minute events; the classics before that are curated. Each card links to the match centre or season page and to the club's own YouTube channel.</p>
@@ -68,6 +69,7 @@
   <p class="sub" id="count"></p>
   <div class="cards" id="cards"></div>
 </div>
+</main>
 <footer class="mu"><span id="stamp"></span> Event data from API-Football; classics from the club's records. "Two goals down" means United trailed by two or more and did not lose; "injury-time winner" is a winning goal in stoppage time; "ten men" is a United red card before the 75th minute in a match not lost.</footer>
 </div>
 <script src="/manutd/mu.js"></script>

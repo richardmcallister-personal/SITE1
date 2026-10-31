@@ -1,4 +1,4 @@
-<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Manchester United · Squad</title>
 <link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -63,12 +63,13 @@ table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;
 .bio h3{margin-top:0}
 .saves{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px} .saves li{background:var(--tint);padding:6px 10px;display:flex;gap:8px;align-items:center} .saves button{all:unset;cursor:pointer;font-weight:600} .saves button[data-del]{color:var(--red-ink);font-weight:700;padding:0 4px}
 .face.sm{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;background:var(--tint)}
-</style></head><body><div class="wrap">
+</style></head><body><a class="skip" href="#main-content">Skip to main content</a><div class="wrap">
 <header class="mu">
-  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Squad &amp; team picker</small>Manchester<br>United</h1></a>
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest-88.webp" srcset="/manutd/assets/crest-44.webp 44w, /manutd/assets/crest-88.webp 88w, /manutd/assets/crest-132.webp 132w" sizes="44px" alt="Manchester United crest" width="44" height="45" decoding="async"><h1><small>Squad &amp; team picker</small>Manchester<br>United</h1></a>
   <div class="from">Squad<span>Fitness · nationality · season stats · pick your XI</span></div>
 </header>
 <nav class="munav" aria-label="Sections"></nav>
+<main id="main-content" tabindex="-1">
 
 <div class="sheet">
   <h2>Team picker</h2>
@@ -99,6 +100,7 @@ table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;
     </div>
   </div>
 </div>
+</main>
 <footer class="mu">Squad from the club's first-team list (1 Sept 2026); portraits and bios from Wikipedia (Creative Commons); injuries, suspensions and season statistics from API-Football. United-career totals are being compiled and will appear next to the season figures.</footer>
 </div>
 <script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script>

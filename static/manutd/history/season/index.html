@@ -1,4 +1,4 @@
-<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Manchester United · Season</title>
 <link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -65,12 +65,13 @@
 a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl.opp{border-bottom-style:dotted} a.pl:hover{border-bottom-color:var(--red-ink);color:var(--red-ink)}
 .pager{display:flex;justify-content:space-between;gap:12px;margin-top:22px;font-size:14px} .pager a{color:var(--ink)}
 .res h3{margin-top:0}
-</style></head><body><div class="wrap">
+</style></head><body><a class="skip" href="#main-content">Skip to main content</a><div class="wrap">
 <header class="mu">
-  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small id="eyebrow">Trophy season</small>Manchester<br>United</h1></a>
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest-88.webp" srcset="/manutd/assets/crest-44.webp 44w, /manutd/assets/crest-88.webp 88w, /manutd/assets/crest-132.webp 132w" sizes="44px" alt="Manchester United crest" width="44" height="45" decoding="async"><h1><small id="eyebrow">Trophy season</small>Manchester<br>United</h1></a>
   <div class="from" id="from">History<span>Season</span></div>
 </header>
 <nav class="munav" aria-label="Sections"></nav>
+<main id="main-content" tabindex="-1">
 
 <div class="sheet">
   <h2 id="h">Season</h2>
@@ -92,6 +93,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
   <div id="results" class="res"></div>
   <div class="pager" id="pager"></div>
 </div>
+</main>
 <footer class="mu">Scores, scorers and line-ups from the club's and competitions' records. For matches from 2010 onwards, line-ups, statistics and events are read from API-Football where it holds them. <a href="/manutd/history/">All honours</a></footer>
 </div>
 <script src="/manutd/mu.js"></script>

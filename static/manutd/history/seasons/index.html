@@ -1,4 +1,4 @@
-<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Manchester United · Every season</title>
 <link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -52,12 +52,13 @@ table.mu tr.d2 td{background:var(--tint)}
 .decade{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);background:var(--tint)}
 .key{font-size:12px;color:var(--muted);margin:8px 0 0}
 </style>
-</head><body><div class="wrap">
+</head><body><a class="skip" href="#main-content">Skip to main content</a><div class="wrap">
 <header class="mu">
-  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Every season since 1892</small>Manchester<br>United</h1></a>
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest-88.webp" srcset="/manutd/assets/crest-44.webp 44w, /manutd/assets/crest-88.webp 88w, /manutd/assets/crest-132.webp 132w" sizes="44px" alt="Manchester United crest" width="44" height="45" decoding="async"><h1><small>Every season since 1892</small>Manchester<br>United</h1></a>
   <div class="from">History<span>All seasons</span></div>
 </header>
 <nav class="munav" aria-label="Sections"></nav>
+<main id="main-content" tabindex="-1">
 
 <div class="ticker" id="ticker"><span><span class="k">League seasons</span><span class="v" id="tN">—</span></span><span><span class="k">Titles</span><span class="v" id="tT">—</span></span><span><span class="k">Seasons in the second tier</span><span class="v" id="tD2">—</span></span><span><span class="k">Relegations</span><span class="v" id="tR">—</span></span></div>
 
@@ -68,6 +69,7 @@ table.mu tr.d2 td{background:var(--tint)}
   <div id="list"></div>
   <p class="key">No league football 1915–19 and 1939–46 (wartime regional competitions are not counted). FA Cup rounds from the match records to 2018/19 and from the live feed after that. League tables are computed from every result with the points rules of the day.</p>
 </div>
+</main>
 <footer class="mu"><span id="stamp"></span> Match records from the engsoccerdata archive and API-Football; season write-ups on each page from Wikipedia, CC BY-SA 4.0. <a href="/manutd/history/">Honours</a></footer>
 </div>
 <script src="/manutd/mu.js"></script>

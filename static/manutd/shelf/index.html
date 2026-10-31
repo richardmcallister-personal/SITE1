@@ -1,4 +1,4 @@
-<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Manchester United · Bookshelf & watchlist</title>
 <link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -52,12 +52,13 @@
 .item .acts{margin-top:8px;display:flex;gap:6px;flex-wrap:wrap} .item .acts a,.item .acts button{font:inherit;font-size:11px;letter-spacing:.08em;text-transform:uppercase;text-decoration:none;color:var(--ink);background:var(--tint);padding:4px 8px;border:0;cursor:pointer} .item .acts button[aria-pressed="true"]{background:var(--win);color:#fff}
 @media (max-width:640px){.item{grid-template-columns:52px 72px 1fr;gap:10px} .item .cov{width:72px;height:105px}}
 </style>
-</head><body><div class="wrap">
+</head><body><a class="skip" href="#main-content">Skip to main content</a><div class="wrap">
 <header class="mu">
-  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Bookshelf & watchlist</small>Manchester<br>United</h1></a>
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest-88.webp" srcset="/manutd/assets/crest-44.webp 44w, /manutd/assets/crest-88.webp 88w, /manutd/assets/crest-132.webp 132w" sizes="44px" alt="Manchester United crest" width="44" height="45" decoding="async"><h1><small>Bookshelf & watchlist</small>Manchester<br>United</h1></a>
   <div class="from">Shelf<span>Books, documentaries, films and podcasts by era</span></div>
 </header>
 <nav class="munav" aria-label="Sections"></nav>
+<main id="main-content" tabindex="-1">
 <div class="sheet">
   <h2>What to read and watch</h2>
   <p class="sub" style="margin:0 0 10px">A curated shelf rather than everything ever published: what each one adds, and where to find it. Tick what you've done — that's kept in this browser. Streaming availability moves between regions, so the "where" is the publisher or the platform that first carried it.</p>
@@ -65,6 +66,7 @@
   <div class="filters" id="eras"></div>
   <div id="list"></div>
 </div>
+</main>
 <footer class="mu"><span id="stamp"></span> Publishers and platforms as at first release. Search links open the club's own YouTube channel, which carries most of the match footage referred to. <a href="/manutd/links/">Links</a></footer>
 </div>
 <script src="/manutd/mu.js"></script>

@@ -1,4 +1,4 @@
-<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Manchester United · Shirt museum</title>
 <link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -68,13 +68,16 @@
 .panel .pl{display:inline-block;margin:0 8px 4px 0}
 .keybox{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px} .keybox input{font:inherit;font-size:13px;padding:6px 8px;border:1px solid var(--rule);min-width:180px} .keybox button{font:inherit;font-size:13px;padding:6px 10px;border:1px solid var(--ink);background:var(--black);color:var(--on-black);cursor:pointer}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:6px;margin:10px 0} .stats div{background:var(--tint);padding:10px 12px} .stats b{display:block;font-family:var(--head);font-weight:300;font-size:26px;line-height:1} .stats span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+#stats{min-height:168px} #kinds{min-height:125px} #mine{min-height:82px} #list{min-height:60vh}
+@media (min-width:641px){#stats{min-height:90px} #kinds{min-height:44px} #mine{min-height:44px}}
 </style>
-</head><body><div class="wrap">
+</head><body><a class="skip" href="#main-content">Skip to main content</a><div class="wrap">
 <header class="mu">
-  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>The shirt museum</small>Manchester<br>United</h1></a>
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest-88.webp" srcset="/manutd/assets/crest-44.webp 44w, /manutd/assets/crest-88.webp 88w, /manutd/assets/crest-132.webp 132w" sizes="44px" alt="Manchester United crest" width="44" height="45" decoding="async"><h1><small>The shirt museum</small>Manchester<br>United</h1></a>
   <div class="from">Shirts<span>Every kit since 1878 · your collection and wishlist</span></div>
 </header>
 <nav class="munav" aria-label="Sections"></nav>
+<main id="main-content" tabindex="-1">
 
 <div class="sheet">
   <h2>Your collection</h2>
@@ -90,6 +93,7 @@
   <div class="filters"><label class="sub" style="margin:0">Era <select id="era" style="font:inherit;font-size:13px;padding:6px"></select></label></div>
   <div id="list"></div>
 </div>
+</main>
 <footer class="mu"><span id="stamp"></span> Kit images from the site's own archive. Manufacturer and sponsor by season from the club's kit history. Players shown for a season are the most-used from the season squad records (1993–94 onwards) or the trophy-season write-ups.</footer>
 </div>
 <div class="modal" id="modal"><div class="panel" id="panel"></div></div>
