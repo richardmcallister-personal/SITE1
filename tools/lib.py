@@ -44,3 +44,29 @@ def stamp(key, note=""):
 
 def dump(obj, path):
     json.dump(obj, open(path, "w"), ensure_ascii=False, separators=(",", ":"))
+
+def wiki_changed(titles, state_path):
+    """Incremental Wikipedia parsing. Looks up the current revision of each title (50 per call through /wiki-rev) and
+    compares it with the revisions saved at state_path. Returns (todo, revs): the titles that are new or changed, and the
+    full {title: revid} map to save with save_revs() once the caller has parsed them. Titles whose revision could not be
+    read are always re-parsed; a title that disappears from Wikipedia keeps its old rows."""
+    try: old = json.load(open(state_path))
+    except Exception: old = {}
+    revs = {}
+    for i in range(0, len(titles), 50):
+        batch = titles[i:i + 50]
+        try: revs.update(get("/wiki-rev?titles=" + urllib.parse.quote("|".join(batch))))
+        except Exception as e: print("wiki-rev failed, re-parsing batch", e); revs.update({t: None for t in batch})
+    todo = [t for t in titles if revs.get(t) is None or revs.get(t) != old.get(t)]
+    return todo, revs
+
+def save_revs(state_path, revs, done):
+    """Record the revisions actually parsed (done) so the next run skips them if unchanged."""
+    try: old = json.load(open(state_path))
+    except Exception: old = {}
+    for t in done:
+        if revs.get(t): old[t] = revs[t]
+    json.dump(old, open(state_path, "w"), indent=0, ensure_ascii=False, sort_keys=True)
+
+def wiki_raw(title, rev=None):
+    return get("/wiki-raw?title=" + urllib.parse.quote(title) + (f"&rev={rev}" if rev else ""))

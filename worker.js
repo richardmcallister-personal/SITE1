@@ -56,7 +56,7 @@ export default {
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + (WIKI ? "/trips/" : "/manutd/trips/"), 301);
     if (WIKI) {
       // Clean URLs on the club domain: the site lives under /manutd/ in the repo; serve it at the root here.
-      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|collection|cover)(\/|$)/;
+      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|wiki-rev|collection|cover)(\/|$)/;
       if (url.pathname.startsWith("/manutd/")) return Response.redirect(url.origin + url.pathname.slice(7) + url.search, 301);
       if (!SERVICE.test(url.pathname)) {
         const inner = new URL(url.toString()); inner.pathname = "/manutd" + (url.pathname === "/" ? "/" : url.pathname);
@@ -76,6 +76,7 @@ export default {
     if (url.pathname === "/wiki-season") return wikiSeason(url, env, ctx);
     if (url.pathname === "/wiki-club") return wikiClub(url, env, ctx);
     if (url.pathname === "/wiki-raw") return wikiRaw(url, env, ctx);
+    if (url.pathname === "/wiki-rev") return wikiRev(url, env, ctx);
     if (url.pathname === "/cover") return cover(url, env, ctx);
     if (url.pathname === "/collection") { try { return await collection(request, url, env); } catch (e) { return json({ error: "collection: " + (e && e.message || e) }, 500); } }
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
@@ -518,7 +519,8 @@ async function wikiClub(url, env, ctx) {
 // ---- raw wikitext of one article (cached a day) — used by the build scripts that compile squad numbers.
 async function wikiRaw(url, env, ctx) {
   const title = (url.searchParams.get("title") || "").trim(); if (!title) return json({ error: "title required" }, 400);
-  const key = "wiki:raw:v1:" + title, cached = await env.MU_CACHE.get(key);
+  const rev = (url.searchParams.get("rev") || "").replace(/\D/g, "");   // build scripts pass the revision they expect, so a changed article is never served from cache
+  const key = "wiki:raw:v1:" + title + (rev ? "@" + rev : ""), cached = await env.MU_CACHE.get(key);
   if (cached) return new Response(cached, { headers: { "content-type": "text/plain; charset=utf-8", "x-source": "kv-hit" } });
   const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
   const r = await fetch("https://en.wikipedia.org/w/api.php?action=parse&format=json&prop=wikitext&redirects=1&page=" + encodeURIComponent(title.replace(/ /g, "_")), { headers: UA });
@@ -529,6 +531,19 @@ async function wikiRaw(url, env, ctx) {
   return new Response(wt, { headers: { "content-type": "text/plain; charset=utf-8", "x-source": "upstream" } });
 }
 
+
+// Latest revision id for up to 50 titles ("|"-separated), so the build scripts only re-parse articles that have changed.
+async function wikiRev(url, env, ctx) {
+  const titles = (url.searchParams.get("titles") || "").split("|").map((t) => t.trim()).filter(Boolean).slice(0, 50);
+  if (!titles.length) return json({ error: "titles required" }, 400);
+  const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
+  const r = await fetch("https://en.wikipedia.org/w/api.php?action=query&format=json&prop=revisions&rvprop=ids&redirects=1&titles=" + encodeURIComponent(titles.join("|")), { headers: UA });
+  const j = r.ok ? await r.json() : {}, out = {}, back = {};
+  for (const x of (j.query && j.query.redirects) || []) back[x.to] = x.from;
+  for (const x of (j.query && j.query.normalized) || []) back[x.to] = back[x.to] || x.from;
+  for (const p of Object.values((j.query && j.query.pages) || {})) { const rev = p.revisions && p.revisions[0] ? p.revisions[0].revid : null; out[p.title] = rev; if (back[p.title]) out[back[p.title]] = rev; }
+  return json(out);
+}
 
 // ---- Shirt collection: owned / wishlist / notes, stored in KV under a hash of the owner's passphrase.
 // GET  /collection?key=…         → the saved collection (or an empty one)

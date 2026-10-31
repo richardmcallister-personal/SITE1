@@ -67,11 +67,20 @@ def parse_boxes(seg, code, name, sid):
         gf, ga = (int(m.group(1)), int(m.group(2))) if home else (int(m.group(2)), int(m.group(1)))
         rows.append(dict(d=d, c=code, h=home, o=(t2 if home else t1), gf=gf, ga=ga, s=sid, div=name, r=clean(f.get('round', ''))))
     return rows
-all_rows = []
 Y = season_now()
-for y in range(1956, 2025):   # archive ends 2024/25; build_clubs.py takes later seasons from the feed
-    sid_ = sid(y); title = f"{y}–{str(y + 1) if y % 100 == 99 else str(y + 1)[2:]} Manchester United F.C. season"
-    try: wt = get("/wiki-raw?title=" + urllib.parse.quote(title))
+STATE = os.path.join(ROOT, "tools", "data", "wiki_revs.json")
+def stitle(y): return f"{y}–{str(y + 1) if y % 100 == 99 else str(y + 1)[2:]} Manchester United F.C. season"
+YEARS = list(range(1956, 2021))   # archive ends 2024/25; the live feed covers cups from 2021/22 and build_clubs.py the seasons after
+todo, revs = wiki_changed([stitle(y) for y in YEARS], STATE)
+old = json.load(open(OUT)) if os.path.exists(OUT) else []
+all_rows = [r for r in old if r['s'] not in {sid(y) for y in YEARS if stitle(y) in todo} and r['s'] < sid(2021)]   # unchanged seasons keep their rows
+print(len(todo), "of", len(YEARS), "season articles changed")
+done = []
+for y in YEARS:
+    title = stitle(y)
+    if title not in todo: continue
+    sid_ = sid(y)
+    try: wt = wiki_raw(title, revs.get(title))
     except Exception as e: print("no article", y, e); continue
     if not isinstance(wt, str): continue
     secs = sections(wt); n0 = len(all_rows)
@@ -81,7 +90,8 @@ for y in range(1956, 2025):   # archive ends 2024/25; build_clubs.py takes later
         seg = wt[start:end]
         rows = parse_tables(seg, code, name, sid_) or parse_boxes(seg, code, name, sid_)
         all_rows += rows
-    print(y, len(all_rows) - n0, [c for c, _, _ in secs]); time.sleep(0.4)
+    done.append(title); print(y, len(all_rows) - n0, [c for c, _, _ in secs]); time.sleep(0.4)
+save_revs(STATE, revs, done)
 # From 2021/22 the live feed has every cup match (with extra time and penalties), so it replaces the article parse.
 COMP = {'FA Cup': 'FAC', 'League Cup': 'LC', 'UEFA Champions League': 'UCL', 'UEFA Europa League': 'UEL', 'Community Shield': 'CS', 'UEFA Super Cup': 'SC', 'FIFA Club World Cup': 'CWCup'}
 for y in range(2021, 2025):

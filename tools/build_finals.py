@@ -17,9 +17,14 @@ def date(t):
     sd = re.search(r'\{\{[Ss]tart date\|(\d{4})\|(\d{1,2})\|(\d{1,2})', t)
     if sd: return f"{sd.group(1)}-{int(sd.group(2)):02d}-{int(sd.group(3)):02d}"
     m = re.search(r'(\d{1,2}) (\w+) (\d{4})', t); return f"{m.group(3)}-{MON[m.group(2)]:02d}-{int(m.group(1)):02d}" if m and m.group(2) in MON else None
-out = []
+OUT = os.path.join(STATIC, "numbers", "finals.json"); STATE = os.path.join(ROOT, "tools", "data", "wiki_revs.json")
+todo, revs = wiki_changed(FINALS, STATE); old = json.load(open(OUT)) if os.path.exists(OUT) else []
+out = [r for r in old if r['title'].replace(' (replay)', '') not in todo]; done = []
+print(len(todo), "of", len(FINALS), "final articles changed")
 for T in FINALS:
-    try: wt = get("/wiki-raw?title=" + urllib.parse.quote(T))
+    if T not in todo: continue
+    done.append(T)
+    try: wt = wiki_raw(T, revs.get(T))
     except Exception as e: print("no article", T, e); continue
     if not isinstance(wt, str): print("skip", T); continue
     boxes = [m.group(0) for m in re.finditer(r'\{\{[Ff]ootball ?box[\s\S]*?\n\}\}', wt)]
@@ -66,5 +71,5 @@ for T in FINALS:
         out.append(rec); print(T, k, rec['d'], opp, gf, ga, [(p['no'], p['name']) for p in xi][:3], len(subs))
     time.sleep(0.3)
 out.sort(key=lambda r: r['d'])
-dump(out, os.path.join(STATIC, "numbers", "finals.json")); stamp("finals", f"{len(out)} finals with line-ups")
+save_revs(STATE, revs, done); dump(out, OUT); stamp("finals", f"{len(out)} finals with line-ups")
 print(len(out), "line-ups")

@@ -53,13 +53,19 @@ def parse(wt):
     return out
 res = json.load(open(OUT)) if os.path.exists(OUT) else {}
 Y = season_now()
-for y in range(1993, Y + 1):
-    title = f"{y}–{str(y + 1) if y % 100 == 99 else str(y + 1)[2:]} Manchester United F.C. season"
+STATE = os.path.join(ROOT, "tools", "data", "wiki_revs.json")
+def stitle(y): return f"{y}–{str(y + 1) if y % 100 == 99 else str(y + 1)[2:]} Manchester United F.C. season"
+YEARS = list(range(1993, Y + 1)); todo, revs = wiki_changed([stitle(y) for y in YEARS], STATE)
+print(len(todo), "of", len(YEARS), "season articles changed"); done = []
+for y in YEARS:
+    title = stitle(y)
+    if title not in todo and sid(y) in res: continue
     try:
-        wt = get("/wiki-raw?title=" + urllib.parse.quote(title))
+        wt = wiki_raw(title, revs.get(title))
     except Exception as e:
         print("no article", title, e); continue
     rows = parse(wt) if isinstance(wt, str) else []
-    if rows: res[sid(y)] = rows
+    if rows: res[sid(y)] = rows; done.append(title)
     print(y, len(rows), "rows"); time.sleep(0.5)
+save_revs(STATE, revs, done)
 dump(res, OUT); stamp("numbers", f"{len(res)} seasons")
