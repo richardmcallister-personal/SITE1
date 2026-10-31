@@ -44,7 +44,7 @@ for c in json.load(open(H + '/clubs.json')):
 # seasons
 S = {s['id']: s for s in json.load(open(H + '/seasons.json'))}
 for a in json.load(open(H + '/all.json')):
-    t = S.get(a['id'], {}); sub = f"{a['div']} · {a['pos']}{'st' if a['pos'] == 1 else 'nd' if a['pos'] == 2 else 'rd' if a['pos'] == 3 else 'th'} of {a['teams']}" if a.get('pos') else a.get('div', '')
+    t = S.get(a['id'], {}); sub = f"{a['div']} · {a['pos']}{'st' if a['pos'] == 1 else 'nd' if a['pos'] == 2 else 'rd' if a['pos'] == 3 else 'th'} of {a['teams']}" if a.get('pos') else (a.get('div') or 'FA Cup only')
     if t.get('trophies'): sub += ' · ' + ', '.join(t['trophies'])
     add(a['title'] + ' season', 'season', '/manutd/history/season/?s=' + a['id'], sub + (' · ' + t['manager'] if t.get('manager') else ''), [a['id'], a['title'], a['title'].replace('–', '/'), a['title'][:4] + '/' + a['title'][-2:], a['title'][:4], str(int(a['title'][:4]) + 1)])
 for y in range(2025, season_now() + 1):

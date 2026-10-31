@@ -3,6 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 python3 tools/build_comebacks.py
+python3 tools/build_early.py
 python3 tools/build_cups.py
 python3 tools/build_scorers.py
 python3 tools/build_clubs.py

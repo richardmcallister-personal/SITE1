@@ -5,6 +5,7 @@ Everything here talks to the live site's Worker (manutd.wiki), never to API-Foot
 | Script | Rebuilds | Source |
 |---|---|---|
 | `build_comebacks.py` | `comebacks/api.json` (+ `tools/data/events_seen.json`) | match events, 2010/11 → now; incremental |
+| `build_early.py` | `history/data/1886-87…1891-92.json`, `history/all.json` | Newton Heath before the League: FA Cup from 1886/87 and the Football Alliance 1889–92 |
 | `build_cups.py` | `tools/data/cups.json` | League Cup, European and other cup ties 1956/57–2024/25 (FA Cup from 2019/20) from the Wikipedia season articles, live feed from 2021/22 |
 | `build_managers.py` | `history/managers.json` | Wikipedia's list of managers + record by season computed from the archive, trophies from seasons.json, arrivals from numbers.json |
 | `build_season_api.py <year>` | `history/data/<season>.json`, `history/all.json` | one-off: fill a season the archive lacks from the live feed and Wikipedia's league table (used for 2022/23) |

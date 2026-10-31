@@ -34,11 +34,8 @@ for s in sorted(NUM):
         row['apps'] = row.get('apps', 0) + x['apps']; row['goals_list'] = row.get('goals_list', 0) + x['goals']; row.setdefault('no', []).append(x['no']); row['pos'] = row.get('pos') or x.get('pos')
         if x['no'] not in p['nos']: p['nos'].append(x['no'])
 # goals
-SC = json.load(open(H + '/scorers.json'))
-for d, rows in SC.items():
-    m = M.get(d)
-    if not m: continue
-    for name, title, g, fl in rows:
+for d, m in M.items():   # scorers sit on the match rows (build_scorers.py / build_early.py)
+    for name, title, g, fl in m.get('sc', []):
         if 'o' in fl or not title: continue
         p = get_p(title, name); row = p['seasons'].setdefault(m['s'], {})
         row['goals'] = row.get('goals', 0) + g; row.setdefault('bycomp', {}); row['bycomp'][m['c']] = row['bycomp'].get(m['c'], 0) + g

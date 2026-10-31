@@ -5,7 +5,7 @@
 },
 "clubs": {
 "date": "2026-10-31",
-"note": "232 clubs"
+"note": "241 clubs"
 },
 "numbers": {
 "date": "2026-10-31",
@@ -29,7 +29,7 @@
 },
 "onthisday": {
 "date": "2026-10-31",
-"note": "6015 matches across 315 days"
+"note": "6094 matches across 315 days"
 },
 "grounds": {
 "date": "2026-10-30",
@@ -37,15 +37,15 @@
 },
 "cups": {
 "date": "2026-10-31",
-"note": "711 cup and European matches 1956–2025"
+"note": "716 cup and European matches 1956–2025"
 },
 "managers": {
 "date": "2026-10-31",
-"note": "33 managers; 6015 matches assigned"
+"note": "33 managers; 6094 matches assigned"
 },
 "records": {
 "date": "2026-10-31",
-"note": "6015 matches, 122 seasons"
+"note": "6094 matches, 125 seasons"
 },
 "finals": {
 "date": "2026-10-31",
@@ -53,11 +53,11 @@
 },
 "search": {
 "date": "2026-10-31",
-"note": "1694 entries"
+"note": "1724 entries"
 },
 "pace": {
 "date": "2026-10-31",
-"note": "122 seasons"
+"note": "125 seasons"
 },
 "scorers": {
 "date": "2026-10-31",
@@ -65,6 +65,10 @@
 },
 "players": {
 "date": "2026-10-31",
-"note": "752 players"
+"note": "769 players"
+},
+"early": {
+"date": "2026-10-31",
+"note": "Newton Heath 1886–92"
 }
 }

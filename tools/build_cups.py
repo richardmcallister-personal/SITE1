@@ -1,4 +1,4 @@
-"""League Cup, European and other cup matches 1956/57–2024/25 (and the FA Cup from 2019/20) from the Wikipedia season articles (the match archive only has
+"""Charity Shield, League Cup, European and other cup matches 1908–2024/25 (and the FA Cup from 2019/20) from the Wikipedia season articles (the match archive only has
 league and FA Cup). Writes tools/data/cups.json rows {d, c, h, o, gf, ga, s, div, r} consumed by build_clubs.py and build_onthisday.py."""
 import json, os, re, sys, time, urllib.parse
 sys.path.insert(0, os.path.dirname(__file__)); from lib import *
@@ -70,7 +70,7 @@ def parse_boxes(seg, code, name, sid):
 Y = season_now()
 STATE = os.path.join(ROOT, "tools", "data", "wiki_revs_cups.json")
 def stitle(y): return f"{y}–{str(y + 1) if y % 100 == 99 else str(y + 1)[2:]} Manchester United F.C. season"
-YEARS = list(range(1956, 2021))   # archive ends 2024/25; the live feed covers cups from 2021/22 and build_clubs.py the seasons after
+YEARS = list(range(1902, 2021))   # Charity Shields from 1908, Europe from 1956, League Cup from 1960; the live feed covers cups from 2021/22 and build_clubs.py the seasons after
 todo, revs = wiki_changed([stitle(y) for y in YEARS], STATE)
 old = json.load(open(OUT)) if os.path.exists(OUT) else []
 all_rows = [r for r in old if r['s'] not in {sid(y) for y in YEARS if stitle(y) in todo} and r['s'] < sid(2021)]   # unchanged seasons keep their rows
