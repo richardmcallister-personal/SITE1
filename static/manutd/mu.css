@@ -100,7 +100,7 @@ a.cl{color:inherit;text-decoration:none;border-bottom:1px dotted var(--rule)} a.
 .stamp{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--rule);padding:2px 8px;border-radius:3px;background:var(--paper);margin-left:8px;vertical-align:middle} .stamp.old{color:#7a5a00;background:#fff4c2;border-color:#e6c84a} footer.mu .stamp{background:var(--paper)}
 
 /* match report (hub + match centre) */
-.report .rh .k{font-family:var(--head);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.report .rh .k{font-family:var(--head);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0;border:0;padding:0;display:block}
 .report .line{font-size:20px;font-weight:600;margin:6px 0 4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap} .report .line b{font-family:var(--head);font-weight:300;font-size:34px;margin:0 6px}
 .report .sent{margin:0 0 10px;font-size:15px} .report .tag{display:inline-block;font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;background:var(--red);color:#fff;text-decoration:none;margin-left:4px;vertical-align:middle}
 .report .rg{display:grid;grid-template-columns:1fr 1fr;gap:18px} @media (max-width:640px){.report .rg{grid-template-columns:1fr}}
