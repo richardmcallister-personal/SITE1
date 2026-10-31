@@ -82,7 +82,7 @@ window.MU=(function(){
   // Kick-off in the viewer's zone, with the UK (match) time as a small sub-value beneath — or beside, inline — unless the viewer is in the UK.
   // Plain-text form for canvases and titles.
   function fmtKOText(iso){return IN_UK?fmtUK(iso)+" UK":fmtLocal(iso)+" "+tzLabel(iso)+" (" +fmtUK(iso)+" UK)"}
-  function fmtKO(iso,inline){return IN_UK?fmtUK(iso)+" UK":fmtLocal(iso)+" "+esc(tzLabel(iso))+'<small class="tz'+(inline?' inl':'')+'">'+fmtUK(iso)+' UK</small>'}
+  function fmtKO(iso,inline){return IN_UK?fmtUK(iso)+" UK":fmtLocal(iso)+" "+esc(tzLabel(iso))+'<small class="tz'+(inline?' inl':'')+'">'+(inline?'· ':'')+fmtUK(iso)+' UK</small>'}
   function fmtSE(iso){return fmtLocal(iso)}
   // ---- single fixture source: fixtures.js wins over the API for kick-off date/time; the API supplies ids, scores, status.
   function nrm(n){return String(n||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z]/g,"")}
