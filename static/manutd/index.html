@@ -43,88 +43,95 @@
 
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
 <link rel="stylesheet" href="/manutd/mu.css">
-<style>.alertRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap} .prefs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px 18px;margin:12px 0 0;font-size:14px} .prefs label{display:flex;gap:8px;align-items:center} .prefs input{width:16px;height:16px;accent-color:var(--red)} #alertStatus{font-size:13px}</style>
 <style>
-.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:4px;margin-top:10px}
-@media (max-width:760px){.hero{grid-template-columns:1fr}}
-.next{background:#fff;padding:22px 26px}
-.next .opp{font-family:var(--head);font-weight:600;font-size:clamp(28px,4vw,44px);line-height:1;letter-spacing:-.01em;margin:12px 0 6px}
-.next .meta{font-size:15px;color:var(--muted)}
-.next .vs{display:flex;align-items:center;gap:14px;margin-top:12px} .next .vs img.crest{width:64px;height:64px;margin:0;vertical-align:middle} .next .vs span{font-family:var(--head);font-weight:300;font-size:28px;color:var(--muted)}
-.next .opp{margin-top:10px}
-.count{display:flex;gap:18px;margin-top:14px}
-.count div{text-align:center} .count b{display:block;font-family:var(--head);font-size:40px;line-height:1;font-weight:300}
-.count span{font-family:var(--head);font-weight:500;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-.pos{background:var(--black);color:#fff;padding:22px 26px;display:flex;flex-direction:column;justify-content:space-between}
-.pos .big{font-family:var(--head);font-weight:300;font-size:clamp(64px,10vw,100px);line-height:.85;margin-top:14px}
-.pos .big small{font-size:.3em;vertical-align:top;margin-left:4px}
-.pos .k{font-family:var(--head);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#bbb;display:flex;align-items:center;gap:8px}
-.pos .k img,.from .comps img{background:#fff;border-radius:6px;padding:3px;box-sizing:content-box}
-.from .comps a{display:block;line-height:0} .from .comps img{height:30px;width:30px;object-fit:contain} .from .comps img.dark{background:#111} .from .comps a:hover img{outline:2px solid #fff}
-.pos table{color:#fff} .pos .sub{color:#bbb}
-.preview{margin-top:16px;border-top:1px solid var(--rule);padding-top:12px} .preview h4{font-family:var(--head);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:10px 0 4px}
-.preview .h2h{display:flex;gap:6px;flex-wrap:wrap} .preview .h2h div{background:var(--tint);padding:8px 10px;text-align:center;min-width:64px} .preview .h2h b{display:block;font-family:var(--head);font-weight:300;font-size:22px;line-height:1} .preview .h2h span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.alertRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap} .prefs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px 18px;margin:12px 0 0;font-size:14px} .prefs label{display:flex;gap:8px;align-items:center} .prefs input{width:16px;height:16px;accent-color:var(--red-ink)} #alertStatus{font-size:13px}
+/* hub layout: one column on phones (DOM order), three on desktop */
+.hub{display:grid;grid-template-columns:1fr;gap:0}
+.hub>.sheet{margin-top:12px}
+@media (min-width:900px){.hub{grid-template-columns:repeat(3,minmax(0,1fr));gap:0 16px;align-items:start}
+  .hub .col{display:flex;flex-direction:column;min-width:0} .hub #alerts{grid-column:1/-1}
+  .lastrow .d{white-space:nowrap}}
+@media (max-width:899px){.hub .col{display:contents} .hub{display:flex;flex-direction:column}
+  #matchSheet{order:1} #tableSheet{order:2} #otdSheet{order:3} #lastSheet{order:4} #upSheet{order:5} #secSheet{order:6} #alerts{order:7}}
+/* match card */
+.mc .k{font-family:var(--display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mc .pill{font-family:var(--body);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--tint);padding:3px 8px;border-radius:10px} .mc .pill.live{background:var(--red);color:#fff}
+.mc .vs{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;margin:12px 0 8px}
+.mc .team{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:13px;font-weight:600;text-align:center} .mc .team img{width:56px;height:56px;object-fit:contain;margin:0}
+.mc .score{font-family:var(--display);font-size:56px;line-height:1;letter-spacing:.02em;text-align:center} .mc .score small{display:block;font-family:var(--body);font-size:11px;color:var(--muted);letter-spacing:.06em;margin-top:4px}
+.mc .time{font-family:var(--display);font-size:36px;line-height:1;text-align:center} .mc .time small{display:block;font-family:var(--body);font-size:11px;color:var(--muted);margin-top:4px}
+.mc .line{font-size:13px;color:var(--muted);text-align:center;margin:0 0 12px}
+.mc .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px} .mc .acts .btn{text-align:center;padding:12px} .mc .acts .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink);padding:11px}
+.mc details{margin-top:12px;border-top:1px solid var(--rule);padding-top:8px} .mc summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--red-ink);list-style:none} .mc summary::-webkit-details-marker{display:none} .mc summary:after{content:" ›";}
+.preview h4{font-family:var(--head);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:10px 0 4px}
+.preview .h2h{display:flex;gap:6px;flex-wrap:wrap} .preview .h2h div{background:var(--tint);padding:8px 10px;text-align:center;min-width:64px;border-radius:8px} .preview .h2h b{display:block;font-family:var(--display);font-size:22px;line-height:1} .preview .h2h span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .preview ul{list-style:none;margin:0;padding:0;font-size:13px} .preview li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid var(--rule)} .preview li small{color:var(--muted)}
-.preview .kit{display:flex;align-items:center;gap:10px} .preview .kit img{width:56px;height:56px;object-fit:contain;background:#fafafa;border:1px solid var(--rule)}
+.preview .kit{display:flex;align-items:center;gap:10px} .preview .kit img{width:56px;height:56px;object-fit:contain;background:var(--tint);border-radius:6px}
 .preview .two{display:grid;grid-template-columns:1fr 1fr;gap:14px} @media (max-width:640px){.preview .two{grid-template-columns:1fr}}
-.otdy{display:inline-block;min-width:44px;font-family:var(--head);font-weight:300;font-size:18px;color:var(--red);margin-right:8px;vertical-align:-2px}
-.links{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:4px;margin-top:4px}
-.links a{display:block;background:#fff;color:var(--ink);text-decoration:none;padding:18px 22px}
-.links a:hover{background:var(--tint)} .links a b{display:block;font-family:var(--head);font-weight:600;font-size:15px;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px}
-.links a span{font-size:14px;color:var(--muted)}
+/* small tiles */
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px} .tile{background:var(--paper);border-radius:var(--radius);padding:12px 14px;display:flex;flex-direction:column;gap:3px;box-shadow:0 1px 0 rgba(0,0,0,.05)}
+.tile .k{font-family:var(--display);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)} .tile .v{font-size:15px;font-weight:600} .tile .s{font-size:13px;color:var(--muted)} .tile .t{font-size:11px;color:var(--muted)}
+/* compact table */
+table.mini{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums} table.mini th{font-family:var(--head);font-weight:500;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:left;padding:4px 6px} table.mini td{padding:7px 6px;border-top:1px solid var(--rule)} table.mini .n{text-align:right} table.mini tr.us td{background:var(--us);font-weight:700} table.mini td.pos{color:var(--muted)} table.mini tr.gap td{text-align:center;color:var(--muted);font-size:11px;padding:2px}
+table.mini tr.rel td:first-child{box-shadow:inset 3px 0 0 var(--red)}
+/* on this day + sections */
+.lastrow .d.otdy{font-family:var(--display);font-size:20px;color:var(--red-ink);min-width:56px}
+.secs{list-style:none;margin:0;padding:0} .secs li{border-top:1px solid var(--rule)} .secs li:first-child{border-top:0} .secs a{display:flex;align-items:center;gap:12px;padding:12px 0;color:var(--ink);text-decoration:none} .secs .ic{width:34px;height:34px;border-radius:8px;background:var(--us);color:var(--red-ink);display:flex;align-items:center;justify-content:center;flex:0 0 auto} .secs .ic svg{width:18px;height:18px} .secs b{display:block;font-size:15px} .secs small{font-size:12px;color:var(--muted)} .secs .ch{margin-left:auto;color:var(--muted)}
+h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;padding:0;width:100%;font-family:var(--display);font-weight:400;font-size:13px} h2.row a{font-family:var(--body);font-size:12px;color:var(--red-ink);text-decoration:none;letter-spacing:0;text-transform:none;font-weight:600}
+.lastrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--rule);font-size:14px} .lastrow .d{font-size:11px;color:var(--muted);min-width:56px} .lastrow .ha{font-size:10px;font-weight:700;color:var(--muted);background:var(--tint);padding:2px 5px;border-radius:3px} .lastrow .o{flex-grow:1;font-weight:600} .lastrow .o small{display:block;font-weight:400;color:var(--muted);font-size:11px} .lastrow .r{font-family:var(--display);font-size:18px;white-space:nowrap} .lastrow .r a{color:inherit;text-decoration:none} .lastrow .r small.tz{font-family:var(--body);font-size:10px} .lastrow .form{margin-left:2px}
 </style></head><body><div class="wrap">
 <header class="mu">
-  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Season 2026/27</small>Manchester<br>United</h1></a>
-  <div class="from">Club hub<span class="comps" style="display:flex;gap:8px;justify-content:flex-end;align-items:center;margin-top:8px"><a href="https://www.premierleague.com/" target="_blank" rel="noopener" title="Premier League"><img src="/manutd/assets/comps/premier-league.png" alt="Premier League"></a><a href="https://www.uefa.com/uefachampionsleague/" target="_blank" rel="noopener" title="UEFA Champions League"><img src="/manutd/assets/comps/champions-league.png" alt="Champions League"></a><a href="https://www.thefa.com/competitions/thefacup" target="_blank" rel="noopener" title="The FA Cup"><img src="/manutd/assets/comps/fa-cup.png" alt="FA Cup"></a><a href="https://www.efl.com/competitions/carabao-cup/" target="_blank" rel="noopener" title="Carabao Cup"><img src="/manutd/assets/comps/league-cup-carabao.png" alt="Carabao Cup"></a></span></div>
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small id="eyebrow">Season 2026/27</small>Manchester<br>United</h1></a>
+  <div class="from">Club hub<span id="fromSub">Today</span></div>
 </header>
 <nav class="munav" aria-label="Sections"></nav>
 
-<div class="hero">
-  <div class="next" id="next"><div class="k" style="font-family:var(--display);font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Next match</div><div class="opp">—</div></div>
-  <div class="pos" id="pos"><div><div class="k"><img src="/manutd/assets/comps/premier-league.png" alt="" style="height:18px;width:auto">Premier League</div><div class="big">—</div></div><p class="sub">Live position, points and form arrive once the API key is active.</p></div>
-</div>
-
-<div class="links">
-  <a href="/manutd/trips/"><b>Trips</b><span>Tickets, flights and hotels for every fixture, home and away, with real prices.</span></a>
-  <a href="/manutd/grounds/"><b>Ground guides</b><span>Before you go: getting there, the away end, meeting spots, bag rules and getting home — with the date each was checked.</span></a>
-  <a href="/manutd/season/"><b>Season</b><span>League table, Champions League phase, every result and what's left.</span></a>
-  <a href="/manutd/squad/"><b>Squad & team picker</b><span>Who's fit, who's out, stats this season and for United, pick your XI.</span></a>
-  <a href="/manutd/youth/"><b>Academy & loans</b><span>Weekly minutes, roles and form for the loanees and the kids in the squad, and the route to a debut.</span></a>
-  <a href="/manutd/kits/"><b>The shirt museum</b><span>Every kit since 1878 — home, away, third, keepers and finals — with your own collection and wishlist.</span></a>
-  <a href="/manutd/numbers/"><b>Who wore this number?</b><span>Follow 7, 9 or 10 through the years — every holder of every squad number since 1993–94, and who wore 1–11 in the finals before that.</span></a>
-  <a href="/manutd/comebacks/"><b>The comeback collection</b><span>Two goals down, injury-time winners, ten men, penalties — something to watch after a bad day.</span></a>
-  <a href="/manutd/shelf/"><b>Bookshelf & watchlist</b><span>The books, documentaries, films and podcasts worth your time, by era — what each adds and where to find it.</span></a>
-  <a href="/manutd/history/"><b>History</b><span>Every season since 1892, every opponent, every manager — tables, results and the matches that decided them.</span></a>
-  <a href="/manutd/rivalry/"><b>Rivalries</b><span>Liverpool, City, Leeds, Arsenal, Chelsea — the full record, runs, scorers in the fixture and the next meeting with a trip link.</span></a>
-  <a href="/manutd/history/records/"><b>Records</b><span>Biggest wins, heaviest defeats, the 45-match unbeaten run, most goals in a season — all computed from the archive, not copied.</span></a>
-  <a href="/manutd/history/managers/"><b>The managers</b><span>From Albut to Carrick: tenure, record season by season, honours and the players who arrived under each.</span></a>
-</div>
-
-<div class="sheet" style="margin-top:4px" id="reportSheet" hidden><div id="report"></div></div>
-<div class="sheet" style="margin-top:4px">
-  <h2>On this day</h2>
-  <p class="sub" id="otdNote" style="margin:0 0 8px"></p>
-  <ul class="fxlist" id="otd"></ul>
-</div>
-<div class="sheet" style="margin-top:4px">
-  <h2>Last five</h2>
-  <div id="last"></div>
-  <h2 style="margin-top:22px">Coming up</h2>
-  <ul class="fxlist" id="upcoming"></ul>
-</div>
-
-<div class="sheet" style="margin-top:4px" id="alerts">
-  <h2>Match alerts</h2>
-  <p class="sub" id="alertNote" style="margin:0 0 10px">Team news an hour before kick-off, every goal as it goes in, half-time and the final score — pushed to this device.</p>
-  <div class="alertRow"><button class="btn red" id="alertBtn" type="button">Turn on alerts</button><button class="btn" id="alertTest" type="button" hidden>Send a test</button><span id="alertStatus" class="sub"></span></div>
-  <div class="prefs" id="alertPrefs" hidden>
-    <label><input type="checkbox" data-p="kickoff" checked> Kick-off reminder, an hour before</label>
-    <label><input type="checkbox" data-p="lineups" checked> Team news when the line-ups are out</label>
-    <label><input type="checkbox" data-p="goals" checked> Goals, both ends</label>
-    <label><input type="checkbox" data-p="result" checked> Half-time and full-time</label>
+<main class="hub">
+  <div class="col">
+  <div class="sheet mc" id="matchSheet"><div class="k">Next match</div><div class="line">Loading…</div></div>
+  <div class="sheet" id="upSheet"><h2 class="row">Coming up <a href="/manutd/trips/">Trips →</a></h2><div id="upcoming"></div></div>
   </div>
-  <p class="sub" id="alertHint" style="margin:8px 0 0" hidden></p>
-</div>
+  <div class="col">
+  <div class="sheet" id="tableSheet" style="padding:0;background:transparent;box-shadow:none">
+    <div class="tiles" id="tiles">
+      <div class="tile" id="tileTable"><span class="k">Table</span><span class="v">—</span><span class="s"></span><span class="t"></span></div>
+      <div class="tile" id="tileNews"><span class="k">Team news</span><span class="v">—</span><span class="s"></span><span class="t"></span></div>
+    </div>
+    <div class="sheet" id="miniSheet" hidden><h2 class="row">Premier League <a href="/manutd/season/">Full table →</a></h2><div id="mini"></div><p class="sub" id="pace" style="margin:8px 0 0"></p></div>
+  </div>
+  <div class="sheet" id="lastSheet"><h2 class="row">Last five <a href="/manutd/season/">Results →</a></h2><div id="last"></div><div id="reportWrap" hidden><h3>Latest match report</h3><div id="report"></div></div></div>
+  </div>
+  <div class="col">
+  <div class="sheet" id="otdSheet"><h2 class="row">On this day <a href="/manutd/history/">History →</a></h2><p class="sub" id="otdNote" style="margin:0 0 6px"></p><div id="otd"></div></div>
+  <div class="sheet" id="secSheet"><a id="more"></a><h2 class="row">Everything else</h2>
+    <ul class="secs">
+      <li><a href="/manutd/trips/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><span><b>Trips</b><small>Flights, hotels and prices for every fixture</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/grounds/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span><b>Ground guides</b><small>17 away days: getting there, the away end, getting home</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/squad/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span><b>Squad &amp; team picker</b><small>Who's fit, who's out, this season's numbers</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/youth/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 9l7-6 7 6M5 15l7 6 7-6"/></svg></span><span><b>Academy &amp; loans</b><small>Loan watch and the route to a debut</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/history/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span><b>History</b><small>140 seasons, 770 players, 33 managers, records</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/rivalry/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l16 16M20 4 4 20"/></svg></span><span><b>Rivalries</b><small>Liverpool, City, Leeds, Arsenal, Chelsea</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/kits/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4 4 7l2 4 2-1v10h8V10l2 1 2-4-4-3a4 4 0 0 1-8 0Z"/></svg></span><span><b>Shirt museum</b><small>445 kits since 1878, your collection</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/numbers/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14M7 4v16M17 4v16"/></svg></span><span><b>Who wore this number?</b><small>Every holder since 1993, and 1–11 at the finals</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/comebacks/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14a8 8 0 1 0 2-5.3M4 4v5h5"/></svg></span><span><b>Comeback collection</b><small>Something to watch after a bad day</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/shelf/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v14H4zM9 5v14M4 10h16"/></svg></span><span><b>Bookshelf &amp; watchlist</b><small>Books, documentaries, films and podcasts by era</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/links/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></span><span><b>Links</b><small>Official sites, tickets, travel</small></span><span class="ch">›</span></a></li>
+    </ul>
+  </div>
+  </div>
+  <div class="sheet" id="alerts">
+    <h2>Match alerts</h2>
+    <p class="sub" id="alertNote" style="margin:0 0 10px">Team news an hour before kick-off, every goal as it goes in, half-time and the final score — pushed to this device.</p>
+    <div class="alertRow"><button class="btn red" id="alertBtn" type="button">Turn on alerts</button><button class="btn" id="alertTest" type="button" hidden>Send a test</button><span id="alertStatus" class="sub"></span></div>
+    <div class="prefs" id="alertPrefs" hidden>
+      <label><input type="checkbox" data-p="kickoff" checked> Kick-off reminder, an hour before</label>
+      <label><input type="checkbox" data-p="lineups" checked> Team news when the line-ups are out</label>
+      <label><input type="checkbox" data-p="goals" checked> Goals, both ends</label>
+      <label><input type="checkbox" data-p="result" checked> Half-time and full-time</label>
+    </div>
+    <p class="sub" id="alertHint" style="margin:8px 0 0" hidden></p>
+  </div>
+</main>
 
 <footer class="mu">Fixture dates from tickets.manutd.com (home) and the TV-selected lists (away) on 29 Oct 2026. Live table, results and form from API-Football via this site's own Worker; nothing is fetched from the user's browser except this site and flag images.</footer>
 </div>
@@ -162,22 +169,29 @@
 <script>
 (function(){
   MU.nav("Hub");
-  var now=new Date(), fx=window.MU_FIXTURES, next=null;
+  var $=function(i){return document.getElementById(i)}, now=new Date(), fx=window.MU_FIXTURES, next=null;
   for(var i=0;i<fx.length;i++){if(new Date(fx[i].ko)>now){next=fx[i];break}}
-  function renderNext(f){
-    if(!f)return;
-    var el=document.getElementById("next");
-    el.innerHTML='<div style="font-family:var(--head);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)">Next match · '+(f.home?"Old Trafford":"Away · "+MU.esc(f.venue))+'</div>'+
-      '<div class="vs">'+MU.crest(f.home?"Manchester United":f.opp,64)+'<span>v</span>'+MU.crest(f.home?f.opp:"Manchester United",64)+'</div>'+
-      '<div class="opp">'+(f.home?"United v "+MU.esc(f.opp):MU.esc(f.opp)+" v United")+'</div>'+
-      '<div class="meta">'+MU.fmtDate(f.ko)+' · '+MU.fmtKO(f.ko,true)+' · '+MU.comp(f.comp,22)+MU.esc(f.comp)+MU.prov(f)+'</div>'+
-      '<div class="count" id="count"></div><p style="margin:14px 0 0;display:flex;gap:8px;flex-wrap:wrap"><a class="btn red" href="/manutd/trips/">Plan the trip</a><a class="btn" id="mcBtn" href="/manutd/season/">Match centre</a></p><div class="preview" id="preview"></div>';
-    function tick(){var ms=new Date(f.ko)-new Date(); if(ms<0){document.getElementById("count").innerHTML="<div><b>Live</b></div>";return}
-      var d=Math.floor(ms/864e5),h=Math.floor(ms%864e5/36e5),m=Math.floor(ms%36e5/6e4);
-      document.getElementById("count").innerHTML='<div><b>'+d+'</b><span>days</span></div><div><b>'+h+'</b><span>hours</span></div><div><b>'+m+'</b><span>min</span></div>'}
-    tick(); setInterval(tick,30000);
+  function ord(n){return n+(["th","st","nd","rd"][n%10>3||Math.floor(n%100/10)===1?0:n%10])}
+  function when(iso){var ms=new Date(iso)-new Date(), d=Math.floor(ms/864e5), h=Math.floor(ms%864e5/36e5); if(ms<0)return "Now"; if(d===0)return h<1?"In "+Math.max(1,Math.floor(ms/6e4))+" min":"Today · in "+h+"h"; if(d===1)return "Tomorrow"; return "In "+d+" days"}
+  // ---- The match card: upcoming (fixture file), live or just finished (feed)
+  function cardUpcoming(f){
+    $("matchSheet").innerHTML='<div class="k"><span>Next · '+MU.esc(f.comp)+'</span><span class="pill" id="pill">'+when(f.ko)+'</span></div>'+
+      '<div class="vs"><div class="team">'+MU.crest(f.home?"Manchester United":f.opp,56)+(f.home?"United":MU.esc(f.opp))+'</div><div class="time">'+MU.fmtLocal(f.ko)+'<small>'+(MU.IN_UK?"UK":MU.fmtKO(f.ko,true).replace(/<[^>]+>/g," ").replace(/^\S+\s+/,""))+MU.prov(f)+'</small></div><div class="team">'+MU.crest(f.home?f.opp:"Manchester United",56)+(f.home?MU.esc(f.opp):"United")+'</div></div>'+
+      '<p class="line">'+MU.fmtDate(f.ko,{weekday:"long",year:undefined})+' · '+MU.esc(f.venue)+'</p>'+
+      '<div class="acts"><a class="btn" id="mcBtn" href="/manutd/season/">Match centre</a><a class="btn ghost" href="/manutd/trips/">'+(f.home?"Plan the day":"Plan the trip")+'</a></div>'+
+      '<details><summary>Match preview</summary><div class="preview" id="preview"></div></details>';
+    setInterval(function(){var p=$("pill"); if(p)p.textContent=when(f.ko)},30000);
   }
-  renderNext(next);
+  function cardLive(m,f){ // m: feed fixture with events (may be null events)
+    var home=m.teams.home.id===MU.TEAM, st=m.fixture.status, live=/1H|HT|2H|ET|P|BT|LIVE/.test(st.short), done=/FT|AET|PEN/.test(st.short);
+    var sc=MU.goalEvents(f).filter(function(e){return e.ok}), us=sc.filter(function(e){return e.team.id===MU.TEAM}), them=sc.filter(function(e){return e.team.id!==MU.TEAM});
+    var line=function(list){return list.map(function(e){return e.player.name.split(" ").pop()+" "+e.time.elapsed+(e.time.extra?"+"+e.time.extra:"")+"'"+(e.detail==="Penalty"?" pen":e.detail==="Own Goal"?" og":"")}).join(", ")};
+    $("matchSheet").innerHTML='<div class="k"><span>'+(live?"Live":"Full-time")+' · '+MU.esc(m.league.name)+'</span><span class="pill'+(live?' live':'')+'">'+(live?(st.elapsed!=null?st.elapsed+"'":st.long):MU.fmtDate(m.fixture.date))+'</span></div>'+
+      '<div class="vs"><div class="team">'+MU.crest(m.teams.home.name,56)+MU.esc(m.teams.home.name)+'</div><div class="score">'+m.goals.home+'–'+m.goals.away+(st.short==="PEN"&&m.score.penalty?'<small>'+m.score.penalty.home+'–'+m.score.penalty.away+' pens</small>':'')+'</div><div class="team">'+MU.crest(m.teams.away.name,56)+MU.esc(m.teams.away.name)+'</div></div>'+
+      '<p class="line">'+(sc.length?MU.esc(line(home?us:them))+(us.length&&them.length?' · ':'')+MU.esc(line(home?them:us)):'')+'</p>'+
+      '<div class="acts"><a class="btn" href="/manutd/match/?id='+m.fixture.id+'">Match centre</a><a class="btn ghost" href="/manutd/season/">Table</a></div>';
+  }
+  if(next)cardUpcoming(next); else $("matchSheet").innerHTML='<div class="k">Next match</div><p class="line">No fixture in the file yet.</p>';
   // ---- Match preview: head-to-head, last five meetings, form, doubts, the kit.
   function preview(f){ if(!f||!document.getElementById("preview"))return; var el=document.getElementById("preview"), slug=(MU.crest(f.opp,1).match(/crests\/([^"]+)\.png/)||[])[1];
     Promise.all([fetch("/manutd/history/clubs.json").then(function(r){return r.json()}).catch(function(){return []}),fetch("/manutd/kits/kits.json").then(function(r){return r.json()}).catch(function(){return []}),MU.api("injuries").catch(function(){return {response:[]}}),MU.api("standings").catch(function(){return null})]).then(function(res){
@@ -199,40 +213,42 @@
     }).catch(function(){});
   }
   preview(next);
-  // ---- On this day: the archive indexed by calendar day.
+  // ---- On this day
   fetch("/manutd/history/onthisday.json").then(function(r){return r.json()}).then(function(O){
-    var d=new Date(), md=d.toLocaleDateString("en-GB",{month:"2-digit",day:"2-digit",timeZone:"Europe/London"}).split("/").reverse().join("-"), ms=O[md]||[], yr=d.getFullYear();
-    document.getElementById("otdNote").textContent=ms.length?ms.length+" United matches have been played on "+MU.fmtDate(d.toISOString(),{weekday:undefined,day:"numeric",month:"long"})+" since 1892. The ones worth remembering:":"No United match on this date in the archive — a rest day across 130 seasons.";
-    document.getElementById("otd").innerHTML=ms.slice(0,6).map(function(m){var res=m.gf>m.ga?"W":m.gf<m.ga?"L":"D", y=parseInt(m.d,10);
-      return '<li class="'+(m.h?"home":"away")+'"><span class="d"><span class="otdy">'+(yr-y)+'</span>yrs ago</span><span class="o">'+MU.club(m.o)+' <small>· '+MU.esc(m.comp||m.div)+(m.r?' · '+MU.esc(m.r):'')+' · <a href="/manutd/history/season/?s='+m.s+'">'+m.s.replace("-","–")+'</a>'+(m.scorers?' · '+MU.esc(m.scorers):'')+(m.tags&&m.tags.length?' · <a href="/manutd/comebacks/">'+m.tags.map(function(t){return MU.TAGLABEL[t]||t}).join(", ")+'</a>':'')+'</small></span><span class="r">'+(m.id?'<a href="/manutd/match/?id='+m.id+'" style="color:inherit;text-decoration:none">':'')+m.gf+'–'+m.ga+(m.id?'</a>':'')+' '+MU.form(res)+'</span></li>'}).join("");
+    var d=new Date(), md=d.toLocaleDateString("en-GB",{month:"2-digit",day:"2-digit",timeZone:MU.TZ}).split("/").reverse().join("-"), ms=O[md]||[], yr=d.getFullYear();
+    $("otdNote").textContent=ms.length?ms.length+" United matches on "+MU.fmtDate(d.toISOString(),{weekday:undefined,day:"numeric",month:"long"})+" since 1886.":"No United match on this date in the archive.";
+    $("otd").innerHTML=ms.slice(0,5).map(function(m){var res=m.gf>m.ga?"W":m.gf<m.ga?"L":"D", y=parseInt(m.d,10);
+      return '<div class="lastrow"><span class="d otdy">'+y+'</span><span class="ha">'+(m.h?"H":"A")+'</span><span class="o">'+MU.club(m.o)+'<small>'+MU.esc(m.comp||m.div)+(m.r?' · '+MU.esc(m.r):'')+(m.scorers?' · '+MU.esc(m.scorers):'')+'</small></span><span class="r">'+(m.id?'<a href="/manutd/match/?id='+m.id+'">':'<a href="/manutd/history/season/?s='+m.s+'">')+m.gf+'–'+m.ga+'</a></span>'+MU.form(res)+'</div>'}).join("");
   }).catch(function(){});
-  var up=document.getElementById("upcoming");
-  up.innerHTML=fx.filter(function(f){return new Date(f.ko)>now}).slice(0,8).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtKO(f.ko)+MU.prov(f)+'</span><span class="o">'+MU.club(f.opp)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("");
-
-  // Live bits
+  function upRow(home,opp,ko,comp,venue,prov,id){return '<div class="lastrow"><span class="d">'+MU.fmtDate(ko)+'</span><span class="ha">'+(home?"H":"A")+'</span><span class="o">'+MU.club(opp)+'<small>'+MU.esc(comp)+(home?'':' · '+MU.esc(venue||""))+(id?' · <a href="/manutd/match/?id='+id+'">Match centre</a>':'')+'</small></span><span class="r" style="font-size:15px;text-align:right">'+MU.fmtLocal(ko)+(prov?MU.prov(prov):'')+(MU.IN_UK?'':'<small class="tz">'+MU.fmtUK(ko)+' UK</small>')+'</span></div>'}
+  $("upcoming").innerHTML=fx.filter(function(f){return new Date(f.ko)>now}).slice(0,6).map(function(f){return upRow(f.home,f.opp,f.ko,f.comp,f.venue,f)}).join("");
+  // ---- Live bits: table tile + compact table + pace, team news, last five, live/finished match card
   MU.api("standings").then(function(j){
-    var rows=j.response[0].league.standings[0], me=rows.filter(function(r){return r.team.id===MU.TEAM})[0];
-    if(!me)return;
-    var pos=document.getElementById("pos");
-    var ord=["th","st","nd","rd"][me.rank%10>3||Math.floor(me.rank%100/10)===1?0:me.rank%10];
-    pos.innerHTML='<div><div class="k"><img src="/manutd/assets/comps/premier-league.png" alt="" style="height:18px;width:auto">Premier League · after '+me.all.played+' games</div><div class="big">'+me.rank+'<small>'+ord+'</small></div></div>'+
-      '<table class="mu" style="margin-top:10px"><tr><td>Points</td><td class="n">'+me.points+'</td></tr><tr><td>W–D–L</td><td class="n">'+me.all.win+'–'+me.all.draw+'–'+me.all.lose+'</td></tr><tr><td>Goal difference</td><td class="n">'+(me.goalsDiff>0?"+":"")+me.goalsDiff+'</td></tr><tr><td>Form</td><td class="n">'+MU.form(me.form)+'</td></tr></table>'+
-      '<p class="sub" style="color:#bbb">'+MU.esc(me.description||"")+' · <a href="/manutd/season/" style="color:#fff">Full table</a></p>';
-  }).catch(function(e){ /* keep placeholder */ });
+    var rows=j.response[0].league.standings[0], me=rows.filter(function(r){return r.team.id===MU.TEAM})[0]; if(!me)return;
+    var t=$("tileTable"); t.querySelector(".v").textContent=ord(me.rank)+" · "+me.points+" pts"; t.querySelector(".s").innerHTML=me.all.played+" played · "+MU.form(me.form); t.querySelector(".t").textContent=(me.description||"").replace(/Promotion - /,"");
+    var i=rows.indexOf(me), pick=rows.slice(0,2).concat(rows.slice(Math.max(2,i-1),Math.min(rows.length,i+2))), prev=null;
+    $("miniSheet").hidden=false; $("mini").innerHTML='<table class="mini"><thead><tr><th>#</th><th>Team</th><th class="n">P</th><th class="n">GD</th><th class="n">Pts</th></tr></thead><tbody>'+pick.map(function(r){var gap=prev&&r.rank-prev.rank>1; prev=r; var cls=(r.team.id===MU.TEAM?"us":"")+(/relegation/i.test(r.description||"")?" rel":""); return (gap?'<tr class="gap"><td colspan="5">· · ·</td></tr>':'')+'<tr class="'+cls+'"><td class="pos">'+r.rank+'</td><td>'+MU.club(r.team.name)+'</td><td class="n">'+r.all.played+'</td><td class="n">'+(r.goalsDiff>0?"+":"")+r.goalsDiff+'</td><td class="n"><b>'+r.points+'</b></td></tr>'}).join("")+'</tbody></table>';
+    fetch("/manutd/history/pace.json").then(function(r){return r.json()}).then(function(P){var n=me.all.played; if(n<3)return; var rs=[]; Object.keys(P).forEach(function(s){var v=P[s]; if(v.tier===1&&v.run.length>=n)rs.push(v.run[n-1][0])}); rs.sort(function(a,b){return b-a}); var better=rs.filter(function(p){return p>me.points}).length; $("pace").innerHTML=ord(better+1)+"-best start of "+(rs.length+1)+" top-flight seasons at "+n+" games · <a href=\"/manutd/season/\">how it compares</a>"; $("tileTable").querySelector(".t").textContent=ord(better+1)+"-best start of "+(rs.length+1)}).catch(function(){});
+  }).catch(function(){});
+  MU.api("injuries").then(function(j){var inj=(j.response||[]).filter(function(x){var d=x.fixture&&x.fixture.date; return !d||new Date(d)>new Date(Date.now()-7*864e5)}).reduce(function(a,x){if(!a.some(function(q){return q.player.id===x.player.id}))a.push(x);return a},[]);
+    var t=$("tileNews"), out=inj.filter(function(x){return /Missing/i.test(x.player.type||"")}), dbt=inj.filter(function(x){return !/Missing/i.test(x.player.type||"")});
+    t.querySelector(".v").textContent=inj.length?out.length+" out"+(dbt.length?", "+dbt.length+" doubt"+(dbt.length>1?"s":""):""):"No absentees reported";
+    t.querySelector(".s").textContent=inj.slice(0,3).map(function(x){return x.player.name.split(" ").pop()+(x.player.reason?" ("+x.player.reason.toLowerCase()+")":"")}).join(", ");
+    t.querySelector(".t").innerHTML='<a href="/manutd/squad/">Squad →</a>';
+  }).catch(function(){});
   MU.api("fixtures").then(function(j){
-    var played=j.response.filter(function(m){return m.fixture.status.short==="FT"||m.fixture.status.short==="AET"||m.fixture.status.short==="PEN"}).sort(function(a,b){return b.fixture.timestamp-a.fixture.timestamp}).slice(0,5);
-    document.getElementById("last").innerHTML='<ul class="fxlist">'+played.map(function(m){
-      var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home;
-      var res=gf>ga?"W":gf<ga?"L":"D";
-      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(m.fixture.date)+'</span><span class="o">'+MU.club(opp.name)+' <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+'</small></span><span class="r"><a href="/manutd/match/?id='+m.fixture.id+'" style="color:inherit;text-decoration:none">'+gf+'–'+ga+'</a> '+MU.form(res)+'</span></li>'}).join("")+'</ul>';
-    // match report for the latest finished match (kept on the match centre page too)
-    if(played[0]){MU.api("match",{fixture:played[0].fixture.id}).then(function(j){var f=j.response&&j.response[0]; if(!f)return; document.getElementById("report").innerHTML=MU.report(f,{label:"Latest match"}); document.getElementById("reportSheet").hidden=false}).catch(function(){})}
-    // upcoming from live data too (replaces the static list when available)
-    var nxt=j.response.filter(function(m){return !/FT|AET|PEN|CANC/.test(m.fixture.status.short)}).sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp})[0];
-    if(nxt&&document.getElementById("mcBtn")){document.getElementById("mcBtn").href="/manutd/match/?id="+nxt.fixture.id; if(/1H|HT|2H|ET|P|LIVE/.test(nxt.fixture.status.short))document.getElementById("mcBtn").textContent="Live now · "+(nxt.goals.home==null?"":nxt.goals.home+"–"+nxt.goals.away)}
-    var next=j.response.filter(function(m){return m.fixture.status.short==="NS"||m.fixture.status.short==="TBD"}).sort(function(a,b){return new Date(MU.ko(a).ko)-new Date(MU.ko(b).ko)}).slice(0,8);
-    if(next.length){document.getElementById("upcoming").innerHTML=next.map(function(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, k=MU.ko(m);
-      return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(k.ko)+'<br>'+MU.fmtKO(k.ko)+MU.prov(k)+'</span><span class="o">'+MU.club(opp.name)+' <a class="chip" href="/manutd/match/?id='+m.fixture.id+'">Match</a> <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r"></span></li>'}).join("")}
-  }).catch(function(e){MU.apiDown(document.getElementById("last"),e)});
+    var all=j.response.filter(function(m){return !/riendl/.test(m.league.name)}).sort(function(a,b){return b.fixture.timestamp-a.fixture.timestamp});
+    var played=all.filter(function(m){return /FT|AET|PEN/.test(m.fixture.status.short)}).slice(0,5);
+    $("last").innerHTML=played.map(function(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home, res=gf>ga?"W":gf<ga?"L":"D";
+      return '<div class="lastrow"><span class="d">'+MU.fmtDate(m.fixture.date)+'</span><span class="ha">'+(home?"H":"A")+'</span><span class="o">'+MU.club(opp.name)+'<small>'+MU.esc(m.league.name)+'</small></span><span class="r"><a href="/manutd/match/?id='+m.fixture.id+'">'+gf+'–'+ga+'</a></span>'+MU.form(res)+'</div>'}).join("");
+    // live or recently finished match takes over the card
+    var live=all.filter(function(m){return /1H|HT|2H|ET|P|BT|LIVE/.test(m.fixture.status.short)})[0], recent=played[0]&&(Date.now()-played[0].fixture.timestamp*1000<6*3600000)?played[0]:null, take=live||recent;
+    if(take){cardLive(take,null); MU.api("match",{fixture:take.fixture.id}).then(function(k){var f=k.response&&k.response[0]; if(f){cardLive(f,f); if(!live){$("report").innerHTML=MU.report(f,{label:"Match report"}); $("reportWrap").hidden=false}}}).catch(function(){}); if(live)setTimeout(function(){location.reload()},60000)}
+    else if(played[0]){MU.api("match",{fixture:played[0].fixture.id}).then(function(k){var f=k.response&&k.response[0]; if(f){$("report").innerHTML=MU.report(f,{label:"Latest match"}); $("reportWrap").hidden=false}}).catch(function(){})}
+    var nxt=all.filter(function(m){return !/FT|AET|PEN|CANC/.test(m.fixture.status.short)}).sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp})[0];
+    if(nxt&&$("mcBtn"))$("mcBtn").href="/manutd/match/?id="+nxt.fixture.id;
+    var up=all.filter(function(m){return m.fixture.status.short==="NS"||m.fixture.status.short==="TBD"}).sort(function(a,b){return new Date(MU.ko(a).ko)-new Date(MU.ko(b).ko)}).slice(0,6);
+    if(up.length)$("upcoming").innerHTML=up.map(function(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, k=MU.ko(m); return upRow(home,opp.name,k.ko,m.league.name,m.fixture.venue&&m.fixture.venue.name,k,m.fixture.id)}).join("");
+  }).catch(function(e){MU.apiDown($("last"),e)});
 })();
 </script></body></html>

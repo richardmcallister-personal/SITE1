@@ -655,13 +655,22 @@ async function pushTick(env) {
       state.sent.lineups = 1; const us = f.lineups.find((l) => l.team.id === TEAM);
       if (us) fan("lineups", { title: "Team news: United XI", body: (us.formation ? us.formation + " · " : "") + us.startXI.map((x) => x.player.name.split(" ").pop()).join(", "), kind: "lineups" });
     }
-    for (const e of f.events || []) {
-      if (e.type !== "Goal" || e.detail === "Missed Penalty" || e.time.elapsed == null) continue;
+    // Goal events reconciled against the official score: the feed logs a goal as soon as the ball goes in; if VAR rules it
+    // out the event can stay (usually with no scorer) while f.goals never moves. Only goals the score counts are sent,
+    // so a goal is announced on the first tick the score corroborates it, and a disallowed one never is.
+    const GE = (f.events || []).filter((e) => e.type === "Goal" && e.detail !== "Missed Penalty" && e.time && e.time.elapsed != null);
+    for (const [t, allowed] of [[f.teams.home, g.home], [f.teams.away, g.away]]) {
+      const mine = GE.filter((e) => e.team.id === t.id); mine.forEach((e) => { e.ok = true; });
+      const extra = mine.length - (allowed == null ? mine.length : allowed);
+      if (extra > 0) mine.filter((e) => !(e.player && e.player.name)).concat(mine.filter((e) => e.player && e.player.name).reverse()).slice(0, extra).forEach((e) => { e.ok = false; });
+    }
+    for (const e of GE) {
+      if (!e.ok) continue;
       const eid = "g" + e.team.id + "-" + (e.player && e.player.id) + "-" + e.time.elapsed + "+" + (e.time.extra || 0);
       if (state.sent[eid]) continue; state.sent[eid] = 1;
       const us = e.team.id === TEAM, minute = e.time.elapsed + (e.time.extra ? "+" + e.time.extra : "") + "'";
       // running score after this goal, counted from the events so far
-      const sofar = (f.events || []).filter((x) => x.type === "Goal" && x.detail !== "Missed Penalty" && (x.time.elapsed < e.time.elapsed || (x.time.elapsed === e.time.elapsed && (x.time.extra || 0) <= (e.time.extra || 0)))), hg = sofar.filter((x) => x.team.id === f.teams.home.id).length, ag = sofar.length - hg;
+      const sofar = GE.filter((x) => x.ok && (x.time.elapsed < e.time.elapsed || (x.time.elapsed === e.time.elapsed && (x.time.extra || 0) <= (e.time.extra || 0)))), hg = sofar.filter((x) => x.team.id === f.teams.home.id).length, ag = sofar.length - hg;
       fan("goals", { title: (us ? "GOAL! " : "") + name(hg, ag), body: (e.player && e.player.name || "") + " " + minute + (e.detail === "Penalty" ? " (pen)" : e.detail === "Own Goal" ? " (og)" : "") + (e.assist && e.assist.name ? " · assist " + e.assist.name : ""), kind: us ? "goal" : "goal-against" });
     }
     if (!state.sent.ht && st === "HT") { state.sent.ht = 1; fan("result", { title: "Half-time: " + name(g.home, g.away), body: next.league.name, kind: "ht" }); }

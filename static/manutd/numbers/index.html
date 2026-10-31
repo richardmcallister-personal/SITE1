@@ -44,26 +44,22 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
 <link rel="stylesheet" href="/manutd/mu.css">
 <style>
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:6px;margin:10px 0 0}
-.grid button{font-family:var(--head);font-weight:400;font-size:24px;line-height:1;padding:10px 0 8px;border:1px solid var(--rule);background:#fff;cursor:pointer;color:var(--ink)}
-.grid button small{display:block;font-family:var(--body);font-size:10px;color:var(--muted);letter-spacing:.06em;margin-top:4px}
-.grid button[aria-pressed="true"]{background:var(--red);color:#fff;border-color:var(--red)} .grid button[aria-pressed="true"] small{color:#ffd0d3}
 .shirt{display:flex;gap:22px;align-items:center;flex-wrap:wrap;margin:0 0 14px}
-.shirt .big{font-family:var(--head);font-size:96px;line-height:.9;color:var(--red)}
+.shirt .big{font-family:var(--head);font-size:96px;line-height:.9;color:var(--red-ink)}
 .stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:6px;flex:1;min-width:240px}
 .stat div{background:var(--tint);padding:10px 12px} .stat .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:var(--muted)} .stat .v{font-size:15px;margin-top:3px}
 .tl{list-style:none;margin:0;padding:0}
 .tl li{display:grid;grid-template-columns:90px 1fr auto auto;gap:14px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule)}
 .tl .s a{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-decoration:none}
 .tl .n{font-size:16px;font-weight:600} .tl .n small{font-weight:400;color:var(--muted);margin-left:6px}
-.tl .ap,.tl .g{font-family:var(--head);font-weight:300;font-size:22px;min-width:52px;text-align:right} .tl .g{color:var(--red)}
-.tl li.run{border-top:0} .tl .n a{color:inherit;text-decoration:none;border-bottom:1px dotted #999}
+.tl .ap,.tl .g{font-family:var(--head);font-weight:300;font-size:22px;min-width:52px;text-align:right} .tl .g{color:var(--red-ink)}
+.tl li.run{border-top:0} .tl .n a{color:inherit;text-decoration:none;border-bottom:1px dotted var(--rule)}
 .holders{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 16px} .holders a{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);padding:6px 10px;color:var(--ink);text-decoration:none;font-size:13px} .holders a b{font-family:var(--head);font-weight:400;font-size:18px}
 .holders img{width:28px;height:28px;border-radius:50%;object-fit:cover;background:var(--tint)}
 @media (max-width:640px){.tl li{grid-template-columns:70px 1fr auto auto;gap:8px}.shirt .big{font-size:64px}}
-.fin{list-style:none;margin:0;padding:0} .fin li{display:grid;grid-template-columns:90px 1fr auto;gap:14px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule)} .fin .s{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)} .fin .n{font-size:16px;font-weight:600} .fin .n small{font-weight:400;color:var(--muted);margin-left:6px;display:block;font-size:12px} .fin .n a{color:inherit;text-decoration:none;border-bottom:1px dotted #999} .fin .r{font-family:var(--head);font-weight:300;font-size:20px;white-space:nowrap}
-.pick{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px} .pick select{font:inherit;font-size:14px;padding:6px 10px;border:1px solid var(--rule);background:#fff}
-.xi{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px} .xi div{background:var(--tint);padding:8px 10px;font-size:13px} .xi b{font-family:var(--head);font-weight:400;font-size:22px;margin-right:8px;color:var(--red)} .xi small{color:var(--muted)} .xi a{color:inherit;text-decoration:none;border-bottom:1px dotted #999}
+.fin{list-style:none;margin:0;padding:0} .fin li{display:grid;grid-template-columns:90px 1fr auto;gap:14px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule)} .fin .s{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)} .fin .n{font-size:16px;font-weight:600} .fin .n small{font-weight:400;color:var(--muted);margin-left:6px;display:block;font-size:12px} .fin .n a{color:inherit;text-decoration:none;border-bottom:1px dotted var(--rule)} .fin .r{font-family:var(--head);font-weight:300;font-size:20px;white-space:nowrap}
+.pick{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px} .pick select{font:inherit;font-size:14px;padding:6px 10px;border:1px solid var(--rule);background:var(--paper)}
+.xi{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px} .xi div{background:var(--tint);padding:8px 10px;font-size:13px} .xi b{font-family:var(--head);font-weight:400;font-size:22px;margin-right:8px;color:var(--red-ink)} .xi small{color:var(--muted)} .xi a{color:inherit;text-decoration:none;border-bottom:1px dotted var(--rule)}
 .era-note{font-size:13px;color:var(--muted);margin:0 0 8px}
 </style>
 </head><body><div class="wrap">
@@ -120,7 +116,7 @@
   var FIN=[]; function finNo(n){ if(!FIN.length)return; var rows=[]; FIN.forEach(function(f){f.xi.filter(function(p){return p.no===n}).forEach(function(p){rows.push({f:f,p:p})})});
     $("eraH").textContent="Who wore "+n+" in the finals"; $("finNo").innerHTML=rows.length?rows.map(function(x){var f=x.f,p=x.p,res=f.gf>f.ga?"W":f.gf<f.ga?"L":"D"; return '<li><span class="s">'+f.d.slice(0,4)+'</span><span class="n">'+pl(p)+(p.cap?' <small style="display:inline">(c)</small>':'')+'<small>'+MU.esc(f.comp)+' · v '+MU.esc(f.o)+(f.title.indexOf("replay")>0?" (replay)":"")+' · '+MU.esc(p.pos)+'</small></span><span class="r">'+f.gf+'–'+f.ga+(f.aet?'<small> aet</small>':'')+' '+MU.form(res)+'</span></li>'}).join(""):'<li><span class="s"></span><span class="n" style="font-weight:400;color:var(--muted)">'+(n>11?"Only 1–11 took the field before 1965; substitutes wore 12 and later 13–16.":"No record for this number in the finals.")+'</span></li>' }
   function finShow(i){var f=FIN[i]; if(!f)return; var res=f.gf>f.ga?"won":f.gf<f.ga?"lost":"drew"; $("finNote").innerHTML=MU.esc(f.comp)+', '+MU.fmtDate(f.d+"T12:00:00Z",{year:"numeric",weekday:undefined})+' at '+MU.esc(f.venue||"")+': United '+res+' '+f.gf+'–'+f.ga+(f.aet?' after extra time':'')+(f.pens?' ('+MU.esc(f.pens)+' on penalties)':'')+' against '+MU.club(f.o)+(f.mgr?'. Manager: '+MU.esc(f.mgr):'')+'. <a href="'+f.url+'" target="_blank" rel="noopener">Match article</a>.';
-    $("finXI").innerHTML=f.xi.map(function(p){return '<div><b>'+(p.no||"–")+'</b>'+pl(p)+(p.cap?' (c)':'')+' <small>'+MU.esc(p.pos)+(p.sub?' · off '+p.sub+"'":'')+'</small></div>'}).join("")+f.subs.map(function(p){return '<div style="background:#fff;border:1px solid var(--rule)"><b>'+(p.no||"–")+'</b>'+pl(p)+' <small>'+MU.esc(p.pos)+(p.sub?' · on '+p.sub+"'":' · unused')+'</small></div>'}).join("")}
+    $("finXI").innerHTML=f.xi.map(function(p){return '<div><b>'+(p.no||"–")+'</b>'+pl(p)+(p.cap?' (c)':'')+' <small>'+MU.esc(p.pos)+(p.sub?' · off '+p.sub+"'":'')+'</small></div>'}).join("")+f.subs.map(function(p){return '<div style="background:var(--paper);border:1px solid var(--rule)"><b>'+(p.no||"–")+'</b>'+pl(p)+' <small>'+MU.esc(p.pos)+(p.sub?' · on '+p.sub+"'":' · unused')+'</small></div>'}).join("")}
   fetch("/manutd/numbers/finals.json").then(function(r){return r.json()}).then(function(j){FIN=j; finNo(cur);
     $("finPick").innerHTML=FIN.map(function(f,i){return '<option value="'+i+'">'+MU.esc(f.title.replace(/ final/,"")+" · v "+f.o+" "+f.gf+"–"+f.ga)+'</option>'}).join(""); $("finPick").value=FIN.length-1; finShow(FIN.length-1);
     $("finPick").addEventListener("change",function(){finShow(+this.value)})}).catch(function(){$("era").hidden=true});

@@ -10,10 +10,26 @@ window.MU=(function(){
   (function(){try{var sa=window.navigator.standalone===true||matchMedia("(display-mode: standalone)").matches; if(!sa||sessionStorage.getItem("mu:splash"))return; sessionStorage.setItem("mu:splash","1");
     var d=document.createElement("div"); d.className="splash"; d.innerHTML='<img src="/manutd/assets/crest.png" alt="">'; (document.body||document.documentElement).appendChild(d);
     setTimeout(function(){d.classList.add("out"); setTimeout(function(){d.remove()},500)},900)}catch(e){}})();
+  // Appearance: auto (device) / light / dark, remembered on this device; the switch sits in the footer of every page.
+  function theme(mode){try{if(mode==="auto")localStorage.removeItem("mu:theme"); else localStorage.setItem("mu:theme",mode)}catch(e){} if(mode==="auto")document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme",mode);
+    var m=document.querySelector('meta[name="theme-color"]'); if(m)m.setAttribute("content",getComputedStyle(document.documentElement).getPropertyValue("--red").trim()||"#da020e");
+    document.querySelectorAll(".themesw button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.m===mode)})}
+  (function(){try{var t=localStorage.getItem("mu:theme"); if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}})();
+  function themeSwitch(){var f=document.querySelector("footer.mu"); if(!f||f.querySelector(".themesw"))return; var cur="auto"; try{cur=localStorage.getItem("mu:theme")||"auto"}catch(e){}
+    var d=document.createElement("span"); d.className="themesw"; d.setAttribute("role","group"); d.setAttribute("aria-label","Appearance"); d.innerHTML=["auto","light","dark"].map(function(m){return '<button type="button" data-m="'+m+'" aria-pressed="'+(m===cur)+'">'+m+'</button>'}).join("");
+    d.addEventListener("click",function(e){var b=e.target.closest("button"); if(b)theme(b.dataset.m)}); f.appendChild(document.createTextNode(" Appearance:")); f.appendChild(d)}
+  document.addEventListener("DOMContentLoaded",themeSwitch);
   function nav(active){
     var el=document.querySelector("nav.munav"); if(!el)return;
+    document.querySelectorAll("header.mu h1 br").forEach(function(br){br.replaceWith(" ")});   // the wordmark sits on one line now
     el.innerHTML=NAV.map(function(n){return '<a href="'+n[0]+'"'+(n[1]===active?' aria-current="page"':'')+'>'+n[1]+'</a>'}).join("")+'<form class="musearch" role="search" action="/manutd/search/"><input type="search" name="q" placeholder="Search players, clubs, seasons, kits…" aria-label="Search the site" autocomplete="off"><div class="hits" hidden></div></form>';
     searchBox(el.querySelector(".musearch"));
+    // phone tab bar: five destinations, the current one lit
+    var TABS=[["/manutd/","Match",'<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/>',["Hub"]],["/manutd/season/","Season",'<path d="M4 6h16M4 12h16M4 18h10"/>',["Season"]],["/manutd/history/","History",'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',["History"]],["/manutd/kits/","Shirts",'<path d="M8 4 4 7l2 4 2-1v10h8V10l2 1 2-4-4-3a4 4 0 0 1-8 0Z"/>',["Shirts"]],["/manutd/#more","More",'<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>',["Trips","Squad","Academy","Links"]]];
+    var old=document.querySelector("nav.mutabs"); if(old)old.remove();
+    var t=document.createElement("nav"); t.className="mutabs"; t.setAttribute("aria-label","Sections");
+    t.innerHTML=TABS.map(function(x){return '<a href="'+x[0]+'"'+(x[3].indexOf(active)>=0?' aria-current="page"':'')+'><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">'+x[2]+'</svg>'+x[1]+'</a>'}).join("");
+    document.body.appendChild(t);
   }
   // ---- Site search: /manutd/search.json is [title, kind, url, subtitle, aliases]; loaded on first keystroke, matched client-side.
   var IDX=null, KIND={player:"Player",manager:"Manager",club:"Club",season:"Season",kit:"Kit",ground:"Ground",book:"Book",doc:"Documentary",film:"Film",pod:"Podcast",match:"Match",page:"Section"};
@@ -121,6 +137,28 @@ window.MU=(function(){
     return '<div class="report"><div class="rh"><span class="k">'+(opt.label||"Match report")+' · '+fmtDate(f.fixture.date,{year:"numeric"})+' · '+comp(f.league.name,16)+esc(f.league.name)+(f.fixture.venue&&f.fixture.venue.name?' · '+esc(f.fixture.venue.name):'')+'</span><div class="line">'+crest(f.teams.home.name,28)+esc(f.teams.home.name)+' <b>'+f.goals.home+'–'+f.goals.away+'</b> '+esc(f.teams.away.name)+crest(f.teams.away.name,28)+' '+formHtml(res)+'</div><p class="sent">'+sentence+(tags.length?' '+tags.map(function(t){return '<a class="tag" href="/manutd/comebacks/">'+(TAGLABEL[t]||t)+'</a>'}).join(" "):'')+'</p></div>'+
       '<div class="rg"><div><h4>How it went</h4>'+(tl?'<ul class="tl">'+tl+'</ul>':'<p class="sub">No goals.</p>')+'</div><div><h4>Stood out</h4>'+(stars.length?'<ul class="stars">'+stars.map(function(p){var g=p.statistics[0]; return '<li><img src="/img/player/'+p.player.id+'.png" alt="" onerror="this.style.visibility=\'hidden\'"><span><a class="pl" href="/manutd/player/?q='+encodeURIComponent(p.player.name)+'">'+esc(p.player.name)+'</a><small>'+g.games.minutes+'′'+(g.goals.total?' · '+g.goals.total+' goal'+(g.goals.total>1?'s':''):'')+(g.goals.assists?' · '+g.goals.assists+' assist'+(g.goals.assists>1?'s':''):'')+(g.goals.saves?' · '+g.goals.saves+' saves':'')+'</small></span><b>'+(+g.games.rating).toFixed(1)+'</b></li>'}).join("")+'</ul>':'<p class="sub">Ratings not published for this match.</p>')+'</div></div>'+(opt.link!==false?'<p class="sub" style="margin-top:8px"><a href="/manutd/match/?id='+f.fixture.id+'">Full match centre →</a></p>':'')+'</div>'}
   // scorers from the archive: [[name, article title, goals, flags]] -> "Beckham, Cole 2 (pen), Dunk (og)" with player links
+  // Goal events reconciled against the official score: the feed logs a goal the moment the ball goes in, and if VAR
+  // rules it out the event can stay (usually with no scorer) while f.goals never moves. Returns the goal events
+  // (penalty misses excluded) with e.ok=true for the ones the score counts and e.ok=false for the ones ruled out;
+  // when a team has more goal events than goals, the extras are the ones without a scorer first, then the latest.
+  function goalEvents(f){var ev=(f&&f.events||[]).filter(function(e){return e.type==="Goal"&&e.detail!=="Missed Penalty"&&e.time&&e.time.elapsed!=null}); if(!f||!f.goals||!f.teams)return ev.map(function(e){e.ok=true;return e});
+    [f.teams.home,f.teams.away].forEach(function(t,i){var mine=ev.filter(function(e){return e.team.id===t.id}), allowed=i?f.goals.away:f.goals.home; if(allowed==null)allowed=mine.length; var extra=mine.length-allowed; mine.forEach(function(e){e.ok=true});
+      if(extra>0){var pool=mine.filter(function(e){return !(e.player&&e.player.name)}).concat(mine.filter(function(e){return e.player&&e.player.name}).reverse()); pool.slice(0,extra).forEach(function(e){e.ok=false})}});
+    return ev}
+  // Section pills. pills(el, items) renders [{id,label,count}] as jump links and highlights the section in view;
+  // tabs(el, items, def) does the same but on phones (≤640px) shows only the chosen section, remembers it, and honours #hash.
+  function pills(el,items){el.innerHTML=items.map(function(i){return '<a href="#'+i.id+'">'+esc(i.label)+(i.count!=null?' <small>'+i.count+'</small>':'')+'</a>'}).join(""); if(!items.length){el.hidden=true;return} el.hidden=false;
+    var links=[].slice.call(el.querySelectorAll("a")), secs=items.map(function(i){return document.getElementById(i.id)});
+    function mark(){var y=window.scrollY+90, on=0, best=-Infinity; secs.forEach(function(s,i){if(!s||s.offsetParent===null)return; var t=s.getBoundingClientRect().top+window.scrollY; if(t<=y&&t>best){best=t;on=i}}); links.forEach(function(a,i){a.classList.toggle("on",i===on)})}
+    window.addEventListener("scroll",mark,{passive:true}); mark()}
+  function tabs(el,items,def){var phone=function(){return window.matchMedia("(max-width:640px)").matches}, wrap=el.parentNode, key="tab:"+location.pathname;
+    el.innerHTML=items.map(function(i){return '<a href="#'+i.id+'" data-t="'+i.id+'">'+esc(i.label)+'</a>'}).join(""); wrap.classList.add("tabbed");
+    function show(id,push){items.forEach(function(i){var s=document.querySelector('[data-tab="'+i.id+'"]'); if(s)s.classList.toggle("on",i.id===id)}); [].slice.call(el.querySelectorAll("a")).forEach(function(a){a.classList.toggle("on",a.getAttribute("data-t")===id)}); try{localStorage.setItem(key,id)}catch(e){} if(push)history.replaceState(null,"","#"+id)}
+    var start=(location.hash||"").slice(1); if(!items.some(function(i){return i.id===start})){try{start=localStorage.getItem(key)}catch(e){} if(!items.some(function(i){return i.id===start}))start=def||items[0].id}
+    show(start,false);
+    el.addEventListener("click",function(ev){var a=ev.target.closest("a"); if(!a)return; var id=a.getAttribute("data-t"); if(phone()){ev.preventDefault(); show(id,true); window.scrollTo({top:0,behavior:"smooth"})} else show(id,false)});
+    window.addEventListener("hashchange",function(){var id=location.hash.slice(1); if(items.some(function(i){return i.id===id}))show(id,false)});
+    if(!phone())pills(el,items)}
   function scorers(sc){if(!sc||!sc.length)return ""; return sc.map(function(x){var fl=x[3]||"", og=fl.indexOf("o")>=0; return (x[1]&&!og?'<a class="pl" href="/manutd/player/?p='+encodeURIComponent(x[1])+'">'+esc(x[0])+'</a>':esc(x[0]))+(x[2]>1?' '+x[2]:'')+(fl.indexOf("p")>=0?' <i>pen</i>':'')+(og?' <i>og</i>':'')}).join(", ")}
   // links for an archived match row: the site's match centre (feed id, 2010/11 on), the match report the season article cites, else the season article itself
   function mlinks(m){var out=[]; if(m.id)out.push('<a class="chip" href="/manutd/match/?id='+m.id+'">Match centre</a>');
@@ -129,5 +167,5 @@ window.MU=(function(){
     return out.join("")}
   function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
   function formHtml(str){return '<span class="form">'+String(str||"").split("").map(function(c){return '<b class="'+c+'">'+c+'</b>'}).join("")+'</span>'}
-  return {TEAM:TEAM,nav:nav,scorers:scorers,mlinks:mlinks,search:search,hit:hit,KIND:KIND,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,fmtLocal:fmtLocal,fmtKO:fmtKO,fmtKOText:fmtKOText,TZ:TZ,IN_UK:IN_UK,esc:esc,form:formHtml};
+  return {TEAM:TEAM,nav:nav,theme:theme,pills:pills,tabs:tabs,scorers:scorers,goalEvents:goalEvents,mlinks:mlinks,search:search,hit:hit,KIND:KIND,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,fmtLocal:fmtLocal,fmtKO:fmtKO,fmtKOText:fmtKOText,TZ:TZ,IN_UK:IN_UK,esc:esc,form:formHtml};
 })();
