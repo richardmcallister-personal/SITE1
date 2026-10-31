@@ -13,7 +13,7 @@
 # It needs a looser policy than the rest of the site; scoped to this path only.
 /manutd/*
   ! Content-Security-Policy
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: ; media-src https:; connect-src 'self' https://api.open-meteo.com https://en.wikipedia.org; frame-src https://preview.3ddigitalvenue.com https://www.youtube.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https: ; media-src https:; connect-src 'self' https://api.open-meteo.com https://en.wikipedia.org https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://cloudflareinsights.com; frame-src https://preview.3ddigitalvenue.com https://www.youtube.com; frame-ancestors 'self'; base-uri 'self'; form-action 'self'
 
 /should-i-go/*
   ! Content-Security-Policy
