@@ -413,7 +413,7 @@ function buildRail(){
     var d=new Date(f.ko), b=document.createElement("button");
     b.className="fx"+(d<now?" past":"")+(f.away?" away":""); b.setAttribute("role","option"); b.setAttribute("aria-pressed",i===sel?"true":"false");
     if(f.away){b.style.setProperty("--fc",f.col); b.style.setProperty("--ft",f.fg||"#fff"); if(f.stripe)b.style.setProperty("--fs",f.stripe)}
-    b.innerHTML='<div class="d">'+fmtDate(d)+(f.away?' · <b>Away</b>':'')+'</div><div class="o">'+crestImg(f.opp)+'<span>'+f.opp+'</span></div><div class="k">'+fmtUK(d)+' UK · '+fmtSE(d)+' SE'+(f.tbc?' <span class="prov" title="Original Premier League slot — may move when that month\'s TV picks are announced">Provisional</span>':'')+'</div><span class="c">'+(f.comp==="Champions League"?'<img src="/manutd/assets/comps/champions-league.png" alt="" onerror="this.remove()">':'<img src="/manutd/assets/comps/premier-league.png" alt="" onerror="this.remove()">')+f.comp+(f.away?' · '+f.venue:'')+'</span>';
+    b.innerHTML='<div class="d">'+fmtDate(d)+(f.away?' · <b>Away</b>':'')+'</div><div class="o">'+crestImg(f.opp)+'<span>'+f.opp+'</span></div><div class="k">'+fmtKO(d)+(f.tbc?' <span class="prov" title="Original Premier League slot — may move when that month\'s TV picks are announced">Provisional</span>':'')+'</div><span class="c">'+(f.comp==="Champions League"?'<img src="/manutd/assets/comps/champions-league.png" alt="" onerror="this.remove()">':'<img src="/manutd/assets/comps/premier-league.png" alt="" onerror="this.remove()">')+f.comp+(f.away?' · '+f.venue:'')+'</span>';
     b.addEventListener("click",function(){sel=i;buildRail();pick()});
     rail.appendChild(b);
   });
@@ -476,7 +476,7 @@ function render(){
   var td=tripDates(f,nights);
   $("bookNote").textContent=f.away?("Away ticket first — it is the scarce part. Flights open SlickTrip pre-set to CPH–"+(f.dest||"MAN")+", "+td.dep+(nights?" to "+td.ret:" day return")+", 1 adult; the hotel opens hotels.com in "+f.city+" with these dates. "+(f.destNote||"")+"."):"Ticket first (seats go), then flights, then the bed. Flights and hotel open SlickTrip pre-set to CPH–MAN, "+td.dep+(nights?" to "+td.ret:" day return")+", 1 adult; pick the seller and pay on their site. The ticket link opens this fixture's seating plan on tickets.manutd.com under your members' login; it lands on block "+(blk?blk.code:"")+"'s seat map so you pick the exact row and seat.";
 
-  window.__verdict=(f.away?f.opp+" v Man Utd":"Man Utd v "+f.opp)+" ("+f.comp+"), "+fmtDate(d)+" "+fmtUK(d)+" UK. "+plan.label+". Seat: "+(blk?blk.code+" ("+blk.info.stand+", "+blk.info.tierName.toLowerCase()+", "+blk.info.pos+") £"+blk.price:"none on sale")+". "+fl.l+"; "+(nights?h.n+" × "+nights:"no hotel")+". All-in "+gbp(total)+".";
+  window.__verdict=(f.away?f.opp+" v Man Utd":"Man Utd v "+f.opp)+" ("+f.comp+"), "+fmtDate(d)+" "+fmtKO(d,true).replace(/<[^>]+>/g," ").replace(/\s+/g," ")+". "+plan.label+". Seat: "+(blk?blk.code+" ("+blk.info.stand+", "+blk.info.tierName.toLowerCase()+", "+blk.info.pos+") £"+blk.price:"none on sale")+". "+fl.l+"; "+(nights?h.n+" × "+nights:"no hotel")+". All-in "+gbp(total)+".";
 }
 
 function currentBlock(f){var list=availFor(f); var v=$("block").value; for(var i=0;i<list.length;i++){if(list[i].code===v)return list[i]} return null}
