@@ -153,7 +153,7 @@ table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;
     g.strokeRect(W/2-180,30,360,140); g.strokeRect(W/2-180,H-170,360,140);
     var f=window.MU_FIXTURES.filter(function(x){return x.ko===$("fix").value})[0];
     g.fillStyle="#fff"; g.font="bold 30px Archivo, Arial"; g.textAlign="center"; g.fillText((f?(f.home?"United v "+f.opp:f.opp+" v United"):"United XI")+" · "+$("form").value,W/2,H-60);
-    g.font="16px Archivo, Arial"; g.fillText(f?MU.fmtDate(f.ko)+" · "+MU.fmtUK(f.ko)+" UK":"",W/2,H-36);
+    g.font="16px Archivo, Arial"; g.fillText(f?MU.fmtDate(f.ko)+" · "+MU.fmtKOText(f.ko):"",W/2,H-36);
     var i=0, jobs=[]; var rowH=(H-260)/rows.length;
     rows.forEach(function(r,ri){var cy=H-160-rowH*ri-rowH/2; r.forEach(function(pos,ci){var cx=W*(ci+1)/(r.length+1), id=picks[i++], p=squad.filter(function(x){return String(x.id)===String(id)})[0];
       jobs.push(new Promise(function(res){

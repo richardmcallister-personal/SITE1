@@ -78,7 +78,7 @@ a.pl{color:inherit;text-decoration:none;border-bottom:1px dotted #999}
     var P=j.players||[], loans=P.filter(function(p){return p.status==="loan"}), acad=P.filter(function(p){return p.status==="academy"});
     P.forEach(function(p){p.seasonYear=j.season});
     $("tLoan").textContent=loans.length; $("tAcad").textContent=acad.length+(P.filter(function(p){return p.status==="young"}).length?" (+"+P.filter(function(p){return p.status==="young"}).length+" U21 signings)":"");
-    $("tWin").textContent=MU.fmtDate(j.window.from+"T12:00:00Z")+" – "+MU.fmtDate(j.window.to+"T12:00:00Z"); $("tUpd").textContent=MU.fmtDate(j.generated)+" "+MU.fmtUK(j.generated)+" UK";
+    $("tWin").textContent=MU.fmtDate(j.window.from+"T12:00:00Z")+" – "+MU.fmtDate(j.window.to+"T12:00:00Z"); $("tUpd").textContent=MU.fmtDate(j.generated)+" "+MU.fmtKO(j.generated,true);
     // This week
     var wk=P.filter(function(p){return p.week&&p.week.length});
     $("week").innerHTML=wk.length?wk.map(function(p){

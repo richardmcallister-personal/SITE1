@@ -73,9 +73,17 @@ window.MU=(function(){
   function club(name,size,cls){var href=name==="Manchester United"?"/manutd/":"/manutd/club/?c="+encodeURIComponent(name); return crest(name,size)+'<a class="cl'+(cls?' '+cls:'')+'" href="'+href+'">'+esc(name)+'</a>'}
   function comp(name,size){var c=COMPS[name]; size=size||18; return c?'<img class="comp" src="/manutd/assets/comps/'+c+'.png" alt="'+name+'" title="'+name+'" width="'+size+'" height="'+size+'" style="width:'+size+'px;height:'+size+'px;object-fit:contain;vertical-align:-4px;margin-right:4px">':''}
   function flag(nat){var c=ISO[nat]; return c?'<img class="flag" src="https://flagcdn.com/w40/'+c+'.png" srcset="https://flagcdn.com/w80/'+c+'.png 2x" alt="'+nat+'" title="'+nat+'">':''}
-  function fmtDate(iso,opt){return new Date(iso).toLocaleDateString("en-GB",Object.assign({weekday:"short",day:"numeric",month:"short",timeZone:"Europe/London"},opt||{}))}
+  // Times default to the viewer's own time zone; UK time is added alongside when the viewer is elsewhere.
+  var TZ=(function(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||"Europe/London"}catch(e){return "Europe/London"}})(), IN_UK=TZ==="Europe/London";
+  function fmtDate(iso,opt){return new Date(iso).toLocaleDateString("en-GB",Object.assign({weekday:"short",day:"numeric",month:"short",timeZone:TZ},opt||{}))}
   function fmtUK(iso){return new Date(iso).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/London"})}
-  function fmtSE(iso){return new Date(iso).toLocaleTimeString("sv-SE",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Stockholm"})}
+  function fmtLocal(iso){return new Date(iso).toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:TZ})}
+  function tzLabel(iso){try{var p=new Intl.DateTimeFormat(navigator.language||"en-GB",{timeZone:TZ,timeZoneName:"short"}).formatToParts(new Date(iso)).filter(function(x){return x.type==="timeZoneName"})[0]; return p?p.value:"local"}catch(e){return "local"}}
+  // Kick-off in the viewer's zone, with the UK (match) time as a small sub-value beneath — or beside, inline — unless the viewer is in the UK.
+  // Plain-text form for canvases and titles.
+  function fmtKOText(iso){return IN_UK?fmtUK(iso)+" UK":fmtLocal(iso)+" "+tzLabel(iso)+" (" +fmtUK(iso)+" UK)"}
+  function fmtKO(iso,inline){return IN_UK?fmtUK(iso)+" UK":fmtLocal(iso)+" "+esc(tzLabel(iso))+'<small class="tz'+(inline?' inl':'')+'">'+fmtUK(iso)+' UK</small>'}
+  function fmtSE(iso){return fmtLocal(iso)}
   // ---- single fixture source: fixtures.js wins over the API for kick-off date/time; the API supplies ids, scores, status.
   function nrm(n){return String(n||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z]/g,"")}
   function fixFor(opp,home,iso){var L=window.MU_FIXTURES||[], a=nrm(opp), t=iso?new Date(iso).getTime():0;
@@ -117,5 +125,5 @@ window.MU=(function(){
     return out.join("")}
   function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
   function formHtml(str){return '<span class="form">'+String(str||"").split("").map(function(c){return '<b class="'+c+'">'+c+'</b>'}).join("")+'</span>'}
-  return {TEAM:TEAM,nav:nav,scorers:scorers,mlinks:mlinks,search:search,hit:hit,KIND:KIND,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,esc:esc,form:formHtml};
+  return {TEAM:TEAM,nav:nav,scorers:scorers,mlinks:mlinks,search:search,hit:hit,KIND:KIND,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,fmtLocal:fmtLocal,fmtKO:fmtKO,fmtKOText:fmtKOText,TZ:TZ,IN_UK:IN_UK,esc:esc,form:formHtml};
 })();

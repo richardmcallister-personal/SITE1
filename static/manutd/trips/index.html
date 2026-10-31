@@ -111,12 +111,13 @@ nav.munav{display:flex;gap:0;background:#111;overflow-x:auto;margin:0}
 nav.munav a{flex:1 0 auto;font-family:var(--body);font-weight:500;font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:#fff;text-decoration:none;padding:12px 18px;border-right:1px solid #333;white-space:nowrap;text-align:center}
 nav.munav a:hover{background:#222} nav.munav a[aria-current="page"]{background:#fff;color:var(--ink)}
 header .brand a{color:#fff;text-decoration:none}
+small.tz{display:block;font-size:11px;color:var(--muted,#666);letter-spacing:.02em;font-weight:400} small.tz.inl{display:inline;margin-left:5px} small.tz.inl:before{content:'· '}
 </style>
 
 </head><body><div class="wrap">
 <header>
   <div class="brand"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Trip planner · home and away</small><a href="/manutd/">Manchester<br>United</a></h1></div>
-  <div class="from">Tickets · flights<br>· hotels<span>Vellinge → CPH → MAN · GBP · UK / SE kick-offs</span></div>
+  <div class="from">Tickets · flights<br>· hotels<span>Vellinge → CPH → MAN · GBP · kick-offs in your time</span></div>
 </header>
 <nav class="munav" aria-label="Sections"><a href="/manutd/">Hub</a><a href="/manutd/trips/" aria-current="page">Trips</a><a href="/manutd/season/">Season</a><a href="/manutd/squad/">Squad</a><a href="/manutd/youth/">Academy</a><a href="/manutd/kits/">Shirts</a><a href="/manutd/history/">History</a><a href="/manutd/links/">Links</a></nav>
 
@@ -378,9 +379,12 @@ var $=function(id){return document.getElementById(id)};
 var sel=0, wx=null, wxCache={};
 
 // ---- helpers ----------------------------------------------------------
-function fmtDate(d){return d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",timeZone:"Europe/London"})}
+function fmtDate(d){return d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",timeZone:TZ})}
 function fmtUK(d){return d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/London"})}
-function fmtSE(d){return d.toLocaleTimeString("sv-SE",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Stockholm"})}
+var TZ=(function(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||"Europe/London"}catch(e){return "Europe/London"}})(), IN_UK=TZ==="Europe/London";
+function fmtSE(d){return d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:TZ})}   // the viewer's own zone
+function tzLabel(d){try{var p=new Intl.DateTimeFormat(navigator.language||"en-GB",{timeZone:TZ,timeZoneName:"short"}).formatToParts(d).filter(function(x){return x.type==="timeZoneName"})[0]; return p?p.value:"local"}catch(e){return "local"}}
+function fmtKO(d,inline){return IN_UK?fmtUK(d)+" UK":fmtSE(d)+" "+tzLabel(d)+'<small class="tz'+(inline?' inl':'')+'">'+fmtUK(d)+' UK</small>'}
 function gbp(n){return "£"+Math.round(n)}
 function num(id){var v=parseFloat($(id).value);return isFinite(v)?v:0}
 function ukHour(d){return parseInt(d.toLocaleTimeString("en-GB",{hour:"2-digit",hour12:false,timeZone:"Europe/London"}),10)}
@@ -455,7 +459,7 @@ function render(){
 
   // plan block
   var dl=$("plan"), planHtml=(f.away?'<dt>Match</dt><dd>'+f.opp+' v Manchester United · '+f.venue+', '+f.city+'</dd>':'')+'<dt>Plan</dt><dd>'+plan.label+(plan.kind==="sameday-fail"?' <span class="flag">— not possible: the last direct flight home that day leaves at 07:40, before kick-off. Falling back to one night.</span>':'')+'</dd>';
-  planHtml+='<dt>Kick-off</dt><dd>'+fmtDate(d)+' · '+fmtUK(d)+' UK / '+fmtSE(d)+' Swedish'+(f.tbc?' <span class="prov" title="Original Premier League slot — may move when that month\'s TV picks are announced">Provisional</span> <small>— check before booking anything non-refundable</small>':' <small style="color:var(--muted)">confirmed</small>')+'</dd>';
+  planHtml+='<dt>Kick-off</dt><dd>'+fmtDate(d)+' · '+fmtKO(d,true)+(f.tbc?' <span class="prov" title="Original Premier League slot — may move when that month\'s TV picks are announced">Provisional</span> <small>— check before booking anything non-refundable</small>':' <small style="color:var(--muted)">confirmed</small>')+'</dd>';
   planHtml+='<dt>Nights</dt><dd>'+nights+(nights!==plan.nights?' (plan says '+plan.nights+')':'')+'</dd>';
   dl.innerHTML=planHtml;
 

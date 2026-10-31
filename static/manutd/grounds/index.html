@@ -39,7 +39,7 @@
     var f=nextAt(g), age=Math.round((Date.now()-new Date(g.checked+"T12:00:00Z"))/864e5);
     var sec=function(t,v,wide){return '<div'+(wide?' class="wide"':'')+'><h3>'+t+'</h3><p>'+MU.esc(v||"Not stated by the sources.")+'</p></div>'};
     $("guide").innerHTML='<h2>'+MU.crest(g.club,36)+MU.esc(g.ground)+' <small>'+MU.esc(g.club)+' · '+MU.esc(g.city)+'</small></h2>'+
-      (f?'<div class="fx"><b>Next visit:</b> '+MU.fmtDate(f.ko,{year:"numeric"})+' · '+MU.fmtUK(f.ko)+' UK'+MU.prov(f)+' · '+MU.esc(f.comp)+' · <a href="/manutd/trips/">plan the trip</a> · <a href="/manutd/club/?c='+encodeURIComponent(g.club)+'">head-to-head</a></div>':'')+
+      (f?'<div class="fx"><b>Next visit:</b> '+MU.fmtDate(f.ko,{year:"numeric"})+' · '+MU.fmtKO(f.ko,true)+MU.prov(f)+' · '+MU.esc(f.comp)+' · <a href="/manutd/trips/">plan the trip</a> · <a href="/manutd/club/?c='+encodeURIComponent(g.club)+'">head-to-head</a></div>':'')+
       '<span class="warn">Last checked '+MU.fmtDate(g.checked+"T12:00:00Z",{year:"numeric"})+(age>60?' · '+age+' days ago, re-check before travelling':'')+'</span>'+
       '<div class="g">'+sec("Getting there",g.arrival)+sec("From the airport",g.from_airport)+sec("The away end",g.away_end)+sec("Meeting spots",g.meeting)+sec("Bags and what you can bring",g.bags)+sec("Getting away afterwards",g.after)+sec("Tips",g.tips,true)+'</div>'+
       '<p class="src">Sources: '+(g.sources||[]).map(function(u){try{return '<a href="'+u+'" target="_blank" rel="noopener">'+new URL(u).hostname.replace(/^www\./,"")+'</a>'}catch(e){return ''}}).filter(Boolean).join(" · ")+'</p>';
