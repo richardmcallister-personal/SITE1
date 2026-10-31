@@ -49,8 +49,10 @@
 .hub{display:grid;grid-template-columns:1fr;gap:0}
 .hub>.sheet{margin-top:12px}
 @media (min-width:900px){.hub{grid-template-columns:repeat(3,minmax(0,1fr));gap:0 16px;align-items:start}
-  .hub .c1{grid-column:1} .hub .c2{grid-column:2} .hub .c3{grid-column:3}
-  .hub #matchSheet{grid-row:1} .hub #upSheet{grid-row:2} .hub #tableSheet{grid-row:1} .hub #lastSheet{grid-row:2} .hub #otdSheet{grid-row:1} .hub #secSheet{grid-row:2} .hub #alerts{grid-row:3;grid-column:1/-1}}
+  .hub .col{display:flex;flex-direction:column;min-width:0} .hub #alerts{grid-column:1/-1}
+  .lastrow .d{white-space:nowrap}}
+@media (max-width:899px){.hub .col{display:contents} .hub{display:flex;flex-direction:column}
+  #matchSheet{order:1} #tableSheet{order:2} #otdSheet{order:3} #lastSheet{order:4} #upSheet{order:5} #secSheet{order:6} #alerts{order:7}}
 /* match card */
 .mc .k{font-family:var(--display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px}
 .mc .pill{font-family:var(--body);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--tint);padding:3px 8px;border-radius:10px} .mc .pill.live{background:var(--red);color:#fff}
@@ -85,18 +87,23 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
 <nav class="munav" aria-label="Sections"></nav>
 
 <main class="hub">
-  <div class="sheet mc c1" id="matchSheet"><div class="k">Next match</div><div class="line">Loading…</div></div>
-  <div class="sheet c2" id="tableSheet" style="padding:0;background:transparent;box-shadow:none">
+  <div class="col">
+  <div class="sheet mc" id="matchSheet"><div class="k">Next match</div><div class="line">Loading…</div></div>
+  <div class="sheet" id="upSheet"><h2 class="row">Coming up <a href="/manutd/trips/">Trips →</a></h2><div id="upcoming"></div></div>
+  <div class="sheet" id="lastSheet"><h2 class="row">Last five <a href="/manutd/season/">Results →</a></h2><div id="last"></div><div id="reportWrap" hidden><h3>Latest match report</h3><div id="report"></div></div></div>
+  </div>
+  <div class="col">
+  <div class="sheet" id="tableSheet" style="padding:0;background:transparent;box-shadow:none">
     <div class="tiles" id="tiles">
       <div class="tile" id="tileTable"><span class="k">Table</span><span class="v">—</span><span class="s"></span><span class="t"></span></div>
       <div class="tile" id="tileNews"><span class="k">Team news</span><span class="v">—</span><span class="s"></span><span class="t"></span></div>
     </div>
     <div class="sheet" id="miniSheet" hidden><h2 class="row">Premier League <a href="/manutd/season/">Full table →</a></h2><div id="mini"></div><p class="sub" id="pace" style="margin:8px 0 0"></p></div>
   </div>
-  <div class="sheet c3" id="otdSheet"><h2 class="row">On this day <a href="/manutd/history/">History →</a></h2><p class="sub" id="otdNote" style="margin:0 0 6px"></p><div id="otd"></div></div>
-  <div class="sheet c2" id="lastSheet"><h2 class="row">Last five <a href="/manutd/season/">Results →</a></h2><div id="last"></div><div id="reportWrap" hidden><h3>Latest match report</h3><div id="report"></div></div></div>
-  <div class="sheet c1" id="upSheet"><h2 class="row">Coming up <a href="/manutd/trips/">Trips →</a></h2><div id="upcoming"></div></div>
-  <div class="sheet c3" id="secSheet"><a id="more"></a><h2 class="row">Everything else</h2>
+  </div>
+  <div class="col">
+  <div class="sheet" id="otdSheet"><h2 class="row">On this day <a href="/manutd/history/">History →</a></h2><p class="sub" id="otdNote" style="margin:0 0 6px"></p><div id="otd"></div></div>
+  <div class="sheet" id="secSheet"><a id="more"></a><h2 class="row">Everything else</h2>
     <ul class="secs">
       <li><a href="/manutd/trips/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><span><b>Trips</b><small>Flights, hotels and prices for every fixture</small></span><span class="ch">›</span></a></li>
       <li><a href="/manutd/grounds/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span><b>Ground guides</b><small>17 away days: getting there, the away end, getting home</small></span><span class="ch">›</span></a></li>
@@ -110,6 +117,7 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
       <li><a href="/manutd/shelf/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v14H4zM9 5v14M4 10h16"/></svg></span><span><b>Bookshelf &amp; watchlist</b><small>Books, documentaries, films and podcasts by era</small></span><span class="ch">›</span></a></li>
       <li><a href="/manutd/links/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></span><span><b>Links</b><small>Official sites, tickets, travel</small></span><span class="ch">›</span></a></li>
     </ul>
+  </div>
   </div>
   <div class="sheet" id="alerts">
     <h2>Match alerts</h2>
