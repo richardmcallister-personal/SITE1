@@ -56,7 +56,7 @@ export default {
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + (WIKI ? "/trips/" : "/manutd/trips/"), 301);
     if (WIKI) {
       // Clean URLs on the club domain: the site lives under /manutd/ in the repo; serve it at the root here.
-      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|wiki-rev|collection|cover)(\/|$)/;
+      const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|wiki-rev|wiki-page|collection|cover)(\/|$)/;
       if (url.pathname.startsWith("/manutd/")) return Response.redirect(url.origin + url.pathname.slice(7) + url.search, 301);
       if (!SERVICE.test(url.pathname)) {
         const inner = new URL(url.toString()); inner.pathname = "/manutd" + (url.pathname === "/" ? "/" : url.pathname);
@@ -77,6 +77,7 @@ export default {
     if (url.pathname === "/wiki-club") return wikiClub(url, env, ctx);
     if (url.pathname === "/wiki-raw") return wikiRaw(url, env, ctx);
     if (url.pathname === "/wiki-rev") return wikiRev(url, env, ctx);
+    if (url.pathname === "/wiki-page") return wikiPage(url, env, ctx);
     if (url.pathname === "/cover") return cover(url, env, ctx);
     if (url.pathname === "/collection") { try { return await collection(request, url, env); } catch (e) { return json({ error: "collection: " + (e && e.message || e) }, 500); } }
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
@@ -531,6 +532,19 @@ async function wikiRaw(url, env, ctx) {
   return new Response(wt, { headers: { "content-type": "text/plain; charset=utf-8", "x-source": "upstream" } });
 }
 
+
+// Plain article summary (lead paragraph, thumbnail, link) for any title — rivalry articles and the like; a week in KV.
+async function wikiPage(url, env, ctx) {
+  const title = (url.searchParams.get("title") || "").trim(); if (!title) return json({ error: "title required" }, 400);
+  const key = "wiki:pg:v1:" + title, cached = await env.MU_CACHE.get(key);
+  if (cached) return new Response(cached, { headers: headers("kv-hit") });
+  const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
+  const r = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(title.replace(/ /g, "_")), { headers: UA });
+  if (!r.ok) return json({ error: "no article", title }, 404);
+  const j = await r.json(), out = { title: j.title, description: j.description || "", extract: j.extract || "", thumbnail: j.thumbnail ? j.thumbnail.source : "", original: j.originalimage ? j.originalimage.source : "", url: j.content_urls ? j.content_urls.desktop.page : "" };
+  const body = JSON.stringify(out); ctx.waitUntil(env.MU_CACHE.put(key, body, { expirationTtl: 7 * 86400 }));
+  return new Response(body, { headers: headers("upstream") });
+}
 
 // Latest revision id for up to 50 titles ("|"-separated), so the build scripts only re-parse articles that have changed.
 async function wikiRev(url, env, ctx) {

@@ -1,0 +1,89 @@
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Manchester United · Rivalries</title>
+<link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="/manutd/mu.css">
+<style>
+.rivals{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 4px} .rivals a{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);background:#fff;padding:8px 12px;color:var(--ink);text-decoration:none;font-family:var(--head);font-weight:500;font-size:13px;letter-spacing:.08em;text-transform:uppercase} .rivals a[aria-current="page"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center;text-align:center;margin:0 0 14px} .vs img{width:96px;height:96px;object-fit:contain} .vs .nm{font-family:var(--head);font-size:22px;margin-top:6px} .vs .big{font-family:var(--head);font-weight:300;font-size:64px;line-height:1} .vs .big small{display:block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-family:var(--body);font-weight:500}
+.vs .big b{color:#0a7a2f} .vs .big i{font-style:normal;color:var(--red)}
+.h2h{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin:0 0 14px} .h2h div{background:#fff;border:1px solid var(--rule);padding:12px;text-align:center} .h2h b{display:block;font-family:var(--head);font-weight:300;font-size:28px;line-height:1} .h2h span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)} .h2h small{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:4px 0 14px} .bar i{display:block} .bar .w{background:#0a7a2f}.bar .d{background:#bbb}.bar .l{background:var(--red)}
+.lead{font-size:15px;line-height:1.6;max-width:80ch} .attr{font-size:12px;color:var(--muted)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:22px} @media (max-width:760px){.two{grid-template-columns:1fr}}
+.res .fxlist li{grid-template-columns:110px 1fr auto;padding:6px 0;gap:10px} .res .fxlist li .o:before{min-width:0;padding:4px 6px 3px;margin-right:8px} .res .fxlist li.home .o:before{content:"H"} .res .fxlist li.away .o:before{content:"A"} .res .fxlist .o{font-weight:500} .res .fxlist .o small{display:block;font-size:12px} .res .fxlist .r{font-size:19px;min-width:58px}
+.next{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;background:var(--tint);padding:14px 16px;margin:0 0 14px} .next .d{font-family:var(--head);font-size:22px;line-height:1.1} .next .d small{display:block;font-family:var(--body);font-size:12px;color:var(--muted);margin-top:4px}
+table.mu tr.hl td{font-weight:600}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:4px;margin:0 0 6px} .facts div{background:var(--tint);padding:10px 12px} .facts .k{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:var(--muted)} .facts .v{font-size:14px;margin-top:3px}
+</style>
+</head><body><div class="wrap">
+<header class="mu">
+  <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small id="eyebrow">Rivalries</small>Manchester<br>United</h1></a>
+  <div class="from" id="from">Rivalry<span>…</span></div>
+</header>
+<nav class="munav" aria-label="Sections"></nav>
+<div class="sheet"><div class="rivals" id="rivals"></div></div>
+<div class="sheet">
+  <div class="vs" id="vs"></div>
+  <div class="bar" id="bar"></div>
+  <div id="next"></div>
+  <p class="lead" id="lead"></p><p class="attr" id="attr"></p>
+</div>
+<div class="sheet">
+  <h2>The record</h2>
+  <div class="h2h" id="stats"></div>
+  <div class="two">
+    <div><h3>By competition</h3><div id="byComp"></div><h3 style="margin-top:18px">By decade</h3><div id="byDec"></div></div>
+    <div><h3>Runs and extremes</h3><div class="facts" id="facts"></div><h3 style="margin-top:18px">United's scorers in the fixture</h3><p class="sub" style="margin:0 0 6px">From the match-by-match scorers in the archive; own goals not credited.</p><div id="scorers"></div></div>
+  </div>
+</div>
+<div class="sheet">
+  <h2>Recent meetings</h2>
+  <div id="recent" class="res"></div>
+  <p class="sub" style="margin:10px 0 0">Every meeting, with filters, is on the <a id="clubLink" href="#">club page</a>.</p>
+</div>
+<footer class="mu"><span id="stamp"></span> Narrative from Wikipedia (CC BY-SA 4.0); every figure computed from the match archive, all competitive meetings including the Shield. <a href="/manutd/history/opponents/">Every opponent</a></footer>
+</div>
+<script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script>
+<script>
+(function(){
+  MU.nav("History"); MU.checked("clubs",document.getElementById("stamp"),"Archive checked");
+  var $=function(i){return document.getElementById(i)};
+  var R={liverpool:{club:"Liverpool",label:"Liverpool",wiki:"Liverpool F.C.–Manchester United F.C. rivalry"},city:{club:"Manchester City",label:"Manchester City",wiki:"Manchester derby"},leeds:{club:"Leeds United",label:"Leeds United",wiki:"Leeds United F.C.–Manchester United F.C. rivalry"},arsenal:{club:"Arsenal",label:"Arsenal",wiki:"Arsenal F.C.–Manchester United F.C. rivalry"},chelsea:{club:"Chelsea",label:"Chelsea",wiki:null}};
+  var key=new URLSearchParams(location.search).get("r")||"liverpool"; if(!R[key])key="liverpool"; var RV=R[key], club=RV.club;
+  $("rivals").innerHTML=Object.keys(R).map(function(k){return '<a href="?r='+k+'"'+(k===key?' aria-current="page"':'')+'>'+MU.crest(R[k].club,22)+R[k].label+'</a>'}).join("");
+  document.title="Manchester United · v "+club; $("from").innerHTML="Rivalry<span>United v "+MU.esc(club)+"</span>";
+  function fmt(d){return MU.fmtDate(d+"T12:00:00Z",{year:"numeric",weekday:undefined})} function sp(s){return s.replace("-","–")}
+  var CN={L:"League",FAC:"FA Cup",LC:"League Cup",UCL:"Champions League / European Cup",UEL:"Europa League / UEFA Cup",CWC:"Cup Winners' Cup",SC:"Super Cup",CS:"Charity / Community Shield",OTH:"Other"};
+  // Narrative
+  if(RV.wiki)MU.api("../wiki-page",{title:RV.wiki}).then(function(w){ if(w.error)throw 0; $("lead").textContent=w.extract; $("attr").innerHTML='From <a href="'+w.url+'" target="_blank" rel="noopener">'+MU.esc(w.title)+'</a> on Wikipedia, CC BY-SA 4.0.'}).catch(function(){$("lead").textContent=""});
+  // Next meeting from the single fixture source
+  var now=Date.now(), nx=(window.MU_FIXTURES||[]).filter(function(f){return f.opp===club&&new Date(f.ko).getTime()>now}).sort(function(a,b){return new Date(a.ko)-new Date(b.ko)})[0];
+  if(nx)$("next").innerHTML='<div class="next">'+MU.crest(nx.home?"Manchester United":club,44)+'<div class="d">'+(nx.home?"United v "+MU.esc(club):MU.esc(club)+" v United")+'<small>'+MU.fmtDate(nx.ko,{year:"numeric"})+' · '+MU.fmtUK(nx.ko)+' UK'+MU.prov(nx)+' · '+MU.esc(nx.comp)+' · '+MU.esc(nx.venue)+'</small></div><a class="btn red" href="/manutd/trips/">'+(nx.home?"Plan the trip →":"Plan the away trip →")+'</a></div>';
+  // Record
+  fetch("/manutd/history/clubs.json").then(function(r){return r.json()}).then(function(ix){var c=ix.filter(function(x){return x.name===club})[0]; $("clubLink").href="/manutd/club/?c="+encodeURIComponent(club); return fetch("/manutd/history/clubs/"+c.slug+".json").then(function(r){return r.json()})}).then(function(C){
+    var M=C.matches, a=C.all, pct=function(n){return a.p?Math.round(100*n/a.p):0};
+    $("vs").innerHTML='<div>'+MU.crest("Manchester United",96)+'<div class="nm">United</div></div><div class="big"><b>'+a.w+'</b> – '+a.d+' – <i>'+a.l+'</i><small>'+a.p+' meetings since '+C.first.slice(0,4)+'</small></div><div>'+MU.crest(club,96)+'<div class="nm">'+MU.esc(club)+'</div></div>';
+    $("bar").innerHTML='<i class="w" style="width:'+pct(a.w)+'%"></i><i class="d" style="width:'+pct(a.d)+'%"></i><i class="l" style="width:'+pct(a.l)+'%"></i>';
+    // runs
+    function runs(ok){var best=0,cur=0,b=null,s=null; M.forEach(function(m){ if(ok(m)){cur++; if(cur===1)s=m; if(cur>best){best=cur;b={n:cur,fr:s.d,to:m.d}}} else cur=0}); return b}
+    var res=function(m){return m.gf>m.ga?"W":m.gf<m.ga?"L":"D"}, cur=0, curType=null; for(var i=M.length-1;i>=0;i--){var r=res(M[i]); if(curType===null){curType=r==="L"?"L":"U"} if((curType==="U"&&r!=="L")||(curType==="L"&&r==="L"))cur++; else break}
+    var unb=runs(function(m){return res(m)!=="L"}), win=runs(function(m){return res(m)==="W"}), lose=runs(function(m){return res(m)==="L"}), winless=runs(function(m){return res(m)!=="W"});
+    var home=M.filter(function(m){return m.h}), away=M.filter(function(m){return !m.h}), agg=function(r){return {p:r.length,w:r.filter(function(m){return res(m)==="W"}).length,d:r.filter(function(m){return res(m)==="D"}).length,l:r.filter(function(m){return res(m)==="L"}).length,gf:r.reduce(function(x,m){return x+m.gf},0),ga:r.reduce(function(x,m){return x+m.ga},0)}};
+    var H=agg(home), A=agg(away), last10=agg(M.slice(-10));
+    $("stats").innerHTML='<div><b>'+pct(a.w)+'%</b><span>United win rate</span></div><div><b>'+a.gf+'–'+a.ga+'</b><span>Goals</span></div><div><b>'+H.w+'–'+H.d+'–'+H.l+'</b><span>At Old Trafford</span><small>'+H.p+' games</small></div><div><b>'+A.w+'–'+A.d+'–'+A.l+'</b><span>Away</span><small>'+A.p+' games</small></div><div><b>'+last10.w+'–'+last10.d+'–'+last10.l+'</b><span>Last 10</span></div><div><b>'+cur+'</b><span>'+(curType==="L"?"Straight defeats":"Unbeaten run")+'</span><small>current, in this fixture</small></div>';
+    var byc={}; M.forEach(function(m){var k=CN[m.c]||m.div||m.c; (byc[k]=byc[k]||[]).push(m)});
+    $("byComp").innerHTML='<table class="mu"><thead><tr><th>Competition</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th class="n">GF</th><th class="n">GA</th></tr></thead><tbody>'+Object.keys(byc).sort(function(x,y){return byc[y].length-byc[x].length}).map(function(k){var g=agg(byc[k]); return '<tr><td>'+MU.esc(k)+'</td><td class="n">'+g.p+'</td><td class="n">'+g.w+'</td><td class="n">'+g.d+'</td><td class="n">'+g.l+'</td><td class="n">'+g.gf+'</td><td class="n">'+g.ga+'</td></tr>'}).join("")+'</tbody></table>';
+    var byd={}; M.forEach(function(m){var k=m.d.slice(0,3)+"0s"; (byd[k]=byd[k]||[]).push(m)});
+    $("byDec").innerHTML='<table class="mu"><thead><tr><th>Decade</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th>United won</th></tr></thead><tbody>'+Object.keys(byd).sort().map(function(k){var g=agg(byd[k]), p=Math.round(100*g.w/g.p); return '<tr><td>'+k+'</td><td class="n">'+g.p+'</td><td class="n">'+g.w+'</td><td class="n">'+g.d+'</td><td class="n">'+g.l+'</td><td><span style="display:inline-block;width:60px;height:8px;background:#eee;vertical-align:middle;margin-right:6px"><i style="display:block;height:100%;width:'+p+'%;background:#0a7a2f"></i></span>'+p+'%</td></tr>'}).join("")+'</tbody></table>';
+    var sc=function(m){return m.gf+"–"+m.ga+" · "+fmt(m.d)+(m.h?" (H)":" (A)")}, runTxt=function(r,what){return r?r.n+" "+what+", "+r.fr.slice(0,4)+"–"+r.to.slice(0,4):"—"};
+    var hs=M.slice().sort(function(x,y){return (y.gf+y.ga)-(x.gf+x.ga)||y.gf-x.gf})[0];
+    var cnt={}; M.forEach(function(m){var k=m.gf+"–"+m.ga; cnt[k]=(cnt[k]||0)+1}); var common=Object.keys(cnt).sort(function(x,y){return cnt[y]-cnt[x]}).slice(0,3).map(function(k){return k+" ("+cnt[k]+")"}).join(", ");
+    $("facts").innerHTML=[["Biggest United win",sc(C.best)],["Heaviest defeat",C.worst.gf<C.worst.ga?sc(C.worst):"Never beaten"],["Highest-scoring",hs?hs.gf+"–"+hs.ga+" · "+fmt(hs.d):"—"],["Longest unbeaten",runTxt(unb,"games")],["Longest winning run",runTxt(win,"wins")],["Longest without a win",runTxt(winless,"games")],["Most common score",common],["First meeting",fmt(C.first)+" · "+C.matches[0].gf+"–"+C.matches[0].ga]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+MU.esc(f[1])+'</div></div>'}).join("");
+    var tot={}; M.forEach(function(m){(m.sc||[]).forEach(function(x){if(x[3]&&x[3].indexOf("o")>=0||!x[1])return; var t=tot[x[1]]||(tot[x[1]]={n:x[0],t:x[1],g:0,games:0,first:m.d,last:m.d}); t.g+=x[2]; t.games++; t.last=m.d})});
+    var top=Object.values(tot).sort(function(x,y){return y.g-x.g||x.n.localeCompare(y.n)}).slice(0,12);
+    $("scorers").innerHTML=top.length?'<table class="mu"><thead><tr><th>#</th><th>Player</th><th class="n">Goals</th><th class="n">Games scored in</th><th>Years</th></tr></thead><tbody>'+top.map(function(t,i){return '<tr'+(i===0?' class="hl"':'')+'><td>'+(i+1)+'</td><td><a class="pl" href="/manutd/player/?p='+encodeURIComponent(t.t)+'">'+MU.esc(t.n)+'</a></td><td class="n">'+t.g+'</td><td class="n">'+t.games+'</td><td class="yrs">'+t.first.slice(0,4)+(t.last.slice(0,4)!==t.first.slice(0,4)?'–'+t.last.slice(0,4):'')+'</td></tr>'}).join("")+'</tbody></table>':'<p class="sub">No scorer data for this fixture.</p>';
+    $("recent").innerHTML='<ul class="fxlist">'+M.slice(-12).reverse().map(function(m){var r=res(m), note=(m.c!=="L"?(m.div||"")+(m.r?" · "+m.r:""):m.div||"")+" · "+sp(m.s); return '<li class="'+(m.h?"home":"away")+'"><span class="d">'+fmt(m.d)+'</span><span class="o">'+(m.h?"United v "+MU.esc(club):MU.esc(club)+" v United")+'<small>'+MU.esc(note)+'</small>'+(m.sc?'<span class="sc">'+MU.scorers(m.sc)+'</span>':'')+'</span><span class="r">'+(m.id?'<a href="/manutd/match/?id='+m.id+'" style="color:inherit;text-decoration:none">':'')+m.gf+'–'+m.ga+(m.id?'</a>':'')+(m.aet?'<small> aet</small>':'')+(m.pens?'<small> p '+m.pens+'</small>':'')+' '+MU.form(r)+'</span></li>'}).join("")+'</ul>';
+  });
+})();
+</script></body></html>

@@ -65,7 +65,9 @@ for c in json.load(open(os.path.join(STATIC, "comebacks", "classics.json"))):
 for u, t, s in [('/manutd/', 'Hub', 'next match, on this day, latest report'), ('/manutd/trips/', 'Trips & planner', 'flights, hotels and prices for every fixture'), ('/manutd/season/', 'Season', 'table, results, fixtures'),
                 ('/manutd/squad/', 'Squad & team picker', ''), ('/manutd/youth/', 'Academy & loans', ''), ('/manutd/kits/', 'Shirt museum', 'every kit since 1878'), ('/manutd/numbers/', 'Who wore this number?', ''),
                 ('/manutd/comebacks/', 'Comeback collection', ''), ('/manutd/shelf/', 'Bookshelf & watchlist', ''), ('/manutd/grounds/', 'Ground guides', ''), ('/manutd/history/', 'History', ''),
-                ('/manutd/history/seasons/', 'All seasons', ''), ('/manutd/history/opponents/', 'Every opponent', ''), ('/manutd/history/managers/', 'Every manager', ''), ('/manutd/history/records/', 'Records', ''), ('/manutd/links/', 'Links', '')]:
+                ('/manutd/history/seasons/', 'All seasons', ''), ('/manutd/history/opponents/', 'Every opponent', ''), ('/manutd/history/managers/', 'Every manager', ''), ('/manutd/history/records/', 'Records', ''), ('/manutd/links/', 'Links', ''),
+                ('/manutd/rivalry/?r=liverpool', 'United v Liverpool', 'rivalry: record, runs, scorers, next meeting'), ('/manutd/rivalry/?r=city', 'Manchester derby', 'rivalry: record, runs, scorers, next meeting'),
+                ('/manutd/rivalry/?r=leeds', 'United v Leeds', 'Roses rivalry: record, runs, scorers'), ('/manutd/rivalry/?r=arsenal', 'United v Arsenal', 'rivalry: record, runs, scorers, next meeting'), ('/manutd/rivalry/?r=chelsea', 'United v Chelsea', 'record, runs, scorers, next meeting')]:
     add(t, 'page', u, s)
 dump(E, os.path.join(STATIC, "search.json")); stamp("search", f"{len(E)} entries")
 print(len(E), "entries", collections.Counter(e[1] for e in E))

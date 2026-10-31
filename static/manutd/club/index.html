@@ -31,7 +31,7 @@
 <div class="sheet" id="top"><small>Loading…</small></div>
 <div class="sheet">
   <h2>Head to head with United</h2>
-  <p class="sub" id="h2hNote" style="margin:0 0 8px"></p>
+  <p class="sub" id="h2hNote" style="margin:0 0 8px"></p><p class="sub" id="rivLink" style="margin:0 0 8px" hidden></p>
   <div class="h2h" id="h2h"></div>
   <div class="bar" id="bar"></div>
   <div class="facts" id="h2hFacts"></div>
@@ -74,6 +74,7 @@
     if(!canon)throw new Error("none"); if(canon.name!==name){name=canon.name; document.title="Manchester United · "+name; $("from").innerHTML="Club<span>"+MU.esc(name)+"</span>"}
     return fetch("/manutd/history/clubs/"+canon.slug+".json").then(function(r){if(!r.ok)throw new Error("none");return r.json()})}).then(function(c){
     M=c.matches; var a=c.all, pct=function(n){return a.p?Math.round(100*n/a.p):0};
+    var RK={"Liverpool":"liverpool","Manchester City":"city","Leeds United":"leeds","Arsenal":"arsenal","Chelsea":"chelsea"}[name]; if(RK){$("rivLink").hidden=false; $("rivLink").innerHTML='This is one of the big ones: <a href="/manutd/rivalry/?r='+RK+'">the rivalry page</a> has the runs, the decades, United\'s scorers in the fixture and the next meeting.'}
     $("eyebrow").textContent=a.p+" meetings since "+c.first.slice(0,4);
     $("h2hNote").textContent="United's record in "+a.p+" competitive meetings, "+fmt(c.first)+" to "+fmt(c.last)+", across "+c.seasons+" seasons"+(c.other&&c.other.p?", including "+c.other.p+" League Cup, European and other cup ties.":".");
     $("h2h").innerHTML='<div><b>'+a.p+'</b><span>Played</span></div><div class="w"><b>'+a.w+'</b><span>United wins</span></div><div><b>'+a.d+'</b><span>Draws</span></div><div class="l"><b>'+a.l+'</b><span>'+MU.esc(name)+' wins</span></div><div><b>'+a.gf+'–'+a.ga+'</b><span>Goals</span></div>';
