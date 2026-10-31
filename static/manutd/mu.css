@@ -34,6 +34,8 @@ table.mu th{font-family:var(--head);font-weight:500;font-size:11px;letter-spacin
 table.mu td{padding:7px 8px;border-bottom:1px solid var(--rule);vertical-align:middle}
 table.mu td.n,table.mu th.n{text-align:right}
 table.mu td a:not(.chip):not(.cl){color:var(--ink);text-decoration:none;border-bottom:1px dotted #999} table.mu td a:not(.chip):not(.cl):hover{color:var(--red);border-bottom-color:var(--red)} table.mu td.yrs a,table.mu td.s a{border-bottom:0;font-weight:600}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+@media (max-width:640px){.tw table.mu th,.tw table.mu td{white-space:nowrap}}
 @media (min-width:641px){table.mu th{white-space:nowrap} table.mu td.yrs,table.mu td.pos,table.mu td.s{white-space:nowrap}}
 table.mu tr.us td{background:#fff3f3;font-weight:700}
 table.mu tr.ucl td:first-child{box-shadow:inset 4px 0 0 var(--ink)}

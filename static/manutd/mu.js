@@ -2,6 +2,10 @@
 window.MU=(function(){
   var TEAM=33;
   var NAV=[["/manutd/","Hub"],["/manutd/trips/","Trips"],["/manutd/season/","Season"],["/manutd/squad/","Squad"],["/manutd/youth/","Academy"],["/manutd/kits/","Shirts"],["/manutd/history/","History"],["/manutd/links/","Links"]];
+  // Wide tables scroll sideways on narrow screens instead of being clipped: every table.mu gets a scroll wrapper, including ones rendered later.
+  function wrapTables(root){(root||document).querySelectorAll("table.mu").forEach(function(t){if(t.parentElement&&t.parentElement.classList.contains("tw"))return; var w=document.createElement("div"); w.className="tw"; t.parentNode.insertBefore(w,t); w.appendChild(t)})}
+  if(window.MutationObserver){new MutationObserver(function(ms){var hit=false; ms.forEach(function(m){if(m.addedNodes.length)hit=true}); if(hit)wrapTables()}).observe(document.documentElement,{childList:true,subtree:true})}
+  document.addEventListener("DOMContentLoaded",function(){wrapTables()});
   function nav(active){
     var el=document.querySelector("nav.munav"); if(!el)return;
     el.innerHTML=NAV.map(function(n){return '<a href="'+n[0]+'"'+(n[1]===active?' aria-current="page"':'')+'>'+n[1]+'</a>'}).join("")+'<form class="musearch" role="search" action="/manutd/search/"><input type="search" name="q" placeholder="Search players, clubs, seasons, kits…" aria-label="Search the site" autocomplete="off"><div class="hits" hidden></div></form>';
