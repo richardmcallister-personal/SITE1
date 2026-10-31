@@ -3,6 +3,9 @@
 <link rel="icon" href="/manutd/assets/favicon-32.png" type="image/png"><link rel="apple-touch-icon" href="/manutd/assets/apple-touch-icon.png"><link rel="manifest" href="/manutd/manifest.webmanifest"><meta name="theme-color" content="#da020e"><meta name="apple-mobile-web-app-title" content="Man Utd">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
 <link rel="stylesheet" href="/manutd/mu.css">
+<style>.h2h{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin:0 0 14px} .h2h div{background:#fff;border:1px solid var(--rule);padding:12px;text-align:center} .h2h b{display:block;font-family:var(--head);font-weight:300;font-size:30px;line-height:1} .h2h span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)} .h2h small{display:block;font-size:12px;color:var(--muted);margin-top:4px}
+.pace{display:grid;grid-template-columns:72px 1fr 44px;gap:10px;align-items:center;font-size:13px} .pace .lab{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.08em;color:var(--muted);white-space:nowrap} .pace .lab a{color:inherit;text-decoration:none} .pace .bar{height:14px;background:var(--tint);position:relative} .pace .bar i{position:absolute;left:0;top:0;bottom:0;background:#bbb} .pace .now .bar i{background:var(--red)} .pace .lab.now,.pace .n.now{color:var(--red);font-weight:600} .pace .n{text-align:right;font-family:var(--head);font-size:16px}
+.pace .gap{grid-column:1/-1;height:1px;background:var(--rule);margin:4px 0}</style>
 <style>.two{display:grid;grid-template-columns:1fr 1fr;gap:26px}@media (max-width:820px){.two{grid-template-columns:1fr}} .logo{width:20px;height:20px;object-fit:contain;vertical-align:-4px;margin-right:6px}</style>
 </head><body><div class="wrap">
 <header class="mu">
@@ -20,6 +23,13 @@
 <div class="sheet">
   <h2><img src="/manutd/assets/comps/champions-league.png" alt="" style="height:26px;width:auto;vertical-align:-7px;margin-right:8px">Champions League · league phase</h2>
   <div id="ucl"></div>
+</div>
+<div class="sheet" id="paceSheet" hidden>
+  <h2>This season against every other</h2>
+  <p class="sub" id="paceNote" style="margin:0 0 10px"></p>
+  <div class="h2h" id="paceStats"></div>
+  <div id="paceChart"></div>
+  <p class="sub" id="paceFoot" style="margin:8px 0 0"></p>
 </div>
 <div class="sheet">
   <div class="two">
@@ -41,7 +51,31 @@
   }
   MU.api("standings").then(function(j){
     document.getElementById("pl").innerHTML=table(j.response[0].league.standings[0],{note:"Black bar: Champions League places · grey: Europa / Conference · red: relegation."});
+    var me=j.response[0].league.standings[0].filter(function(r){return r.team.id===MU.TEAM})[0]; if(me&&me.all.played>=3)pace(me.all.played,me.points,me.goalsDiff,me.rank,j.response[0].league.season);
   }).catch(function(e){MU.apiDown(document.getElementById("pl"),e)});
+  // Where this season's points after N games sit against every archived season at the same stage (three points a win throughout).
+  function pace(n,pts,gd,rank,year){
+    fetch("/manutd/history/pace.json").then(function(r){return r.json()}).then(function(P){
+      var $=function(i){return document.getElementById(i)}, cur=year+"-"+String(year+1).slice(2), rows=[];
+      Object.keys(P).forEach(function(s){var v=P[s]; if(v.tier!==1||v.run.length<n||s===cur)return; rows.push({s:s,pts:v.run[n-1][0],gd:v.run[n-1][1],fin:v.pos,pts3:v.pts3,n:v.n,div:v.div})});
+      if(!rows.length)return; rows.sort(function(a,b){return b.pts-a.pts||b.gd-a.gd});
+      var better=rows.filter(function(r){return r.pts>pts||(r.pts===pts&&r.gd>gd)}).length, same=rows.filter(function(r){return r.pts===pts}), titles=rows.filter(function(r){return r.fin===1}), worstTitle=titles.length?Math.min.apply(null,titles.map(function(r){return r.pts})):null;
+      var ords=function(k){var s=["th","st","nd","rd"],v=k%100;return k+(s[(v-20)%10]||s[v]||s[0])}, avg=rows.reduce(function(a,r){return a+r.pts},0)/rows.length;
+      var likeUs=same.length?same.slice().sort(function(a,b){return b.s.localeCompare(a.s)}):rows.filter(function(r){return Math.abs(r.pts-pts)<=1}).sort(function(a,b){return Math.abs(a.pts-pts)-Math.abs(b.pts-pts)||b.s.localeCompare(a.s)});
+      var finishes=likeUs.map(function(r){return r.fin}).filter(Boolean), medFin=finishes.length?finishes.slice().sort(function(a,b){return a-b})[Math.floor(finishes.length/2)]:null;
+      $("paceSheet").hidden=false;
+      $("paceNote").innerHTML="After "+n+" league games United have "+pts+" points (currently "+ords(rank)+"). Against the "+rows.length+" other top-flight seasons in the archive at the same stage, with three points a win applied throughout, that is the <b>"+ords(better+1)+" best start</b>"+(same.length?"; "+same.length+" season"+(same.length===1?"":"s")+" had exactly "+pts+".":".");
+      $("paceStats").innerHTML='<div><b>'+ords(better+1)+'</b><span>of '+(rows.length+1)+' seasons</span><small>at '+n+' games</small></div><div><b>'+rows[0].pts+'</b><span>best start</span><small><a href="/manutd/history/season/?s='+rows[0].s+'">'+rows[0].s.replace("-","–")+'</a>, finished '+ords(rows[0].fin)+'</small></div><div><b>'+avg.toFixed(1)+'</b><span>average</span><small>all top-flight seasons</small></div>'+(worstTitle!=null?'<div><b>'+worstTitle+'</b><span>lowest title pace</span><small>a champion side had this many at '+n+' games</small></div>':'')+(medFin?'<div><b>'+ords(medFin)+'</b><span>typical finish</span><small>seasons on '+pts+(same.length?'':' ± 1')+' points at this stage</small></div>':'');
+      // chart: top 8, the current season, the 5 nearest, bottom 3
+      var pick={}, add=function(r){pick[r.s]=r}; rows.slice(0,8).forEach(add); likeUs.slice(0,5).forEach(add); rows.slice(-3).forEach(add);
+      var list=Object.values(pick).sort(function(a,b){return b.pts-a.pts||b.gd-a.gd}); list.push({s:cur,pts:pts,gd:gd,now:true}); list.sort(function(a,b){return b.pts-a.pts||b.gd-a.gd});
+      var max=list[0].pts, html='', prev=null;
+      list.forEach(function(r){ if(prev&&prev.pts-r.pts>6)html+='<span class="gap"></span>'; prev=r;
+        html+='<div class="lab'+(r.now?' now':'')+'">'+(r.now?'This season':'<a href="/manutd/history/season/?s='+r.s+'">'+r.s.replace("-","–")+'</a>')+'</div><div class="'+(r.now?'now ':'')+'"><div class="bar"><i style="width:'+Math.round(100*r.pts/max)+'%"></i></div></div><div class="n'+(r.now?' now':'')+'">'+r.pts+(r.fin?' <small style="color:var(--muted);font-weight:400">'+ords(r.fin)+'</small>':'')+'</div>'});
+      $("paceChart").innerHTML='<div class="pace">'+html+'</div>';
+      $("paceFoot").textContent="Bars: the best starts, the nearest seasons to this one, and the worst; the small figure is where that season finished. Points per game differ by era (22 to 42 league games), so the comparison is at the same number of games played, not the same date.";
+    }).catch(function(){});
+  }
   MU.api("ucl").then(function(j){
     var groups=j.response[0].league.standings; var rows=groups.length===1?groups[0]:[].concat.apply([],groups);
     document.getElementById("ucl").innerHTML=table(rows,{note:"Top 8 go straight to the round of 16; 9th–24th play a knockout round."});

@@ -11,6 +11,7 @@ Everything here talks to the live site's Worker (manutd.wiki), never to API-Foot
 | `build_records.py` | `history/records.json` | biggest wins/defeats, runs, season extremes, opponent records, by decade — from the same match set |
 | `build_finals.py` | `numbers/finals.json` | United's XI with shirt numbers from every final to 1992/93 (Wikipedia match articles) — the 1–11 era on the numbers page |
 | `build_search.py` | `search.json` | site-wide search index (players, managers, clubs, seasons, kits, grounds, shelf, classics, sections) — run last |
+| `build_pace.py` | `history/pace.json` | cumulative league points (3 a win) after each game, every season — the Season page's 'this season against every other' |
 | `build_clubs.py` | `history/clubs/*.json`, `history/clubs.json` | match archive + cups.json + live feed from 2025/26; every competitive meeting |
 | `build_numbers.py` | `numbers/numbers.json` | Wikipedia season articles via `/wiki-raw` |
 | `update.sh` | all of the above | |
