@@ -44,7 +44,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
 <link rel="stylesheet" href="/manutd/mu.css">
 <style>
-.alertRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap} .prefs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px 18px;margin:12px 0 0;font-size:14px} .prefs label{display:flex;gap:8px;align-items:center} .prefs input{width:16px;height:16px;accent-color:var(--red)} #alertStatus{font-size:13px}
+.alertRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap} .prefs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px 18px;margin:12px 0 0;font-size:14px} .prefs label{display:flex;gap:8px;align-items:center} .prefs input{width:16px;height:16px;accent-color:var(--red-ink)} #alertStatus{font-size:13px}
 /* hub layout: one column on phones (DOM order), three on desktop */
 .hub{display:grid;grid-template-columns:1fr;gap:0}
 .hub>.sheet{margin-top:12px}
@@ -60,7 +60,7 @@
 .mc .time{font-family:var(--display);font-size:36px;line-height:1;text-align:center} .mc .time small{display:block;font-family:var(--body);font-size:11px;color:var(--muted);margin-top:4px}
 .mc .line{font-size:13px;color:var(--muted);text-align:center;margin:0 0 12px}
 .mc .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px} .mc .acts .btn{text-align:center;padding:12px} .mc .acts .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--ink);padding:11px}
-.mc details{margin-top:12px;border-top:1px solid var(--rule);padding-top:8px} .mc summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--red);list-style:none} .mc summary::-webkit-details-marker{display:none} .mc summary:after{content:" ›";}
+.mc details{margin-top:12px;border-top:1px solid var(--rule);padding-top:8px} .mc summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--red-ink);list-style:none} .mc summary::-webkit-details-marker{display:none} .mc summary:after{content:" ›";}
 .preview h4{font-family:var(--head);font-weight:500;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:10px 0 4px}
 .preview .h2h{display:flex;gap:6px;flex-wrap:wrap} .preview .h2h div{background:var(--tint);padding:8px 10px;text-align:center;min-width:64px;border-radius:8px} .preview .h2h b{display:block;font-family:var(--display);font-size:22px;line-height:1} .preview .h2h span{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .preview ul{list-style:none;margin:0;padding:0;font-size:13px} .preview li{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid var(--rule)} .preview li small{color:var(--muted)}
@@ -73,9 +73,9 @@
 table.mini{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums} table.mini th{font-family:var(--head);font-weight:500;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);text-align:left;padding:4px 6px} table.mini td{padding:7px 6px;border-top:1px solid var(--rule)} table.mini .n{text-align:right} table.mini tr.us td{background:#fde8e9;font-weight:700} table.mini td.pos{color:var(--muted)} table.mini tr.gap td{text-align:center;color:var(--muted);font-size:11px;padding:2px}
 table.mini tr.rel td:first-child{box-shadow:inset 3px 0 0 var(--red)}
 /* on this day + sections */
-.lastrow .d.otdy{font-family:var(--display);font-size:20px;color:var(--red);min-width:56px}
-.secs{list-style:none;margin:0;padding:0} .secs li{border-top:1px solid var(--rule)} .secs li:first-child{border-top:0} .secs a{display:flex;align-items:center;gap:12px;padding:12px 0;color:var(--ink);text-decoration:none} .secs .ic{width:34px;height:34px;border-radius:8px;background:#fde8e9;color:var(--red);display:flex;align-items:center;justify-content:center;flex:0 0 auto} .secs .ic svg{width:18px;height:18px} .secs b{display:block;font-size:15px} .secs small{font-size:12px;color:var(--muted)} .secs .ch{margin-left:auto;color:#b5b5b5}
-h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;padding:0;width:100%;font-family:var(--display);font-weight:400;font-size:13px} h2.row a{font-family:var(--body);font-size:12px;color:var(--red);text-decoration:none;letter-spacing:0;text-transform:none;font-weight:600}
+.lastrow .d.otdy{font-family:var(--display);font-size:20px;color:var(--red-ink);min-width:56px}
+.secs{list-style:none;margin:0;padding:0} .secs li{border-top:1px solid var(--rule)} .secs li:first-child{border-top:0} .secs a{display:flex;align-items:center;gap:12px;padding:12px 0;color:var(--ink);text-decoration:none} .secs .ic{width:34px;height:34px;border-radius:8px;background:#fde8e9;color:var(--red-ink);display:flex;align-items:center;justify-content:center;flex:0 0 auto} .secs .ic svg{width:18px;height:18px} .secs b{display:block;font-size:15px} .secs small{font-size:12px;color:var(--muted)} .secs .ch{margin-left:auto;color:#b5b5b5}
+h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;padding:0;width:100%;font-family:var(--display);font-weight:400;font-size:13px} h2.row a{font-family:var(--body);font-size:12px;color:var(--red-ink);text-decoration:none;letter-spacing:0;text-transform:none;font-weight:600}
 .lastrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--rule);font-size:14px} .lastrow .d{font-size:11px;color:var(--muted);min-width:56px} .lastrow .ha{font-size:10px;font-weight:700;color:var(--muted);background:var(--tint);padding:2px 5px;border-radius:3px} .lastrow .o{flex-grow:1;font-weight:600} .lastrow .o small{display:block;font-weight:400;color:var(--muted);font-size:11px} .lastrow .r{font-family:var(--display);font-size:18px;white-space:nowrap} .lastrow .r a{color:inherit;text-decoration:none} .lastrow .r small.tz{font-family:var(--body);font-size:10px} .lastrow .form{margin-left:2px}
 </style></head><body><div class="wrap">
 <header class="mu">

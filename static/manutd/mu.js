@@ -10,6 +10,15 @@ window.MU=(function(){
   (function(){try{var sa=window.navigator.standalone===true||matchMedia("(display-mode: standalone)").matches; if(!sa||sessionStorage.getItem("mu:splash"))return; sessionStorage.setItem("mu:splash","1");
     var d=document.createElement("div"); d.className="splash"; d.innerHTML='<img src="/manutd/assets/crest.png" alt="">'; (document.body||document.documentElement).appendChild(d);
     setTimeout(function(){d.classList.add("out"); setTimeout(function(){d.remove()},500)},900)}catch(e){}})();
+  // Appearance: auto (device) / light / dark, remembered on this device; the switch sits in the footer of every page.
+  function theme(mode){try{if(mode==="auto")localStorage.removeItem("mu:theme"); else localStorage.setItem("mu:theme",mode)}catch(e){} if(mode==="auto")document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme",mode);
+    var m=document.querySelector('meta[name="theme-color"]'); if(m)m.setAttribute("content",getComputedStyle(document.documentElement).getPropertyValue("--red").trim()||"#da020e");
+    document.querySelectorAll(".themesw button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.m===mode)})}
+  (function(){try{var t=localStorage.getItem("mu:theme"); if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}})();
+  function themeSwitch(){var f=document.querySelector("footer.mu"); if(!f||f.querySelector(".themesw"))return; var cur="auto"; try{cur=localStorage.getItem("mu:theme")||"auto"}catch(e){}
+    var d=document.createElement("span"); d.className="themesw"; d.setAttribute("role","group"); d.setAttribute("aria-label","Appearance"); d.innerHTML=["auto","light","dark"].map(function(m){return '<button type="button" data-m="'+m+'" aria-pressed="'+(m===cur)+'">'+m+'</button>'}).join("");
+    d.addEventListener("click",function(e){var b=e.target.closest("button"); if(b)theme(b.dataset.m)}); f.appendChild(document.createTextNode(" Appearance:")); f.appendChild(d)}
+  document.addEventListener("DOMContentLoaded",themeSwitch);
   function nav(active){
     var el=document.querySelector("nav.munav"); if(!el)return;
     document.querySelectorAll("header.mu h1 br").forEach(function(br){br.replaceWith(" ")});   // the wordmark sits on one line now
@@ -136,5 +145,5 @@ window.MU=(function(){
     return out.join("")}
   function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
   function formHtml(str){return '<span class="form">'+String(str||"").split("").map(function(c){return '<b class="'+c+'">'+c+'</b>'}).join("")+'</span>'}
-  return {TEAM:TEAM,nav:nav,scorers:scorers,mlinks:mlinks,search:search,hit:hit,KIND:KIND,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,fmtLocal:fmtLocal,fmtKO:fmtKO,fmtKOText:fmtKOText,TZ:TZ,IN_UK:IN_UK,esc:esc,form:formHtml};
+  return {TEAM:TEAM,nav:nav,theme:theme,scorers:scorers,mlinks:mlinks,search:search,hit:hit,KIND:KIND,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,fmtLocal:fmtLocal,fmtKO:fmtKO,fmtKOText:fmtKOText,TZ:TZ,IN_UK:IN_UK,esc:esc,form:formHtml};
 })();

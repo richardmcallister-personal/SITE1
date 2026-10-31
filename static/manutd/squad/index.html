@@ -49,21 +49,20 @@
 .pitch:after{content:"";position:absolute;left:0;right:0;top:50%;border-top:3px solid rgba(255,255,255,.8)}
 .row{display:flex;justify-content:space-evenly;gap:6px;position:relative;z-index:1}
 .slot{width:clamp(84px,18vw,130px);text-align:center}
-.slot select{width:100%;font:inherit;font-size:12px;padding:4px;border:0;background:#fff}
+.slot select{width:100%;font:inherit;font-size:12px;padding:4px;border:0;background:var(--paper)}
 .slot .pos{font-family:var(--head);font-weight:600;font-size:10px;letter-spacing:.14em;color:#fff;opacity:.85;margin-bottom:3px}
-.slot img.face{width:44px;height:44px;border-radius:50%;object-fit:cover;background:#fff;display:block;margin:0 auto 4px;border:2px solid #fff}
+.slot img.face{width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--paper);display:block;margin:0 auto 4px;border:2px solid #fff}
 .slot .nm{color:#fff;font-weight:600;font-size:13px;text-shadow:0 1px 2px #000;line-height:1.1;min-height:16px}
 .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:end;margin-bottom:12px}
-.controls label{display:flex;flex-direction:column;font-size:12px;color:var(--muted)} .controls select,.controls button{font:inherit;padding:7px 10px;border:2px solid var(--ink);background:#fff}
-.controls button{background:var(--ink);color:#fff;cursor:pointer;font-family:var(--head);font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
-.two{display:grid;grid-template-columns:1.1fr .9fr;gap:26px} .two>div>p.sub{min-height:40px;margin:0 0 8px!important}@media (max-width:860px){.two{grid-template-columns:1fr}}
-table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;font-weight:600;border-bottom:1px solid #c9c9c9} a.pl:hover{color:var(--red);border-bottom-color:var(--red)}
-.out{color:var(--red);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.controls label{display:flex;flex-direction:column;font-size:12px;color:var(--muted)} .controls select,.controls button{font:inherit;padding:7px 10px;border:2px solid var(--ink);background:var(--paper)}
+.controls button{background:var(--black);color:var(--on-black);cursor:pointer;font-family:var(--head);font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
+table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;font-weight:600;border-bottom:1px solid #c9c9c9} a.pl:hover{color:var(--red-ink);border-bottom-color:var(--red-ink)}
+.out{color:var(--red-ink);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
 .bio{background:var(--tint);padding:16px 18px;display:none} .bio.on{display:block}
 .bio img{float:right;width:120px;margin:0 0 10px 14px}
 .bio h3{margin-top:0}
-.saves{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px} .saves li{background:var(--tint);padding:6px 10px;display:flex;gap:8px;align-items:center} .saves button{all:unset;cursor:pointer;font-weight:600} .saves button[data-del]{color:var(--red);font-weight:700;padding:0 4px}
-.face.sm{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;background:#eee}
+.saves{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px} .saves li{background:var(--tint);padding:6px 10px;display:flex;gap:8px;align-items:center} .saves button{all:unset;cursor:pointer;font-weight:600} .saves button[data-del]{color:var(--red-ink);font-weight:700;padding:0 4px}
+.face.sm{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;background:var(--tint)}
 </style></head><body><div class="wrap">
 <header class="mu">
   <a class="brand" href="/manutd/"><img src="/manutd/assets/crest.png" alt="Manchester United crest" width="96" height="97"><h1><small>Squad &amp; team picker</small>Manchester<br>United</h1></a>
