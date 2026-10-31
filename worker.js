@@ -68,6 +68,7 @@ export default {
           let body = (await res.text()).replace(/(["'(])\/manutd\//g, "$1/");
           if (/text\/html/.test(ct)) body = body.replace("<head>", '<head><meta name="mu-country" content="' + ((request.cf && request.cf.country) || "").replace(/[^A-Z]/g, "") + '">');
           const h = new Headers(res.headers); h.delete("content-length");
+          if (/text\/html/.test(ct)) h.set("cache-control", "private, max-age=0, must-revalidate");   // carries the visitor's country, so never shared from the edge cache
           return new Response(body, { status: res.status, headers: h });
         }
         return res;
