@@ -52,7 +52,7 @@
   .hub .col{display:flex;flex-direction:column;min-width:0} .hub #alerts{grid-column:1/-1}
   .lastrow .d{white-space:nowrap}}
 @media (max-width:899px){.hub .col{display:contents} .hub{display:flex;flex-direction:column}
-  #matchSheet{order:1} #tableSheet{order:2} #askSheet{order:3} #otdSheet{order:4} #lastSheet{order:5} #upSheet{order:6} #secSheet{order:7} #alerts{order:8}}
+  #matchSheet{order:1} #tableSheet{order:2} #otdSheet{order:3} #lastSheet{order:4} #upSheet{order:5} #secSheet{order:6} #alerts{order:7}}
 /* match card */
 .mc .k{font-family:var(--display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px}
 .mc .pill{font-family:var(--body);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--tint);padding:3px 8px;border-radius:10px} .mc .pill.live{background:var(--red);color:#fff}
@@ -107,7 +107,6 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
   <div class="sheet" id="lastSheet"><h2 class="row">Last five <a href="/manutd/season/">Results →</a></h2><div id="last"></div><div id="reportWrap" hidden style="margin-top:14px"><div id="report"></div></div></div>
   </div>
   <div class="col">
-  <div class="sheet" id="askSheet"><h2 class="row">Ask the archive <a href="/manutd/ask/">More →</a></h2><div id="askBox"></div></div>
   <div class="sheet" id="otdSheet"><h2 class="row">On this day <a href="/manutd/history/">History →</a></h2><p class="sub" id="otdNote" style="margin:0 0 6px"></p><div id="otd"></div></div>
   <div class="sheet" id="secSheet"><a id="more"></a><h2 class="row">Everything else</h2>
     <ul class="secs">
@@ -175,7 +174,7 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
 </script>
 <script>
 (function(){
-  MU.nav("Hub"); MU.askBox(document.getElementById("askBox"),{examples:3});
+  MU.nav("Hub");
   var $=function(i){return document.getElementById(i)}, now=new Date(), fx=window.MU_FIXTURES, next=null;
   for(var i=0;i<fx.length;i++){if(new Date(fx[i].ko)>now){next=fx[i];break}}
   function ord(n){return n+(["th","st","nd","rd"][n%10>3||Math.floor(n%100/10)===1?0:n%10])}
