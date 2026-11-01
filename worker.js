@@ -34,7 +34,8 @@ const ROUTES = {
   "/api/match":         { ttl: 21600, live: true, path: (u) => `/fixtures?id=${num(u, "fixture")}` },
   // Every Premier League fixture this season, trimmed to what the league pages need (~380 rows). 20 minutes between refreshes
   // is the cadence for other clubs' games: scores arrive around half-time and full-time, never minute by minute.
-  "/api/pl":            { ttl: 1200,  path: () => `/fixtures?league=${LEAGUES.pl}&season=${season()}`, slim: (j) => ({ get: "pl", season: season(), results: (j.response || []).length, response: (j.response || []).map((m) => ({ id: m.fixture.id, date: m.fixture.date, ts: m.fixture.timestamp, st: m.fixture.status.short, min: m.fixture.status.elapsed, venue: m.fixture.venue && m.fixture.venue.name || "", round: m.league.round, home: { id: m.teams.home.id, name: m.teams.home.name, logo: m.teams.home.logo }, away: { id: m.teams.away.id, name: m.teams.away.name, logo: m.teams.away.logo }, goals: m.goals, ht: m.score && m.score.halftime || null })) }) },   // one call: fixture + events + line-ups + stats
+  "/api/pl":            { ttl: 1200,  path: () => `/fixtures?league=${LEAGUES.pl}&season=${season()}`, slim: (j) => slimFixtures("pl", j) },
+  "/api/cl":            { ttl: 1200,  path: () => `/fixtures?league=${LEAGUES.ucl}&season=${season()}`, slim: (j) => slimFixtures("cl", j) },   // league phase and knockouts, every club   // one call: fixture + events + line-ups + stats
   "/api/sidelined":     { ttl: 86400, path: (u) => `/sidelined?player=${num(u, "id")}` },
   "/api/lineups":       { ttl: 86400, path: (u) => `/fixtures/lineups?fixture=${num(u, "fixture")}` },
   "/api/fixture-stats": { ttl: 86400, path: (u) => `/fixtures/statistics?fixture=${num(u, "fixture")}` },
@@ -46,10 +47,12 @@ const ROUTES = {
   "/api/players-season": { ttl: 30 * 86400, path: (u) => `/players?team=${TEAM}&season=${num(u, "season")}&page=${u.searchParams.get("page") || 1}` },
   "/api/player-season": { ttl: 30 * 86400, path: (u) => `/players?id=${num(u, "id")}&season=${num(u, "season")}` },   // past seasons, for debut lookups
 };
+// A competition's fixtures trimmed to what the league pages need: id, time, status, round, teams, goals, half-time score, penalties.
+function slimFixtures(tag, j) { return { get: tag, season: season(), results: (j.response || []).length, response: (j.response || []).map((m) => ({ id: m.fixture.id, date: m.fixture.date, ts: m.fixture.timestamp, st: m.fixture.status.short, min: m.fixture.status.elapsed, venue: m.fixture.venue && m.fixture.venue.name || "", round: m.league.round, home: { id: m.teams.home.id, name: m.teams.home.name, logo: m.teams.home.logo }, away: { id: m.teams.away.id, name: m.teams.away.name, logo: m.teams.away.logo }, goals: m.goals, ht: m.score && m.score.halftime || null, pen: m.score && m.score.penalty && m.score.penalty.home != null ? m.score.penalty : null })) }; }
 function num(u, k) { return String(parseInt(u.searchParams.get(k) || "0", 10) || 0); }
 
 // Warmed every hour by the cron so pages never wait on the API.
-const WARM = ["/api/standings", "/api/ucl", "/api/fixtures", "/api/pl", "/api/squad", "/api/injuries", "/api/players?page=1", "/api/players?page=2", "/api/players?page=3"];
+const WARM = ["/api/standings", "/api/ucl", "/api/fixtures", "/api/pl", "/api/cl", "/api/squad", "/api/injuries", "/api/players?page=1", "/api/players?page=2", "/api/players?page=3"];
 
 export default {
   async fetch(request, env, ctx) {
