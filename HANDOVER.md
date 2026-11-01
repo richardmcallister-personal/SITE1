@@ -42,14 +42,15 @@ the live Worker). See `git log` for the latest commit on each branch.
   **United** (position tiles, remaining fixtures, results, pace sheet) · **Premier League**
   (table + every game by matchweek) · **Champions League** (league-phase table with
   top-8 / play-off / out bars + every game by matchday; qualifying hidden unless a club
-  is picked). Desktop ≥900px: table left, games right. Club picker is a dropdown for both.
+  is picked). Desktop ≥900px: table left, games right. Club picker is a dropdown for both. Game lists: an "Earlier" button (past weeks, collapsed) above the current week (open), then upcoming weeks in date order; picking one club opens every week in date order.
   Tab ids are `united`, `premier-league`, `champions-league` (not `#pl` — that is the table).
 - Ask: club questions include that club's CL games; Europe questions get the CL table and
   latest/next CL games. Answer cache bumped to `ask:a:v8:`.
 
 ## Next task
 
-Richard to review the Season page on dev.manutd.wiki, then merge `redesign` → `main`.
+None in progress. Season page (competition tabs, CL, Earlier button) merged to `main` 1 Nov 2026.
+Pick from the open items below.
 
 ## Open items after that
 
