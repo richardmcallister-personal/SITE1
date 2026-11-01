@@ -762,7 +762,7 @@ async function wikiTopic(env, ctx, q) {   // when the question names nothing the
   try {
     const STOPW = /\b(what|why|when|where|who|how|which|did|does|do|is|are|was|were|the|a|an|of|in|on|at|to|for|and|or|happened|called|about|tell|me|explain|get|got|their|its|our|we|us|united|utd|man|manchester|club|team)\b/gi;
     const terms = q.replace(/[?!.,'"]/g, " ").replace(STOPW, " ").replace(/\s+/g, " ").trim(); if (terms.length < 4) return "";
-    const k = "ask:ws:v3:" + (await sha(foldQ(terms))).slice(0, 24); let title = await env.MU_CACHE.get(k);
+    const k = "ask:ws:v4:" + (await sha(foldQ(terms))).slice(0, 24); let title = await env.MU_CACHE.get(k);
     if (title == null) {
       const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" }, words = foldQ(terms).split(" ").filter((w) => w.length >= 4);
       const search = async (qq) => { const r = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=5&srsearch=" + encodeURIComponent(qq), { headers: UA }); const j = await r.json().catch(() => null); return j && j.query && j.query.search || []; };
@@ -771,7 +771,9 @@ async function wikiTopic(env, ctx, q) {   // when the question names nothing the
       title = hit ? hit.title : (/red devil|nickname|founded|history of|old trafford|crest|badge|anthem|rival/i.test(q) ? "Manchester United F.C." : "");
       ctx.waitUntil(env.MU_CACHE.put(k, title, { expirationTtl: 7 * 86400 }));
     }
-    return title ? await wikiBrief(env, ctx, title) : "";
+    if (!title) return "";
+    const r = await wikiPage(new URL("https://site1.local/wiki-page?title=" + encodeURIComponent(title)), env, ctx), j = await r.json();   // plain article summary, any subject
+    return j && j.extract ? `WIKIPEDIA (${j.title}): ${String(j.extract).replace(/\s+/g, " ").slice(0, 1400)}` : "";
   } catch (e) { return ""; }
 }
 function foldQ(t) { return String(t || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/æ/g, "ae").replace(/ø/g, "o").replace(/ß/g, "ss").toLowerCase(); }
@@ -853,7 +855,7 @@ async function ask(request, url, env, ctx) {
     return json({ error: "Ask isn't switched on yet — the site owner needs to add the API key." }, 503);
   }
   if (url.searchParams.get("debug") === "topic") { const idx0 = await assetJSON(env, "/search.json") || [], e0 = pickEntities(idx0, q), wt = await wikiTopic(env, ctx, q); return json({ entities: e0.map((e) => e[1] + ": " + e[0]), best: e0.best || 0, topic: wt.slice(0, 300) }); }
-  const key = "ask:a:v4:" + (await sha(foldQ(q).replace(/[^a-z0-9]+/g, " ").trim()));
+  const key = "ask:a:v5:" + (await sha(foldQ(q).replace(/[^a-z0-9]+/g, " ").trim()));
   const hit = await env.MU_CACHE.get(key, "json"); if (hit) return json(Object.assign({ cached: true }, hit));
   const now = new Date(), day = now.toISOString().slice(0, 10), hour = now.toISOString().slice(0, 13);
   const ip = request.headers.get("cf-connecting-ip") || "", ipk = "ask:ip:" + (await sha("ask:" + ip)).slice(0, 16) + ":" + hour, dayk = "ask:day:" + day;
