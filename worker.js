@@ -758,10 +758,21 @@ async function wikiBrief(env, ctx, title) {   // the article lead and infobox th
     const box = Object.entries(ib).filter(([k, v]) => k !== "_keys" && v && typeof v === "string" && v.length < 160).map(([k, v]) => `${k.replace(/_/g, " ")}: ${v.replace(/\s+/g, " ")}`).concat(ib.youth ? ["youth: " + tbl(ib.youth)] : [], ib.clubs ? ["clubs (league apps/goals): " + tbl(ib.clubs)] : [], ib.national ? ["national team: " + tbl(ib.national)] : [], ib.manager ? ["managed: " + tbl(ib.manager)] : []).join("; ");
     return `WIKIPEDIA (${j.title}): ${String(j.extract).replace(/\s+/g, " ").slice(0, 1100)}${box ? "\nInfobox: " + box : ""}`; } catch (e) { return ""; }
 }
-async function wikiTopic(env, ctx, q) {   // when the question names nothing the site has a page for: the best-matching Wikipedia article about the club
-  try { const terms = q.replace(/[?!.]/g, "").trim(); if (terms.length < 4) return ""; const k = "ask:ws:v1:" + (await sha(foldQ(terms))).slice(0, 24); let title = await env.MU_CACHE.get(k);
-    if (title == null) { const r = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=3&srsearch=" + encodeURIComponent('"Manchester United" ' + terms), { headers: { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" } }); const j = await r.json().catch(() => null); const hit = j && j.query && j.query.search && j.query.search[0]; title = hit ? hit.title : ""; ctx.waitUntil(env.MU_CACHE.put(k, title, { expirationTtl: 7 * 86400 })); }
-    return title ? await wikiBrief(env, ctx, title) : ""; } catch (e) { return ""; }
+async function wikiTopic(env, ctx, q) {   // when the question names nothing the site has a page for: the best-matching Wikipedia article
+  try {
+    const STOPW = /\b(what|why|when|where|who|how|which|did|does|do|is|are|was|were|the|a|an|of|in|on|at|to|for|and|or|happened|called|about|tell|me|explain|get|got|their|its|our|we|us|united|utd|man|manchester|club|team)\b/gi;
+    const terms = q.replace(/[?!.,'"]/g, " ").replace(STOPW, " ").replace(/\s+/g, " ").trim(); if (terms.length < 4) return "";
+    const k = "ask:ws:v2:" + (await sha(foldQ(terms))).slice(0, 24); let title = await env.MU_CACHE.get(k);
+    if (title == null) {
+      const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" }, words = foldQ(terms).split(" ").filter((w) => w.length >= 4);
+      const search = async (qq) => { const r = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=5&srsearch=" + encodeURIComponent(qq), { headers: UA }); const j = await r.json().catch(() => null); return j && j.query && j.query.search || []; };
+      const good = (list) => list.find((h) => { const t = foldQ(h.title); return words.some((w) => t.includes(w)); });   // the title must share a word with the question
+      let hit = good(await search(terms + " Manchester United")) || good(await search(terms));
+      title = hit ? hit.title : (/red devil|nickname|founded|history of|old trafford|crest|badge|anthem|rival/i.test(q) ? "Manchester United F.C." : "");
+      ctx.waitUntil(env.MU_CACHE.put(k, title, { expirationTtl: 7 * 86400 }));
+    }
+    return title ? await wikiBrief(env, ctx, title) : "";
+  } catch (e) { return ""; }
 }
 function foldQ(t) { return String(t || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/æ/g, "ae").replace(/ø/g, "o").replace(/ß/g, "ss").toLowerCase(); }
 async function sha(s) { const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, "0")).join(""); }
@@ -841,7 +852,7 @@ async function ask(request, url, env, ctx) {
     if (url.searchParams.get("debug") === "context") { const idx = await assetJSON(env, "/search.json") || [], ents = pickEntities(idx, q), c = await contextFor(env, ctx, ents, q); return json({ entities: ents.map((e) => e[1] + ": " + e[0]), chars: c.context.length, sources: c.sources, context: c.context }); }
     return json({ error: "Ask isn't switched on yet — the site owner needs to add the API key." }, 503);
   }
-  const key = "ask:a:v2:" + (await sha(foldQ(q).replace(/[^a-z0-9]+/g, " ").trim()));
+  const key = "ask:a:v3:" + (await sha(foldQ(q).replace(/[^a-z0-9]+/g, " ").trim()));
   const hit = await env.MU_CACHE.get(key, "json"); if (hit) return json(Object.assign({ cached: true }, hit));
   const now = new Date(), day = now.toISOString().slice(0, 10), hour = now.toISOString().slice(0, 13);
   const ip = request.headers.get("cf-connecting-ip") || "", ipk = "ask:ip:" + (await sha("ask:" + ip)).slice(0, 16) + ":" + hour, dayk = "ask:day:" + day;
