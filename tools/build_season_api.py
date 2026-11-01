@@ -19,9 +19,14 @@ for m in sorted(jj['response'], key=lambda m: m['fixture']['date']):
 L = [r for r in res if r['c'] == 'L']; FA = [r for r in res if r['c'] == 'FAC']
 T = json.load(open(os.path.join(H, "tables.json"))).get(S)
 if not T or not T.get('rows'):
+    try:   # the feed's final standings for that season
+        st = get(f"/api/season-standings?season={y}&v=3")['response'][0]['league']['standings'][0]
+        T = dict(rule='3 pts a win, goal difference', rows=[dict(team=canon(r['team']['name']), pos=r['rank'], p=r['all']['played'], w=r['all']['win'], d=r['all']['draw'], l=r['all']['lose'], gf=r['all']['goals']['for'], ga=r['all']['goals']['against'], gd=r['goalsDiff'], gavg=round(r['all']['goals']['for'] / r['all']['goals']['against'], 3) if r['all']['goals']['against'] else None, pts=r['points']) for r in st])
+    except Exception as e: print("feed standings unavailable:", e)
+if not T or not T.get('rows'):
     # Wikipedia's "<season> Premier League" league table (Sports table module), CC BY-SA 4.0
     import re, urllib.parse
-    wt = get("/wiki-raw?title=" + urllib.parse.quote(f"{S.replace('-', '–')} Premier League")); seg = wt[wt.index('==League table'):]
+    wt = get("/wiki-raw?title=" + urllib.parse.quote(f"{S.replace('-', '–')} Premier League")); seg = wt[re.search(r'==\s*League table', wt).start():]
     order = re.findall(r'[A-Z]{3}', re.search(r'\|team_order=\s*([A-Z,\s]+)', seg).group(1))
     names = {m.group(1): m.group(2).strip() for m in re.finditer(r'\|\s*name_([A-Z]{3})\s*=\s*\[\[(?:[^\]|]*\|)?([^\]]*)\]\]', seg)}
     rows = []

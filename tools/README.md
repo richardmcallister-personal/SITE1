@@ -16,7 +16,7 @@ Everything here talks to the live site's Worker (manutd.wiki), never to API-Foot
 | `build_scorers.py` | `history/scorers.json`, `scorers_index.json`, plus `sc` on match rows in `history/data/*.json` and `tools/data/cups.json` | goalscorers for every match from the season articles' Scorers columns (incremental) |
 | `build_ids.py` | ids on match rows in `history/data/2010-11…` and `tools/data/cups.json` | match-centre ids from the live feed for archived matches 2010/11 on |
 | `build_players.py` | `history/players/<slug>.json`, `history/players_index.json` | one archive file per player: seasons, numbers, every goal, finals, managers played under |
-| `build_clubs.py` | `history/clubs/*.json`, `history/clubs.json` | match archive + cups.json + live feed from 2025/26; every competitive meeting |
+| `build_clubs.py` | `history/clubs/*.json`, `history/clubs.json` | match archive + cups.json + live feed from 2025/26; every competitive meeting. Feed-era matches get scorers from the feed's goal events (VAR-cancelled goals dropped, count checked against the score, names matched via numbers.json), cached in `tools/data/feed_scorers.json` |
 | `build_numbers.py` | `numbers/numbers.json` | Wikipedia season articles via `/wiki-raw` |
 | `update.sh` | all of the above | |
 
