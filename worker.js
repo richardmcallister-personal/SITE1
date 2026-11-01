@@ -780,6 +780,7 @@ function pickEntities(idx, q) {
   const seen = {}, top = [];
   const best = out.length ? out[0].sc : 0, floor = Math.max(70, Math.round(best * 0.6));
   for (const x of out) { if (x.sc < floor) break; const key = x.e[1] + ":" + x.e[2]; if (seen[key]) continue; seen[key] = 1; top.push(x.e); if (top.length >= 6) break; }
+  top.best = best;   // < 100 means nothing matched a whole name, only a word of one ("Munich" → Bayern Munich)
   return top;
 }
 function res(r) { return `${r.d} ${r.c}${r.r ? " " + r.r : ""} ${r.h ? "v" : r.n === true ? "v" : "at"} ${r.o}${r.n === true ? " (neutral venue" + (typeof r.v === "string" ? ", " + r.v : "") + ")" : typeof r.n === "string" ? " at " + r.n : ""} ${r.gf}-${r.ga}${r.aet ? " aet" : ""}${r.pens ? " (pens " + r.pens + ")" : ""}${r.sc ? " [" + r.sc.map((s) => s[0] + (s[2] > 1 ? " " + s[2] : "") + (s[3] && s[3].includes("p") ? " pen" : "") + (s[3] && s[3].includes("o") ? " og" : "")).join(", ") + "]" : ""}`; }
@@ -830,7 +831,7 @@ async function contextFor(env, ctx, ents, q) {
     try { const inj = await load(env, "api:v3:/api/injuries?v=3"); if (inj.body) { const rows = (JSON.parse(inj.body).response || []).filter((x) => x.fixture && x.fixture.date).sort((a, b) => b.fixture.date.localeCompare(a.fixture.date)); const seen = {}, L = []; for (const x of rows) { if (seen[x.player.id]) continue; seen[x.player.id] = 1; if (new Date(x.fixture.date) > Date.now() - 7 * 864e5) L.push(`${x.player.name} (${x.player.type}${x.player.reason ? ", " + x.player.reason : ""}, flagged for ${x.fixture.date.slice(0, 10)})`); } if (L.length) parts.push("INJURY LIST FROM THE FEED (newest flag per player; a player flagged then seen in a line-up has returned): " + L.join("; ")); } } catch (e) {}
     try { if (fx.body) { const all = JSON.parse(fx.body).response.filter((m) => !/riendl/.test(m.league.name)).sort((a, b) => a.fixture.timestamp - b.fixture.timestamp); const done = all.filter((m) => /FT|AET|PEN/.test(m.fixture.status.short)).slice(-6), next = all.filter((m) => m.fixture.status.short === "NS").slice(0, 6); const line = (m) => `${m.fixture.date.slice(0, 10)} ${m.teams.home.name} ${m.goals.home != null ? m.goals.home + "-" + m.goals.away : "v"} ${m.teams.away.name} (${m.league.name})`; parts.push("RECENT RESULTS: " + done.map(line).join("; ") + "\nNEXT FIXTURES (UTC dates): " + next.map(line).join("; ")); } } catch (e) {}
   }
-  if (!ents.length) { const wt = await wikiTopic(env, ctx, q); if (wt) { parts.push(wt); const m = wt.match(/^WIKIPEDIA \(([^)]+)\)/); if (m) sources.push({ t: m[1] + " (Wikipedia)", u: "https://en.wikipedia.org/wiki/" + encodeURIComponent(m[1].replace(/ /g, "_")) }); } }
+  if (!ents.length || (ents.best || 0) < 100) { const wt = await wikiTopic(env, ctx, q); if (wt) { parts.push(wt); const m = wt.match(/^WIKIPEDIA \(([^)]+)\)/); if (m) sources.push({ t: m[1] + " (Wikipedia)", u: "https://en.wikipedia.org/wiki/" + encodeURIComponent(m[1].replace(/ /g, "_")) }); } }
   return { context: parts.join("\n\n"), sources };
 }
 async function ask(request, url, env, ctx) {
