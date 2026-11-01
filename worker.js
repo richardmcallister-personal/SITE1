@@ -762,7 +762,7 @@ async function wikiTopic(env, ctx, q) {   // when the question names nothing the
   try {
     const STOPW = /\b(what|why|when|where|who|how|which|did|does|do|is|are|was|were|the|a|an|of|in|on|at|to|for|and|or|happened|called|about|tell|me|explain|get|got|their|its|our|we|us|united|utd|man|manchester|club|team)\b/gi;
     const terms = q.replace(/[?!.,'"]/g, " ").replace(STOPW, " ").replace(/\s+/g, " ").trim(); if (terms.length < 4) return "";
-    const k = "ask:ws:v2:" + (await sha(foldQ(terms))).slice(0, 24); let title = await env.MU_CACHE.get(k);
+    const k = "ask:ws:v3:" + (await sha(foldQ(terms))).slice(0, 24); let title = await env.MU_CACHE.get(k);
     if (title == null) {
       const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" }, words = foldQ(terms).split(" ").filter((w) => w.length >= 4);
       const search = async (qq) => { const r = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=5&srsearch=" + encodeURIComponent(qq), { headers: UA }); const j = await r.json().catch(() => null); return j && j.query && j.query.search || []; };
@@ -842,7 +842,7 @@ async function contextFor(env, ctx, ents, q) {
     try { const inj = await load(env, "api:v3:/api/injuries?v=3"); if (inj.body) { const rows = (JSON.parse(inj.body).response || []).filter((x) => x.fixture && x.fixture.date).sort((a, b) => b.fixture.date.localeCompare(a.fixture.date)); const seen = {}, L = []; for (const x of rows) { if (seen[x.player.id]) continue; seen[x.player.id] = 1; if (new Date(x.fixture.date) > Date.now() - 7 * 864e5) L.push(`${x.player.name} (${x.player.type}${x.player.reason ? ", " + x.player.reason : ""}, flagged for ${x.fixture.date.slice(0, 10)})`); } if (L.length) parts.push("INJURY LIST FROM THE FEED (newest flag per player; a player flagged then seen in a line-up has returned): " + L.join("; ")); } } catch (e) {}
     try { if (fx.body) { const all = JSON.parse(fx.body).response.filter((m) => !/riendl/.test(m.league.name)).sort((a, b) => a.fixture.timestamp - b.fixture.timestamp); const done = all.filter((m) => /FT|AET|PEN/.test(m.fixture.status.short)).slice(-6), next = all.filter((m) => m.fixture.status.short === "NS").slice(0, 6); const line = (m) => `${m.fixture.date.slice(0, 10)} ${m.teams.home.name} ${m.goals.home != null ? m.goals.home + "-" + m.goals.away : "v"} ${m.teams.away.name} (${m.league.name})`; parts.push("RECENT RESULTS: " + done.map(line).join("; ") + "\nNEXT FIXTURES (UTC dates): " + next.map(line).join("; ")); } } catch (e) {}
   }
-  if (!ents.length || (ents.best || 0) < 100) { const wt = await wikiTopic(env, ctx, q); if (wt) { parts.push(wt); const m = wt.match(/^WIKIPEDIA \(([^)]+)\)/); if (m) sources.push({ t: m[1] + " (Wikipedia)", u: "https://en.wikipedia.org/wiki/" + encodeURIComponent(m[1].replace(/ /g, "_")) }); } }
+  if (!ents.some((e) => (e[1] === "player" || e[1] === "manager" || e[1] === "club") && (ents.best || 0) >= 100) || /happened|history|story|disaster|tragedy|why|origin|nickname|founded|named/i.test(q)) { const wt = await wikiTopic(env, ctx, q); if (wt) { parts.push(wt); const m = wt.match(/^WIKIPEDIA \(([^)]+)\)/); if (m) sources.push({ t: m[1] + " (Wikipedia)", u: "https://en.wikipedia.org/wiki/" + encodeURIComponent(m[1].replace(/ /g, "_")) }); } }
   return { context: parts.join("\n\n"), sources };
 }
 async function ask(request, url, env, ctx) {
@@ -852,7 +852,8 @@ async function ask(request, url, env, ctx) {
     if (url.searchParams.get("debug") === "context") { const idx = await assetJSON(env, "/search.json") || [], ents = pickEntities(idx, q), c = await contextFor(env, ctx, ents, q); return json({ entities: ents.map((e) => e[1] + ": " + e[0]), chars: c.context.length, sources: c.sources, context: c.context }); }
     return json({ error: "Ask isn't switched on yet — the site owner needs to add the API key." }, 503);
   }
-  const key = "ask:a:v3:" + (await sha(foldQ(q).replace(/[^a-z0-9]+/g, " ").trim()));
+  if (url.searchParams.get("debug") === "topic") { const idx0 = await assetJSON(env, "/search.json") || [], e0 = pickEntities(idx0, q), wt = await wikiTopic(env, ctx, q); return json({ entities: e0.map((e) => e[1] + ": " + e[0]), best: e0.best || 0, topic: wt.slice(0, 300) }); }
+  const key = "ask:a:v4:" + (await sha(foldQ(q).replace(/[^a-z0-9]+/g, " ").trim()));
   const hit = await env.MU_CACHE.get(key, "json"); if (hit) return json(Object.assign({ cached: true }, hit));
   const now = new Date(), day = now.toISOString().slice(0, 10), hour = now.toISOString().slice(0, 13);
   const ip = request.headers.get("cf-connecting-ip") || "", ipk = "ask:ip:" + (await sha("ask:" + ip)).slice(0, 16) + ":" + hour, dayk = "ask:day:" + day;
