@@ -50,6 +50,9 @@ the live Worker). See `git log` for the latest commit on each branch.
 - Ask: club questions include that club's CL games; Europe questions get the CL table and
   latest/next CL games. Answer cache bumped to `ask:a:v9:`.
 
+- Player archive goals for 2025/26 on come from the feed's goal events (`build_clubs.py`, cache
+  `tools/data/feed_scorers.json`); before 1 Nov 2026 those seasons had no scorers at all.
+
 ## Next task
 
 None in progress. Season page (competition tabs, CL, Earlier button) merged to `main` 1 Nov 2026.
