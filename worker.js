@@ -791,10 +791,13 @@ async function collection(request, url, env) {
 async function cover(url, env, ctx) {
   const type = url.searchParams.get("type") || "book", q = (url.searchParams.get("q") || "").trim(), by = (url.searchParams.get("by") || "").trim();
   if (!q) return json({ error: "q required" }, 400);
-  const key = "cover:v2:" + type + ":" + (q + "|" + by).toLowerCase(), cached = await env.MU_CACHE.get(key);
+  const key = "cover:v3:" + type + ":" + (q + "|" + by).toLowerCase(), cached = await env.MU_CACHE.get(key);
   if (cached) return new Response(cached, { headers: headers("kv-hit") });
   const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
   let out = { url: "", src: "" };
+  const words = (t) => String(t || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9 ]+/g, " ").split(/\s+/).filter((w) => w.length > 2 && !/^(the|and|for|with|podcast|film|documentary)$/.test(w));
+  const fits = (title, need) => { const t = words(title), q = words(q0); if (!q.length) return true; const hit = q.filter((w) => t.includes(w)).length; return need === "all" ? hit === q.length : hit / q.length >= 0.5; };
+  const q0 = q.split(/[:—]/)[0];
   try {
     if (type === "book") {
       const main = q.split(/[:—]/)[0].trim(), surname = by ? by.split(/ with | and /)[0].trim().split(" ").pop() : "";
@@ -805,8 +808,8 @@ async function cover(url, env, ctx) {
         if (hit) { out = { url: "https://covers.openlibrary.org/b/id/" + hit.cover_i + "-M.jpg", src: "Open Library", title: hit.title }; break; }
       }
     } else if (type === "pod") {
-      const r = await fetch("https://itunes.apple.com/search?media=podcast&limit=3&term=" + encodeURIComponent(q), { headers: UA });
-      const j = r.ok ? await r.json() : {}; const hit = (j.results || [])[0];
+      const r = await fetch("https://itunes.apple.com/search?media=podcast&limit=10&term=" + encodeURIComponent(q), { headers: UA });
+      const j = r.ok ? await r.json() : {}; const hit = (j.results || []).find((x) => fits(x.collectionName, "all"));   // never another show's artwork
       if (hit) out = { url: (hit.artworkUrl600 || hit.artworkUrl100 || "").replace("100x100", "600x600"), src: "Apple Podcasts", title: hit.collectionName };
     } else {
       // Wikipedia: search for the film/documentary article, then take its lead image.
@@ -814,7 +817,7 @@ async function cover(url, env, ctx) {
       const sj = sr.ok ? await sr.json() : {};
       for (const hit of (sj.query && sj.query.search || []).slice(0, 3)) {
         const pr = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(hit.title.replace(/ /g, "_")), { headers: UA }); const pj = pr.ok ? await pr.json() : {};
-        if (pj.type !== "disambiguation" && pj.thumbnail) { out = { url: pj.originalimage && pj.originalimage.width < 1200 ? pj.originalimage.source : pj.thumbnail.source, src: "Wikipedia", title: pj.title, page: pj.content_urls ? pj.content_urls.desktop.page : "" }; break; }
+        if (pj.type !== "disambiguation" && pj.thumbnail && fits(pj.title)) { out = { url: pj.originalimage && pj.originalimage.width < 1200 ? pj.originalimage.source : pj.thumbnail.source, src: "Wikipedia", title: pj.title, page: pj.content_urls ? pj.content_urls.desktop.page : "" }; break; }
       }
     }
   } catch (e) { out.error = String(e); }
