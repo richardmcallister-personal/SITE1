@@ -31,7 +31,10 @@ const ROUTES = {
   "/api/players":       { ttl: 10800, path: (u) => `/players?team=${TEAM}&season=${season()}&page=${u.searchParams.get("page") || 1}` },
   "/api/player":        { ttl: 86400, path: (u) => `/players?id=${num(u, "id")}&season=${u.searchParams.get("season") || season()}` },
   "/api/season-fixtures": { ttl: 2592000, path: (u) => `/fixtures?team=${TEAM}&season=${num(u, "season")}` },   // historical seasons never change
-  "/api/match":         { ttl: 21600, live: true, path: (u) => `/fixtures?id=${num(u, "fixture")}` },   // one call: fixture + events + line-ups + stats
+  "/api/match":         { ttl: 21600, live: true, path: (u) => `/fixtures?id=${num(u, "fixture")}` },
+  // Every Premier League fixture this season, trimmed to what the league pages need (~380 rows). 20 minutes between refreshes
+  // is the cadence for other clubs' games: scores arrive around half-time and full-time, never minute by minute.
+  "/api/pl":            { ttl: 1200,  path: () => `/fixtures?league=${LEAGUES.pl}&season=${season()}`, slim: (j) => ({ get: "pl", season: season(), results: (j.response || []).length, response: (j.response || []).map((m) => ({ id: m.fixture.id, date: m.fixture.date, ts: m.fixture.timestamp, st: m.fixture.status.short, min: m.fixture.status.elapsed, venue: m.fixture.venue && m.fixture.venue.name || "", round: m.league.round, home: { id: m.teams.home.id, name: m.teams.home.name, logo: m.teams.home.logo }, away: { id: m.teams.away.id, name: m.teams.away.name, logo: m.teams.away.logo }, goals: m.goals, ht: m.score && m.score.halftime || null })) }) },   // one call: fixture + events + line-ups + stats
   "/api/sidelined":     { ttl: 86400, path: (u) => `/sidelined?player=${num(u, "id")}` },
   "/api/lineups":       { ttl: 86400, path: (u) => `/fixtures/lineups?fixture=${num(u, "fixture")}` },
   "/api/fixture-stats": { ttl: 86400, path: (u) => `/fixtures/statistics?fixture=${num(u, "fixture")}` },
@@ -46,7 +49,7 @@ const ROUTES = {
 function num(u, k) { return String(parseInt(u.searchParams.get(k) || "0", 10) || 0); }
 
 // Warmed every hour by the cron so pages never wait on the API.
-const WARM = ["/api/standings", "/api/ucl", "/api/fixtures", "/api/squad", "/api/injuries", "/api/players?page=1", "/api/players?page=2", "/api/players?page=3"];
+const WARM = ["/api/standings", "/api/ucl", "/api/fixtures", "/api/pl", "/api/squad", "/api/injuries", "/api/players?page=1", "/api/players?page=2", "/api/players?page=3"];
 
 export default {
   async fetch(request, env, ctx) {
@@ -99,7 +102,8 @@ export default {
       // Live window: from 90 minutes before kick-off until the match is finished, treat anything older than 60s as stale.
       try { const j = JSON.parse(body), f = j.response && j.response[0]; if (f) { const ko = f.fixture.timestamp * 1000, st = f.fixture.status.short, now = Date.now();
         const inWindow = (now > ko - 90 * 60000 && !/FT|AET|PEN|CANC|PST|ABD|AWD|WO/.test(st)) || /1H|HT|2H|ET|BT|P|LIVE|INT|SUSP/.test(st);
-        if (inWindow && age > 60) { ctx.waitUntil(refresh(env, key, route, url)); return answer(body, "kv-live-stale", age); } if (inWindow) return answer(body, "kv-live", age); } } catch (e) {}
+        const ours = f.teams.home.id === TEAM || f.teams.away.id === TEAM, staleAfter = ours ? 60 : 900;   // other clubs' games: half-time / full-time cadence
+        if (inWindow && age > staleAfter) { ctx.waitUntil(refresh(env, key, route, url)); return answer(body, "kv-live-stale", age); } if (inWindow) return answer(body, "kv-live", age); } } catch (e) {}
     }
     if (body && fresh) return answer(body, "kv-hit", age);
     if (body) { ctx.waitUntil(refresh(env, key, route, url)); return answer(body, "kv-stale", age); }
@@ -152,6 +156,7 @@ async function refresh(env, key, route, url) {
   }
   let clean = false;
   try { const j = JSON.parse(body); clean = !!upstream && upstream.ok && j && (Array.isArray(j.errors) ? j.errors.length === 0 : Object.keys(j.errors || {}).length === 0) && !j.message; } catch (e) {}
+  if (clean && route.slim) { try { body = JSON.stringify(route.slim(JSON.parse(body))); } catch (e) {} }
   if (clean) await env.MU_CACHE.put(key, Math.floor(Date.now() / 1000) + "\n" + route.ttl + "\n" + body, { expirationTtl: route.ttl + KEEP });
   return { ok: clean, body };
 }
@@ -825,6 +830,8 @@ async function contextFor(env, ctx, ents, q) {
         const home = ms.filter((r) => r.h), away = ms.filter((r) => !r.h && r.n !== true), neutral = ms.filter((r) => !r.h && r.n === true), league = ms.filter((r) => r.c === "L"), lastAway = away.slice(-8), lastHome = home.slice(-8), awayWins = away.filter((r) => r.gf > r.ga).slice(-5);
         parts.push(`OPPONENT ${c.name} — ${c.p} meetings ${c.first}–${c.last}: United W${c.w} D${c.d} L${c.l} (all competitions, United-first scores).\nAt Old Trafford / United home: ${tally(home)}. Away at ${c.name}: ${tally(away)}${neutral.length ? ". Neutral venues: " + tally(neutral) : ""}. League only: ${tally(league)}.\nLast 8 away: ${lastAway.map(res).join("; ")}\nLast 8 home: ${lastHome.map(res).join("; ")}\nMost recent United away wins: ${awayWins.map(res).join("; ") || "none in the archive"}\nLast 10 meetings: ${ms.slice(-10).map(res).join("; ")}\n${big.length ? "Big United wins: " + big.map(res).join("; ") : ""}\n${bad.length ? "Heavy defeats: " + bad.map(res).join("; ") : ""}`);
         sources.push({ t: c.name, u: url.replace("/manutd/", "/") });
+        try { const pl = await load(env, "api:v3:/api/pl?v=3"); if (pl.body) { const fold = (t) => String(t).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(), me = fold(c.name), rows = JSON.parse(pl.body).response.filter((m) => [m.home, m.away].some((t) => { const n = fold(t.name); return n === me || me.includes(n) || n.includes(me); })).sort((a, b) => a.ts - b.ts);
+          if (rows.length) parts.push(`${c.name} THIS SEASON (Premier League, all their games; home team first): ` + rows.map((m) => `${m.date.slice(0, 10)} ${m.home.name} ${m.goals.home != null ? m.goals.home + "-" + m.goals.away : "v"} ${m.away.name}${/1H|HT|2H/.test(m.st) ? " (in play)" : m.st === "NS" ? "" : " (" + m.st + ")"}`).join("; ")); } } catch (e) {}
       }
     } else if (kind === "season") {
       const id = (url.match(/s=([^&]+)/) || [])[1], d = await assetJSON(env, "/history/data/" + id + ".json"), all = await assetJSON(env, "/history/seasons.json") || [], w = all.find((x) => x.id === id), cups = (await assetJSON(env, "/history/cups.json") || []).filter((r) => r.s === id && r.c !== "FAC");
