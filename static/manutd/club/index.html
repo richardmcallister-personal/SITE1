@@ -45,6 +45,8 @@
 <link rel="stylesheet" href="/manutd/mu.css">
 <style>
 .desc{color:var(--muted);margin:2px 0 10px;font-size:14px}
+.lastrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--rule);font-size:14px} .lastrow .d{font-size:11px;color:var(--muted);min-width:56px} .lastrow .ha{font-size:10px;font-weight:700;color:var(--muted);background:var(--tint);padding:2px 5px;border-radius:3px} .lastrow .o{flex-grow:1;font-weight:600} .lastrow .o small{display:block;font-weight:400;color:var(--muted);font-size:11px} .lastrow .r{font-family:var(--display);font-size:18px;white-space:nowrap} .lastrow .r a{color:inherit;text-decoration:none} .lastrow.up .r{font-family:var(--body);font-size:14px;font-weight:600}
+.h2h b.formrow{display:inline-flex;gap:4px;align-items:center;font-size:0;line-height:1}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZZVNDNYN9"></script>
@@ -58,6 +60,7 @@
 <main id="main-content" tabindex="-1">
 
 <div class="sheet" id="top"><small>Loading…</small></div>
+<div class="sheet" id="nowSheet" hidden><h2 class="row">This season <a href="/manutd/season/#league">Every game →</a></h2><div class="h2h" id="nowStats"></div><div id="now"></div></div>
 <div class="sheet">
   <h2>Head to head with United</h2>
   <p class="sub" id="h2hNote" style="margin:0 0 8px"></p><p class="sub" id="rivLink" style="margin:0 0 8px" hidden></p>
@@ -113,6 +116,18 @@
     $("h2hFacts").innerHTML=[["League",sp(c.league)],["FA Cup",sp(c.facup)],["League Cup & Europe",sp(c.other)],["Biggest United win",c.best.gf+"–"+c.best.ga+" · "+fmt(c.best.d)+(c.best.h?" (H)":" (A)")],["Heaviest defeat",c.worst.gf<c.worst.ga?c.worst.gf+"–"+c.worst.ga+" · "+fmt(c.worst.d)+(c.worst.h?" (H)":" (A)"):"Never beaten"],["First meeting",fmt(c.first)],["Most recent",fmt(c.last)]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+MU.esc(f[1])+'</div></div>'}).join("");
     render();
   }).catch(function(){$("h2hNote").textContent="No competitive meetings with "+name+" in the archive."; $("list").innerHTML=""});
+  // ---- This season, for a club in the Premier League: position, form, results so far and the next game (scores for other clubs arrive at half-time and full-time)
+  Promise.all([MU.api("pl").catch(function(){return null}),MU.api("standings").catch(function(){return null})]).then(function(r){var pl=r[0], st=r[1]; if(!pl)return;
+    var fold=function(t){return String(t).toLowerCase().replace(/[^a-z0-9]+/g," ").trim()}, me=fold(name), ids={}; pl.response.forEach(function(m){[m.home,m.away].forEach(function(t){ids[t.id]=t.name})});
+    var id=Object.keys(ids).filter(function(k){var n=fold(ids[k]); return n===me||me.indexOf(n)>=0||n.indexOf(me)>=0})[0]; if(!id)return; id=+id;
+    var ms=pl.response.filter(function(m){return m.home.id===id||m.away.id===id}).sort(function(a,b){return a.ts-b.ts}), done=ms.filter(function(m){return /FT|AET|PEN/.test(m.st)}), next=ms.filter(function(m){return !/FT|AET|PEN|CANC|PST|AWD|WO/.test(m.st)})[0];
+    var row=st&&st.response&&st.response[0]&&st.response[0].league.standings[0].filter(function(x){return x.team.id===id})[0];
+    var res=function(m){var h=m.home.id===id, gf=h?m.goals.home:m.goals.away, ga=h?m.goals.away:m.goals.home; return gf>ga?"W":gf<ga?"L":"D"};
+    $("nowStats").innerHTML=(row?'<div><b>'+row.rank+'</b><span>in the table</span></div><div><b>'+row.points+'</b><span>points from '+row.all.played+'</span></div><div><b>'+(row.goalsDiff>0?"+":"")+row.goalsDiff+'</b><span>goal difference</span></div>':'')+'<div><b class="formrow">'+done.slice(-5).map(function(m){return MU.form(res(m))}).join("")+'</b><span>last five</span></div>';
+    var line=function(m){var h=m.home.id===id, opp=h?m.away:m.home, d=/FT|AET|PEN/.test(m.st), live=/1H|HT|2H|ET|BT|P|LIVE|INT/.test(m.st); return '<div class="lastrow'+(d?'':' up')+'"><span class="d">'+MU.fmtDate(m.date)+'</span><span class="ha">'+(h?"H":"A")+'</span><span class="o">'+MU.club(opp.name)+'<small>Premier League'+(live?' · '+(m.st==="HT"?"half-time":"in play"):'')+'</small></span><span class="r"><a href="/manutd/match/?id='+m.id+'">'+(d||live?(h?m.goals.home+"–"+m.goals.away:m.goals.away+"–"+m.goals.home):MU.fmtLocal(m.date))+'</a></span>'+(d?MU.form(res(m)):'')+'</div>'};
+    $("now").innerHTML=(next?'<h3>Next</h3>'+line(next):'')+(done.length?'<h3>Results</h3>'+done.slice().reverse().slice(0,8).map(line).join(""):'');
+    $("nowSheet").hidden=false;
+  });
 })();
 </script>
 </body></html>
