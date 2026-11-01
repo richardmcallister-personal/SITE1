@@ -45,7 +45,7 @@ the live Worker). See `git log` for the latest commit on each branch.
   is picked). Desktop ≥900px: table left, games right. Club picker is a dropdown for both. Game lists: an "Earlier" button (past weeks, collapsed) above the current week (open), then upcoming weeks in date order; picking one club opens every week in date order.
   Tab ids are `united`, `premier-league`, `champions-league` (not `#pl` — that is the table).
 - Ask: club questions include that club's CL games; Europe questions get the CL table and
-  latest/next CL games. Answer cache bumped to `ask:a:v8:`.
+  latest/next CL games. Answer cache bumped to `ask:a:v9:`.
 
 ## Next task
 

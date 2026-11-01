@@ -877,7 +877,7 @@ async function ask(request, url, env, ctx) {
     return json({ error: "Ask isn't switched on yet — the site owner needs to add the API key." }, 503);
   }
   if (url.searchParams.get("debug") === "topic") { const idx0 = await assetJSON(env, "/search.json") || [], e0 = pickEntities(idx0, q), wt = await wikiTopic(env, ctx, q); return json({ entities: e0.map((e) => e[1] + ": " + e[0]), best: e0.best || 0, topic: wt.slice(0, 300) }); }
-  const key = "ask:a:v8:" + (await sha(foldQ(q).replace(/[^a-z0-9]+/g, " ").trim()));
+  const key = "ask:a:v9:" + (await sha(foldQ(q).replace(/[^a-z0-9]+/g, " ").trim()));
   const hit = await env.MU_CACHE.get(key, "json"); if (hit) return json(Object.assign({ cached: true }, hit));
   const now = new Date(), day = now.toISOString().slice(0, 10), hour = now.toISOString().slice(0, 13);
   const ip = request.headers.get("cf-connecting-ip") || "", ipk = "ask:ip:" + (await sha("ask:" + ip)).slice(0, 16) + ":" + hour, dayk = "ask:day:" + day;
