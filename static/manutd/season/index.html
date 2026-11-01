@@ -44,6 +44,23 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
 <link rel="stylesheet" href="/manutd/mu.css">
 <style>
+/* season comparison (United tab): controls, chips with line swatches, inline SVG chart, readout */
+.cmpctl,.cmpadd{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:0 0 10px} .cmpctl .filters,.cmpadd .filters{margin:0}
+.cmpsel,.cmpchk{font-size:13px;color:var(--muted);display:inline-flex;align-items:center;gap:6px} .cmpsel b{color:var(--ink);font-weight:600} .cmpchk input{margin:0;accent-color:var(--red)}
+.cmpadd input{font:inherit;font-size:16px;padding:7px 12px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:8px;width:230px;max-width:100%}
+.cmpchips{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px}
+.cmpchips span,.cmpchips button{display:inline-flex;align-items:center;gap:6px;font:inherit;font-size:13px;font-weight:600;padding:5px 10px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);border-radius:16px;white-space:nowrap}
+.cmpchips button{cursor:pointer} .cmpchips button:hover{border-color:var(--ink)} .cmpchips small{font-weight:400;color:var(--muted)} .cmpchips .x{font-weight:400;color:var(--muted);margin-left:2px}
+.cmpchips svg{width:22px;height:10px;flex:0 0 auto}
+.cmpchart{position:relative;touch-action:pan-y;user-select:none;-webkit-user-select:none} .cmpchart svg{display:block;width:100%;overflow:visible}
+.cmpchart .ax{stroke:var(--rule);stroke-width:1} .cmpchart .ax0{stroke:var(--muted);stroke-width:1} .cmpchart text{fill:var(--muted);font-family:var(--body);font-size:11px}
+.cmpchart .now{stroke:var(--muted);stroke-dasharray:3 3} .cmpchart .gd{stroke:var(--ink);stroke-width:1;opacity:.35}
+.ln{fill:none;stroke-width:2;stroke-linejoin:round;stroke-linecap:round} .ln.cur{stroke:var(--red);stroke-width:3.2}
+.ln.s0{stroke:var(--ink)} .ln.s1{stroke:var(--muted)} .ln.s2{stroke:var(--ink);stroke-dasharray:7 4} .ln.s3{stroke:var(--muted);stroke-dasharray:2 3} .ln.s4{stroke:var(--draw);stroke-dasharray:10 3 2 3}
+.dot{stroke:var(--paper);stroke-width:1.5} .dot.cur{fill:var(--red)} .dot.s0,.dot.s2{fill:var(--ink)} .dot.s1,.dot.s3{fill:var(--muted)} .dot.s4{fill:var(--draw)}
+.cmpread{font-size:13px;margin:8px 0 0;min-height:20px} .cmpread b{font-family:var(--head)} .cmpread ul{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:4px 14px} .cmpread li{display:inline-flex;align-items:center;gap:5px;white-space:nowrap} .cmpread li svg{width:18px;height:8px} .cmpread .v{font-family:var(--head);font-weight:700}
+.cmpread li.cur{color:var(--red-ink)}
+.cmpshare{margin:12px 0 0;display:flex;align-items:center;gap:10px} .cmpshare .btn{border:0;cursor:pointer}
 .pace{display:grid;grid-template-columns:72px 1fr 44px;gap:10px;align-items:center;font-size:13px} .pace .lab{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.08em;color:var(--muted);white-space:nowrap} .pace .lab a{color:inherit;text-decoration:none} .pace .bar{height:14px;background:var(--tint);position:relative} .pace .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--draw)} .pace .now .bar i{background:var(--red)} .pace .lab.now,.pace .n.now{color:var(--red-ink);font-weight:600} .pace .n{text-align:right;font-family:var(--head);font-size:16px}
 .pace .gap{grid-column:1/-1;height:1px;background:var(--rule);margin:4px 0}/* league-wide fixtures */
 .plsel{margin:0 0 6px} .plsel label{font-size:13px;color:var(--muted)} .plsel select{font:inherit;color:var(--ink);padding:6px 8px;margin-left:6px;border:1px solid var(--rule);border-radius:8px;background:var(--paper);max-width:100%}
@@ -93,7 +110,20 @@
     <h2>This season against every other</h2>
     <p class="sub" id="paceNote" style="margin:0 0 10px"></p>
     <div class="h2h" id="paceStats"></div>
-    <div id="paceChart"></div>
+    <div class="cmpctl">
+      <div class="filters" id="cmpVenue" role="group" aria-label="Which games"><button type="button" data-v="" aria-pressed="true">All games</button><button type="button" data-v="home" aria-pressed="false">Home</button><button type="button" data-v="away" aria-pressed="false">Away</button></div>
+      <label class="cmpsel">Measure <select id="cmpMetric"><option value="">Points, 3 a win</option><option value="pts2">Points as awarded</option><option value="gd">Goal difference</option><option value="gf">Goals scored</option><option value="ga">Goals conceded</option></select></label>
+      <span class="cmpsel">Competition <b>League only</b></span>
+      <label class="cmpchk"><input type="checkbox" id="cmpT2"> Include 2nd-tier seasons</label>
+    </div>
+    <div class="cmpadd">
+      <label class="sr" for="cmpFind">Add a season</label><input type="search" id="cmpFind" list="cmpList" placeholder="Add a season, e.g. 1998-99" autocomplete="off" enterkeyhint="done"><datalist id="cmpList"></datalist>
+      <div class="filters" id="cmpQuick" role="group" aria-label="Quick picks"><button type="button" data-q="best">Best starts</button><button type="button" data-q="title">Title seasons</button><button type="button" data-q="near">Nearest to this one</button><button type="button" data-q="last">Last 5 seasons</button><button type="button" data-q="none">Clear</button></div>
+    </div>
+    <div class="cmpchips" id="cmpChips" aria-label="Seasons on the chart"></div>
+    <div id="paceChart" class="cmpchart"></div>
+    <div class="cmpread" id="cmpRead" aria-live="polite"></div>
+    <p class="cmpshare"><button type="button" class="btn" id="cmpCopy">Copy link</button> <span class="sub" id="cmpCopied"></span></p>
     <p class="sub" id="paceFoot" style="margin:8px 0 0"></p>
   </div>
 </div>
@@ -118,6 +148,8 @@
 <script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script>
 <script>
 (function(){
+  if(/[?&]cmp=/.test(location.search)&&!location.hash)history.replaceState(null,"",location.pathname+location.search+"#united");   // a shared comparison opens on the United tab
+  var FX=MU.api("fixtures");
   MU.nav("Season"); MU.tabs(document.getElementById("tabs"),[{id:"united",label:"United"},{id:"premier-league",label:"Premier League"},{id:"champions-league",label:"Champions League"}],"united",{always:true}); MU.checked("fixtures",document.getElementById("stamp"),"Last checked");
   function table(rows,opts){
     return '<table class="mu"><thead><tr><th>#</th><th>Team</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th class="n">GD</th><th class="n">Pts</th><th>Form</th></tr></thead><tbody>'+
@@ -134,31 +166,93 @@
   function tile(i,b,small,href){var t=document.getElementById("usTiles").children[i]; t.querySelector("b").innerHTML=href?'<a href="'+href+'">'+b+'</a>':b; t.querySelector(":scope>small").innerHTML=small}
   MU.api("standings").then(function(j){
     document.getElementById("pl").innerHTML=table(j.response[0].league.standings[0],{note:"Black bar: Champions League places · grey: Europa / Conference · red: relegation."});
-    var me=j.response[0].league.standings[0].filter(function(r){return r.team.id===MU.TEAM})[0]; if(me)tile(0,ords(me.rank),me.points+" pts from "+me.all.played+" · GD "+(me.goalsDiff>0?"+":"")+me.goalsDiff,"#premier-league"); if(me&&me.all.played>=3)pace(me.all.played,me.points,me.goalsDiff,me.rank,j.response[0].league.season);
+    var me=j.response[0].league.standings[0].filter(function(r){return r.team.id===MU.TEAM})[0]; if(me)tile(0,ords(me.rank),me.points+" pts from "+me.all.played+" · GD "+(me.goalsDiff>0?"+":"")+me.goalsDiff,"#premier-league"); if(me)pace(me.rank);
   }).catch(function(e){MU.apiDown(document.getElementById("pl"),e)});
-  // Where this season's points after N games sit against every archived season at the same stage (three points a win throughout).
-  function pace(n,pts,gd,rank,year){
-    fetch("/manutd/history/pace.json").then(function(r){return r.json()}).then(function(P){
-      var $=function(i){return document.getElementById(i)}, cur=year+"-"+String(year+1).slice(2), rows=[];
-      Object.keys(P).forEach(function(s){var v=P[s]; if(v.tier!==1||v.run.length<n||s===cur)return; rows.push({s:s,pts:v.run[n-1][0],gd:v.run[n-1][1],fin:v.pos,pts3:v.pts3,n:v.n,div:v.div})});
-      if(!rows.length)return; rows.sort(function(a,b){return b.pts-a.pts||b.gd-a.gd});
-      var better=rows.filter(function(r){return r.pts>pts||(r.pts===pts&&r.gd>gd)}).length, same=rows.filter(function(r){return r.pts===pts}), titles=rows.filter(function(r){return r.fin===1}), worstTitle=titles.length?Math.min.apply(null,titles.map(function(r){return r.pts})):null;
-      var ords=function(k){var s=["th","st","nd","rd"],v=k%100;return k+(s[(v-20)%10]||s[v]||s[0])}, avg=rows.reduce(function(a,r){return a+r.pts},0)/rows.length;
-      var likeUs=same.length?same.slice().sort(function(a,b){return b.s.localeCompare(a.s)}):rows.filter(function(r){return Math.abs(r.pts-pts)<=1}).sort(function(a,b){return Math.abs(a.pts-pts)-Math.abs(b.pts-pts)||b.s.localeCompare(a.s)});
-      var finishes=likeUs.map(function(r){return r.fin}).filter(Boolean), medFin=finishes.length?finishes.slice().sort(function(a,b){return a-b})[Math.floor(finishes.length/2)]:null;
-      $("paceSheet").hidden=false;
-      $("paceNote").innerHTML="After "+n+" league games United have "+pts+" points (currently "+ords(rank)+"). Against the "+rows.length+" other top-flight seasons in the archive at the same stage, with three points a win applied throughout, that is the <b>"+ords(better+1)+" best start</b>"+(same.length?"; "+same.length+" season"+(same.length===1?"":"s")+" had exactly "+pts+".":".");
-      $("paceStats").innerHTML='<div><b>'+ords(better+1)+'</b><span>of '+(rows.length+1)+' seasons</span><small>at '+n+' games</small></div><div><b>'+rows[0].pts+'</b><span>best start</span><small><a href="/manutd/history/season/?s='+rows[0].s+'">'+rows[0].s.replace("-","–")+'</a>, finished '+ords(rows[0].fin)+'</small></div><div><b>'+avg.toFixed(1)+'</b><span>average</span><small>all top-flight seasons</small></div>'+(worstTitle!=null?'<div><b>'+worstTitle+'</b><span>lowest title pace</span><small>a champion side had this many at '+n+' games</small></div>':'')+(medFin?'<div><b>'+ords(medFin)+'</b><span>typical finish</span><small>seasons on '+pts+(same.length?'':' ± 1')+' points at this stage</small></div>':'');
-      // chart: top 8, the current season, the 5 nearest, bottom 3
-      var pick={}, add=function(r){pick[r.s]=r}; rows.slice(0,8).forEach(add); likeUs.slice(0,5).forEach(add); rows.slice(-3).forEach(add);
-      var list=Object.values(pick).sort(function(a,b){return b.pts-a.pts||b.gd-a.gd}); list.push({s:cur,pts:pts,gd:gd,now:true}); list.sort(function(a,b){return b.pts-a.pts||b.gd-a.gd});
-      var max=list[0].pts, html='', prev=null;
-      list.forEach(function(r){ if(prev&&prev.pts-r.pts>6)html+='<span class="gap"></span>'; prev=r;
-        html+='<div class="lab'+(r.now?' now':'')+'">'+(r.now?'This season':'<a href="/manutd/history/season/?s='+r.s+'">'+r.s.replace("-","–")+'</a>')+'</div><div class="'+(r.now?'now ':'')+'"><div class="bar"><i style="width:'+Math.round(100*r.pts/max)+'%"></i></div></div><div class="n'+(r.now?' now':'')+'">'+r.pts+(r.fin?' <small style="color:var(--muted);font-weight:400">'+ords(r.fin)+'</small>':'')+'</div>'});
-      $("paceChart").innerHTML='<div class="pace">'+html+'</div>';
-      $("paceFoot").textContent="Bars: the best starts, the nearest seasons to this one, and the worst; the small figure is where that season finished. Points per game differ by era (22 to 42 league games), so the comparison is at the same number of games played, not the same date.";
-    }).catch(function(){});
-  }
+  // Season comparison: this season's league run against up to 5 others picked by the viewer, game by game (same number of
+  // games played, not the same date). Data: history/pace.json (m = [home, gf, ga] per league game, every archived season) plus
+  // this season live from the fixtures feed. State lives in the query string (?cmp=1998-99,2007-08&v=home&m=gd&t2=1) so a
+  // comparison can be shared; the tab stays in the hash.
+  var paceRank=null, paceDraw=null;
+  function pace(rank){paceRank=rank; if(paceDraw)paceDraw()}
+  (function(){
+    var $=function(i){return document.getElementById(i)}, MAX=5, P=null, CUR=null, sel=[], st={v:"",m:"",t2:false}, focusK=null;
+    var fmt=function(s){return s.replace("-","–")};
+    var q=new URLSearchParams(location.search), qc=(q.get("cmp")||"").split(",").filter(Boolean), fromUrl=q.has("cmp");
+    st.v=/^(home|away)$/.test(q.get("v")||"")?q.get("v"):""; st.m=/^(pts2|gd|gf|ga)$/.test(q.get("m")||"")?q.get("m"):""; st.t2=q.get("t2")==="1";
+    var NAMES={"":"points","pts2":"points as awarded","gd":"goal difference","gf":"goals scored","ga":"goals conceded"};
+    function seq(S){var out=[],acc=0; S.m.forEach(function(g){if(st.v==="home"&&!g[0]||st.v==="away"&&g[0])return; var gf=g[1],ga=g[2],w=gf>ga,d=gf===ga;
+      acc+=st.m==="gd"?gf-ga:st.m==="gf"?gf:st.m==="ga"?ga:w?(st.m==="pts2"&&S.w2?2:3):d?1:0; out.push(acc)}); return out}
+    var better=function(a,b){return st.m==="ga"?a<b:a>b};
+    function pool(){return Object.keys(P).filter(function(s){return st.t2||P[s].tier===1})}
+    function nNow(){return CUR?seq(CUR).length:0}
+    function quick(kind){var ids=pool().sort(function(a,b){return b.localeCompare(a)}), n=nNow();
+      if(kind==="last")return ids.slice(0,MAX);
+      if(kind==="title")return ids.filter(function(s){return P[s].tier===1&&P[s].pos===1}).slice(0,MAX);
+      var k=Math.max(n,1), at=ids.map(function(s){var r=seq(P[s]); return {s:s,r:r}}).filter(function(x){return x.r.length>=k});
+      if(kind==="best")return at.sort(function(a,b){return better(a.r[k-1],b.r[k-1])?-1:better(b.r[k-1],a.r[k-1])?1:b.s.localeCompare(a.s)}).slice(0,MAX).map(function(x){return x.s});
+      if(kind==="near"){if(!n)return ids.slice(0,MAX); var c=seq(CUR); return at.map(function(x){var d=0; for(var i=0;i<n;i++)d+=Math.abs(x.r[i]-c[i]); return {s:x.s,d:d/n+Math.abs(x.r[n-1]-c[n-1])}}).sort(function(a,b){return a.d-b.d||b.s.localeCompare(a.s)}).slice(0,MAX).map(function(x){return x.s})}
+      return []}
+    function save(){var p=new URLSearchParams(); if(sel.length)p.set("cmp",sel.join(",")); if(st.v)p.set("v",st.v); if(st.m)p.set("m",st.m); if(st.t2)p.set("t2","1");
+      var qs=p.toString().replace(/%2C/g,","); history.replaceState(null,"",location.pathname+(qs?"?"+qs:"")+location.hash); return location.origin+location.pathname+(qs?"?"+qs:"")+"#united"}
+    function sw(cls){return '<svg viewBox="0 0 22 10" aria-hidden="true"><line class="ln '+cls+'" x1="1" y1="5" x2="21" y2="5"/></svg>'}
+    function lab(s){var v=P[s]; return fmt(s)+' <small>'+(v.tier===2?"2nd tier, ":"")+(v.pos?ords(v.pos):"")+(v.tier===1&&v.pos===1?" · champions":"")+'</small>'}
+    function lines(){var L=[]; if(CUR)L.push({s:CUR.id,cls:"cur",r:seq(CUR),label:"This season",now:true});
+      sel.forEach(function(s,i){L.push({s:s,cls:"s"+i,r:seq(P[s]),label:fmt(s)})}); return L}
+    function chart(){var box=$("paceChart"), L=lines(), W=box.clientWidth||640, H=W<520?250:330, ml=34, mr=10, mt=10, mb=28;
+      var nx=Math.max.apply(null,L.map(function(l){return l.r.length}).concat([1])), all=[0].concat.apply([0],L.map(function(l){return l.r})), lo=Math.min.apply(null,all), hi=Math.max.apply(null,all.concat([lo+1]));
+      var span=hi-lo, step=[1,2,5,10,20,25,50].filter(function(s){return span/s<=(H<300?6:8)})[0]||100; lo=Math.floor(lo/step)*step; hi=Math.ceil(hi/step)*step;
+      var X=function(k){return ml+(nx<=1?0:(k-1)*(W-ml-mr)/(nx-1))}, Y=function(v){return mt+(hi-v)*(H-mt-mb)/(hi-lo||1)}, g='';
+      for(var v=lo;v<=hi;v+=step)g+='<line class="'+(v===0&&lo<0?"ax0":"ax")+'" x1="'+ml+'" x2="'+(W-mr)+'" y1="'+Y(v)+'" y2="'+Y(v)+'"/><text x="'+(ml-6)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+v+'</text>';
+      var xs=nx<=12?2:nx<=25?5:10; for(var k=1;k<=nx;k++)if(k===1||k%xs===0)g+='<text x="'+X(k)+'" y="'+(H-mb+16)+'" text-anchor="middle">'+k+'</text>';
+      g+='<text x="'+(W-mr)+'" y="'+(H-2)+'" text-anchor="end">'+(st.v?(st.v==="home"?"home":"away")+" league games":"league games")+' played</text>';
+      var n=nNow(); if(CUR&&n&&n<nx)g+='<line class="now" x1="'+X(n)+'" x2="'+X(n)+'" y1="'+mt+'" y2="'+(H-mb)+'"/>';
+      L.slice().reverse().forEach(function(l){if(!l.r.length)return; g+='<path class="ln '+l.cls+'" d="'+l.r.map(function(v,i){return (i?"L":"M")+X(i+1).toFixed(1)+" "+Y(v).toFixed(1)}).join("")+(l.r.length===1?"h0.1":"")+'"/>'});
+      var k=focusK||n||nx; k=Math.min(Math.max(k,1),nx);
+      g+='<line class="gd" x1="'+X(k)+'" x2="'+X(k)+'" y1="'+mt+'" y2="'+(H-mb)+'"/>'+L.map(function(l){var v=l.r[k-1]; return v==null?"":'<circle class="dot '+l.cls+'" r="'+(l.now?5:4)+'" cx="'+X(k)+'" cy="'+Y(v)+'"/>'}).join("");
+      box.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" height="'+H+'" role="img" aria-label="Cumulative league '+NAMES[st.m]+' by game: this season and '+sel.length+' others">'+g+'</svg>';
+      var R=L.filter(function(l){return l.r[k-1]!=null}).sort(function(a,b){return better(a.r[k-1],b.r[k-1])?-1:better(b.r[k-1],a.r[k-1])?1:0});
+      $("cmpRead").innerHTML='<b>After '+k+' '+(st.v?st.v+" ":"")+'league game'+(k===1?"":"s")+'</b>, '+NAMES[st.m]+(st.m==="ga"?" (fewest first)":"")+'<ul>'+R.map(function(l){return '<li class="'+(l.now?"cur":"")+'">'+sw(l.cls)+l.label+' <span class="v">'+(st.m==="gd"&&l.r[k-1]>0?"+":"")+l.r[k-1]+'</span></li>'}).join("")+'</ul>'+(L.length>R.length?'<span class="sub">Not played that many: '+L.filter(function(l){return l.r[k-1]==null}).map(function(l){return l.label}).join(", ")+'.</span>':'');
+      var svg=box.querySelector("svg"), pick=function(e){var b=svg.getBoundingClientRect(), x=(e.clientX-b.left)*W/b.width; focusK=Math.min(nx,Math.max(1,Math.round((x-ml)/((W-ml-mr)/Math.max(nx-1,1))+1))); chart()};
+      svg.addEventListener("pointerdown",pick); svg.addEventListener("pointermove",function(e){if(e.pointerType==="mouse"||e.buttons)pick(e)});
+    }
+    function stats(){var n=nNow(), c=CUR?seq(CUR):[]; if(!CUR||!n){$("paceNote").textContent="Pick seasons to compare game by game."; $("paceStats").innerHTML=""; return}
+      var me=c[n-1], rows=pool().filter(function(s){return s!==CUR.id}).map(function(s){var r=seq(P[s]); return r.length>=n?{s:s,v:r[n-1],fin:P[s].pos,t:P[s].tier}:null}).filter(Boolean);
+      if(!rows.length){$("paceStats").innerHTML="";return}
+      rows.sort(function(a,b){return better(a.v,b.v)?-1:better(b.v,a.v)?1:0});
+      var ahead=rows.filter(function(r){return better(r.v,me)}).length, same=rows.filter(function(r){return r.v===me}), avg=rows.reduce(function(a,r){return a+r.v},0)/rows.length, pts=!st.m||st.m==="pts2";
+      var titles=rows.filter(function(r){return r.fin===1&&r.t===1}), worstTitle=pts&&titles.length?Math.min.apply(null,titles.map(function(r){return r.v})):null;
+      var like=rows.filter(function(r){return Math.abs(r.v-me)<=(same.length?0:1)}).map(function(r){return r.fin}).filter(Boolean).sort(function(a,b){return a-b}), med=like.length?like[Math.floor(like.length/2)]:null;
+      var what=(st.v?st.v+" ":"")+"league games", word=st.m==="ga"?"fewest conceded":st.m==="gf"?"most scored":st.m==="gd"?"best goal difference":"best start", val=function(v){return (st.m==="gd"&&v>0?"+":"")+(Math.round(v*10)/10)};
+      $("paceNote").innerHTML="After "+n+" "+what+" United have "+val(me)+" "+(pts?"points":NAMES[st.m])+(paceRank&&!st.v?" (currently "+ords(paceRank)+")":"")+". Against the "+rows.length+" other "+(st.t2?"":"top-flight ")+"seasons in the archive at the same stage, that is the <b>"+ords(ahead+1)+" "+word+"</b>"+(same.length?"; "+same.length+" season"+(same.length===1?"":"s")+" had exactly "+val(me)+".":".");
+      $("paceStats").innerHTML='<div><b>'+ords(ahead+1)+'</b><span>of '+(rows.length+1)+' seasons</span><small>at '+n+' '+what+'</small></div><div><b>'+val(rows[0].v)+'</b><span>'+word+'</span><small><a href="/manutd/history/season/?s='+rows[0].s+'">'+fmt(rows[0].s)+'</a>'+(rows[0].fin?', finished '+ords(rows[0].fin):'')+'</small></div><div><b>'+val(avg)+'</b><span>average</span><small>'+(st.t2?"every season":"all top-flight seasons")+'</small></div>'+(worstTitle!=null?'<div><b>'+worstTitle+'</b><span>lowest title pace</span><small>a champion side had this many at '+n+' games</small></div>':'')+(pts&&med?'<div><b>'+ords(med)+'</b><span>typical finish</span><small>seasons on '+val(me)+(same.length?'':' ± 1')+' at this stage</small></div>':'')}
+    function chips(){$("cmpChips").innerHTML=(CUR?'<span>'+sw("cur")+'This season</span>':'')+sel.map(function(s,i){return '<button type="button" data-s="'+s+'" aria-label="Remove '+fmt(s)+'">'+sw("s"+i)+'<a href="/manutd/history/season/?s='+s+'" tabindex="-1" style="color:inherit;text-decoration:none;border:0" onclick="event.stopPropagation()">'+lab(s)+'</a><span class="x" aria-hidden="true">×</span></button>'}).join("")+(sel.length?'':'<span class="sub" style="border:0;background:none;padding:5px 0">No seasons picked — add one or use a quick pick.</span>');
+      $("cmpFind").disabled=sel.length>=MAX; $("cmpFind").placeholder=sel.length>=MAX?"Five seasons picked: remove one to add another":"Add a season, e.g. 1998-99"}
+    function foot(){$("paceFoot").innerHTML="How the seasons line up: by league games played, not by date, and seasons ran from 22 to 42 league games, so longer ones run further right. "+(st.m==="pts2"?"<b>Points as awarded</b>: two for a win up to 1980-81, three from 1981-82, so the older lines sit lower than their real strength. ":(!st.m?"Every win counts <b>three points</b>, including before 1981-82 when a win was worth two, so eras compare (pick “Points as awarded” for the real totals). ":""))+"The 25 second-tier seasons (the last 1974-75) are left out of the rankings and quick picks unless you include them; divisions differ in strength and size. League games only: cup ties carry no points, and the archive holds every league game but not every cup tie, so there is no all-competitions view."}
+    function draw(){if(!P)return; $("paceSheet").hidden=false; [].forEach.call($("cmpVenue").children,function(b){b.setAttribute("aria-pressed",b.getAttribute("data-v")===st.v)}); $("cmpMetric").value=st.m; $("cmpT2").checked=st.t2;
+      stats(); chips(); chart(); foot(); save()}
+    paceDraw=draw;
+    function add(s){if(!P[s]||sel.indexOf(s)>=0||sel.length>=MAX||(CUR&&s===CUR.id))return false; sel.push(s); return true}
+    function parse(t){t=(t||"").trim().replace(/[–—\/]/g,"-"); var m=t.match(/^(\d{4})(?:-(\d{2}|\d{4}))?/)||t.match(/^(\d{2})-(\d{2})$/); if(!m)return null;
+      var y=+m[1]; if(m[1].length===2)y=(y>=86?1800:y>=50?1900:2000)+y; if(y<1886)y+=100; var id=y+"-"+String(y+1).slice(2); if(P[id])return id; if(!m[2]){id=(y-1)+"-"+String(y).slice(2); if(P[id])return id} return null}
+    $("cmpVenue").addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; st.v=b.getAttribute("data-v"); focusK=null; draw()});
+    $("cmpMetric").addEventListener("change",function(){st.m=this.value; draw()});
+    $("cmpT2").addEventListener("change",function(){st.t2=this.checked; list(); draw()});
+    $("cmpQuick").addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; sel=quick(b.getAttribute("data-q")); focusK=null; draw()});
+    $("cmpChips").addEventListener("click",function(e){var b=e.target.closest("button[data-s]"); if(!b)return; sel=sel.filter(function(s){return s!==b.getAttribute("data-s")}); draw()});
+    var fi=$("cmpFind"); function tryAdd(){var id=parse(fi.value); if(id&&add(id)){fi.value=""; draw()} else if(fi.value.trim()&&!id){fi.setCustomValidity("No league season like that in the archive"); fi.reportValidity()}}
+    fi.addEventListener("input",function(){fi.setCustomValidity(""); var v=fi.value.trim(); if(/^\d{4}-\d{2}$/.test(v.replace("–","-"))&&P&&P[v.replace("–","-")])tryAdd()});
+    fi.addEventListener("keydown",function(e){if(e.key==="Enter"){e.preventDefault(); tryAdd()}}); fi.addEventListener("change",tryAdd);
+    function list(){$("cmpList").innerHTML=Object.keys(P).sort(function(a,b){return b.localeCompare(a)}).map(function(s){var v=P[s]; return '<option value="'+s+'">'+fmt(s)+' · '+(v.tier===2?"2nd tier · ":"")+(v.pos?ords(v.pos):"")+(v.tier===1&&v.pos===1?" · champions":"")+'</option>'}).join("")}
+    $("cmpCopy").addEventListener("click",function(){var url=save(), done=function(ok){$("cmpCopied").textContent=ok?"Link copied":"Copy this link: "+url; setTimeout(function(){$("cmpCopied").textContent=""},ok?2500:15000)};
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url).then(function(){done(true)},function(){done(false)}); else done(false)});
+    var rz=null; window.addEventListener("resize",function(){clearTimeout(rz); rz=setTimeout(function(){if(P)chart()},150)}); document.addEventListener("mu:tab",function(e){if(e.detail==="united"&&P)setTimeout(chart,0)});
+    var cur=FX.then(function(j){var all=(j.response||[]).filter(function(m){return m.league.name==="Premier League"&&/^(FT|AET|PEN)$/.test(m.fixture.status.short)}).sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp});
+      var y=(j.response&&j.response[0]&&j.response[0].league.season); if(!y)return null;
+      return {id:y+"-"+String(y+1).slice(2),tier:1,w2:0,m:all.map(function(m){var h=m.teams.home.id===MU.TEAM; return [h?1:0,h?m.goals.home:m.goals.away,h?m.goals.away:m.goals.home]})}}).catch(function(){return null});
+    Promise.all([fetch("/manutd/history/pace.json").then(function(r){return r.json()}),cur]).then(function(r){P=r[0]; CUR=r[1]; if(CUR)delete P[CUR.id]; list();
+      if(fromUrl)qc.forEach(function(s){add(s)}); else {var last=Object.keys(P).sort().pop(); if(last)add(last); quick("best").slice(0,1).concat(quick("near")).forEach(function(s){if(sel.length<4)add(s)})}
+      draw()}).catch(function(){});
+  })();
   MU.api("ucl").then(function(j){
     var groups=j.response[0].league.standings; var rows=groups.length===1?groups[0]:[].concat.apply([],groups);
     document.getElementById("ucl").innerHTML=table(rows,{zone:function(k){return k<=8?"ucl":k<=24?"uel":"rel"},note:"Black bar: top 8 go straight to the round of 16 · grey: 9th–24th play the knockout play-offs · red: out."});
@@ -168,7 +262,7 @@
     var gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home, res=done?(gf>ga?"W":gf<ga?"L":"D"):"";
     var k=done?{ko:m.fixture.date,conf:true}:MU.ko(m);
     return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(k.ko)+'<br>'+(done?"":MU.fmtKO(k.ko)+MU.prov(k)+MU.confTag(k))+'</span><span class="o">'+(MU.crest(opp.name,1)?MU.club(opp.name):'<img class="logo" src="'+opp.logo+'" alt="">'+MU.esc(opp.name))+' <a class="chip" href="/manutd/match/?id='+m.fixture.id+'">Match</a>'+(done?'':' '+MU.calLink(MU.fixFor(opp.name,home,m.fixture.date)))+' <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r">'+(done?gf+'–'+ga+' '+MU.form(res):'')+'</span></li>'}
-  MU.api("fixtures").then(function(j){
+  FX.then(function(j){
     var all=j.response.slice().sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp});
     var done=all.filter(function(m){return /FT|AET|PEN/.test(m.fixture.status.short)}).reverse();
     var todo=all.filter(function(m){return !/FT|AET|PEN|CANC|PST/.test(m.fixture.status.short)}).sort(function(a,b){return new Date(MU.ko(a).ko)-new Date(MU.ko(b).ko)});
