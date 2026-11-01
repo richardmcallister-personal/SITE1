@@ -130,6 +130,23 @@ a.book[aria-disabled="true"]{opacity:.4;pointer-events:none}
 .prov{display:inline-block;font-family:var(--body);font-weight:600;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#7a5a00;background:#fff4c2;border:1px solid #e6c84a;border-radius:3px;padding:0 5px;margin-left:4px;vertical-align:middle}
 
 .rail{border-radius:var(--radius);margin-top:12px} .sheet{margin-top:12px} .verdict{border-radius:var(--radius)} .viewer{border-radius:var(--radius)} .total{border-radius:8px} input,select{border-radius:8px} .fx{background:var(--black);color:var(--on-black)} .fx .d,.fx .k{color:var(--muted-on-black)} .fx[aria-pressed="true"]{background:var(--paper);color:var(--ink)} .total{background:var(--black);color:var(--on-black)} .stat:nth-child(2){background:var(--black);color:var(--on-black)} .dot.good{background:var(--ink)} .awayTickets a{background:var(--tint);color:var(--ink)} .awayTickets a:hover{background:var(--rule)} .viewer-fallback{color:var(--muted)}
+
+/* setup panel + three-way comparison */
+.setup{padding:0} .setup>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 18px;font-size:14px} .setup>summary::-webkit-details-marker{display:none}
+.setup>summary .k{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)} .setup>summary #setupSum{font-weight:600}
+.setup>summary .chev{margin-left:auto;font-size:12px;font-weight:600;color:var(--red-ink);text-decoration:underline;text-underline-offset:3px} .setup[open]>summary .chev{visibility:hidden}
+.setup[open]{padding-bottom:16px} .setup>:not(summary){margin-left:18px;margin-right:18px}
+.setgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:12px 16px}
+.setgrid label{display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600;color:var(--muted)} .setgrid small{font-weight:400;font-size:11px}
+.setgrid input,.setgrid select{font:inherit;font-size:15px;font-weight:500;color:var(--ink);background:var(--paper);border:1px solid var(--rule);border-radius:8px;padding:8px 10px;min-width:0;width:100%;box-sizing:border-box} #sFrom{text-transform:uppercase;letter-spacing:.06em}
+.linkbtn{background:none;border:0;padding:0;font:inherit;font-size:13px;color:var(--red-ink);text-decoration:underline;cursor:pointer}
+.budget{margin:6px 0 0;text-align:right;font-weight:600;color:var(--win)} .budget.over{color:var(--red-ink)}
+.opts{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+.opt{border:1px solid var(--rule);border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:8px} .opt.over{border-color:var(--red)}
+.opt .oh{display:flex;justify-content:space-between;align-items:baseline;gap:8px} .opt .oh b{font-family:var(--head);font-weight:500;letter-spacing:.1em;text-transform:uppercase;font-size:13px}
+.opt .ot{font-family:var(--display);font-size:24px} .opt .ot small{font-family:var(--body);font-size:12px;color:var(--muted)}
+.opt .why{margin:0;font-size:13px;color:var(--muted)} .opt dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:4px 10px;font-size:13px} .opt dt{color:var(--muted)} .opt dd{margin:0} .opt dd small{color:var(--muted);white-space:nowrap}
+.opt dd.ok{color:var(--win);font-weight:600} .opt dd.bad{color:var(--red-ink);font-weight:600} .opt .use{margin-top:auto;align-self:flex-start}
 </style>
 
 <!-- Google tag (gtag.js) -->
@@ -149,9 +166,23 @@ a.book[aria-disabled="true"]{opacity:.4;pointer-events:none}
 <div class="sheet">
   <section class="panel">
     <h2>Your trip</h2>
+    <details class="card setup" id="setup"><summary><span class="k">Your setup</span><span id="setupSum"></span><span class="chev" aria-hidden="true">Change</span></summary>
+      <div class="setgrid">
+        <label>Flying from<input id="sFrom" list="airports" maxlength="3" autocomplete="off" spellcheck="false" value="CPH"><small>Airport code</small></label>
+        <label>Adults<input id="sPax" type="number" min="1" max="8" step="1" value="1"><small>Rooms sleep two</small></label>
+        <label>Currency<select id="sCur"><option>GBP</option><option>EUR</option><option>SEK</option><option>DKK</option><option>NOK</option><option>USD</option></select><small id="rateNote">&nbsp;</small></label>
+        <label>Budget, all-in<input id="sBudget" type="number" min="0" step="50" placeholder="No limit"><small>For the whole party</small></label>
+        <label>Nights<select id="sNights"><option value="plan">As the plan says</option><option value="0">Day trip</option><option value="1">1</option><option value="2">2</option><option value="3">3</option></select><small>&nbsp;</small></label>
+        <label>Hotel first choice<select id="sHotel"><option value="usual">Hotel Football, then Marriott</option><option value="cheap">Cheapest 4-star</option><option value="marriott">Marriott family</option></select><small>&nbsp;</small></label>
+      </div>
+      <datalist id="airports"><option value="CPH">Copenhagen</option><option value="ARN">Stockholm Arlanda</option><option value="GOT">Gothenburg</option><option value="OSL">Oslo</option><option value="BGO">Bergen</option><option value="HEL">Helsinki</option><option value="BLL">Billund</option><option value="AAL">Aalborg</option><option value="DUB">Dublin</option><option value="ORK">Cork</option><option value="SNN">Shannon</option><option value="BFS">Belfast</option><option value="AMS">Amsterdam</option><option value="BRU">Brussels</option><option value="DUS">Düsseldorf</option><option value="HAM">Hamburg</option><option value="BER">Berlin</option><option value="FRA">Frankfurt</option><option value="MUC">Munich</option><option value="ZRH">Zurich</option><option value="CDG">Paris</option><option value="MAD">Madrid</option><option value="BCN">Barcelona</option><option value="LIS">Lisbon</option><option value="FCO">Rome</option><option value="MXP">Milan</option><option value="WAW">Warsaw</option><option value="KEF">Reykjavík</option><option value="JFK">New York</option></datalist>
+      <p class="sub" id="setupNote" style="margin:10px 0 0"></p>
+      <p style="margin:8px 0 0"><button type="button" class="linkbtn" id="sReset">Back to the default</button></p>
+    </details>
     <div class="card">
       <dl class="plan" id="plan"></dl>
       <div class="row"><label for="flight">Flight<span id="flightSub">Direct CPH–MAN, 1 adult, economy</span></label><div class="pick"><select id="flight"></select><a class="book" id="bookFlight" href="#" target="_blank" rel="noopener">Book</a></div></div>
+      <div class="row narrow" id="fareRow" hidden><label for="fare">Your fare<span id="fareSub">Per person, return; leave blank if you don't know yet</span></label><input id="fare" type="number" min="0" step="10" placeholder="—"></div>
       <div class="row"><label for="hotel">Hotel<span id="hotelSub">Per night, cheapest room</span></label><div class="pick"><select id="hotel"></select><a class="book" id="bookHotel" href="#" target="_blank" rel="noopener">Book</a></div></div>
       <div class="row narrow"><label for="nights">Nights<span>Set by the plan; change it if you like</span></label><input id="nights" type="number" min="0" max="4" step="1" value="1"></div>
       <p class="sub" id="priceNote"></p>
@@ -160,14 +191,16 @@ a.book[aria-disabled="true"]{opacity:.4;pointer-events:none}
     <h2>What it costs you</h2>
     <div class="card">
       <div class="row narrow homeOnly"><label>Ticket<span id="ticketLine">Pick a block below</span></label><b id="ticketCost" style="text-align:right;font-variant-numeric:tabular-nums">£—</b></div>
-      <div class="row narrow awayOnly"><label for="awayTicket">Away ticket<span id="awayTicketSub">Premier League caps away tickets at £30</span></label><input id="awayTicket" type="number" min="0" step="1" value="30"></div>
+      <div class="row narrow awayOnly"><label for="awayTicket">Away ticket, £ each<span id="awayTicketSub">Premier League caps away tickets at £30</span></label><input id="awayTicket" type="number" min="0" step="1" value="30"></div>
       <div class="row narrow"><label>Flights<span id="flightLine">—</span></label><b id="flightCost" style="text-align:right;font-variant-numeric:tabular-nums">£—</b></div>
       <div class="row narrow"><label>Hotel<span id="hotelLine">—</span></label><b id="hotelCost" style="text-align:right;font-variant-numeric:tabular-nums">£—</b></div>
       <div class="row narrow"><label for="ground">Trains, trams, taxis<span id="groundSub">Vellinge–CPH, MAN airport–town, to the ground</span></label><input id="ground" type="number" min="0" step="5" value="45"></div>
-      <div class="row narrow"><label for="food">Food and drink<span>Pre-match pint tax included</span></label><input id="food" type="number" min="0" step="5" value="60"></div>
-      <div class="row narrow"><label for="fx">USD → GBP<span>Fares were quoted in dollars</span></label><input id="fx" type="number" min="0.5" max="1" step="0.01" value="0.76"></div>
-      <div class="total"><span>All-in</span><b id="total">£—</b></div>
+      <div class="row narrow"><label for="food">Food and drink<span id="foodSub">Per person; pre-match pint tax included</span></label><input id="food" type="number" min="0" step="5" value="60"></div>
+      <div class="row narrow"><label for="fx" id="fxLab">USD → GBP<span>Fares were quoted in dollars</span></label><input id="fx" type="number" min="0.5" max="1" step="0.01" value="0.76"></div>
+      <div class="total"><span id="totalLab">All-in</span><b id="total">£—</b></div><p class="sub budget" id="budgetLine" hidden></p>
     </div>
+    <h2>Three ways to do it</h2>
+    <div class="card"><div class="opts" id="opts"></div><p class="sub" id="optsNote" style="margin:10px 0 0"></p></div>
 
     <input type="hidden" id="ug" value="1.5"><input type="hidden" id="og" value="1.2">
 
@@ -393,11 +426,23 @@ function viewUrl(code){return "https://preview.3ddigitalvenue.com/manutd?view_id
 function availFor(f){var raw=AVAIL[f.opp]||""; if(!raw)return []; return raw.split(" ").map(function(t){var p=t.split(":");return {code:p[0],price:parseFloat(p[1]),info:blockInfo(p[0])}}).filter(function(b){return b.info})}
 function addDays(iso,n){var d=new Date(iso+"T12:00:00Z"); d.setUTCDate(d.getUTCDate()+n); return d.toISOString().slice(0,10)}
 function tripDates(f,nights){var ko=new Date(f.ko), day=ko.toISOString().slice(0,10), plan=planFor(f); var dep=plan.kind==="before"?addDays(day,-1):day; var ret=addDays(dep,Math.max(nights,0)); return {dep:dep,ret:ret}}
-function flightLink(f,nights){var t=tripDates(f,nights); return "https://slicktrip.com/flights?key="+encodeURIComponent("CPH;"+(f.dest||"MAN")+";economy;1;"+t.dep+";"+t.ret)+(f.dest==="VLC"?"":"&stops=0")}
-function hotelLink(f,nights){var t=tripDates(f,nights); return "https://slicktrip.com/hotels?key="+encodeURIComponent("Old-Trafford,-Manchester,-UK;"+t.dep+";"+t.ret+";1;0")}
+function flightLink(f,nights){var t=tripDates(f,nights); return "https://slicktrip.com/flights?key="+encodeURIComponent(SET.from+";"+(f.dest||"MAN")+";economy;"+SET.pax+";"+t.dep+";"+t.ret)+(f.dest==="VLC"?"":"&stops=0")}
+function hotelLink(f,nights){var t=tripDates(f,nights); return "https://slicktrip.com/hotels?key="+encodeURIComponent("Old-Trafford,-Manchester,-UK;"+t.dep+";"+t.ret+";"+SET.pax+";0")}
 function ticketLink(f,code){if(f.away)return f.tickets[0].u; if(!EVENTS[f.opp])return "https://tickets.manutd.com/en-GB/categories/home-tickets"; var base="https://tickets.manutd.com/en-GB/events/"+(EVENTS[f.opp]||"")+"/old%20trafford"; var id=code?areaId(code):null; return id?base+"?area="+id+"&type=&sb2m=1":base+"?hallmap"}
 var NORMALS={10:{t:13,rain:.45},11:{t:9,rain:.5},0:{t:7,rain:.5},1:{t:8,rain:.45},2:{t:10,rain:.4},3:{t:13,rain:.4},4:{t:16,rain:.4},5:{t:19,rain:.4},6:{t:21,rain:.4},7:{t:20,rain:.4},8:{t:18,rain:.4},9:{t:14,rain:.45}};
 var DEF={ground:45,food:60,fx:0.76};
+// ---- the visitor's setup (defaults: Richard's — Copenhagen, one adult, pounds, the plan's nights, Hotel Football first) ----
+var SDEF={from:"CPH",pax:1,cur:"GBP",budget:"",nights:"plan",hotel:"usual"}, SKEY="mu:trip-setup";
+var SET=(function(){try{return Object.assign({},SDEF,JSON.parse(localStorage.getItem(SKEY)||"{}"))}catch(e){return Object.assign({},SDEF)}})();
+function saveSet(){try{localStorage.setItem(SKEY,JSON.stringify(SET))}catch(e){}}
+// Units of each currency per US dollar. Fallback figures; replaced by the ECB reference rate (via Frankfurter) when it loads.
+var RATES={USD:1,GBP:0.76,EUR:0.87,SEK:9.5,DKK:6.5,NOK:10.1}, RATE_DATE=null;
+function rate(){return RATES[SET.cur]||1}
+function g2c(n){return n*rate()/RATES.GBP}   // pounds -> the chosen currency
+function money(n){if(n==null||!isFinite(n))return "—"; try{return new Intl.NumberFormat("en-GB",{style:"currency",currency:SET.cur,maximumFractionDigits:0,useGrouping:false}).format(Math.round(n))}catch(e){return SET.cur+" "+Math.round(n)}}
+function rooms(){return Math.ceil(Math.max(1,SET.pax)/2)}
+function cached(){return SET.from==="CPH"}   // fares on this page were checked from Copenhagen
+function paxText(){return SET.pax+" adult"+(SET.pax>1?"s":"")}
 var $=function(id){return document.getElementById(id)};
 var sel=0, wx=null, wxCache={};
 
@@ -408,11 +453,11 @@ var TZ=(function(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||
 function fmtSE(d){return d.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit",timeZone:TZ})}   // the viewer's own zone
 function tzLabel(d){try{var p=new Intl.DateTimeFormat(navigator.language||"en-GB",{timeZone:TZ,timeZoneName:"short"}).formatToParts(d).filter(function(x){return x.type==="timeZoneName"})[0]; return p?p.value:"local"}catch(e){return "local"}}
 function fmtKO(d,inline){return IN_UK?fmtUK(d)+" UK":fmtSE(d)+" "+tzLabel(d)+'<small class="tz'+(inline?' inl':'')+'">'+(inline?'· ':'')+fmtUK(d)+' UK</small>'}
-function gbp(n){return "£"+Math.round(n)}
+function gbp(n){return money(n)}
 function num(id){var v=parseFloat($(id).value);return isFinite(v)?v:0}
 function ukHour(d){return parseInt(d.toLocaleTimeString("en-GB",{hour:"2-digit",hour12:false,timeZone:"Europe/London"}),10)}
 function ukDow(d){return d.toLocaleDateString("en-GB",{weekday:"short",timeZone:"Europe/London"})}
-function fx(){return num("fx")||0.76}
+function fx(){return num("fx")||rate()}
 function planFor(f){
   var h=ukHour(new Date(f.ko));
   if(h<14)return {kind:"before",label:"Fly in the night before, home after the game",nights:1};
@@ -420,12 +465,13 @@ function planFor(f){
   return {kind:"evening",label:"Fly in on the day, stay the night",nights:1};
 }
 function hotelsFor(f){var night=tripDates(f,1).dep; if(f.away){return f.hotels.map(function(h,i){return {key:"a"+i,n:h.n,g:h.city||f.city,usd:h.usd,night:night,q:h.n.replace(/\s*\(.*?\)/g,"")+", "+f.city,d:!!h.d}})} var pr=Object.assign({},HOTEL_PRICES[night]||{}); if(!("football" in pr))pr.football=null; return Object.keys(pr).map(function(k){var h=HOTELS[k];return {key:k,id:h.id,n:h.n,g:h.g,usd:pr[k],night:night}}).sort(function(a,b){return (a.usd==null?1e9:a.usd)-(b.usd==null?1e9:b.usd)})}
+function roomParams(){var out="",left=SET.pax,i=1; while(left>0){var n=Math.min(2,left); out+="&rm"+i+"=a"+n; left-=n; i++} return out}
 function hotelPageLink(h,f,nights){
   var t=tripDates(f,nights), id=HOTELSCOM_IDS[h.key];
-  if(h.q) return "https://www.hotels.com/Hotel-Search?destination="+encodeURIComponent(h.q)+"&startDate="+t.dep+"&endDate="+t.ret+"&adults=1&rooms=1";
-  if(id) return "https://www.hotels.com/"+id+"/?chkin="+t.dep+"&chkout="+t.ret+"&rm1=a1";
+  if(h.q) return "https://www.hotels.com/Hotel-Search?destination="+encodeURIComponent(h.q)+"&startDate="+t.dep+"&endDate="+t.ret+"&adults="+SET.pax+"&rooms="+rooms();
+  if(id) return "https://www.hotels.com/"+id+"/?chkin="+t.dep+"&chkout="+t.ret+roomParams();
   var q=HOTELSCOM_NAMES[h.key]||h.n.replace(/\s*\(.*?\)/g,"");
-  return "https://www.hotels.com/Hotel-Search?destination="+encodeURIComponent(q+", Manchester")+"&startDate="+t.dep+"&endDate="+t.ret+"&adults=1&rooms=1";
+  return "https://www.hotels.com/Hotel-Search?destination="+encodeURIComponent(q+", Manchester")+"&startDate="+t.dep+"&endDate="+t.ret+"&adults="+SET.pax+"&rooms="+rooms();
 }
 
 // ---- fixture rail -----------------------------------------------------
@@ -463,12 +509,16 @@ function render(){
   var fl=f.flights[parseInt($("flight").value,10)||0];
   var hl=hotelsFor(f), h=null; hl.forEach(function(x){if(x.key===$("hotel").value)h=x}); if(!h)h=hl[0]||null; var hp={usd:h?h.usd:0};
   var nights=Math.max(0,Math.round(num("nights")));
-  var flightG=fl.usd*fx(), hotelG=nights*hp.usd*fx();
+  if(!cached())fl={l:"Live fares from "+SET.from,usd:null};
+  var flightG=cached()?fl.usd*fx()*SET.pax:num("fare")*SET.pax, hotelG=nights*(hp.usd||0)*fx()*rooms();
   var blk=f.away?null:currentBlock(f);
-  var ticket=f.away?num("awayTicket"):(blk?blk.price:0);
+  var ticket=g2c(f.away?num("awayTicket"):(blk?blk.price:0))*SET.pax;
   document.body.classList.toggle("is-away",!!f.away);
-  $("flightSub").textContent=f.away?("Direct CPH–"+(f.dest==="LOND"?"London":f.dest)+(f.dest==="VLC"?" (1 stop)":"")+", 1 adult, economy"):"Direct CPH–MAN, 1 adult, economy";
-  $("groundSub").textContent=f.away?("Vellinge–CPH, "+(f.destNote||"")):"Vellinge–CPH, MAN airport–town, to the ground";
+  $("flightSub").textContent=(cached()?"Direct ":"")+SET.from+"–"+(f.away?(f.dest==="LOND"?"London":f.dest):"MAN")+(f.dest==="VLC"&&cached()?" (1 stop)":"")+", "+paxText()+", economy";
+  $("fareRow").hidden=cached(); $("fareSub").textContent="Per person, return, in "+SET.cur+"; we only have checked fares from Copenhagen";
+  $("hotelSub").textContent="Per night, cheapest room"+(rooms()>1?", "+rooms()+" rooms":"");
+  $("groundSub").textContent="Per person, in "+SET.cur+" · "+(SET.from==="CPH"?"Vellinge–CPH, ":"Home–"+SET.from+", ")+(f.away?(f.destNote||""):"MAN airport–town, to the ground");
+  $("fxLab").firstChild.textContent="USD → "+SET.cur;
   $("ticketCost").textContent=blk?gbp(ticket):"—";
   $("ticketLine").textContent=blk?blk.code+" · "+blk.info.stand+", "+blk.info.tierName.toLowerCase():(f.sale||"No tickets on sale");
   if(f.away){
@@ -477,7 +527,9 @@ function render(){
     $("awayInfo").innerHTML="<dt>Ground</dt><dd>"+f.venue+", "+f.city+"</dd><dt>Away end</dt><dd>United's allocation, sold by away credits to members</dd><dt>Getting there</dt><dd>"+(f.destNote||"")+"</dd>";
     $("awayLinks").innerHTML=f.tickets.map(function(t,i){return '<li><a href="'+t.u+'" target="_blank" rel="noopener">'+(i+1)+' · '+t.l+'<span>opens in a new tab</span></a></li>'}).join("");
   }
-  var total=ticket+flightG+hotelG+num("ground")+num("food");
+  var total=ticket+flightG+hotelG+(num("ground")+num("food"))*SET.pax;
+  $("totalLab").textContent="All-in"+(SET.pax>1?" for "+SET.pax:"")+(cached()||num("fare")?"":" (plus flights)");
+  var bud=parseFloat(SET.budget), bl=$("budgetLine"); bl.hidden=!(bud>0); if(bud>0){var dlt=bud-total; bl.textContent=(dlt>=0?money(dlt)+" under":money(-dlt)+" over")+" your "+money(bud)+" budget"; bl.classList.toggle("over",dlt<0)}
   var ug=num("ug"), og=num("og"), goals=ug+og;
 
   // plan block
@@ -486,19 +538,20 @@ function render(){
   planHtml+='<dt>Nights</dt><dd>'+nights+(nights!==plan.nights?' (plan says '+plan.nights+')':'')+'</dd>';
   dl.innerHTML=planHtml;
 
-  $("flightLine").textContent=fl.l+" · from $"+fl.usd;
+  $("flightLine").textContent=cached()?fl.l+" · from $"+fl.usd+(SET.pax>1?" × "+SET.pax:""):(num("fare")?SET.from+" fare you entered × "+SET.pax:"Not priced: enter your fare above, or Book to search");
   $("flightCost").textContent=gbp(flightG);
-  $("hotelLine").textContent=!nights?"No hotel (day trip)":!h?"No hotel priced for this night":hp.usd==null?h.n+" · no price released yet; Book shows the live rate":h.n+" · $"+hp.usd+"/night × "+nights;
+  $("hotelLine").textContent=!nights?"No hotel (day trip)":!h?"No hotel priced for this night":hp.usd==null?h.n+" · no price released yet; Book shows the live rate":h.n+" · $"+hp.usd+"/night × "+nights+(rooms()>1?" × "+rooms()+" rooms":"");
   $("hotelCost").textContent=gbp(hotelG);
-  $("priceNote").textContent="Hotel prices are for this exact night ("+(h?fmtDate(new Date(h.night+"T12:00:00Z")):"")+"), cheapest room, 1 adult, checked "+(window.TRIPS_CHECKED||"29–30 Oct 2026")+" (February–May fares are early-release and will move). Book opens the hotel on hotels.com with these dates pre-filled. Flights checked the same day.";
+  $("priceNote").textContent="Hotel prices are for this exact night ("+(h?fmtDate(new Date(h.night+"T12:00:00Z")):"")+"), cheapest room, checked "+(window.TRIPS_CHECKED||"29–30 Oct 2026")+" (February–May fares are early-release and will move). Book opens the hotel on hotels.com with these dates"+(SET.pax>1?" and "+paxText()+" in "+rooms()+" room"+(rooms()>1?"s":""):"")+" pre-filled. "+(cached()?"Flights checked the same day, from Copenhagen.":"We have no checked fares from "+SET.from+"; Book opens a live search.");
   $("total").textContent=gbp(total);
   var fL=flightLink(f,nights), hL=hotelLink(f,nights), tL=ticketLink(f,blk?blk.code:null);
   $("bookFlight").href=fL; $("bn2").href=fL;
   if(h){hL=hotelPageLink(h,f,nights)} $("bookHotel").href=hL; $("bn3").href=hL; $("bookHotel").setAttribute("aria-disabled",nights?"false":"true"); $("bn3").style.display=nights?"":"none";
   $("bookTicket").href=tL; $("bn1").href=tL; $("bookTicket").textContent=blk?"Buy":(f.sale&&/ballot/i.test(f.sale)?"Apply":"Open"); $("bn1").textContent=f.away?"1 · Away ticket":"1 · Ticket";
   var td=tripDates(f,nights);
-  $("bookNote").textContent=f.away?("Away ticket first — it is the scarce part. Flights open SlickTrip pre-set to CPH–"+(f.dest||"MAN")+", "+td.dep+(nights?" to "+td.ret:" day return")+", 1 adult; the hotel opens hotels.com in "+f.city+" with these dates. "+(f.destNote||"")+"."):"Ticket first (seats go), then flights, then the bed. Flights and hotel open SlickTrip pre-set to CPH–MAN, "+td.dep+(nights?" to "+td.ret:" day return")+", 1 adult; pick the seller and pay on their site. The ticket link opens this fixture's seating plan on tickets.manutd.com under your members' login; it lands on block "+(blk?blk.code:"")+"'s seat map so you pick the exact row and seat.";
+  $("bookNote").textContent=f.away?("Away ticket first — it is the scarce part. Flights open SlickTrip pre-set to "+SET.from+"–"+(f.dest||"MAN")+", "+td.dep+(nights?" to "+td.ret:" day return")+", "+paxText()+"; the hotel opens hotels.com in "+f.city+" with these dates. "+(f.destNote||"")+"."):"Ticket first (seats go), then flights, then the bed. Flights and hotel open SlickTrip pre-set to "+SET.from+"–MAN, "+td.dep+(nights?" to "+td.ret:" day return")+", "+paxText()+"; pick the seller and pay on their site. The ticket link opens this fixture's seating plan on tickets.manutd.com under your members' login; it lands on block "+(blk?blk.code:"")+"'s seat map so you pick the exact row and seat.";
 
+  options(f,ticket);
   window.__verdict=(f.away?f.opp+" v Man Utd":"Man Utd v "+f.opp)+" ("+f.comp+"), "+fmtDate(d)+" "+fmtKO(d,true).replace(/<[^>]+>/g," ").replace(/\s+/g," ")+". "+plan.label+". Seat: "+(blk?blk.code+" ("+blk.info.stand+", "+blk.info.tierName.toLowerCase()+", "+blk.info.pos+") £"+blk.price:"none on sale")+". "+fl.l+"; "+(nights?h.n+" × "+nights:"no hotel")+". All-in "+gbp(total)+".";
 }
 
@@ -534,24 +587,71 @@ function updateViewer(f){
 }
 function fillSelects(f){
   var fs=$("flight"); fs.innerHTML="";
-  f.flights.forEach(function(o,i){var op=document.createElement("option");op.value=i;op.textContent=o.l+" — from $"+o.usd;fs.appendChild(op)});
+  if(!cached()){var op0=document.createElement("option");op0.value=0;op0.textContent="Live fares from "+SET.from+" — Book opens the search";fs.appendChild(op0)}
+  else f.flights.forEach(function(o,i){var op=document.createElement("option");op.value=i;op.textContent=o.l+" — from "+money(o.usd*fx()*SET.pax)+(SET.pax>1?" for "+SET.pax:"");fs.appendChild(op)});
   var hs=$("hotel"); hs.innerHTML="";
   var list=hotelsFor(f), groups={};
   list.sort(function(a,b){return (a.key==="football"?-1:0)-(b.key==="football"?-1:0)});
-  list.forEach(function(h){var g=groups[h.g]||(groups[h.g]=document.createElement("optgroup"),groups[h.g].label=h.g,groups[h.g]);var op=document.createElement("option");op.value=h.key;op.textContent=h.n+(h.usd==null?" — no price released yet (check live)":" — $"+h.usd);g.appendChild(op)});
+  list.forEach(function(h){var g=groups[h.g]||(groups[h.g]=document.createElement("optgroup"),groups[h.g].label=h.g,groups[h.g]);var op=document.createElement("option");op.value=h.key;op.textContent=h.n+(h.usd==null?" — no price released yet (check live)":" — "+money(h.usd*fx()*rooms())+(rooms()>1?" for "+rooms()+" rooms":""));g.appendChild(op)});
   ["Hotel Football & near the ground","Marriott family","High-end, city centre","Other 4-star, city centre"].forEach(function(k){if(groups[k])hs.appendChild(groups[k])});
   Object.keys(groups).forEach(function(k){if(!groups[k].parentNode)hs.appendChild(groups[k])});
   if(f.away){var dflt=list.filter(function(h){return h.d})[0]||list[0]; if(dflt)hs.value=dflt.key; return}
   // default: Hotel Football when it has a price, else cheapest priced Marriott, else cheapest priced
+  var priced=list.filter(function(h){return h.usd!=null}).sort(function(a,b){return a.usd-b.usd}), mar=priced.filter(function(h){return /Marriott|Tribute|Autograph|Aloft|Residence|Courtyard/.test(h.n)});
+  if(SET.hotel==="cheap"&&priced[0]){hs.value=priced[0].key;return}
+  if(SET.hotel==="marriott"&&(mar[0]||priced[0])){hs.value=(mar[0]||priced[0]).key;return}
   var pick=list.filter(function(h){return h.key==="football"&&h.usd!=null})[0]||list.filter(function(h){return h.usd!=null&&/Marriott|Tribute|Autograph|Aloft|Residence/.test(h.n)})[0]||list.filter(function(h){return h.usd!=null})[0]; if(pick)hs.value=pick.key;
 }
-function pick(){var f=FIX[sel];$("ug").value=f.ug;$("og").value=f.og;$("nights").value=planFor(f).nights;if(f.away)$("awayTicket").value=f.ticket||30;fillSelects(f);if(!f.away)fillBlocks(f,false);wx=null;loadWeather(f)}
+function pick(){var f=FIX[sel];$("ug").value=f.ug;$("og").value=f.og;$("nights").value=SET.nights==="plan"?planFor(f).nights:+SET.nights;if(f.away)$("awayTicket").value=f.ticket||30;fillSelects(f);if(!f.away)fillBlocks(f,false);wx=null;loadWeather(f)}
+
+// ---- three ways to do it: cheapest, shortest, most flexible -------------
+function outMin(l){var m=/out (?:[A-Z][a-z]{2} )?(\d{1,2}):(\d{2})/.exec(l||""); return m?+m[1]*60+ +m[2]:null}
+function options(f,ticket){
+  var plan=planFor(f), hl=hotelsFor(f).filter(function(h){return h.usd!=null}).sort(function(a,b){return a.usd-b.usd}), fls=cached()?f.flights.map(function(x,i){return Object.assign({i:i},x)}):[];
+  var cheapF=fls.slice().sort(function(a,b){return a.usd-b.usd})[0], lateF=fls.filter(function(x){return outMin(x.l)!=null}).sort(function(a,b){return outMin(b.l)-outMin(a.l)})[0]||cheapF;
+  var minN=plan.kind==="sameday"?0:plan.nights, extras=(num("ground")+num("food"))*SET.pax, checked=window.TRIPS_CHECKED||"29–30 Oct 2026";
+  function cost(fl,n,h){var fc=fl?fl.usd*fx()*SET.pax:(num("fare")?num("fare")*SET.pax:null); return {fc:fc,hc:n&&h?n*h.usd*fx()*rooms():0,t:ticket+extras+(fc||0)+(n&&h?n*h.usd*fx()*rooms():0)}}
+  var O=[{k:"cheapest",t:"Cheapest",why:"Cheapest fare and cheapest priced 4-star room, fewest nights the kick-off allows.",fl:cheapF,n:minN,h:hl[0]},
+         {k:"shortest",t:"Shortest",why:plan.kind==="sameday"?"In and out the same day; no hotel.":"Latest outbound, fewest nights — the least time away.",fl:lateF,n:minN,h:hl[0]},
+         {k:"flexible",t:"Most flexible",why:"One night more than the plan needs, so a TV move of the kick-off or a late flight home doesn't break the trip."+(f.tbc?" Worth it here: this kick-off is still provisional.":""),fl:cheapF,n:minN+1,h:hl[0]}];
+  var bud=parseFloat(SET.budget);
+  $("opts").innerHTML=O.map(function(o,i){var c=cost(o.fl,o.n,o.h), over=bud>0&&c.t>bud;
+    return '<div class="opt'+(over?' over':'')+'"><div class="oh"><b>'+o.t+'</b><span class="ot">'+money(c.t)+(c.fc==null?'<small> + flights</small>':'')+'</span></div><p class="why">'+o.why+'</p><dl>'+
+      '<dt>Flight</dt><dd>'+(o.fl?MU_esc(o.fl.l)+' · '+money(c.fc)+' <small>checked '+checked+'</small>':(c.fc!=null?'Your '+SET.from+' fare · '+money(c.fc):'Live search from '+SET.from+' <small>no checked fare</small>'))+'</dd>'+
+      '<dt>Stay</dt><dd>'+(o.n?o.n+' night'+(o.n>1?'s':'')+(o.h?' · '+MU_esc(o.h.n.replace(/\s*\(.*?\)/g,''))+' · '+money(c.hc)+' <small>checked '+checked+'</small>':' · no hotel priced'):'Day trip')+'</dd>'+
+      (bud>0?'<dt>Budget</dt><dd class="'+(over?'bad':'ok')+'">'+(over?money(c.t-bud)+' over':money(bud-c.t)+' under')+'</dd>':'')+
+      '</dl><button type="button" class="btn ghost use" data-i="'+i+'">Use this</button></div>'}).join("");
+  [].forEach.call($("opts").querySelectorAll(".use"),function(b){b.onclick=function(){var o=O[+b.dataset.i]; if(o.fl)$("flight").value=o.fl.i; if(o.h)$("hotel").value=o.h.key; $("nights").value=o.n; render(); $("plan").scrollIntoView({behavior:"smooth",block:"center"})}});
+  $("optsNote").textContent="Totals are for "+paxText()+(rooms()>1?" in "+rooms()+" rooms":"")+" in "+SET.cur+", ticket and extras included. Fares and room rates are the ones checked on "+checked+" for one adult from Copenhagen, scaled to your party; they move, so Book shows the live price."+(f.tbc?" Kick-off provisional — anything non-refundable is a risk until it's confirmed.":"");
+}
+function MU_esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+
+// ---- setup panel --------------------------------------------------------
+function setupSummary(){$("setupSum").textContent=SET.from+" · "+paxText()+" · "+SET.cur+(parseFloat(SET.budget)>0?" · budget "+money(+SET.budget):"")+" · "+(SET.nights==="plan"?"plan's nights":SET.nights==="0"?"day trip":SET.nights+" night"+(SET.nights==="1"?"":"s"));
+  $("rateNote").textContent=SET.cur==="USD"?"\u00a0":"1 USD = "+rate().toFixed(SET.cur==="GBP"||SET.cur==="EUR"?3:2)+" "+SET.cur+(RATE_DATE?" · ECB "+RATE_DATE:" · approximate");
+  var dflt=JSON.stringify(SET)===JSON.stringify(SDEF); $("sReset").hidden=dflt;
+  $("setupNote").textContent=cached()?"Prices on this page were checked from Copenhagen for one adult; a bigger party is scaled (fares per person, a room per two).":"No checked fares from "+SET.from+": the flight line becomes a live search, and you can type your own fare to include it in the totals."}
+function fillSetup(){$("sFrom").value=SET.from; $("sPax").value=SET.pax; $("sCur").value=SET.cur; $("sBudget").value=SET.budget; $("sNights").value=SET.nights; $("sHotel").value=SET.hotel}
+function setChanged(k,v){var oldRate=rate(); SET[k]=v; saveSet();
+  if(k==="cur"){var r=rate()/oldRate; ["ground","food","fare"].forEach(function(id){var x=parseFloat($(id).value); if(isFinite(x))$(id).value=Math.round(x*r)}); $("fx").value=rate().toFixed(3); if(parseFloat(SET.budget)>0){SET.budget=String(Math.round(SET.budget*r)); $("sBudget").value=SET.budget; saveSet()}}
+  if(k==="nights"){$("nights").value=v==="plan"?planFor(FIX[sel]).nights:+v}
+  var keep={flight:$("flight").value,hotel:$("hotel").value}; fillSelects(FIX[sel]); if(k!=="hotel"&&k!=="from"){$("flight").value=keep.flight; if(k!=="hotel")$("hotel").value=keep.hotel}
+  setupSummary(); render()}
+$("sFrom").addEventListener("change",function(){var v=$("sFrom").value.trim().toUpperCase().replace(/[^A-Z]/g,"").slice(0,3); if(v.length!==3)v="CPH"; $("sFrom").value=v; setChanged("from",v)});
+$("sPax").addEventListener("change",function(){var v=Math.min(8,Math.max(1,Math.round(+$("sPax").value)||1)); $("sPax").value=v; setChanged("pax",v)});
+$("sCur").addEventListener("change",function(){setChanged("cur",$("sCur").value)});
+$("sBudget").addEventListener("input",function(){SET.budget=$("sBudget").value; saveSet(); setupSummary(); render()});
+$("sNights").addEventListener("change",function(){setChanged("nights",$("sNights").value)});
+$("sHotel").addEventListener("change",function(){setChanged("hotel",$("sHotel").value)});
+$("sReset").addEventListener("click",function(){var r=RATES.GBP/rate(); ["ground","food"].forEach(function(id){$(id).value=DEF[id]}); SET=Object.assign({},SDEF); saveSet(); fillSetup(); $("fx").value=rate().toFixed(3); pick(); setupSummary(); render()});
+fetch("https://api.frankfurter.app/latest?from=USD&to=GBP,EUR,SEK,DKK,NOK").then(function(r){return r.json()}).then(function(j){if(!j||!j.rates)return; var was=rate(); Object.keys(j.rates).forEach(function(k){RATES[k]=j.rates[k]}); RATE_DATE=new Date(j.date+"T12:00:00Z").toLocaleDateString("en-GB",{day:"numeric",month:"short"}); if(Math.abs(num("fx")-was)<1e-6)$("fx").value=rate().toFixed(3); setupSummary(); fillSelects(FIX[sel]); render()}).catch(function(){});
 
 // ---- wiring -----------------------------------------------------------
-["ground","food","fx","nights","ug","og","flight","hotel","awayTicket"].forEach(function(id){$(id).addEventListener("input",render)});
+["ground","food","fx","fare","nights","ug","og","flight","hotel","awayTicket"].forEach(function(id){$(id).addEventListener("input",render)});
 $("block").addEventListener("change",function(){if(!FIX[sel].away)updateViewer(FIX[sel]);render()});
 ["fLower","fSide","fCheap"].forEach(function(id){$(id).addEventListener("change",function(){if(!FIX[sel].away)fillBlocks(FIX[sel],true);render()})});
 var now=new Date(Date.now()-3*3600000); for(var i=0;i<FIX.length;i++){if(new Date(FIX[i].ko)>now){sel=i;break}}   // first match not yet finished (a game in play stays selected)
+fillSetup(); $("fx").value=rate().toFixed(3); if(SET.cur!=="GBP"){["ground","food"].forEach(function(id){$(id).value=Math.round(g2c(DEF[id]))})} setupSummary();
 buildRail(); pick();
 })();
 </script>
