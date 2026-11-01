@@ -116,5 +116,6 @@ for r in all_rows:
     seen.add(k); out.append(r)
 out.sort(key=lambda r: r['d'])
 json.dump(out, open(OUT, 'w'), ensure_ascii=False, separators=(',', ':'))
+import shutil; shutil.copy(OUT, os.path.join(STATIC, 'history', 'cups.json'))   # also served, for the Ask route and anything else that wants every cup tie
 stamp("cups", f"{len(out)} cup and European matches 1956–2025")
 print(len(out), "rows")

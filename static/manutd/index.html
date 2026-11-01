@@ -52,7 +52,7 @@
   .hub .col{display:flex;flex-direction:column;min-width:0} .hub #alerts{grid-column:1/-1}
   .lastrow .d{white-space:nowrap}}
 @media (max-width:899px){.hub .col{display:contents} .hub{display:flex;flex-direction:column}
-  #matchSheet{order:1} #tableSheet{order:2} #otdSheet{order:3} #lastSheet{order:4} #upSheet{order:5} #secSheet{order:6} #alerts{order:7}}
+  #matchSheet{order:1} #tableSheet{order:2} #askSheet{order:3} #otdSheet{order:4} #lastSheet{order:5} #upSheet{order:6} #secSheet{order:7} #alerts{order:8}}
 /* match card */
 .mc .k{font-family:var(--display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px}
 .mc .pill{font-family:var(--body);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--tint);padding:3px 8px;border-radius:10px} .mc .pill.live{background:var(--red);color:#fff}
@@ -107,9 +107,11 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
   <div class="sheet" id="lastSheet"><h2 class="row">Last five <a href="/manutd/season/">Results →</a></h2><div id="last"></div><div id="reportWrap" hidden style="margin-top:14px"><div id="report"></div></div></div>
   </div>
   <div class="col">
+  <div class="sheet" id="askSheet"><h2 class="row">Ask the archive <a href="/manutd/ask/">More →</a></h2><div id="askBox"></div></div>
   <div class="sheet" id="otdSheet"><h2 class="row">On this day <a href="/manutd/history/">History →</a></h2><p class="sub" id="otdNote" style="margin:0 0 6px"></p><div id="otd"></div></div>
   <div class="sheet" id="secSheet"><a id="more"></a><h2 class="row">Everything else</h2>
     <ul class="secs">
+      <li><a href="/manutd/ask/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H9l-5 4V5Z"/><path d="M9 9h6M9 12h4"/></svg></span><span><b>Ask the archive</b><small>A question, answered from 140 seasons of data here</small></span><span class="ch">›</span></a></li>
       <li><a href="/manutd/trips/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><span><b>Trips</b><small>Flights, hotels and prices for every fixture</small></span><span class="ch">›</span></a></li>
       <li><a href="/manutd/grounds/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span><b>Ground guides</b><small>17 away days: getting there, the away end, getting home</small></span><span class="ch">›</span></a></li>
       <li><a href="/manutd/squad/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span><b>Squad &amp; team picker</b><small>Who's fit, who's out, this season's numbers</small></span><span class="ch">›</span></a></li>
@@ -173,7 +175,7 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
 </script>
 <script>
 (function(){
-  MU.nav("Hub");
+  MU.nav("Hub"); MU.askBox(document.getElementById("askBox"),{examples:3});
   var $=function(i){return document.getElementById(i)}, now=new Date(), fx=window.MU_FIXTURES, next=null;
   for(var i=0;i<fx.length;i++){if(new Date(fx[i].ko)>now){next=fx[i];break}}
   function ord(n){return n+(["th","st","nd","rd"][n%10>3||Math.floor(n%100/10)===1?0:n%10])}

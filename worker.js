@@ -54,7 +54,7 @@ export default {
     const WIKI = /(^|\.)manutd\.wiki$/.test(url.hostname);
     if (url.hostname === "www.manutd.wiki") return Response.redirect("https://manutd.wiki" + url.pathname + url.search, 301);
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + (WIKI ? "/trips/" : "/manutd/trips/"), 301);
-    const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|wiki-rev|wiki-page|collection|cover|push)(\/|$)/;
+    const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|wiki-rev|wiki-page|collection|cover|push|ask)(\/|$)/;
     // Preview deployments (dev.manutd.wiki) carry no key, KV or crons: every data call goes to the live Worker.
     if (env.UPSTREAM && SERVICE.test(url.pathname)) return fetch(new Request(env.UPSTREAM + url.pathname + url.search, request));
     if (WIKI) {
@@ -83,6 +83,7 @@ export default {
     if (url.pathname === "/wiki-rev") return wikiRev(url, env, ctx);
     if (url.pathname === "/wiki-page") return wikiPage(url, env, ctx);
     if (url.pathname === "/cover") return cover(url, env, ctx);
+    if (url.pathname === "/ask") { try { return await ask(request, url, env, ctx); } catch (e) { return json({ error: "ask: " + (e && e.message || e) }, 500); } }
     if (url.pathname.startsWith("/push/")) { try { return await push(request, url, env, ctx); } catch (e) { return json({ error: "push: " + (e && e.message || e) }, 500); } }
     if (url.pathname === "/collection") { try { return await collection(request, url, env); } catch (e) { return json({ error: "collection: " + (e && e.message || e) }, 500); } }
     if (!url.pathname.startsWith("/api/")) return env.ASSETS.fetch(request);
@@ -738,4 +739,117 @@ async function cover(url, env, ctx) {
   const body = JSON.stringify(out);
   ctx.waitUntil(env.MU_CACHE.put(key, body, { expirationTtl: (out.url ? 30 : 1) * 86400 }));
   return new Response(body, { headers: headers("upstream") });
+}
+
+// ---- Ask the archive: a question answered from this site's own data by Claude, with the pages it used.
+// POST /ask {q} (or GET /ask?q=). Grounding: the search index picks the entities the question is about, their JSON is
+// compacted into a context, the live table/fixtures are added when the question is about now, and the model is told to
+// answer only from that. Caps: ASK_DAILY_CAP questions a day site-wide (default 300), 20 an hour per visitor; answers are
+// cached for a week keyed on the normalised question. Needs the ANTHROPIC_API_KEY secret; without it the route says so.
+const ASK = { model: "claude-haiku-5-5", maxTokens: 700, perHour: 20, cacheDays: 7 };
+let ASSET_CACHE = {};   // per-isolate memo of the small JSON files
+async function assetJSON(env, path) {
+  if (ASSET_CACHE[path] !== undefined) return ASSET_CACHE[path];
+  try { const r = await env.ASSETS.fetch(new Request("https://site1.local/manutd" + path)); if (!r.ok) return (ASSET_CACHE[path] = null); const j = await r.json(); if (Object.keys(ASSET_CACHE).length > 400) ASSET_CACHE = {}; return (ASSET_CACHE[path] = j); } catch (e) { return null; }
+}
+async function wikiBrief(env, ctx, title) {   // the article lead and infobox the profile pages show, from the same 7-day KV cache
+  try { const r = await wiki(new URL("https://site1.local/wiki?title=" + encodeURIComponent(title)), env, ctx); const j = await r.json(); if (!j || !j.extract) return "";
+    const ib = j.infobox && typeof j.infobox === "object" ? j.infobox : {}, tbl = (a) => Array.isArray(a) ? a.map((r) => `${r.years || ""} ${r.clubs || r.team || ""}${r.caps ? " " + r.caps + " apps" : ""}${r.goals ? " " + r.goals + " goals" : ""}`.trim()).join(", ") : "";
+    const box = Object.entries(ib).filter(([k, v]) => k !== "_keys" && v && typeof v === "string" && v.length < 160).map(([k, v]) => `${k.replace(/_/g, " ")}: ${v.replace(/\s+/g, " ")}`).concat(ib.youth ? ["youth: " + tbl(ib.youth)] : [], ib.clubs ? ["clubs (league apps/goals): " + tbl(ib.clubs)] : [], ib.national ? ["national team: " + tbl(ib.national)] : [], ib.manager ? ["managed: " + tbl(ib.manager)] : []).join("; ");
+    return `WIKIPEDIA (${j.title}): ${String(j.extract).replace(/\s+/g, " ").slice(0, 1100)}${box ? "\nInfobox: " + box : ""}`; } catch (e) { return ""; }
+}
+function foldQ(t) { return String(t || "").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/æ/g, "ae").replace(/ø/g, "o").replace(/ß/g, "ss").toLowerCase(); }
+async function sha(s) { const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s)); return [...new Uint8Array(h)].map((b) => b.toString(16).padStart(2, "0")).join(""); }
+const STOP = new Set("the a an of in on at to for and or is was were did do does how many much who what when where which with against vs v united man manchester utd club season seasons ever all time first last best worst most ever".split(" "));
+function pickEntities(idx, q) {
+  const terms = foldQ(q).replace(/[^a-z0-9\s\/–-]/g, " ").split(/\s+/).filter((t) => t.length > 1 && !STOP.has(t));
+  const years = (q.match(/\b(18|19|20)\d{2}\b/g) || []);
+  const out = [];
+  for (const e of idx) {
+    const f = foldQ(e[0]), fa = (e[4] || []).map(foldQ), k = e[1]; let sc = 0;
+    for (const t of terms) { if (f === t) sc += 100; else if (f.split(/[\s,]+/).includes(t)) sc += 70; else if (fa.some((a) => a === t)) sc += 80; else if (f.startsWith(t) && t.length > 3) sc += 40; }
+    if (k === "season") { if (years.some((y) => f.startsWith(y) || fa.includes(y))) sc += 90; else if (sc < 100) sc = 0; }   // a season only when a year is named
+    if (sc) { if (k === "player" || k === "manager") sc += 30; else if (k === "club") sc += 15; else if (k === "kit") sc -= 70; else if (/^(book|doc|film|pod|page)$/.test(k)) sc -= 40; out.push({ e, sc }); }
+  }
+  out.sort((a, b) => b.sc - a.sc);
+  const seen = {}, top = [];
+  const best = out.length ? out[0].sc : 0, floor = Math.max(70, Math.round(best * 0.6));
+  for (const x of out) { if (x.sc < floor) break; const key = x.e[1] + ":" + x.e[2]; if (seen[key]) continue; seen[key] = 1; top.push(x.e); if (top.length >= 6) break; }
+  return top;
+}
+function res(r) { return `${r.d} ${r.c}${r.r ? " " + r.r : ""} ${r.h ? "v" : r.n === true ? "v" : "at"} ${r.o}${r.n === true ? " (neutral venue" + (typeof r.v === "string" ? ", " + r.v : "") + ")" : typeof r.n === "string" ? " at " + r.n : ""} ${r.gf}-${r.ga}${r.aet ? " aet" : ""}${r.pens ? " (pens " + r.pens + ")" : ""}${r.sc ? " [" + r.sc.map((s) => s[0] + (s[2] > 1 ? " " + s[2] : "") + (s[3] && s[3].includes("p") ? " pen" : "") + (s[3] && s[3].includes("o") ? " og" : "")).join(", ") + "]" : ""}`; }
+async function contextFor(env, ctx, ents, q) {
+  const parts = [], sources = [];
+  const pidx = await assetJSON(env, "/history/players_index.json") || [];
+  for (const e of ents) {
+    const [title, kind, url] = e;
+    if (kind === "player") {
+      const t = decodeURIComponent((url.match(/p=([^&]+)/) || [])[1] || ""), row = pidx.find((r) => r.t === t);
+      const p = row ? await assetJSON(env, "/history/players/" + row.slug + ".json") : null;
+      if (p) {
+        const seasons = Object.keys(p.seasons || {}).sort().map((s) => { const r = p.seasons[s]; return `${s}: ${r.apps != null ? r.apps + " apps, " : ""}${r.goals || 0} goals${r.no && r.no.length ? ", no. " + r.no.join("/") : ""}${r.bycomp ? " (" + Object.entries(r.bycomp).map(([c, n]) => c + " " + n).join(", ") + ")" : ""}`; });
+        const big = (p.goals || []).filter((g) => g.g >= 2).slice(-12).map((g) => `${g.d} ${g.g} v ${g.o} (${g.c}, ${g.gf}-${g.ga})`);
+        parts.push(`PLAYER ${p.name} — United ${p.first} to ${p.last}; ${p.apps != null ? p.apps + " appearances (squad lists from 1993-94), " : "appearances not in the archive (pre-1993-94), "}${p.total_goals} goals in the archive${p.gaps && p.gaps.length ? " (archive incomplete: " + p.gaps.length + " scoring match(es) in his seasons have no scorers recorded, so the total may be low)" : ""}; hat-tricks ${p.hat_tricks.length}; shirt numbers ${(p.nos || []).join(", ") || "n/a"}; managers ${(p.managers || []).map((m) => m.name).join(", ")}.\nSeason by season: ${seasons.join("; ")}\n${big.length ? "Multi-goal games (latest): " + big.join("; ") : ""}\n${(p.finals || []).length ? "Finals: " + p.finals.map((f) => `${f.d.slice(0, 4)} ${f.comp} v ${f.o} ${f.gf}-${f.ga} (${f.start ? "started" : "bench"})`).join("; ") : ""}`);
+        sources.push({ t: p.name, u: url.replace("/manutd/", "/") });
+        const wb = await wikiBrief(env, ctx, p.title || p.name); if (wb) parts.push(wb);
+      }
+    } else if (kind === "manager") {
+      const slug = (url.match(/m=([^&]+)/) || [])[1], ms = await assetJSON(env, "/history/managers.json") || [], m = ms.find((x) => x.slug === slug);
+      if (m) { parts.push(`MANAGER ${m.name}${m.role ? " (" + m.role + ")" : ""} — ${m.from} to ${m.to || "present"}; record P${m.rec.p} W${m.rec.w} D${m.rec.d} L${m.rec.l}; honours: ${(m.honours || []).join(", ") || "none"}; seasons: ${(m.seasons || []).map((s) => `${s.id}${s.pos ? " " + s.pos + (s.div ? " in " + s.div : "") : ""}`).join(", ")}${m.notes ? "; " + m.notes : ""}`); sources.push({ t: m.name, u: url.replace("/manutd/", "/") }); const wb = await wikiBrief(env, ctx, m.wiki && typeof m.wiki === "string" ? m.wiki : m.name); if (wb) parts.push(wb); }
+    } else if (kind === "club") {
+      const name = decodeURIComponent((url.match(/c=([^&]+)/) || [])[1] || ""), clubs = await assetJSON(env, "/history/clubs.json") || [], c = clubs.find((x) => x.name === name);
+      const cj = c ? await assetJSON(env, "/history/clubs/" + c.slug + ".json") : null;
+      if (c) {
+        const ms = (cj && cj.matches || []), big = ms.filter((r) => r.gf - r.ga >= 4).slice(-6), bad = ms.filter((r) => r.ga - r.gf >= 3).slice(-4);
+        const tally = (list) => { const t = { p: 0, w: 0, d: 0, l: 0, gf: 0, ga: 0 }; for (const r of list) { t.p++; t.gf += r.gf; t.ga += r.ga; if (r.gf > r.ga) t.w++; else if (r.gf < r.ga) t.l++; else t.d++; } return `P${t.p} W${t.w} D${t.d} L${t.l} (${t.gf}-${t.ga})`; };
+        const home = ms.filter((r) => r.h), away = ms.filter((r) => !r.h && r.n !== true), neutral = ms.filter((r) => !r.h && r.n === true), league = ms.filter((r) => r.c === "L"), lastAway = away.slice(-8), lastHome = home.slice(-8), awayWins = away.filter((r) => r.gf > r.ga).slice(-5);
+        parts.push(`OPPONENT ${c.name} — ${c.p} meetings ${c.first}–${c.last}: United W${c.w} D${c.d} L${c.l} (all competitions, United-first scores).\nAt Old Trafford / United home: ${tally(home)}. Away at ${c.name}: ${tally(away)}${neutral.length ? ". Neutral venues: " + tally(neutral) : ""}. League only: ${tally(league)}.\nLast 8 away: ${lastAway.map(res).join("; ")}\nLast 8 home: ${lastHome.map(res).join("; ")}\nMost recent United away wins: ${awayWins.map(res).join("; ") || "none in the archive"}\nLast 10 meetings: ${ms.slice(-10).map(res).join("; ")}\n${big.length ? "Big United wins: " + big.map(res).join("; ") : ""}\n${bad.length ? "Heavy defeats: " + bad.map(res).join("; ") : ""}`);
+        sources.push({ t: c.name, u: url.replace("/manutd/", "/") });
+      }
+    } else if (kind === "season") {
+      const id = (url.match(/s=([^&]+)/) || [])[1], d = await assetJSON(env, "/history/data/" + id + ".json"), all = await assetJSON(env, "/history/seasons.json") || [], w = all.find((x) => x.id === id), cups = (await assetJSON(env, "/history/cups.json") || []).filter((r) => r.s === id && r.c !== "FAC");
+      if (d) {
+        parts.push(`SEASON ${d.title}${d.club ? " (" + d.club + ")" : ""} — ${d.div || "no league"}${d.pos ? ", finished " + d.pos + " of " + d.teams : ""}; P${d.p} W${d.w} D${d.d} L${d.l} GF${d.gf} GA${d.ga}${d.pts != null ? " pts " + d.pts : ""}; FA Cup: ${d.fac || "n/a"}${d.facWon ? " (won)" : ""}.${w ? ` Manager ${w.manager || "?"}; captain ${w.captain || "?"}; trophies: ${(w.trophies || []).join(", ") || "none"}; top scorer ${w.scorer || "?"}. ${w.summary || ""}` : ""}\nLeague and FA Cup results: ${(d.results || []).map(res).join("; ")}${cups.length ? "\nOther cups (League Cup, Europe, Shield; United-first scores): " + cups.map(res).join("; ") : ""}`);
+        sources.push({ t: d.title + " season", u: url.replace("/manutd/", "/") });
+      }
+    }
+  }
+  if (/record|most|biggest|longest|fewest|highest|lowest|best|worst|streak|run|unbeaten|ever|history|all[- ]time|top scorer|goalscor/i.test(q)) {
+    const r = await assetJSON(env, "/history/records.json");
+    if (r) { const top = (a, n) => (a || []).slice(0, n), sc = r.scorers || {}, run = (k) => (r.runs && r.runs[k] || []).slice(0, 2).map((x) => `${x.n} games ${x.fr} to ${x.to} (W${x.w} D${x.d} L${x.l})`).join("; "), sea = (k) => (r.seasons && r.seasons[k] || []).slice(0, 3).map((x) => `${x.s} ${x.div}: ${x.gf} for, ${x.ga} against, ${x.pts != null ? x.pts + " pts, " : ""}finished ${x.pos}`).join("; ");
+      parts.push(`RECORDS (archive, competitive matches; Shields and Super Cups excluded from win/defeat records):\nBiggest wins: ${top(r.wins, 6).map(res).join("; ")}\nHeaviest defeats: ${top(r.defeats, 5).map(res).join("; ")}\nLongest unbeaten: ${run("unbeaten")}. Longest winning: ${run("winning")}. Longest winless: ${run("winless")}. Longest losing: ${run("losing")}. Consecutive clean sheets: ${run("cleansheets")}.\nMost goals in a league season: ${sea("most_goals")}. Fewest conceded: ${sea("fewest_conceded")}. Most points: ${sea("most_points")}. Worst seasons: ${sea("worst_pct")}.\nAll-time scorers (archive): ${top(sc.alltime, 15).map((x) => `${x.n} ${x.g}${x.apps ? " in " + x.apps + " apps" : ""} (${x.first}–${x.last})`).join(", ")}\nMost hat-tricks: ${top(sc.hat_tricks, 8).map((x) => `${x.n} ${x.ht}`).join(", ")}\nMost goals in one season: ${top(sc.season, 6).map((x) => `${x.n} ${x.g} in ${x.s}`).join(", ")}\nBiggest hauls in a match: ${top(sc.biggest_hauls, 5).map((x) => `${x.t} ${x.g} v ${x.o} ${x.d}`).join(", ")}\nTitles: ${JSON.stringify((r.seasons && r.seasons.titles || []).map((x) => x.s))}`); sources.push({ t: "Records", u: "/history/records/" }); }
+  }
+  if (/this season|current|now|today|tonight|table|standing|next|fixture|upcoming|injur|squad|form|latest|last match|recent|who plays|kick/i.test(q)) {
+    const st = await load(env, "api:v3:/api/standings?v=3"), fx = await load(env, "api:v3:/api/fixtures?v=3");
+    try { if (st.body) { const rows = JSON.parse(st.body).response[0].league.standings[0]; parts.push("PREMIER LEAGUE TABLE NOW: " + rows.map((x) => `${x.rank}. ${x.team.name} P${x.all.played} ${x.points}pts GD${x.goalsDiff > 0 ? "+" : ""}${x.goalsDiff}`).join("; ")); sources.push({ t: "Season", u: "/season/" }); } } catch (e) {}
+    try { const inj = await load(env, "api:v3:/api/injuries?v=3"); if (inj.body) { const rows = (JSON.parse(inj.body).response || []).filter((x) => x.fixture && x.fixture.date).sort((a, b) => b.fixture.date.localeCompare(a.fixture.date)); const seen = {}, L = []; for (const x of rows) { if (seen[x.player.id]) continue; seen[x.player.id] = 1; if (new Date(x.fixture.date) > Date.now() - 7 * 864e5) L.push(`${x.player.name} (${x.player.type}${x.player.reason ? ", " + x.player.reason : ""}, flagged for ${x.fixture.date.slice(0, 10)})`); } if (L.length) parts.push("INJURY LIST FROM THE FEED (newest flag per player; a player flagged then seen in a line-up has returned): " + L.join("; ")); } } catch (e) {}
+    try { if (fx.body) { const all = JSON.parse(fx.body).response.filter((m) => !/riendl/.test(m.league.name)).sort((a, b) => a.fixture.timestamp - b.fixture.timestamp); const done = all.filter((m) => /FT|AET|PEN/.test(m.fixture.status.short)).slice(-6), next = all.filter((m) => m.fixture.status.short === "NS").slice(0, 6); const line = (m) => `${m.fixture.date.slice(0, 10)} ${m.teams.home.name} ${m.goals.home != null ? m.goals.home + "-" + m.goals.away : "v"} ${m.teams.away.name} (${m.league.name})`; parts.push("RECENT RESULTS: " + done.map(line).join("; ") + "\nNEXT FIXTURES (UTC dates): " + next.map(line).join("; ")); } } catch (e) {}
+  }
+  return { context: parts.join("\n\n"), sources };
+}
+async function ask(request, url, env, ctx) {
+  const q = String((request.method === "POST" ? ((await request.json().catch(() => ({}))).q) : url.searchParams.get("q")) || "").trim().replace(/\s+/g, " ");
+  if (q.length < 3 || q.length > 300) return json({ error: "Ask a question of 3 to 300 characters." }, 400);
+  if (!env.ANTHROPIC_API_KEY) {   // not configured: show what would be sent (the site's own data) so the retrieval can be checked
+    if (url.searchParams.get("debug") === "context") { const idx = await assetJSON(env, "/search.json") || [], ents = pickEntities(idx, q), c = await contextFor(env, ctx, ents, q); return json({ entities: ents.map((e) => e[1] + ": " + e[0]), chars: c.context.length, sources: c.sources, context: c.context }); }
+    return json({ error: "Ask isn't switched on yet — the site owner needs to add the API key." }, 503);
+  }
+  const key = "ask:a:" + (await sha(foldQ(q).replace(/[^a-z0-9]+/g, " ").trim()));
+  const hit = await env.MU_CACHE.get(key, "json"); if (hit) return json(Object.assign({ cached: true }, hit));
+  const now = new Date(), day = now.toISOString().slice(0, 10), hour = now.toISOString().slice(0, 13);
+  const ip = request.headers.get("cf-connecting-ip") || "", ipk = "ask:ip:" + (await sha("ask:" + ip)).slice(0, 16) + ":" + hour, dayk = "ask:day:" + day;
+  const used = parseInt((await env.MU_CACHE.get(ipk)) || "0", 10), today = parseInt((await env.MU_CACHE.get(dayk)) || "0", 10), cap = parseInt(env.ASK_DAILY_CAP || "300", 10);
+  if (used >= ASK.perHour) return json({ error: "That's plenty for one hour — try again a bit later." }, 429);
+  if (today >= cap) return json({ error: "The archive has answered its quota of questions for today. Back tomorrow." }, 429);
+  const idx = await assetJSON(env, "/search.json") || [], ents = pickEntities(idx, q), { context, sources } = await contextFor(env, ctx, ents, q);
+  const system = `You answer questions about Manchester United for manutd.wiki, a fan-built club hub. Today is ${day}. Use ONLY the DATA below, which comes from the site's archive (Wikipedia-derived season tables and squad lists) and its live feed. Rules: answer in plain English in at most 110 words, as plain text — no markdown, no asterisks, no headings or bullet lists; give the figures the data supports and say which season or match they come from; if the data does not cover the question, say what the site does not hold rather than guessing or using outside knowledge; never invent players, scores or dates; archive goal totals are "in the archive" figures, and appearances exist only from 1993-94. Scores in the data are United-first unless shown as "Home X-Y Away".`;
+  const body = { model: env.ASK_MODEL || ASK.model, max_tokens: ASK.maxTokens, thinking: { type: "disabled" }, system, messages: [{ role: "user", content: `DATA:\n${context || "(no matching data on the site)"}\n\nQUESTION: ${q}` }] };
+  const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "content-type": "application/json", "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01" }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) return json({ error: "The model didn't answer (" + r.status + ")." }, 502);
+  const answer = (j.content || []).filter((c) => c.type === "text").map((c) => c.text).join("\n").trim();
+  const out = { answer, sources, q, usage: j.usage ? { in: j.usage.input_tokens, out: j.usage.output_tokens } : undefined, stop: j.stop_reason };
+  if (!answer) return json({ error: "The model returned no text (" + (j.stop_reason || "no stop reason") + ").", stop: j.stop_reason, raw: JSON.stringify(j).slice(0, 400) }, 502);
+  ctx.waitUntil(Promise.all([env.MU_CACHE.put(key, JSON.stringify(out), { expirationTtl: ASK.cacheDays * 86400 }), env.MU_CACHE.put(ipk, String(used + 1), { expirationTtl: 3600 }), env.MU_CACHE.put(dayk, String(today + 1), { expirationTtl: 2 * 86400 })]));
+  return json(out);
 }
