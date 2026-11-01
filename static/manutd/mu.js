@@ -126,11 +126,17 @@ window.MU=(function(){
   // ---- single fixture source: fixtures.js wins over the API for kick-off date/time; the API supplies ids, scores, status.
   function nrm(n){return String(n||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z]/g,"")}
   function fixFor(opp,home,iso){var L=window.MU_FIXTURES||[], a=nrm(opp), t=iso?new Date(iso).getTime():0;
-    return L.filter(function(f){if(!!f.home!==!!home)return false; var b=nrm(f.opp); if(!(a===b||a.indexOf(b)===0||b.indexOf(a)===0))return false; return !t||Math.abs(new Date(f.ko).getTime()-t)<5*864e5})[0]||null}
+    return L.filter(function(f){if(!!f.home!==!!home)return false; var b=nrm(f.opp); if(!(a===b||(Math.min(a.length,b.length)>=4&&(a.indexOf(b)>=0||b.indexOf(a)>=0))))return false; return !t||Math.abs(new Date(f.ko).getTime()-t)<5*864e5})[0]||null}
   // ko(m): for an API match object → {ko, conf, src}. ko(f) for a fixtures.js entry works too.
   function ko(m){ if(m&&m.fixture){var home=m.teams.home.id===TEAM, opp=(home?m.teams.away:m.teams.home).name, f=fixFor(opp,home,m.fixture.date);
       if(f)return {ko:f.ko,conf:!!f.conf,src:"site"}; return {ko:m.fixture.date,conf:m.fixture.status.short!=="TBD",src:"api"} }
     return {ko:m.ko,conf:!!m.conf,src:"site"} }
+  // Calendar: the same stable id the Worker's /calendar.ics uses (season-comp-opponent-h/a), so a downloaded match and the subscription are one event.
+  function fxSlug(t){return String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
+  function fxUid(f){var d=new Date(f.ko), y=d.getUTCMonth()>=6?d.getUTCFullYear():d.getUTCFullYear()-1; return [y+"-"+String(y+1).slice(2),fxSlug(f.comp),fxSlug(f.opp),f.home?"h":"a"].join("-")}
+  function calLink(f){return f?'<a class="calbtn" href="/manutd/calendar.ics?m='+fxUid(f)+'" download title="Add this match to your calendar'+(f.conf?'':' (provisional — a downloaded copy will not update; subscribe for that)')+'">+ Calendar</a>':''}
+  function calFeed(q){var h=location.host||"manutd.wiki", path=(/manutd\.wiki$/.test(h)?"":"/manutd")+"/calendar.ics"+(q||""); return {webcal:"webcal://"+h+path, https:location.protocol+"//"+h+path, google:"https://calendar.google.com/calendar/r?cid="+encodeURIComponent("webcal://"+h+path)}}
+  function confTag(x){return x&&x.conf?'<span class="conftag" title="Kick-off confirmed">Confirmed</span>':''}
   function prov(x){var c=x&&typeof x==="object"?x.conf:x; return c?"":'<span class="prov" title="Original Premier League slot — may move when that month\'s TV picks are announced">Provisional</span>'}
   // "Last checked" stamps from status.json, written by the build scripts and the weekly scheduled task.
   function checked(key,el,label){ if(!el)return; (checked._p=checked._p||fetch("/manutd/status.json").then(function(r){return r.json()}).catch(function(){return {}})).then(function(s){var x=s[key]; if(!x)return; var d=new Date(x.date+"T12:00:00Z"), age=Math.round((Date.now()-d)/864e5); el.innerHTML='<span class="stamp'+(age>35?' old':'')+'" title="'+esc(x.note||"")+'">'+(label||"Last checked")+' '+d.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric",timeZone:"UTC"})+(age>35?' · '+age+' days ago':'')+'</span>'}) }
@@ -224,5 +230,5 @@ window.MU=(function(){
     return out.join("")}
   function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
   function formHtml(str){return '<span class="form">'+String(str||"").split("").map(function(c){return '<b class="'+c+'">'+c+'</b>'}).join("")+'</span>'}
-  return {TEAM:TEAM,nav:nav,theme:theme,ask:ask,askBox:askBox,portrait:portrait,injuries:injuries,ago:ago,GROUP:GROUP,GORDER:GORDER,pills:pills,tabs:tabs,scorers:scorers,goalEvents:goalEvents,mlinks:mlinks,search:search,hit:hit,KIND:KIND,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,fmtLocal:fmtLocal,fmtKO:fmtKO,fmtKOText:fmtKOText,TZ:TZ,IN_UK:IN_UK,esc:esc,form:formHtml};
+  return {fxUid:fxUid,calLink:calLink,calFeed:calFeed,confTag:confTag,TEAM:TEAM,nav:nav,theme:theme,ask:ask,askBox:askBox,portrait:portrait,injuries:injuries,ago:ago,GROUP:GROUP,GORDER:GORDER,pills:pills,tabs:tabs,scorers:scorers,goalEvents:goalEvents,mlinks:mlinks,search:search,hit:hit,KIND:KIND,checked:checked,report:report,tagsFor:tagsFor,TAGLABEL:TAGLABEL,fixFor:fixFor,ko:ko,prov:prov,crest:crest,club:club,comp:comp,api:api,apiDown:apiDown,flag:flag,fmtDate:fmtDate,fmtUK:fmtUK,fmtSE:fmtSE,fmtLocal:fmtLocal,fmtKO:fmtKO,fmtKOText:fmtKOText,TZ:TZ,IN_UK:IN_UK,esc:esc,form:formHtml};
 })();

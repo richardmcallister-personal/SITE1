@@ -65,6 +65,7 @@ export default {
     const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|wiki-rev|wiki-page|collection|cover|push)(\/|$)|^\/ask$/;   // /ask is the question route; /ask/ is the page
     // Preview deployments (dev.manutd.wiki) carry no key, KV or crons: every data call goes to the live Worker.
     if (env.UPSTREAM && SERVICE.test(url.pathname)) return fetch(new Request(env.UPSTREAM + url.pathname + url.search, request));
+    if (url.pathname === "/calendar.ics" || url.pathname === "/manutd/calendar.ics") { try { return await calendar(url, env); } catch (e) { return json({ error: "calendar: " + (e && e.message || e) }, 500); } }
     if (WIKI) {
       // Clean URLs on the club domain: the site lives under /manutd/ in the repo; serve it at the root here.
       if (url.pathname.startsWith("/manutd/")) return Response.redirect(url.origin + url.pathname.slice(7) + url.search, 301);
@@ -121,6 +122,7 @@ export default {
   // Hourly warm-up (wrangler.jsonc → triggers.crons). Sequential, spaced, so it never trips the per-minute cap.
   async scheduled(event, env, ctx) {
     if (event.cron === "* * * * *") { ctx.waitUntil(pushTick(env).catch((e) => console.log("pushTick", e && e.message))); return; }
+    ctx.waitUntil(fixtureWatch(env).catch((e) => console.log("fixtureWatch", e && e.message)));
     ctx.waitUntil((async () => {
       for (const p of WARM) {
         const url = new URL("https://site1.local" + p);
@@ -629,7 +631,7 @@ async function push(request, url, env, ctx) {
   const b = await request.json().catch(() => ({}));
   if (p === "/push/subscribe") {
     if (!b.sub || !b.sub.endpoint || !b.sub.keys) return json({ error: "subscription required" }, 400);
-    const prefs = Object.assign({ goals: true, lineups: true, kickoff: true, result: true }, b.prefs || {});
+    const prefs = Object.assign({ goals: true, lineups: true, kickoff: true, result: true, changes: true, tickets: true }, b.prefs || {});
     const key = await subKey(b.sub.endpoint), old = await env.MU_CACHE.get(key, "json");
     await env.MU_CACHE.put(key, JSON.stringify({ sub: b.sub, prefs, created: old ? old.created : Date.now(), seen: Date.now(), ua: (request.headers.get("user-agent") || "").slice(0, 120) }));
     return json({ ok: true, prefs });
@@ -693,6 +695,76 @@ async function pushTick(env) {
   for (const o of out) for (const s of subs) { if (s.prefs && s.prefs[o.pref] === false) continue; try { await sendPush(env, s, o.msg); } catch (e) { console.log("push fail", e && e.message); } }
 }
 
+
+// ---- Fixture calendar and fixture-change alerts -------------------------------------------------------------------------
+// fixtures.js (the site's single fixture source: kick-offs from the club, conf:true once confirmed, optional sales[] with
+// ballot/sale dates) is read from the deployed assets. The same stable UID is used by the subscription feed, the single-match
+// download and the pages (MU.fxUid in mu.js), so a downloaded match and a subscribed one are the same calendar event.
+async function fixturesList(env) {
+  const r = await env.ASSETS.fetch(new Request("https://site1.local/manutd/fixtures.js")); if (!r.ok) return [];
+  const t = await r.text(), i = t.indexOf("[", t.indexOf("MU_FIXTURES")); return JSON.parse(t.slice(i, t.lastIndexOf("]") + 1));
+}
+const fxSlug = (t) => String(t || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+function fxSeason(iso) { const d = new Date(iso), y = d.getUTCMonth() >= 6 ? d.getUTCFullYear() : d.getUTCFullYear() - 1; return y + "-" + String(y + 1).slice(2); }
+function fxUid(f) { return [fxSeason(f.ko), fxSlug(f.comp), fxSlug(f.opp), f.home ? "h" : "a"].join("-"); }
+function fxTitle(f) { return f.home ? "Man Utd v " + f.opp : f.opp + " v Man Utd"; }
+function ukWhen(iso) { const d = new Date(iso); return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "Europe/London" }) + ", " + d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/London" }) + " UK"; }
+function icsEsc(t) { return String(t).replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n"); }
+function icsFold(line) { const b = new TextEncoder().encode(line); if (b.length <= 74) return line; let out = "", cur = ""; for (const ch of line) { if (new TextEncoder().encode(cur + ch).length > 73) { out += (out ? "\r\n " : "") + cur; cur = ch; } else cur += ch; } return out + "\r\n " + cur; }
+const icsTime = (iso) => new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+async function calendar(url, env) {
+  const all = await fixturesList(env), one = url.searchParams.get("m"), comp = url.searchParams.get("comp"), venue = url.searchParams.get("venue"), withSales = url.searchParams.get("tickets") !== "0";
+  const origin = "https://manutd.wiki", now = icsTime(new Date().toISOString());
+  let list = all.filter((f) => !one || fxUid(f) === one);
+  if (comp === "pl") list = list.filter((f) => /premier/i.test(f.comp)); else if (comp === "europe") list = list.filter((f) => /champions|europa|conference/i.test(f.comp)); else if (comp === "cups") list = list.filter((f) => !/premier/i.test(f.comp));
+  if (venue === "home") list = list.filter((f) => f.home); else if (venue === "away") list = list.filter((f) => !f.home);
+  if (one && !list.length) return new Response("No such fixture", { status: 404 });
+  const L = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//manutd.wiki//Fixtures//EN", "CALSCALE:GREGORIAN", "METHOD:PUBLISH"];
+  if (!one) L.push("X-WR-CALNAME:Manchester United" + (comp === "pl" ? " · Premier League" : comp === "europe" ? " · Europe" : comp === "cups" ? " · cups" : "") + (venue === "home" ? " · home" : venue === "away" ? " · away" : ""), "X-WR-CALDESC:" + icsEsc("Fixtures from manutd.wiki. Provisional kick-offs are marked (provisional) and TENTATIVE; they update here when the TV picks confirm them."), "X-WR-TIMEZONE:Europe/London", "REFRESH-INTERVAL;VALUE=DURATION:PT6H", "X-PUBLISHED-TTL:PT6H");
+  for (const f of list) {
+    const uid = fxUid(f), end = new Date(new Date(f.ko).getTime() + 115 * 60000).toISOString();
+    const desc = f.comp + (f.venue ? " · " + f.venue : "") + "\n" + (f.conf ? "Kick-off confirmed." : "PROVISIONAL: this is the original slot and can move when the TV picks are announced. This calendar updates when it does; a downloaded copy does not.") + "\n" + origin + "/trips/";
+    L.push("BEGIN:VEVENT", "UID:" + uid + "@manutd.wiki", "DTSTAMP:" + now, "DTSTART:" + icsTime(f.ko), "DTEND:" + icsTime(end), ("SUMMARY:" + icsEsc(fxTitle(f) + (f.conf ? "" : " (provisional)"))), "STATUS:" + (f.conf ? "CONFIRMED" : "TENTATIVE"), ("LOCATION:" + icsEsc(f.venue || "")), ("DESCRIPTION:" + icsEsc(desc)), "CATEGORIES:" + icsEsc(f.comp), "URL:" + origin + "/season/", "TRANSP:OPAQUE", "END:VEVENT");
+    if (withSales) for (const s of f.sales || []) for (const [k, when] of [["opens", s.opens], ["closes", s.closes]]) {
+      if (!when) continue;
+      L.push("BEGIN:VEVENT", "UID:" + uid + "-" + fxSlug(s.what) + "-" + k + "@manutd.wiki", "DTSTAMP:" + now, "DTSTART:" + icsTime(when), "DTEND:" + icsTime(new Date(new Date(when).getTime() + 15 * 60000).toISOString()), ("SUMMARY:" + icsEsc("Tickets: " + s.what + " " + (k === "opens" ? "opens" : "closes") + " · " + fxTitle(f))), ("DESCRIPTION:" + icsEsc((s.who ? s.who + "\n" : "") + "https://tickets.manutd.com/")), "TRANSP:TRANSPARENT",
+        "BEGIN:VALARM", "ACTION:DISPLAY", "DESCRIPTION:" + icsEsc(s.what + " " + k), "TRIGGER:-PT" + (k === "closes" ? "24H" : "0M"), "END:VALARM", "END:VEVENT");
+    }
+  }
+  L.push("END:VCALENDAR");
+  const name = one ? "man-utd-" + one + ".ics" : "man-utd-fixtures.ics";
+  return new Response(L.map(icsFold).join("\r\n") + "\r\n", { headers: { "content-type": "text/calendar; charset=utf-8", "cache-control": "public, max-age=1800", "content-disposition": (one ? "attachment" : "inline") + '; filename="' + name + '"', "access-control-allow-origin": "*" } });
+}
+// Hourly: compare fixtures.js with the last snapshot and push "kick-off moved" / "kick-off confirmed" / "new fixture",
+// and ticket alerts when a sale or ballot opens and 24 hours before one closes. The first run only records the snapshot.
+async function fixtureWatch(env) {
+  const list = await fixturesList(env); if (!list.length) return;
+  const SK = "push:fxsnap:v1", snap = await env.MU_CACHE.get(SK, "json"), now = Date.now(), cur = {}, out = [];
+  for (const f of list) cur[fxUid(f)] = { ko: f.ko, conf: !!f.conf };
+  const msg = (f, pref, title, body, tag) => out.push({ pref, msg: { title, body, url: "/season/#united", tag: tag || "fx-" + fxUid(f), kind: pref } });
+  if (snap) for (const f of list) {
+    const u = fxUid(f), was = snap[u]; if (new Date(f.ko).getTime() < now) continue;
+    if (!was) { msg(f, "changes", "New fixture: " + fxTitle(f), f.comp + " · " + ukWhen(f.ko) + (f.conf ? "" : " (provisional)")); continue; }
+    const moved = was.ko !== f.ko, confirmed = !was.conf && f.conf;
+    if (moved) msg(f, "changes", (confirmed ? "Kick-off confirmed and moved: " : "Kick-off moved: ") + fxTitle(f), "Now " + ukWhen(f.ko) + " (was " + ukWhen(was.ko) + ")" + (f.conf ? "" : " · still provisional"));
+    else if (confirmed) msg(f, "changes", "Kick-off confirmed: " + fxTitle(f), ukWhen(f.ko) + " · " + f.comp);
+  }
+  // ticket windows: an alert when a sale opens, and one 24 hours before it closes (each sent once)
+  for (const f of list) for (const s of f.sales || []) {
+    for (const [k, when, lead] of [["open", s.opens, 0], ["close24", s.closes, 24 * 3600000]]) {
+      if (!when) continue; const t = new Date(when).getTime() - lead;
+      if (now < t || now > t + 3 * 3600000) continue;   // a three-hour window after the moment, so one missed hourly run still sends
+      const key = "push:sale:" + fxUid(f) + ":" + fxSlug(s.what) + ":" + k; if (await env.MU_CACHE.get(key)) continue;
+      await env.MU_CACHE.put(key, "1", { expirationTtl: 30 * 86400 });
+      if (k === "open") msg(f, "tickets", "Tickets: " + s.what + " open · " + fxTitle(f), s.closes ? "Closes " + ukWhen(s.closes) : (s.who || "tickets.manutd.com"), "sale-" + fxUid(f));
+      else msg(f, "tickets", "Closes tomorrow: " + s.what + " · " + fxTitle(f), "Apply by " + ukWhen(s.closes) + (s.who ? " · " + s.who : ""), "sale-" + fxUid(f));
+    }
+  }
+  await env.MU_CACHE.put(SK, JSON.stringify(cur));
+  if (!out.length) return;
+  const subs = await allSubs(env);
+  for (const o of out) for (const s of subs) { if (s.prefs && s.prefs[o.pref] === false) continue; try { await sendPush(env, s, Object.assign({ url: "/" }, o.msg)); } catch (e) { console.log("push fail", e && e.message); } }
+}
 // ---- Shirt collection: owned / wishlist / notes, stored in KV under a hash of the owner's passphrase.
 // GET  /collection?key=…         → the saved collection (or an empty one)
 // PUT  /collection?key=…  body   → replace it (JSON, 64 KB max)

@@ -127,13 +127,15 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
   </div>
   <div class="sheet" id="alerts">
     <h2>Match alerts</h2>
-    <p class="sub" id="alertNote" style="margin:0 0 10px">Team news an hour before kick-off, every goal as it goes in, half-time and the final score — pushed to this device.</p>
+    <p class="sub" id="alertNote" style="margin:0 0 10px">Team news an hour before kick-off, every goal as it goes in, half-time and the final score; kick-off changes and ticket deadlines between games — pushed to this device. Prefer a calendar? <a href="/manutd/season/#united">Subscribe on the Season page</a>.</p>
     <div class="alertRow"><button class="btn red" id="alertBtn" type="button">Turn on alerts</button><button class="btn" id="alertTest" type="button" hidden>Send a test</button><span id="alertStatus" class="sub"></span></div>
     <div class="prefs" id="alertPrefs" hidden>
       <label><input type="checkbox" data-p="kickoff" checked> Kick-off reminder, an hour before</label>
       <label><input type="checkbox" data-p="lineups" checked> Team news when the line-ups are out</label>
       <label><input type="checkbox" data-p="goals" checked> Goals, both ends</label>
       <label><input type="checkbox" data-p="result" checked> Half-time and full-time</label>
+      <label><input type="checkbox" data-p="changes" checked> Kick-off moved or confirmed, and new fixtures</label>
+      <label><input type="checkbox" data-p="tickets" checked> Ticket sales and ballots: when they open, and a day before they close</label>
     </div>
     <p class="sub" id="alertHint" style="margin:8px 0 0" hidden></p>
   </div>

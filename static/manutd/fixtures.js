@@ -3,6 +3,8 @@
 // conf:true  = kick-off confirmed (Premier League TV picks announced, or a UEFA date).
 // conf:false = provisional: the original Premier League slot, which may move once that month's TV picks are announced
 //              (January picks are normally announced mid-November, and so on month by month).
+// sales (optional) = ticket windows: [{what, opens?, closes?, who?}] in UTC, from tickets.manutd.com. They drive the
+//              calendar's ticket events and the 'ticket deadline' push alerts, so keep them current when a sale or ballot is announced.
 // The API-Football feed is used for ids, scores and status only; where it still shows a provisional slot, this file wins.
 window.MU_FIXTURES=[
 {
@@ -155,7 +157,14 @@ window.MU_FIXTURES=[
 "ko": "2027-01-23T15:00:00Z",
 "home": true,
 "venue": "Old Trafford",
-"conf": false
+"conf": false,
+"sales": [
+{
+"what": "Members' ballot",
+"closes": "2026-11-11T08:00:00Z",
+"who": "Official Members, Season Ticket Holders, Executive Club"
+}
+]
 },
 {
 "opp": "Villarreal",
@@ -164,7 +173,15 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "Estadio de la Cerámica",
 "col": "#FFE667",
-"conf": true
+"conf": true,
+"sales": [
+{
+"what": "Members' away ballot",
+"opens": "2026-12-17T08:00:00Z",
+"closes": "2026-12-22T08:00:00Z",
+"who": "Executive Club, Season Ticket Holders, Official Members"
+}
+]
 },
 {
 "opp": "Brentford",

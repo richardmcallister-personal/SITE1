@@ -84,7 +84,10 @@
   <div class="sheet" id="usNow"><h2>United this season</h2><div class="h2h now" id="usTiles"><div><b>–</b><span>Premier League</span><small>&nbsp;</small></div><div><b>–</b><span>Champions League</span><small>&nbsp;</small></div><div><b>–</b><span>Next match</span><small>&nbsp;</small></div></div></div>
   <div class="two">
     <div class="sheet" id="results-tab"><h2>Results</h2><ul class="fxlist" id="results"></ul></div>
-    <div class="sheet" id="fixtures-tab"><h2>Remaining fixtures</h2><ul class="fxlist" id="fixtures"></ul></div>
+    <div class="sheet" id="fixtures-tab"><h2>Remaining fixtures</h2>
+      <div class="calbar"><label class="sr" for="calScope">Which games</label><select id="calScope"><option value="">Every game</option><option value="?comp=pl">Premier League</option><option value="?comp=europe">Europe</option><option value="?venue=home">Home games</option><option value="?venue=away">Away games</option></select><a class="btn red" id="calSub" href="#">Subscribe</a><a class="btn" id="calG" href="#" target="_blank" rel="noopener">Google Calendar</a><a class="calbtn" id="calDl" href="#" download>Download .ics</a></div>
+      <p class="sub" style="margin:0 0 10px">A subscription updates itself: <span class="prov">Provisional</span> kick-offs move to the confirmed time when the TV picks are announced, and ticket ballot dates are included. A downloaded file is a one-off copy.</p>
+      <ul class="fxlist" id="fixtures"></ul></div>
   </div>
   <div class="sheet" id="paceSheet" hidden>
     <h2>This season against every other</h2>
@@ -125,6 +128,8 @@
   }
   var SHORT={"Manchester United":"Man Utd","Manchester City":"Man City","Nottingham Forest":"Forest","Crystal Palace":"Palace","Sheffield United":"Sheff Utd","Wolverhampton Wanderers":"Wolves","West Ham United":"West Ham","Tottenham Hotspur":"Tottenham","Brighton & Hove Albion":"Brighton","Newcastle United":"Newcastle","Leicester City":"Leicester","AFC Bournemouth":"Bournemouth",
     "Paris Saint Germain":"PSG","Bayern München":"Bayern","Borussia Dortmund":"Dortmund","Atletico Madrid":"Atlético","Shakhtar Donetsk":"Shakhtar","Slovan Bratislava":"Slovan","PSV Eindhoven":"PSV","Club Brugge KV":"Club Brugge","AEK Athens FC":"AEK Athens","Slavia Praha":"Slavia","VfB Stuttgart":"Stuttgart"};
+  (function(){var sc=document.getElementById("calScope"); function set(){var c=MU.calFeed(sc.value); document.getElementById("calSub").href=c.webcal; document.getElementById("calG").href=c.google; document.getElementById("calDl").href=c.https}
+    sc.addEventListener("change",set); set()})();
   var ords=function(k){var s=["th","st","nd","rd"],v=k%100;return k+(s[(v-20)%10]||s[v]||s[0])};
   function tile(i,b,small,href){var t=document.getElementById("usTiles").children[i]; t.querySelector("b").innerHTML=href?'<a href="'+href+'">'+b+'</a>':b; t.querySelector(":scope>small").innerHTML=small}
   MU.api("standings").then(function(j){
@@ -162,7 +167,7 @@
   function li(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, st=m.fixture.status.short, done=st==="FT"||st==="AET"||st==="PEN";
     var gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home, res=done?(gf>ga?"W":gf<ga?"L":"D"):"";
     var k=done?{ko:m.fixture.date,conf:true}:MU.ko(m);
-    return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(k.ko)+'<br>'+(done?"":MU.fmtKO(k.ko)+MU.prov(k))+'</span><span class="o">'+(MU.crest(opp.name,1)?MU.club(opp.name):'<img class="logo" src="'+opp.logo+'" alt="">'+MU.esc(opp.name))+' <a class="chip" href="/manutd/match/?id='+m.fixture.id+'">Match</a> <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r">'+(done?gf+'–'+ga+' '+MU.form(res):'')+'</span></li>'}
+    return '<li class="'+(home?"home":"away")+'"><span class="d">'+MU.fmtDate(k.ko)+'<br>'+(done?"":MU.fmtKO(k.ko)+MU.prov(k)+MU.confTag(k))+'</span><span class="o">'+(MU.crest(opp.name,1)?MU.club(opp.name):'<img class="logo" src="'+opp.logo+'" alt="">'+MU.esc(opp.name))+' <a class="chip" href="/manutd/match/?id='+m.fixture.id+'">Match</a>'+(done?'':' '+MU.calLink(MU.fixFor(opp.name,home,m.fixture.date)))+' <small>· '+MU.comp(m.league.name)+MU.esc(m.league.name)+(home?'':' · '+MU.esc(m.fixture.venue.name||""))+'</small></span><span class="r">'+(done?gf+'–'+ga+' '+MU.form(res):'')+'</span></li>'}
   MU.api("fixtures").then(function(j){
     var all=j.response.slice().sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp});
     var done=all.filter(function(m){return /FT|AET|PEN/.test(m.fixture.status.short)}).reverse();
@@ -173,7 +178,7 @@
   }).catch(function(e){
     MU.apiDown(document.getElementById("results"),e);
     var now=new Date();
-    document.getElementById("fixtures").innerHTML=window.MU_FIXTURES.filter(function(f){return new Date(f.ko)>now}).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtKO(f.ko)+MU.prov(f)+'</span><span class="o">'+MU.club(f.opp)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("")+'<li><span class="d"></span><span class="o"><small>From the site fixture list (the official club fixtures page); results arrive with the API.</small></span><span></span></li>';
+    document.getElementById("fixtures").innerHTML=window.MU_FIXTURES.filter(function(f){return new Date(f.ko)>now}).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtKO(f.ko)+MU.prov(f)+MU.confTag(f)+'</span><span class="o">'+MU.club(f.opp)+' '+MU.calLink(f)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("")+'<li><span class="d"></span><span class="o"><small>From the site fixture list (the official club fixtures page); results arrive with the API.</small></span><span></span></li>';
   });
   // ---- Every game in a competition, grouped (PL: matchweeks; CL: matchdays, knockout rounds, qualifying), in date order,
   // the current group open, a club picker. Other clubs' scores arrive at half-time and full-time.
