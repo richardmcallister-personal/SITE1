@@ -167,8 +167,8 @@
     var now=new Date();
     document.getElementById("fixtures").innerHTML=window.MU_FIXTURES.filter(function(f){return new Date(f.ko)>now}).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtKO(f.ko)+MU.prov(f)+'</span><span class="o">'+MU.club(f.opp)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("")+'<li><span class="d"></span><span class="o"><small>From the site fixture list (the official club fixtures page); results arrive with the API.</small></span><span></span></li>';
   });
-  // ---- Every game in a competition, grouped (PL: matchweeks; CL: matchdays, knockout rounds, qualifying), the current group open,
-  // nearest groups first, a club picker. Other clubs' scores arrive at half-time and full-time.
+  // ---- Every game in a competition, grouped (PL: matchweeks; CL: matchdays, knockout rounds, qualifying), in date order,
+  // the current group open, a club picker. Other clubs' scores arrive at half-time and full-time.
   var LIVE=/1H|HT|2H|ET|BT|P|LIVE|INT/, DONE=/FT|AET|PEN/, OVER=/FT|AET|PEN|CANC|PST|AWD|WO/;
   function nm(n){return '<span class="n"><span class="long">'+MU.esc(n)+'</span><span class="short">'+MU.esc(SHORT[n]||n)+'</span></span>'}
   function cr(t){return MU.crest(t.name,22)||'<img class="crest" src="'+MU.esc(t.logo||"")+'" alt="" width="22" height="22" loading="lazy" style="width:22px;height:22px;object-fit:contain;vertical-align:-6px">'}
@@ -181,7 +181,7 @@
       var keys=Object.keys(by).sort(function(a,b){return Math.min.apply(null,by[a].map(function(m){return m.ts}))-Math.min.apply(null,by[b].map(function(m){return m.ts}))});
       if(!keys.length){$(o.out).innerHTML='<p class="sub">No games yet.</p>';return}
       var ci=keys.findIndex(function(k){return by[k].some(function(m){return !OVER.test(m.st)})}); if(ci<0)ci=keys.length-1;
-      var one=club!=="all", order=keys.map(function(k,i){return i}); if(!one)order.sort(function(a,b){return Math.abs(a-ci)-Math.abs(b-ci)||a-b});   // one club: every week open, in date order
+      var one=club!=="all", order=keys.map(function(k,i){return i});   // date order; one club: every week open, all clubs: the current week open
       $(o.out).innerHTML=order.map(function(i){var k=keys[i], ms=by[k].slice().sort(function(a,b){return a.ts-b.ts}), played=ms.filter(function(m){return DONE.test(m.st)}).length;
         return '<details class="mw"'+(one||i===ci?' open':'')+'><summary>'+MU.esc(lab[k])+'<small>'+(played===ms.length?"all played":played+" of "+ms.length+" played")+' · '+MU.fmtDate(ms[0].date)+(ms[ms.length-1].date.slice(0,10)!==ms[0].date.slice(0,10)?"–"+MU.fmtDate(ms[ms.length-1].date):"")+'</small></summary>'+ms.map(row).join("")+'</details>'}).join("");
       var live=list.filter(function(m){return LIVE.test(m.st)&&m.st!=="PST"}).length; $(o.note).textContent=(live?live+" in play · ":"")+"other clubs' scores update at half-time and full-time"}
