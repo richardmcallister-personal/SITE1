@@ -53,6 +53,21 @@ the live Worker). See `git log` for the latest commit on each branch.
 - Player archive goals for 2025/26 on come from the feed's goal events (`build_clubs.py`, cache
   `tools/data/feed_scorers.json`); before 1 Nov 2026 those seasons had no scorers at all.
 
+- 1 Nov 2026 evening (on `redesign` / dev, not yet on main):
+  - Trips: visitor setup (airport, adults, currency with ECB rates via Frankfurter, budget, nights, hotel choice; defaults =
+    Richard's) and cheapest / shortest / most flexible options. Only CPH fares are cached; other airports get a live search.
+  - Calendar: Worker `/calendar.ics` (all, `?comp=pl|europe|cups`, `?venue=home|away`, `?m=<uid>` one match) built from
+    fixtures.js; provisional = TENTATIVE + "(provisional)". UID = season-comp-opponent-h/a (`MU.fxUid` = worker `fxUid`).
+  - fixtures.js entries may carry `sales:[{what,opens,closes,who}]` (UTC) — drives ticket events and alerts. Keep them current.
+  - Alerts: hourly `fixtureWatch` in the Worker diffs fixtures.js against KV `push:fxsnap:v1` → "kick-off moved / confirmed /
+    new fixture" (pref `changes`) and ticket windows (pref `tickets`, at opening and 24 h before closing, once each).
+  - Where to watch: `watch.json` (official PL and UEFA lists, dated) + `watch.js`, on match pages; country from mu-country.
+    Sofascore was considered and rejected (no public API, blocks non-browser clients, terms).
+  - Season page: interactive comparison (pace.json now has per-game `m` and `w2`; shareable `?cmp=&v=&m=&t2=`).
+  - New pages: /find/ (build_find.py → find/index.json), /history/timeline/ (build_timeline.py + timeline-club.json),
+    /compare/ (player comparison, feed for starts/minutes from 2010/11), Milestone watch (build_milestones.py →
+    history/milestones.json + milestones.js) on the hub and match page.
+
 ## Next task
 
 None in progress. Season page (competition tabs, CL, Earlier button) merged to `main` 1 Nov 2026.
