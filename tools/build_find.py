@@ -17,7 +17,10 @@ matches = {}
 for f in sorted(glob.glob(H + '/data/*.json')):
     d = json.load(open(f))
     for r in d['results']: matches.setdefault(r['d'], dict(r, s=d['id'], div=d['div'] if r['c'] == 'L' else 'FA Cup'))
-for r in json.load(open(os.path.join(ROOT, "tools", "data", "cups.json"))): matches.setdefault(r['d'], dict(r))
+for r in json.load(open(os.path.join(ROOT, "tools", "data", "cups.json"))):
+    m = matches.setdefault(r['d'], dict(r))
+    for k in ('sc', 'id', 'pens', 'aet', 'r', 'n', 'rep'):
+        if r.get(k) and not m.get(k): m[k] = r[k]
 for f in glob.glob(H + '/clubs/*.json'):
     for r in json.load(open(f))['matches']:
         m = matches.get(r['d'])
@@ -100,12 +103,26 @@ def ixd(lst, d, v):
     if v not in d: d[v] = len(lst); lst.append(v)
     return d[v]
 
+import unicodedata
+def pkey(n): return ''.join(ch for ch in unicodedata.normalize('NFKD', n) if not unicodedata.combining(ch)).lower()
+PK = {}                                  # one entry per person however the sources spell the case or accents (Park Ji-Sung / Park Ji-sung)
+def pidx(n):
+    k = pkey(n)
+    if k not in PK: PK[k] = ixd(P, Pix, n)
+    return PK[k]
+# shoot-outs the season articles' rows do not record (United-first); the cup builder only takes pens from the feed from 2021/22
+PENS_FIX = {'1985-03-20': '4-5', '1992-09-29': '3-4', '1993-08-07': '5-4', '1997-08-03': '4-2', '2003-08-10': '4-3', '2007-08-05': '3-0',
+            '2008-05-21': '6-5', '2008-08-10': '3-1', '2009-03-01': '4-1', '2009-08-09': '1-4', '2021-05-26': '10-11'}
 rows, rep, skipped = [], {}, 0
 for m in ms:
     if m['c'] in ('FR',) or 'riendl' in (m.get('div') or ''): skipped += 1; continue
     code = comp_code(m)
     label = m.get('div') or {'L': 'League', 'FAC': 'FA Cup'}.get(m['c'], m['c'])
     neutral = bool(m.get('n'))
+    y = int(m['d'][:4]); rr = (m.get('r') or '').strip().lower()
+    if not neutral and ((code == 'CS' and y >= 1974) or (code == 'SC' and y >= 1998) or code == 'CWCup'
+                        or (rr in ('final', 'finals') and code in ('FAC', 'LC', 'UCL', 'UEL', 'CWC', 'SC'))):
+        neutral = True                  # one-off finals and the Wembley/Cardiff Shields are on neutral ground; the feed rows call them home or away
     row = dict(d=m['d'], c=ixd(C, Cix, (code, label)), h=2 if neutral else (1 if m['h'] else 0), o=ixd(O, Oix, m['o']), f=m['gf'], a=m['ga'])
     rt = round_text(m)
     if rt: row['r'] = ixd(R, Rix, rt)
@@ -113,10 +130,13 @@ for m in ms:
     for s in m.get('sc') or []:
         nm = clean_name(s); n = s[2] if len(s) > 2 and s[2] else 1
         fl = 'o' if nm == 'own goal' else ('p' if len(s) > 3 and s[3] == 'p' else '')
-        sc.append(f"{ixd(P, Pix, nm)}{'*' + str(n) if n > 1 else ''}{fl}")
+        sc.append(f"{pidx(nm)}{'*' + str(n) if n > 1 else ''}{fl}")
     if sc: row['s'] = ' '.join(sc)
     row['m'] = ixd(M, Mix, manager(m['d']))
-    if m.get('pens'): row['p'] = m['pens'].replace('–', '-')
+    pens = (m.get('pens') or PENS_FIX.get(m['d']) or '').replace('–', '-')
+    pm = re.match(r'^(\d+)-(\d+)\s+(\S.*)$', pens)
+    if pm: pens = f"{pm[1]}-{pm[2]}" if pm[3].strip() in ('Manchester United', 'United') else f"{pm[2]}-{pm[1]}"   # "5-4 Arsenal" = the shoot-out winner's score first
+    if pens: row['p'] = pens
     if m.get('aet'): row['e'] = 1
     if neutral:
         v = neutral_venue(m)
