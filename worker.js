@@ -208,6 +208,7 @@ const FEEDS = {
   "pod-tribf":  "https://feeds.megaphone.fm/GLT8847082992",
   "pod-second": "https://feeds.acast.com/public/shows/627a2e8f84f3d50012cf11fb",
   "pod-overlap":"https://feeds.acast.com/public/shows/d2a98018-244b-4999-9a83-9c2b9d43a1e3",
+  "pod-uws":    "https://feeds.megaphone.fm/COMG9154050627",   // United We Stand Podcast (the fanzine)
 };
 async function feed(url, env, ctx) {
   const id = url.searchParams.get("id"), src = FEEDS[id];
