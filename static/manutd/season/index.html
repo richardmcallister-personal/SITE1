@@ -52,6 +52,11 @@
 @media (max-width:640px){#usTiles>div:last-child{grid-column:1/-1}} .h2h.now a{color:inherit;text-decoration:none} .h2h.now a:hover b{color:var(--red-ink)}
 .comp .plrow .long{display:none} .comp .plrow .short{display:inline} table.mu td.tm{white-space:nowrap}
 .earlier{display:flex;align-items:center;gap:8px;width:100%;margin:10px 0 0;padding:10px 12px;border:1px dashed var(--rule);border-radius:8px;background:transparent;color:var(--muted);font:inherit;font-family:var(--head);font-weight:500;font-size:13px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer} .earlier:hover{color:var(--ink);border-color:var(--muted)} .earlier small{margin-left:auto;font-family:var(--body);letter-spacing:0;font-weight:600} .earlier[aria-expanded="true"]{border-style:solid} .past .mw:last-child{border-bottom:2px solid var(--ink);padding-bottom:6px}
+.ldrs{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px 28px;margin-top:18px;padding-top:14px;border-top:1px solid var(--rule)} .ldrs:empty{display:none}
+.ldrs h3{margin:0 0 4px;font-family:var(--head);font-weight:500;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.ldr{list-style:none;margin:0;padding:0} .ldr li{display:grid;grid-template-columns:22px 24px minmax(0,1fr) auto;gap:6px;align-items:center;padding:6px 0;border-top:1px solid var(--rule);font-size:14px} .ldr li:first-child{border-top:0}
+.ldr .k{color:var(--muted);font-size:12px} .ldr .who{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .ldr .who small{display:block;color:var(--muted);font-size:11px} .ldr .v{font-family:var(--display);font-size:20px;line-height:1} .ldr .v small{font-family:var(--body);font-size:11px;color:var(--muted);margin-left:4px}
+.ldr li.us .who{font-weight:700} .ldr li.us{box-shadow:inset 3px 0 var(--red);padding-left:6px} .ldr .crest,.ldr img.crest{margin:0!important}
 .plrow.us{box-shadow:inset 3px 0 var(--red);padding-left:8px} .mw .rtag{font-size:11px;color:var(--muted)}
 .mw{margin-top:14px} .mw h3{margin:0 0 4px} .mw summary{cursor:pointer;list-style:none;font-family:var(--head);font-weight:500;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:10px 0;border-top:1px solid var(--rule)} .mw summary::-webkit-details-marker{display:none} .mw summary small{font-weight:400;letter-spacing:0;text-transform:none;margin-left:8px}
 .plrow{display:grid;grid-template-columns:76px 1fr auto 1fr;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--rule);font-size:14px} .plrow:first-of-type{border-top:0}
@@ -90,13 +95,15 @@
   </div>
 </div>
 <div data-tab="premier-league" id="premier-league"><div class="comp">
-  <div class="sheet"><h2><img src="/manutd/assets/comps/premier-league.png" alt="" class="cmplogo">Table</h2><div id="pl"></div></div>
+  <div class="sheet"><h2><img src="/manutd/assets/comps/premier-league.png" alt="" class="cmplogo">Table</h2><div id="pl"></div>
+    <div class="ldrs" id="plLeaders"></div></div>
   <div class="sheet"><h2 class="row">Every game <span id="plNote" class="sub gnote"></span></h2>
     <p class="plsel"><label>Club <select id="plSel"><option value="all">All clubs</option></select></label></p>
     <div id="plGames"></div></div>
 </div></div>
 <div data-tab="champions-league" id="champions-league"><div class="comp">
-  <div class="sheet"><h2><img src="/manutd/assets/comps/champions-league.png" alt="" class="cmplogo">League phase</h2><div id="ucl"></div></div>
+  <div class="sheet"><h2><img src="/manutd/assets/comps/champions-league.png" alt="" class="cmplogo">League phase</h2><div id="ucl"></div>
+    <div class="ldrs" id="clLeaders"></div></div>
   <div class="sheet"><h2 class="row">Every game <span id="clNote" class="sub gnote"></span></h2>
     <p class="plsel"><label>Club <select id="clSel"><option value="all">All clubs</option></select></label></p>
     <div id="clGames"></div></div>
@@ -170,6 +177,15 @@
   });
   // ---- Every game in a competition, grouped (PL: matchweeks; CL: matchdays, knockout rounds, qualifying), in date order,
   // the current group open, a club picker. Other clubs' scores arrive at half-time and full-time.
+  // Top scorers and assists under each table (API-Football leaders, top 10; ties keep the feed's order).
+  function leaders(c,el){var box=document.getElementById(el);
+    Promise.all([MU.api("leaders",{c:c,k:"goals"}),MU.api("leaders",{c:c,k:"assists"})]).then(function(r){
+      var list=function(j,f,title){var rows=(j.response||[]).filter(function(p){return p[f]>0}).sort(function(a,b){return b[f]-a[f]||a.min-b.min}).slice(0,10); if(!rows.length)return "";
+        var k=0,prev=null; return '<div><h3>'+title+'</h3><ol class="ldr">'+rows.map(function(p,i){if(p[f]!==prev){k=i+1;prev=p[f]} var t=p.team||{name:"",logo:""}, us=t.id===MU.TEAM, nm=(p.first&&p.last&&p.name.indexOf(".")>0)?p.name:p.name;
+          return '<li'+(us?' class="us"':'')+'><span class="k">'+k+'</span>'+(MU.crest(t.name,20)||'<img class="crest" src="'+MU.esc(t.logo)+'" alt="" width="20" height="20" loading="lazy" style="width:20px;height:20px;object-fit:contain">')+'<span class="who">'+MU.esc(nm)+'<small>'+MU.esc(SHORT[t.name]||t.name)+' · '+p.apps+' apps</small></span><span class="v">'+p[f]+(f==="g"&&p.pen?'<small>'+p.pen+' pen</small>':'')+'</span></li>'}).join("")+'</ol></div>'};
+      box.innerHTML=list(r[0],"g","Top scorers")+list(r[1],"a","Top assists");
+    }).catch(function(){box.innerHTML=""})}
+  leaders("pl","plLeaders"); leaders("cl","clLeaders");
   var LIVE=/1H|HT|2H|ET|BT|P|LIVE|INT/, DONE=/FT|AET|PEN/, OVER=/FT|AET|PEN|CANC|PST|AWD|WO/;
   function nm(n){return '<span class="n"><span class="long">'+MU.esc(n)+'</span><span class="short">'+MU.esc(SHORT[n]||n)+'</span></span>'}
   function cr(t){return MU.crest(t.name,22)||'<img class="crest" src="'+MU.esc(t.logo||"")+'" alt="" width="22" height="22" loading="lazy" style="width:22px;height:22px;object-fit:contain;vertical-align:-6px">'}
