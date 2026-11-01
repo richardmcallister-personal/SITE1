@@ -182,7 +182,7 @@
     Promise.all([MU.api("leaders",{c:c,k:"goals"}),MU.api("leaders",{c:c,k:"assists"})]).then(function(r){
       var list=function(j,f,title){var rows=(j.response||[]).filter(function(p){return p[f]>0}).sort(function(a,b){return b[f]-a[f]||a.min-b.min}).slice(0,10); if(!rows.length)return "";
         var k=0,prev=null; return '<div><h3>'+title+'</h3><ol class="ldr">'+rows.map(function(p,i){if(p[f]!==prev){k=i+1;prev=p[f]} var t=p.team||{name:"",logo:""}, us=t.id===MU.TEAM, nm=(p.first&&p.last&&p.name.indexOf(".")>0)?p.name:p.name;
-          return '<li'+(us?' class="us"':'')+'><span class="k">'+k+'</span>'+(MU.crest(t.name,20)||'<img class="crest" src="'+MU.esc(t.logo)+'" alt="" width="20" height="20" loading="lazy" style="width:20px;height:20px;object-fit:contain">')+'<span class="who">'+MU.esc(nm)+'<small>'+MU.esc(SHORT[t.name]||t.name)+' · '+p.apps+' apps</small></span><span class="v">'+p[f]+(f==="g"&&p.pen?'<small>'+p.pen+' pen</small>':'')+'</span></li>'}).join("")+'</ol></div>'};
+          return '<li'+(us?' class="us"':'')+'><span class="k">'+k+'</span>'+(MU.crest(t.name,20)||'<img class="crest" src="'+MU.esc(t.logo)+'" alt="" width="20" height="20" loading="lazy" style="width:20px;height:20px;object-fit:contain">')+'<span class="who">'+MU.esc(nm)+'<small>'+MU.esc(SHORT[t.name]||t.name)+' · '+p.apps+' apps</small></span><span class="v">'+p[f]+(f==="g"&&p.pen&&c!=="cl"?'<small>'+p.pen+' pen</small>':'')+'</span></li>'}).join("")+'</ol></div>'};
       box.innerHTML=list(r[0],"g","Top scorers")+list(r[1],"a","Top assists");
     }).catch(function(){box.innerHTML=""})}
   leaders("pl","plLeaders"); leaders("cl","clLeaders");
