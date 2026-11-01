@@ -95,7 +95,7 @@
     if(COV[i]!==undefined)return put(COV[i]);
     var FEED={"the-athletic-talk-of-the-devils":"pod-totd","stretford-paddock":"pod-paddock","the-overlap":"pod-overlap","stick-to-football":"pod-overlap","uws-united-we-stand":"pod-uws"};
     if(x.k==="pod"&&FEED[i]){fetch("/feed?id="+FEED[i]).then(function(r){return r.json()}).then(function(j){COV[i]=(j.image||j.artwork||(j.show&&j.show.image)||"")||""; put(COV[i])}).catch(function(){COV[i]=""}); return}
-    var q=x.k==="book"?{type:"book",q:x.t,by:x.by}:x.k==="pod"?{type:"pod",q:x.t.replace(/^UWS: /,"").replace(/^The Athletic: /,"")}:{type:"wiki",q:x.t,hint:x.k==="film"?"film":"documentary "+x.y};
+    var q=x.wiki?{type:"wikititle",q:x.wiki}:x.k==="book"?{type:"book",q:x.t,by:x.by}:x.k==="pod"?{type:"pod",q:x.t.replace(/^UWS: /,"").replace(/^The Athletic: /,"")}:{type:"wiki",q:x.t,hint:x.k==="film"?"film":"documentary "+x.y};
     MU.api("../cover",q).then(function(j){COV[i]=j.url||""; put(COV[i])}).catch(function(){COV[i]=""});
   }
   $("list").addEventListener("click",function(e){var b=e.target.closest("button[data-id]"); if(!b)return; done[b.dataset.id]=!done[b.dataset.id]; if(!done[b.dataset.id])delete done[b.dataset.id]; save(); render()});

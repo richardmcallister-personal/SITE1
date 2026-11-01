@@ -814,6 +814,10 @@ async function cover(url, env, ctx) {
       const r = await fetch("https://itunes.apple.com/search?media=podcast&limit=10&term=" + encodeURIComponent(q), { headers: UA });
       const j = r.ok ? await r.json() : {}; const hit = (j.results || []).find((x) => fits(x.collectionName, "all"));   // never another show's artwork
       if (hit) out = { url: (hit.artworkUrl600 || hit.artworkUrl100 || "").replace("100x100", "600x600"), src: "Apple Podcasts", title: hit.collectionName };
+    } else if (type === "wikititle") {
+      // an exact article named in shelf.json ("wiki"), for titles a search can't pin down
+      const pr = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(q.replace(/ /g, "_")), { headers: UA }); const pj = pr.ok ? await pr.json() : {};
+      if (pj.thumbnail) out = { url: pj.originalimage && pj.originalimage.width < 1200 ? pj.originalimage.source : pj.thumbnail.source, src: "Wikipedia", title: pj.title, page: pj.content_urls ? pj.content_urls.desktop.page : "" };
     } else {
       // Wikipedia: search for the film/documentary article, then take its lead image.
       const sr = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=3&srsearch=" + encodeURIComponent(q + " " + (url.searchParams.get("hint") || "film")), { headers: UA });
