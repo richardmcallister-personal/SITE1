@@ -786,7 +786,7 @@ function pickEntities(idx, q) {
   const out = [];
   for (const e of idx) {
     const f = foldQ(e[0]), fa = (e[4] || []).map(foldQ), k = e[1]; let sc = 0;
-    for (const t of terms) { if (f === t) sc += 100; else if (f.split(/[\s,]+/).includes(t)) sc += (t.length >= 4 || k === "player" || k === "manager") ? 70 : 20;   // "red" alone should not pull in Red Star else if (fa.some((a) => a === t)) sc += 80; else if (f.startsWith(t) && t.length > 3) sc += 40; }
+    for (const t of terms) { if (f === t) sc += 100; else if (f.split(/[\s,]+/).includes(t)) sc += (t.length >= 4 || k === "player" || k === "manager") ? 70 : 20; else if (fa.some((a) => a === t)) sc += 80; else if (f.startsWith(t) && t.length > 3) sc += 40; }   // a three-letter word ("red") should not pull in a club on its own
     if (k === "season") { if (years.some((y) => f.startsWith(y) || fa.includes(y))) sc += 90; else if (sc < 100) sc = 0; }   // a season only when a year is named
     if (sc) { if (k === "player" || k === "manager") sc += 30; else if (k === "club") sc += 15; else if (k === "kit") sc -= 70; else if (/^(book|doc|film|pod|page)$/.test(k)) sc -= 40; out.push({ e, sc }); }
   }
