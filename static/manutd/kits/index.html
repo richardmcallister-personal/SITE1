@@ -133,7 +133,7 @@
       '<div class="k">Find one to buy</div><div class="v buys">'+buyLinks(k,true)+'</div><p class="sub" style="margin:4px 0 10px">Searches open in a new tab with “'+MU.esc(buyQuery(k))+'”; sizes and condition are on the listings.</p>'+
       '<div class="k">My notes</div><textarea id="note" placeholder="Player name on the back, size, condition, where it came from…">'+MU.esc(col.notes[id]||"")+'</textarea>'+
       '<div class="k">Season</div><div class="v"><a class="pl" href="/manutd/history/season/?s='+s+'">'+MU.esc(k.label)+(t?' · '+t.trophies.join(", "):'')+'</a></div>'+
-      '<div class="k">Who wore it</div><div class="v">'+players(k)+'</div><div class="k">Memorable matches</div><div class="v">'+matches(k)+'</div>'+
+      '<div class="k">That season\'s squad</div><div class="v">'+players(k)+'</div>'+
       (k.partial?'<div class="k">Note</div><div class="v">Image is a partial view of the shirt.</div>':'')+'</div>';
     $("modal").classList.add("on"); document.body.style.overflow="hidden";
     $("close").onclick=close; $("bo").onclick=function(){toggle(col.owned,id)}; $("bw").onclick=function(){toggle(col.wish,id)};
