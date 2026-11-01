@@ -431,9 +431,9 @@ function hotelPageLink(h,f,nights){
 // ---- fixture rail -----------------------------------------------------
 function buildRail(){
   var rail=$("rail"); rail.innerHTML="";
-  var now=new Date();
+  var now=new Date(), gone=new Date(Date.now()-3*3600000);   // a match drops off the rail once it has finished (kick-off + 3 h)
   FIX.forEach(function(f,i){
-    var d=new Date(f.ko), b=document.createElement("button");
+    var d=new Date(f.ko); if(d<gone)return; var b=document.createElement("button");
     b.className="fx"+(d<now?" past":"")+(f.away?" away":""); b.setAttribute("role","option"); b.setAttribute("aria-pressed",i===sel?"true":"false");
     if(f.away){b.style.setProperty("--fc",f.col); b.style.setProperty("--ft",f.fg||"#fff"); if(f.stripe)b.style.setProperty("--fs",f.stripe)}
     b.innerHTML='<div class="d">'+fmtDate(d)+(f.away?' · <b>Away</b>':'')+'</div><div class="o">'+crestImg(f.opp)+'<span>'+f.opp+'</span></div><div class="k">'+fmtKO(d)+(f.tbc?' <span class="prov" title="Original Premier League slot — may move when that month\'s TV picks are announced">Provisional</span>':'')+'</div><span class="c">'+(f.comp==="Champions League"?'<img src="/manutd/assets/comps/champions-league.png" alt="" onerror="this.remove()">':'<img src="/manutd/assets/comps/premier-league.png" alt="" onerror="this.remove()">')+f.comp+(f.away?' · '+f.venue:'')+'</span>';
@@ -551,7 +551,7 @@ function pick(){var f=FIX[sel];$("ug").value=f.ug;$("og").value=f.og;$("nights")
 ["ground","food","fx","nights","ug","og","flight","hotel","awayTicket"].forEach(function(id){$(id).addEventListener("input",render)});
 $("block").addEventListener("change",function(){if(!FIX[sel].away)updateViewer(FIX[sel]);render()});
 ["fLower","fSide","fCheap"].forEach(function(id){$(id).addEventListener("change",function(){if(!FIX[sel].away)fillBlocks(FIX[sel],true);render()})});
-var now=new Date(); for(var i=0;i<FIX.length;i++){if(new Date(FIX[i].ko)>now){sel=i;break}}
+var now=new Date(Date.now()-3*3600000); for(var i=0;i<FIX.length;i++){if(new Date(FIX[i].ko)>now){sel=i;break}}   // first match not yet finished (a game in play stays selected)
 buildRail(); pick();
 })();
 </script>
