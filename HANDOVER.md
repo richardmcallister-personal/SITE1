@@ -9,7 +9,7 @@ This file only says where things stand.
 
 Everything below is live on manutd.wiki (branch `main`, Worker `site1`) and identical on
 dev.manutd.wiki (branch `redesign`, Worker `site1-dev`, which proxies all data calls to
-the live Worker). Last commit on both: `b4b641d`.
+the live Worker). See `git log` for the latest commit on each branch.
 
 - Redesign shipped: shared shell, hub in three columns, dark mode, phone tab bar,
   sticky pills on player pages, tabs on the season page.
@@ -38,28 +38,18 @@ the live Worker). Last commit on both: `b4b641d`.
   Season page **League** tab (by matchweek, club filter), match centre works for any
   game (United extras gated on `OURS`; other games refresh every 10 min client-side and
   at 15-min cadence in the Worker's live window), club pages have a "This season" block.
-- Champions League: Worker route `/api/cl` is deployed (same slim shape; rounds are
-  "League Stage - N" then knockout names). **No page uses it yet.**
+- Season page by competition (tabs at every width, `MU.tabs(..., {always:true})`):
+  **United** (position tiles, remaining fixtures, results, pace sheet) · **Premier League**
+  (table + every game by matchweek) · **Champions League** (league-phase table with
+  top-8 / play-off / out bars + every game by matchday; qualifying hidden unless a club
+  is picked). Desktop ≥900px: table left, games right. Club picker is a dropdown for both.
+  Tab ids are `united`, `premier-league`, `champions-league` (not `#pl` — that is the table).
+- Ask: club questions include that club's CL games; Europe questions get the CL table and
+  latest/next CL games. Answer cache bumped to `ask:a:v8:`.
 
-## Next task (where the last chat stopped)
+## Next task
 
-Add the Champions League to the Season page and reshape that page so the extra
-information reads well. The plan agreed in outline:
-
-1. Tabs by competition instead of by type: **United** (results, remaining fixtures,
-   pace sheet) · **Premier League** (table + every game) · **Champions League**
-   (league-phase table from `/api/ucl` + every game from `/api/cl`, United's games
-   highlighted). Make the tabs apply on desktop too (`MU.tabs` currently only tabs on
-   ≤640px; add an option) and, inside PL/CL on desktop, two columns: table left, games
-   right.
-2. Reuse the League-tab renderer from `static/manutd/season/index.html` (`row`, `nm`,
-   `render`, club filter) for CL: "League Stage - N" → "Matchday N", knockout rounds
-   by name; club picker as a dropdown (36 clubs).
-3. Cadence for non-United games stays half-time/full-time (nothing to change in the
-   Worker).
-4. Give Ask the CL games the same way `/api/pl` is used in `contextFor`.
-5. Audit (`node /tmp/claude-0/audit2.js` pattern: 23 pages × light/dark × 1280/390,
-   Chrome UA, no `pageerror`, no overflow), push to `redesign`, check dev, merge.
+Richard to review the Season page on dev.manutd.wiki, then merge `redesign` → `main`.
 
 ## Open items after that
 

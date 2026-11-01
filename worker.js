@@ -775,7 +775,11 @@ async function wikiTopic(env, ctx, q) {   // when the question names nothing the
       const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" }, words = foldQ(terms).split(" ").filter((w) => w.length >= 4);
       const search = async (qq) => { const r = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=5&srsearch=" + encodeURIComponent(qq), { headers: UA }); const j = await r.json().catch(() => null); return j && j.query && j.query.search || []; };
       const good = (list) => list.find((h) => { const t = foldQ(h.title); return words.some((w) => t.includes(w)); });   // the title must share a word with the question
-      if (/red devil|nickname|crest|badge|anthem|founded|history of (the )?club|club history|who owns|owner|glazer|ineos|ratcliffe/i.test(q)) title = "Manchester United F.C.";   // questions about the club itself
+      if (/champions league|\bucl\b|\bcl\b|europe|european|league phase|league stage|matchday|knockout|round of 16|play-?off/i.test(q)) {
+    try { const u = await load(env, "api:v3:/api/ucl?v=3"); if (u.body) { const g = JSON.parse(u.body).response[0].league.standings, rows = g.length === 1 ? g[0] : [].concat(...g); parts.push("CHAMPIONS LEAGUE LEAGUE-PHASE TABLE NOW (top 8 to the round of 16, 9th-24th to the knockout play-offs): " + rows.map((x) => `${x.rank}. ${x.team.name} P${x.all.played} ${x.points}pts GD${x.goalsDiff > 0 ? "+" : ""}${x.goalsDiff}`).join("; ")); sources.push({ t: "Season · Champions League", u: "/season/#champions-league" }); } } catch (e) {}
+    try { const cl = await load(env, "api:v3:/api/cl?v=3"); if (cl.body) { const ms = JSON.parse(cl.body).response.filter((m) => !/qualif|play-offs$/i.test(m.round) || /knockout/i.test(m.round)).sort((a, b) => a.ts - b.ts), done = ms.filter((m) => /FT|AET|PEN/.test(m.st)), next = ms.filter((m) => m.st === "NS"), line = (m) => `${m.date.slice(0, 10)} ${m.round}: ${m.home.name} ${m.goals.home != null ? m.goals.home + "-" + m.goals.away : "v"} ${m.away.name}`; parts.push("CHAMPIONS LEAGUE RESULTS (latest 18): " + done.slice(-18).map(line).join("; ") + "\nCHAMPIONS LEAGUE NEXT (18): " + next.slice(0, 18).map(line).join("; ")); } } catch (e) {}
+  }
+  if (/red devil|nickname|crest|badge|anthem|founded|history of (the )?club|club history|who owns|owner|glazer|ineos|ratcliffe/i.test(q)) title = "Manchester United F.C.";   // questions about the club itself
       else if (/old trafford|theatre of dreams|stadium|ground/i.test(q) && !/away|ground guide/i.test(q)) title = "Old Trafford";
       else { const hit = good(await search(terms + " Manchester United")) || good(await search(terms)); title = hit ? hit.title : ""; }
       ctx.waitUntil(env.MU_CACHE.put(k, title, { expirationTtl: 7 * 86400 }));
@@ -833,8 +837,10 @@ async function contextFor(env, ctx, ents, q) {
         const home = ms.filter((r) => r.h), away = ms.filter((r) => !r.h && r.n !== true), neutral = ms.filter((r) => !r.h && r.n === true), league = ms.filter((r) => r.c === "L"), lastAway = away.slice(-8), lastHome = home.slice(-8), awayWins = away.filter((r) => r.gf > r.ga).slice(-5);
         parts.push(`OPPONENT ${c.name} — ${c.p} meetings ${c.first}–${c.last}: United W${c.w} D${c.d} L${c.l} (all competitions, United-first scores).\nAt Old Trafford / United home: ${tally(home)}. Away at ${c.name}: ${tally(away)}${neutral.length ? ". Neutral venues: " + tally(neutral) : ""}. League only: ${tally(league)}.\nLast 8 away: ${lastAway.map(res).join("; ")}\nLast 8 home: ${lastHome.map(res).join("; ")}\nMost recent United away wins: ${awayWins.map(res).join("; ") || "none in the archive"}\nLast 10 meetings: ${ms.slice(-10).map(res).join("; ")}\n${big.length ? "Big United wins: " + big.map(res).join("; ") : ""}\n${bad.length ? "Heavy defeats: " + bad.map(res).join("; ") : ""}`);
         sources.push({ t: c.name, u: url.replace("/manutd/", "/") });
-        try { const pl = await load(env, "api:v3:/api/pl?v=3"); if (pl.body) { const fold = (t) => String(t).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(), me = fold(c.name), rows = JSON.parse(pl.body).response.filter((m) => [m.home, m.away].some((t) => { const n = fold(t.name); return n === me || me.includes(n) || n.includes(me); })).sort((a, b) => a.ts - b.ts);
-          if (rows.length) parts.push(`${c.name} THIS SEASON (Premier League, all their games; home team first): ` + rows.map((m) => `${m.date.slice(0, 10)} ${m.home.name} ${m.goals.home != null ? m.goals.home + "-" + m.goals.away : "v"} ${m.away.name}${/1H|HT|2H/.test(m.st) ? " (in play)" : m.st === "NS" ? "" : " (" + m.st + ")"}`).join("; ")); } } catch (e) {}
+        for (const [tag, label] of [["pl", "Premier League"], ["cl", "Champions League"]]) {
+          try { const pl = await load(env, `api:v3:/api/${tag}?v=3`); if (pl.body) { const fold = (t) => String(t).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim(), me = fold(c.name), rows = JSON.parse(pl.body).response.filter((m) => [m.home, m.away].some((t) => { const n = fold(t.name); return n === me || me.includes(n) || n.includes(me); })).sort((a, b) => a.ts - b.ts);
+            if (rows.length) parts.push(`${c.name} THIS SEASON (${label}, all their games; home team first): ` + rows.map((m) => `${m.date.slice(0, 10)}${tag === "cl" ? " " + m.round : ""} ${m.home.name} ${m.goals.home != null ? m.goals.home + "-" + m.goals.away : "v"} ${m.away.name}${/1H|HT|2H/.test(m.st) ? " (in play)" : m.st === "NS" ? "" : " (" + m.st + ")"}`).join("; ")); } } catch (e) {}
+        }
       }
     } else if (kind === "season") {
       const id = (url.match(/s=([^&]+)/) || [])[1], d = await assetJSON(env, "/history/data/" + id + ".json"), all = await assetJSON(env, "/history/seasons.json") || [], w = all.find((x) => x.id === id), cups = (await assetJSON(env, "/history/cups.json") || []).filter((r) => r.s === id && r.c !== "FAC");
@@ -869,7 +875,7 @@ async function ask(request, url, env, ctx) {
     return json({ error: "Ask isn't switched on yet — the site owner needs to add the API key." }, 503);
   }
   if (url.searchParams.get("debug") === "topic") { const idx0 = await assetJSON(env, "/search.json") || [], e0 = pickEntities(idx0, q), wt = await wikiTopic(env, ctx, q); return json({ entities: e0.map((e) => e[1] + ": " + e[0]), best: e0.best || 0, topic: wt.slice(0, 300) }); }
-  const key = "ask:a:v7:" + (await sha(foldQ(q).replace(/[^a-z0-9]+/g, " ").trim()));
+  const key = "ask:a:v8:" + (await sha(foldQ(q).replace(/[^a-z0-9]+/g, " ").trim()));
   const hit = await env.MU_CACHE.get(key, "json"); if (hit) return json(Object.assign({ cached: true }, hit));
   const now = new Date(), day = now.toISOString().slice(0, 10), hour = now.toISOString().slice(0, 13);
   const ip = request.headers.get("cf-connecting-ip") || "", ipk = "ask:ip:" + (await sha("ask:" + ip)).slice(0, 16) + ":" + hour, dayk = "ask:day:" + day;

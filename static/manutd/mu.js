@@ -170,14 +170,14 @@ window.MU=(function(){
     var links=[].slice.call(el.querySelectorAll("a")), secs=items.map(function(i){return document.getElementById(i.id)});
     function mark(){var y=window.scrollY+90, on=0, best=-Infinity; secs.forEach(function(s,i){if(!s||s.offsetParent===null)return; var t=s.getBoundingClientRect().top+window.scrollY; if(t<=y&&t>best){best=t;on=i}}); links.forEach(function(a,i){a.classList.toggle("on",i===on)})}
     window.addEventListener("scroll",mark,{passive:true}); mark()}
-  function tabs(el,items,def){var phone=function(){return window.matchMedia("(max-width:640px)").matches}, wrap=el.parentNode, key="tab:"+location.pathname;
-    el.innerHTML=items.map(function(i){return '<a href="#'+i.id+'" data-t="'+i.id+'">'+esc(i.label)+'</a>'}).join(""); wrap.classList.add("tabbed");
-    function show(id,push){items.forEach(function(i){var s=document.querySelector('[data-tab="'+i.id+'"]'); if(s)s.classList.toggle("on",i.id===id)}); [].slice.call(el.querySelectorAll("a")).forEach(function(a){a.classList.toggle("on",a.getAttribute("data-t")===id)}); try{localStorage.setItem(key,id)}catch(e){} if(push)history.replaceState(null,"","#"+id)}
+  function tabs(el,items,def,opt){var always=!!(opt&&opt.always), phone=function(){return always||window.matchMedia("(max-width:640px)").matches}, wrap=el.parentNode, key="tab:"+location.pathname+(always?":v2":"");
+    el.innerHTML=items.map(function(i){return '<a href="#'+i.id+'" data-t="'+i.id+'"'+(always?' role="tab"':'')+'>'+(i.icon||"")+esc(i.label)+'</a>'}).join(""); wrap.classList.add("tabbed"); if(always){wrap.classList.add("always"); el.setAttribute("role","tablist")}
+    function show(id,push){items.forEach(function(i){var s=document.querySelector('[data-tab="'+i.id+'"]'); if(s)s.classList.toggle("on",i.id===id)}); [].slice.call(el.querySelectorAll("a")).forEach(function(a){var on=a.getAttribute("data-t")===id; a.classList.toggle("on",on); if(always)a.setAttribute("aria-selected",on)}); if(always)document.dispatchEvent(new CustomEvent("mu:tab",{detail:id})); try{localStorage.setItem(key,id)}catch(e){} if(push)history.replaceState(null,"","#"+id)}
     var start=(location.hash||"").slice(1); if(!items.some(function(i){return i.id===start})){try{start=localStorage.getItem(key)}catch(e){} if(!items.some(function(i){return i.id===start}))start=def||items[0].id}
     show(start,false);
     el.addEventListener("click",function(ev){var a=ev.target.closest("a"); if(!a)return; var id=a.getAttribute("data-t"); if(phone()){ev.preventDefault(); show(id,true); window.scrollTo({top:0,behavior:"smooth"})} else show(id,false)});
     window.addEventListener("hashchange",function(){var id=location.hash.slice(1); if(items.some(function(i){return i.id===id}))show(id,false)});
-    if(!phone())pills(el,items)}
+    if(!phone())pills(el,items); return {show:show}}
   // Team news from the injuries feed, reconciled. The feed lists a player once per fixture he was flagged for and the order is
   // not by date, so the newest flag per player wins; a player who then started or came on in a match played on or after his
   // flag is "back" (with the minute), not injured. Returns {list, out, doubts, back, asOf, fetched}.

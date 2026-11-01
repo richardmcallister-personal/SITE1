@@ -46,7 +46,12 @@
 <style>
 .pace{display:grid;grid-template-columns:72px 1fr 44px;gap:10px;align-items:center;font-size:13px} .pace .lab{font-family:var(--head);font-weight:500;font-size:12px;letter-spacing:.08em;color:var(--muted);white-space:nowrap} .pace .lab a{color:inherit;text-decoration:none} .pace .bar{height:14px;background:var(--tint);position:relative} .pace .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--draw)} .pace .now .bar i{background:var(--red)} .pace .lab.now,.pace .n.now{color:var(--red-ink);font-weight:600} .pace .n{text-align:right;font-family:var(--head);font-size:16px}
 .pace .gap{grid-column:1/-1;height:1px;background:var(--rule);margin:4px 0}/* league-wide fixtures */
-.plsel{display:none;margin:0 0 10px} .plsel select{font:inherit;padding:6px 8px;border:1px solid var(--rule);border-radius:8px;background:var(--paper);color:var(--ink)} @media (max-width:640px){#plClubs{display:none} .plsel{display:block}}
+.plsel{margin:0 0 6px} .plsel label{font-size:13px;color:var(--muted)} .plsel select{font:inherit;color:var(--ink);padding:6px 8px;margin-left:6px;border:1px solid var(--rule);border-radius:8px;background:var(--paper);max-width:100%}
+.comp{margin-top:12px} .comp .sheet{margin-top:0} @media (min-width:900px){.comp{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;align-items:start}} @media (max-width:899px){.comp .sheet+.sheet{margin-top:12px}}
+.cmplogo{height:26px;width:auto;vertical-align:-7px;margin-right:8px} .gnote{font-weight:400;letter-spacing:0;text-transform:none}
+@media (max-width:640px){#usTiles>div:last-child{grid-column:1/-1}} .h2h.now a{color:inherit;text-decoration:none} .h2h.now a:hover b{color:var(--red-ink)}
+.comp .plrow .long{display:none} .comp .plrow .short{display:inline} table.mu td.tm{white-space:nowrap}
+.plrow.us{box-shadow:inset 3px 0 var(--red);padding-left:8px} .mw .rtag{font-size:11px;color:var(--muted)}
 .mw{margin-top:14px} .mw h3{margin:0 0 4px} .mw summary{cursor:pointer;list-style:none;font-family:var(--head);font-weight:500;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:10px 0;border-top:1px solid var(--rule)} .mw summary::-webkit-details-marker{display:none} .mw summary small{font-weight:400;letter-spacing:0;text-transform:none;margin-left:8px}
 .plrow{display:grid;grid-template-columns:76px 1fr auto 1fr;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--rule);font-size:14px} .plrow:first-of-type{border-top:0}
 .plrow .d{font-size:11px;color:var(--muted);line-height:1.25} .plrow .stx{display:block} @media (max-width:640px){.plrow .stx{display:inline}} .plrow.live .d .stx{color:var(--red-ink);font-weight:700} .plrow .h{text-align:right;display:flex;justify-content:flex-end;align-items:center;gap:6px;min-width:0} .plrow .a{display:flex;align-items:center;gap:6px;min-width:0} .plrow .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .plrow .short{display:none} @media (max-width:640px){.plrow .long{display:none} .plrow .short{display:inline}}
@@ -60,7 +65,7 @@
 </head><body><a class="skip" href="#main-content">Skip to main content</a><div class="wrap">
 <header class="mu">
   <a class="brand" href="/manutd/"><img src="/manutd/assets/crest-88.webp" srcset="/manutd/assets/crest-44.webp 44w, /manutd/assets/crest-88.webp 88w, /manutd/assets/crest-132.webp 132w" sizes="44px" alt="Manchester United crest" width="44" height="45" decoding="async"><h1><small>Season 2026/27</small>Manchester<br>United</h1></a>
-  <div class="from">Season<span>Table · Champions League · results · fixtures</span></div>
+  <div class="from">Season<span>United · Premier League · Champions League</span></div>
 </header>
 <nav class="munav" aria-label="Sections"></nav>
 <main id="main-content" tabindex="-1">
@@ -68,33 +73,33 @@
 <div class="ticker" id="ticker"><span><span class="k">Last season</span><span class="v">3rd · 71 pts</span></span><span><span class="k">Manager</span><span class="v">Michael Carrick</span></span><span><span class="k">Europe</span><span class="v">Champions League</span></span></div>
 
 <div id="sections">
-<nav class="pills tabs" id="tabs" aria-label="Sections"></nav>
-<div data-tab="table" id="table">
-<div class="sheet">
-  <h2><img src="/manutd/assets/comps/premier-league.png" alt="" style="height:26px;width:auto;vertical-align:-7px;margin-right:8px">Premier League table</h2>
-  <div id="pl"></div>
-</div>
-<div class="sheet">
-  <h2><img src="/manutd/assets/comps/champions-league.png" alt="" style="height:26px;width:auto;vertical-align:-7px;margin-right:8px">Champions League · league phase</h2>
-  <div id="ucl"></div>
-</div>
-<div class="sheet" id="paceSheet" hidden>
-  <h2>This season against every other</h2>
-  <p class="sub" id="paceNote" style="margin:0 0 10px"></p>
-  <div class="h2h" id="paceStats"></div>
-  <div id="paceChart"></div>
-  <p class="sub" id="paceFoot" style="margin:8px 0 0"></p>
-</div>
-</div>
-<div class="two">
-  <div class="sheet" data-tab="results" id="results-tab"><h2>Results</h2><ul class="fxlist" id="results"></ul></div>
-  <div class="sheet" data-tab="fixtures" id="fixtures-tab"><h2>Remaining fixtures</h2><ul class="fxlist" id="fixtures"></ul></div>
-</div>
-  <div class="sheet" data-tab="league" id="league-tab"><h2 class="row">Premier League · every game <span id="plNote" class="sub" style="font-weight:400;letter-spacing:0;text-transform:none"></span></h2>
-    <div class="filters" id="plClubs"></div>
-    <p class="plsel"><label>Club <select id="plSel"><option value="all">All clubs</option></select></label></p>
-    <div id="plGames"></div>
+<nav class="pills tabs" id="tabs" aria-label="Competitions"></nav>
+<div data-tab="united" id="united">
+  <div class="sheet" id="usNow"><h2>United this season</h2><div class="h2h now" id="usTiles"><div><b>–</b><span>Premier League</span><small>&nbsp;</small></div><div><b>–</b><span>Champions League</span><small>&nbsp;</small></div><div><b>–</b><span>Next match</span><small>&nbsp;</small></div></div></div>
+  <div class="two">
+    <div class="sheet" id="fixtures-tab"><h2>Remaining fixtures</h2><ul class="fxlist" id="fixtures"></ul></div>
+    <div class="sheet" id="results-tab"><h2>Results</h2><ul class="fxlist" id="results"></ul></div>
   </div>
+  <div class="sheet" id="paceSheet" hidden>
+    <h2>This season against every other</h2>
+    <p class="sub" id="paceNote" style="margin:0 0 10px"></p>
+    <div class="h2h" id="paceStats"></div>
+    <div id="paceChart"></div>
+    <p class="sub" id="paceFoot" style="margin:8px 0 0"></p>
+  </div>
+</div>
+<div data-tab="premier-league" id="premier-league"><div class="comp">
+  <div class="sheet"><h2><img src="/manutd/assets/comps/premier-league.png" alt="" class="cmplogo">Table</h2><div id="pl"></div></div>
+  <div class="sheet"><h2 class="row">Every game <span id="plNote" class="sub gnote"></span></h2>
+    <p class="plsel"><label>Club <select id="plSel"><option value="all">All clubs</option></select></label></p>
+    <div id="plGames"></div></div>
+</div></div>
+<div data-tab="champions-league" id="champions-league"><div class="comp">
+  <div class="sheet"><h2><img src="/manutd/assets/comps/champions-league.png" alt="" class="cmplogo">League phase</h2><div id="ucl"></div></div>
+  <div class="sheet"><h2 class="row">Every game <span id="clNote" class="sub gnote"></span></h2>
+    <p class="plsel"><label>Club <select id="clSel"><option value="all">All clubs</option></select></label></p>
+    <div id="clGames"></div></div>
+</div></div>
 </div>
 </main>
 <footer class="mu"><span id="stamp"></span> Tables and results from API-Football (hourly cache on this site's Worker). Last season's figures from the club's 2025/26 record: 3rd on 71 points, 20–11–7, Šeško and Mbeumo top scorers on 12.</footer>
@@ -102,16 +107,21 @@
 <script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script>
 <script>
 (function(){
-  MU.nav("Season"); MU.tabs(document.getElementById("tabs"),[{id:"table",label:"Table"},{id:"results",label:"Results"},{id:"fixtures",label:"Fixtures"},{id:"league",label:"League"}],"table"); MU.checked("fixtures",document.getElementById("stamp"),"Last checked");
+  MU.nav("Season"); MU.tabs(document.getElementById("tabs"),[{id:"united",label:"United"},{id:"premier-league",label:"Premier League"},{id:"champions-league",label:"Champions League"}],"united",{always:true}); MU.checked("fixtures",document.getElementById("stamp"),"Last checked");
   function table(rows,opts){
     return '<table class="mu"><thead><tr><th>#</th><th>Team</th><th class="n">P</th><th class="n">W</th><th class="n">D</th><th class="n">L</th><th class="n">GD</th><th class="n">Pts</th><th>Form</th></tr></thead><tbody>'+
-      rows.map(function(r){var cls=r.team.id===MU.TEAM?"us":""; var d=(r.description||"").toLowerCase(); if(/champions league/.test(d)&&!/qualif/.test(d))cls+=" ucl"; else if(/europa|conference/.test(d))cls+=" uel"; else if(/relegation/.test(d))cls+=" rel";
-        return '<tr class="'+cls+'"><td>'+r.rank+'</td><td>'+(MU.crest(r.team.name,1)?MU.club(r.team.name):'<img class="logo" src="'+r.team.logo+'" alt="">'+MU.esc(r.team.name))+'</td><td class="n">'+r.all.played+'</td><td class="n">'+r.all.win+'</td><td class="n">'+r.all.draw+'</td><td class="n">'+r.all.lose+'</td><td class="n">'+(r.goalsDiff>0?"+":"")+r.goalsDiff+'</td><td class="n"><b>'+r.points+'</b></td><td>'+MU.form(r.form)+'</td></tr>'}).join("")+'</tbody></table>'+
+      rows.map(function(r){var cls=r.team.id===MU.TEAM?"us":""; var d=(r.description||"").toLowerCase(); if(opts&&opts.zone)cls+=" "+opts.zone(r.rank); else if(/champions league/.test(d)&&!/qualif/.test(d))cls+=" ucl"; else if(/europa|conference/.test(d))cls+=" uel"; else if(/relegation/.test(d))cls+=" rel";
+        var n=r.team.name, sh=MU.esc(SHORT[n]||n), cell=MU.crest(n,1)?MU.crest(n,22)+'<a class="cl" href="'+(n==="Manchester United"?"/manutd/":"/manutd/club/?c="+encodeURIComponent(n))+'" title="'+MU.esc(n)+'">'+sh+'</a>':'<img class="logo" src="'+MU.esc(r.team.logo)+'" alt="">'+'<span title="'+MU.esc(n)+'">'+sh+'</span>';
+        return '<tr class="'+cls+'"><td>'+r.rank+'</td><td class="tm">'+cell+'</td><td class="n">'+r.all.played+'</td><td class="n">'+r.all.win+'</td><td class="n">'+r.all.draw+'</td><td class="n">'+r.all.lose+'</td><td class="n">'+(r.goalsDiff>0?"+":"")+r.goalsDiff+'</td><td class="n"><b>'+r.points+'</b></td><td>'+MU.form(r.form)+'</td></tr>'}).join("")+'</tbody></table>'+
       (opts&&opts.note?'<p class="sub">'+opts.note+'</p>':'');
   }
+  var SHORT={"Manchester United":"Man Utd","Manchester City":"Man City","Nottingham Forest":"Forest","Crystal Palace":"Palace","Sheffield United":"Sheff Utd","Wolverhampton Wanderers":"Wolves","West Ham United":"West Ham","Tottenham Hotspur":"Tottenham","Brighton & Hove Albion":"Brighton","Newcastle United":"Newcastle","Leicester City":"Leicester","AFC Bournemouth":"Bournemouth",
+    "Paris Saint Germain":"PSG","Bayern München":"Bayern","Borussia Dortmund":"Dortmund","Atletico Madrid":"Atlético","Shakhtar Donetsk":"Shakhtar","Slovan Bratislava":"Slovan","PSV Eindhoven":"PSV","Club Brugge KV":"Club Brugge","AEK Athens FC":"AEK Athens","Slavia Praha":"Slavia","VfB Stuttgart":"Stuttgart"};
+  var ords=function(k){var s=["th","st","nd","rd"],v=k%100;return k+(s[(v-20)%10]||s[v]||s[0])};
+  function tile(i,b,small,href){var t=document.getElementById("usTiles").children[i]; t.querySelector("b").innerHTML=href?'<a href="'+href+'">'+b+'</a>':b; t.querySelector(":scope>small").innerHTML=small}
   MU.api("standings").then(function(j){
     document.getElementById("pl").innerHTML=table(j.response[0].league.standings[0],{note:"Black bar: Champions League places · grey: Europa / Conference · red: relegation."});
-    var me=j.response[0].league.standings[0].filter(function(r){return r.team.id===MU.TEAM})[0]; if(me&&me.all.played>=3)pace(me.all.played,me.points,me.goalsDiff,me.rank,j.response[0].league.season);
+    var me=j.response[0].league.standings[0].filter(function(r){return r.team.id===MU.TEAM})[0]; if(me)tile(0,ords(me.rank),me.points+" pts from "+me.all.played+" · GD "+(me.goalsDiff>0?"+":"")+me.goalsDiff,"#premier-league"); if(me&&me.all.played>=3)pace(me.all.played,me.points,me.goalsDiff,me.rank,j.response[0].league.season);
   }).catch(function(e){MU.apiDown(document.getElementById("pl"),e)});
   // Where this season's points after N games sit against every archived season at the same stage (three points a win throughout).
   function pace(n,pts,gd,rank,year){
@@ -138,7 +148,8 @@
   }
   MU.api("ucl").then(function(j){
     var groups=j.response[0].league.standings; var rows=groups.length===1?groups[0]:[].concat.apply([],groups);
-    document.getElementById("ucl").innerHTML=table(rows,{note:"Top 8 go straight to the round of 16; 9th–24th play a knockout round."});
+    document.getElementById("ucl").innerHTML=table(rows,{zone:function(k){return k<=8?"ucl":k<=24?"uel":"rel"},note:"Black bar: top 8 go straight to the round of 16 · grey: 9th–24th play the knockout play-offs · red: out."});
+    var me=rows.filter(function(r){return r.team.id===MU.TEAM})[0]; if(me)tile(1,ords(me.rank),me.points+" pts from "+me.all.played+" · league phase","#champions-league");
   }).catch(function(e){MU.apiDown(document.getElementById("ucl"),e)});
   function li(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, st=m.fixture.status.short, done=st==="FT"||st==="AET"||st==="PEN";
     var gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home, res=done?(gf>ga?"W":gf<ga?"L":"D"):"";
@@ -150,35 +161,39 @@
     var todo=all.filter(function(m){return !/FT|AET|PEN|CANC|PST/.test(m.fixture.status.short)}).sort(function(a,b){return new Date(MU.ko(a).ko)-new Date(MU.ko(b).ko)});
     document.getElementById("results").innerHTML=done.map(li).join("")||'<li>No results yet</li>';
     document.getElementById("fixtures").innerHTML=todo.map(li).join("");
+    var n=todo[0]; if(n){var home=n.teams.home.id===MU.TEAM, opp=home?n.teams.away:n.teams.home, k=MU.ko(n); tile(2,MU.esc(SHORT[opp.name]||opp.name),(home?"Home":"Away")+" · "+MU.fmtDate(k.ko)+" · "+MU.fmtLocal(k.ko)+" · "+MU.esc(n.league.name.replace(/^UEFA /,"")),"/manutd/match/?id="+n.fixture.id)}
   }).catch(function(e){
     MU.apiDown(document.getElementById("results"),e);
     var now=new Date();
     document.getElementById("fixtures").innerHTML=window.MU_FIXTURES.filter(function(f){return new Date(f.ko)>now}).map(function(f){return '<li class="'+(f.home?"home":"away")+'"><span class="d">'+MU.fmtDate(f.ko)+'<br>'+MU.fmtKO(f.ko)+MU.prov(f)+'</span><span class="o">'+MU.club(f.opp)+' <small>· '+MU.comp(f.comp)+MU.esc(f.comp)+(f.home?'':' · '+MU.esc(f.venue))+'</small></span><span class="r"></span></li>'}).join("")+'<li><span class="d"></span><span class="o"><small>From the site fixture list (the official club fixtures page); results arrive with the API.</small></span><span></span></li>';
   });
-  // ---- Every Premier League game: by matchweek, current one open, a club filter. Other clubs' scores arrive at half-time and full-time.
-  (function(){
-    var club="all", DATA=null;
-    function mwNo(r){var m=String(r||"").match(/(\d+)$/); return m?+m[1]:0}
-    var SHORT={"Manchester United":"Man Utd","Manchester City":"Man City","Nottingham Forest":"Forest","Crystal Palace":"Palace","Sheffield United":"Sheff Utd","Wolverhampton Wanderers":"Wolves","West Ham United":"West Ham","Tottenham Hotspur":"Tottenham","Brighton & Hove Albion":"Brighton","Newcastle United":"Newcastle","Leicester City":"Leicester","AFC Bournemouth":"Bournemouth"};
-    function nm(n){return '<span class="n"><span class="long">'+MU.esc(n)+'</span><span class="short">'+MU.esc(SHORT[n]||n)+'</span></span>'}
-    function row(m){var st=m.st, live=/1H|HT|2H|ET|BT|P|LIVE|INT/.test(st), done=/FT|AET|PEN/.test(st), ns=!live&&!done, us=m.home.id===MU.TEAM||m.away.id===MU.TEAM;
-      var mid=ns?MU.fmtLocal(m.date):(m.goals.home==null?"–":m.goals.home+"–"+m.goals.away), tag=live?(st==="HT"?"HT":(m.min||"")+"'"):"";
-      return '<div class="plrow'+(live?" live":"")+(ns?" ns":"")+(us?" us":"")+'"><span class="d">'+MU.fmtDate(m.date)+(ns?"":'<span class="stx"> · '+(live?tag:(st==="FT"?"FT":st))+'</span>')+'</span><span class="h">'+nm(m.home.name)+MU.crest(m.home.name,22)+'</span><span class="sc"><a href="/manutd/match/?id='+m.id+'" title="Match centre">'+mid+'</a></span><span class="a">'+MU.crest(m.away.name,22)+nm(m.away.name)+'</span></div>'}
-    function render(){if(!DATA)return; var list=DATA.response.filter(function(m){return club==="all"||m.home.id===club||m.away.id===club}), by={}; list.forEach(function(m){var k=mwNo(m.round); (by[k]=by[k]||[]).push(m)});
-      var now=Date.now()/1000, keys=Object.keys(by).map(Number).sort(function(a,b){return a-b});
-      // the current matchweek: the first with a game not yet finished, else the last
-      var cur=keys.filter(function(k){return by[k].some(function(m){return !/FT|AET|PEN|CANC|PST|AWD|WO/.test(m.st)})})[0]||keys[keys.length-1];
-      var order=keys.slice().sort(function(a,b){return Math.abs(a-cur)-Math.abs(b-cur)||a-b});   // nearest matchweeks first
-      document.getElementById("plGames").innerHTML=order.map(function(k){var ms=by[k].slice().sort(function(a,b){return a.ts-b.ts}), played=ms.filter(function(m){return /FT|AET|PEN/.test(m.st)}).length, open=k===cur;
-        return '<details class="mw"'+(open?' open':'')+'><summary>Matchweek '+k+'<small>'+(played===ms.length?"all played":played+" of "+ms.length+" played")+' · '+MU.fmtDate(ms[0].date)+(ms.length>1&&ms[ms.length-1].date.slice(0,10)!==ms[0].date.slice(0,10)?"–"+MU.fmtDate(ms[ms.length-1].date):"")+'</small></summary>'+ms.map(row).join("")+'</details>'}).join("");
-      var live=list.filter(function(m){return /1H|HT|2H|ET|BT|P|LIVE|INT/.test(m.st)}).length; document.getElementById("plNote").textContent=(live?live+" in play · ":"")+"other clubs' scores update at half-time and full-time";}
-    MU.api("pl").then(function(j){DATA=j; var clubs={}; j.response.forEach(function(m){clubs[m.home.id]=m.home.name; clubs[m.away.id]=m.away.name});
-      var ids=Object.keys(clubs).sort(function(a,b){return clubs[a].localeCompare(clubs[b])});
-      var el=document.getElementById("plClubs"); el.innerHTML='<button type="button" data-c="all" aria-pressed="true">All clubs</button>'+ids.map(function(id){return '<button type="button" data-c="'+id+'" aria-pressed="false">'+MU.crest(clubs[id],16)+' '+MU.esc(clubs[id].replace(/^Manchester /,"Man "))+'</button>'}).join("");
-      el.addEventListener("click",function(e){var b=e.target.closest("button"); if(!b)return; club=b.dataset.c==="all"?"all":+b.dataset.c; [].forEach.call(el.children,function(x){x.setAttribute("aria-pressed",x===b)}); sel.value=String(club); render()});
-      var sel=document.getElementById("plSel"); sel.innerHTML='<option value="all">All clubs</option>'+ids.map(function(id){return '<option value="'+id+'">'+MU.esc(clubs[id])+'</option>'}).join(""); sel.addEventListener("change",function(){club=sel.value==="all"?"all":+sel.value; [].forEach.call(el.children,function(x){x.setAttribute("aria-pressed",x.dataset.c===sel.value)}); render()});
-      render();
-    }).catch(function(e){MU.apiDown(document.getElementById("plGames"),e)});
-  })();
+  // ---- Every game in a competition, grouped (PL: matchweeks; CL: matchdays, knockout rounds, qualifying), the current group open,
+  // nearest groups first, a club picker. Other clubs' scores arrive at half-time and full-time.
+  var LIVE=/1H|HT|2H|ET|BT|P|LIVE|INT/, DONE=/FT|AET|PEN/, OVER=/FT|AET|PEN|CANC|PST|AWD|WO/;
+  function nm(n){return '<span class="n"><span class="long">'+MU.esc(n)+'</span><span class="short">'+MU.esc(SHORT[n]||n)+'</span></span>'}
+  function cr(t){return MU.crest(t.name,22)||'<img class="crest" src="'+MU.esc(t.logo||"")+'" alt="" width="22" height="22" loading="lazy" style="width:22px;height:22px;object-fit:contain;vertical-align:-6px">'}
+  function row(m){var st=m.st, live=LIVE.test(st)&&st!=="PST", done=DONE.test(st), ns=!live&&!done, us=m.home.id===MU.TEAM||m.away.id===MU.TEAM;
+    var mid=ns?MU.fmtLocal(m.date):(m.goals.home==null?"–":m.goals.home+"–"+m.goals.away), tag=live?(st==="HT"?"HT":(m.min||"")+"'"):"", pen=m.pen&&m.pen.home!=null?" · pens "+m.pen.home+"–"+m.pen.away:"";
+    return '<div class="plrow'+(live?" live":"")+(ns?" ns":"")+(us?" us":"")+'"><span class="d">'+MU.fmtDate(m.date)+(ns?"":'<span class="stx"> · '+(live?tag:st)+pen+'</span>')+'</span><span class="h">'+nm(m.home.name)+cr(m.home)+'</span><span class="sc"><a href="/manutd/match/?id='+m.id+'" title="Match centre">'+mid+'</a></span><span class="a">'+cr(m.away)+nm(m.away.name)+'</span></div>'}
+  function games(o){var club="all", DATA=null, $=function(i){return document.getElementById(i)};
+    function render(){if(!DATA)return; var list=DATA.filter(function(m){return club==="all"?!o.hide||!o.hide(m):m.home.id===club||m.away.id===club}), by={}, lab={};
+      list.forEach(function(m){var g=o.group(m); (by[g.k]=by[g.k]||[]).push(m); lab[g.k]=g.label});
+      var keys=Object.keys(by).sort(function(a,b){return Math.min.apply(null,by[a].map(function(m){return m.ts}))-Math.min.apply(null,by[b].map(function(m){return m.ts}))});
+      if(!keys.length){$(o.out).innerHTML='<p class="sub">No games yet.</p>';return}
+      var ci=keys.findIndex(function(k){return by[k].some(function(m){return !OVER.test(m.st)})}); if(ci<0)ci=keys.length-1;
+      var order=keys.map(function(k,i){return i}).sort(function(a,b){return Math.abs(a-ci)-Math.abs(b-ci)||a-b});
+      $(o.out).innerHTML=order.map(function(i){var k=keys[i], ms=by[k].slice().sort(function(a,b){return a.ts-b.ts}), played=ms.filter(function(m){return DONE.test(m.st)}).length;
+        return '<details class="mw"'+(i===ci?' open':'')+'><summary>'+MU.esc(lab[k])+'<small>'+(played===ms.length?"all played":played+" of "+ms.length+" played")+' · '+MU.fmtDate(ms[0].date)+(ms[ms.length-1].date.slice(0,10)!==ms[0].date.slice(0,10)?"–"+MU.fmtDate(ms[ms.length-1].date):"")+'</small></summary>'+ms.map(row).join("")+'</details>'}).join("");
+      var live=list.filter(function(m){return LIVE.test(m.st)&&m.st!=="PST"}).length; $(o.note).textContent=(live?live+" in play · ":"")+"other clubs' scores update at half-time and full-time"}
+    MU.api(o.api).then(function(j){DATA=j.response; var clubs={}; DATA.filter(function(m){return !o.hide||!o.hide(m)}).forEach(function(m){clubs[m.home.id]=m.home.name; clubs[m.away.id]=m.away.name});
+      var ids=Object.keys(clubs).sort(function(a,b){return clubs[a].localeCompare(clubs[b])}), sel=$(o.sel);
+      sel.innerHTML='<option value="all">All clubs</option><option value="'+MU.TEAM+'">Manchester United</option>'+ids.filter(function(id){return +id!==MU.TEAM}).map(function(id){return '<option value="'+id+'">'+MU.esc(clubs[id])+'</option>'}).join("");
+      sel.addEventListener("change",function(){club=sel.value==="all"?"all":+sel.value; render()}); render();
+    }).catch(function(e){MU.apiDown($(o.out),e)})}
+  function mwNo(r){var m=String(r||"").match(/(\d+)$/); return m?+m[1]:0}
+  games({api:"pl",out:"plGames",sel:"plSel",note:"plNote",group:function(m){var n=mwNo(m.round); return {k:"m"+n,label:"Matchweek "+n}}});
+  var QUAL=/qualifying|^play-offs$/i;
+  games({api:"cl",out:"clGames",sel:"clSel",note:"clNote",hide:function(m){return QUAL.test(m.round)},
+    group:function(m){var r=m.round||"", n=r.match(/League Stage - (\d+)/i); if(n)return {k:"ls"+n[1],label:"Matchday "+n[1]}; if(QUAL.test(r))return {k:r,label:"Qualifying · "+r.replace(/ Qualifying Round/i," round").replace(/^Play-offs$/i,"play-off round")}; return {k:r,label:r.replace(/^Knockout Round Play-offs$/i,"Knockout play-offs")}}});
 })();
 </script></body></html>
