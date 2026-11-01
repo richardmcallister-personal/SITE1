@@ -53,7 +53,7 @@
 },
 "search": {
 "date": "2026-11-01",
-"note": "1730 entries"
+"note": "1776 entries"
 },
 "pace": {
 "date": "2026-10-31",
@@ -70,5 +70,9 @@
 "early": {
 "date": "2026-10-31",
 "note": "Newton Heath 1886–92"
+},
+"timeline": {
+"date": "2026-11-01",
+"note": "254 events"
 }
 }

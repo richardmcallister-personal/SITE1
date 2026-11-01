@@ -61,11 +61,16 @@ for s in json.load(open(os.path.join(STATIC, "shelf", "shelf.json"))):
 # classic matches
 for c in json.load(open(os.path.join(STATIC, "comebacks", "classics.json"))):
     add(f"{'United' if c['home'] else c['opp']} {c['score']} {c['opp'] if c['home'] else 'United'}, {c['date'][:4]}", 'match', '/manutd/comebacks/', f"{c['comp']} {c['round']} · {c['venue']}".strip(' ·'), [c['date']])
+# club history on the timeline (founding, grounds, owners): each opens its decade in the Club view
+TL = json.load(open(H + '/timeline.json'))
+for e in TL['events']:
+    if e['t'] in ('club', 'ground'):
+        add(e['ti'], 'page', f"/manutd/history/timeline/?d={e['d'][:3]}0s&v=club#e-{e['d']}", f"{e['d'][:4]} · club history", [e['d'][:4]])
 # sections
 for u, t, s in [('/manutd/', 'Hub', 'next match, on this day, latest report'), ('/manutd/trips/', 'Trips & planner', 'flights, hotels and prices for every fixture'), ('/manutd/season/', 'Season', 'table, results, fixtures'),
                 ('/manutd/squad/', 'Squad & team picker', ''), ('/manutd/youth/', 'Academy & loans', ''), ('/manutd/kits/', 'Shirt museum', 'every kit since 1878'), ('/manutd/numbers/', 'Who wore this number?', ''),
                 ('/manutd/comebacks/', 'Comeback collection', ''), ('/manutd/shelf/', 'Bookshelf & watchlist', ''), ('/manutd/grounds/', 'Ground guides', ''), ('/manutd/history/', 'History', ''), ('/manutd/ask/', 'Ask the archive', 'a question answered from the site data'),
-                ('/manutd/history/seasons/', 'All seasons', ''), ('/manutd/history/opponents/', 'Every opponent', ''), ('/manutd/history/managers/', 'Every manager', ''), ('/manutd/history/records/', 'Records', ''), ('/manutd/links/', 'Links', ''),
+                ('/manutd/history/seasons/', 'All seasons', ''), ('/manutd/history/opponents/', 'Every opponent', ''), ('/manutd/history/managers/', 'Every manager', ''), ('/manutd/history/records/', 'Records', ''), ('/manutd/history/timeline/', 'History timeline', 'managers, trophies, grounds and club history by decade'), ('/manutd/links/', 'Links', ''),
                 ('/manutd/rivalry/?r=liverpool', 'United v Liverpool', 'rivalry: record, runs, scorers, next meeting'), ('/manutd/rivalry/?r=city', 'Manchester derby', 'rivalry: record, runs, scorers, next meeting'),
                 ('/manutd/rivalry/?r=leeds', 'United v Leeds', 'Roses rivalry: record, runs, scorers'), ('/manutd/rivalry/?r=arsenal', 'United v Arsenal', 'rivalry: record, runs, scorers, next meeting'), ('/manutd/rivalry/?r=chelsea', 'United v Chelsea', 'record, runs, scorers, next meeting')]:
     add(t, 'page', u, s)
