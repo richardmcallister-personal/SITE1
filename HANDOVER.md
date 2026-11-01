@@ -44,6 +44,9 @@ the live Worker). See `git log` for the latest commit on each branch.
   top-8 / play-off / out bars + every game by matchday; qualifying hidden unless a club
   is picked). Desktop ≥900px: table left, games right. Club picker is a dropdown for both. Game lists: an "Earlier" button (past weeks, collapsed) above the current week (open), then upcoming weeks in date order; picking one club opens every week in date order.
   Tab ids are `united`, `premier-league`, `champions-league` (not `#pl` — that is the table).
+- Top scorers / Top assists (top 10, ties share a rank) under both tables, from Worker route
+  `/api/leaders?c=pl|cl&k=goals|assists` (API-Football topscorers/topassists, slimmed, 3-h cache).
+  CL figures include qualifying rounds (that is how the feed counts them).
 - Ask: club questions include that club's CL games; Europe questions get the CL table and
   latest/next CL games. Answer cache bumped to `ask:a:v9:`.
 
