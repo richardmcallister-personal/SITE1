@@ -93,6 +93,7 @@
   function covers(x){var i=id(x), el=document.querySelector('[data-cov="'+i+'"]'); if(!el)return;
     function put(u){if(u){el.innerHTML='<img src="'+u+'" alt="" loading="lazy" onerror="this.parentNode.innerHTML=\'<span>'+KIND[x.k]+'</span>\'">'}}
     if(COV[i]!==undefined)return put(COV[i]);
+    if("cover" in x){COV[i]=x.cover; return put(x.cover)}   // checked by hand in shelf.json ("" = no reliable cover, keep the placeholder)
     var FEED={"the-athletic-talk-of-the-devils":"pod-totd","stretford-paddock":"pod-paddock","the-overlap":"pod-overlap","stick-to-football":"pod-overlap","uws-united-we-stand":"pod-uws"};
     if(x.k==="pod"&&FEED[i]){fetch("/feed?id="+FEED[i]).then(function(r){return r.json()}).then(function(j){COV[i]=(j.image||j.artwork||(j.show&&j.show.image)||"")||""; put(COV[i])}).catch(function(){COV[i]=""}); return}
     var q=x.wiki?{type:"wikititle",q:x.wiki}:x.k==="book"?{type:"book",q:x.t,by:x.by}:x.k==="pod"?{type:"pod",q:x.t.replace(/^UWS: /,"").replace(/^The Athletic: /,"")}:{type:"wiki",q:x.t,hint:x.k==="film"?"film":"documentary "+x.y};
