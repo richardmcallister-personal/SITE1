@@ -181,9 +181,9 @@
       var keys=Object.keys(by).sort(function(a,b){return Math.min.apply(null,by[a].map(function(m){return m.ts}))-Math.min.apply(null,by[b].map(function(m){return m.ts}))});
       if(!keys.length){$(o.out).innerHTML='<p class="sub">No games yet.</p>';return}
       var ci=keys.findIndex(function(k){return by[k].some(function(m){return !OVER.test(m.st)})}); if(ci<0)ci=keys.length-1;
-      var order=keys.map(function(k,i){return i}).sort(function(a,b){return Math.abs(a-ci)-Math.abs(b-ci)||a-b});
+      var one=club!=="all", order=keys.map(function(k,i){return i}); if(!one)order.sort(function(a,b){return Math.abs(a-ci)-Math.abs(b-ci)||a-b});   // one club: every week open, in date order
       $(o.out).innerHTML=order.map(function(i){var k=keys[i], ms=by[k].slice().sort(function(a,b){return a.ts-b.ts}), played=ms.filter(function(m){return DONE.test(m.st)}).length;
-        return '<details class="mw"'+(i===ci?' open':'')+'><summary>'+MU.esc(lab[k])+'<small>'+(played===ms.length?"all played":played+" of "+ms.length+" played")+' · '+MU.fmtDate(ms[0].date)+(ms[ms.length-1].date.slice(0,10)!==ms[0].date.slice(0,10)?"–"+MU.fmtDate(ms[ms.length-1].date):"")+'</small></summary>'+ms.map(row).join("")+'</details>'}).join("");
+        return '<details class="mw"'+(one||i===ci?' open':'')+'><summary>'+MU.esc(lab[k])+'<small>'+(played===ms.length?"all played":played+" of "+ms.length+" played")+' · '+MU.fmtDate(ms[0].date)+(ms[ms.length-1].date.slice(0,10)!==ms[0].date.slice(0,10)?"–"+MU.fmtDate(ms[ms.length-1].date):"")+'</small></summary>'+ms.map(row).join("")+'</details>'}).join("");
       var live=list.filter(function(m){return LIVE.test(m.st)&&m.st!=="PST"}).length; $(o.note).textContent=(live?live+" in play · ":"")+"other clubs' scores update at half-time and full-time"}
     MU.api(o.api).then(function(j){DATA=j.response; var clubs={}; DATA.filter(function(m){return !o.hide||!o.hide(m)}).forEach(function(m){clubs[m.home.id]=m.home.name; clubs[m.away.id]=m.away.name});
       var ids=Object.keys(clubs).sort(function(a,b){return clubs[a].localeCompare(clubs[b])}), sel=$(o.sel);
