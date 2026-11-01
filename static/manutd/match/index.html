@@ -79,6 +79,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
   <div class="actions" id="actions"></div>
   <p class="note" id="note"></p>
   <div class="watch" id="watch" hidden></div>
+  <div class="miles" id="miles" hidden><h2>Milestone watch</h2><div class="msbody"></div></div>
 </div>
 <div class="sheet" id="reportSheet" style="display:none"><div id="report"></div></div>
 <div class="sheet" id="bodyWait" aria-hidden="true" style="min-height:70vh"></div>
@@ -91,7 +92,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
 </main>
 <footer class="mu">Live data from API-Football; refreshed every minute from 90 minutes before kick-off until the final whistle, hourly otherwise. Kick-offs are shown in your own time zone, with UK time beneath.</footer>
 </div>
-<script src="/manutd/mu.js"></script><script src="/manutd/watch.js"></script><script src="/manutd/fixtures.js"></script>
+<script src="/manutd/mu.js"></script><script src="/manutd/watch.js"></script><script src="/manutd/milestones.js"></script><script src="/manutd/fixtures.js"></script>
 <script>
 (function(){
   MU.nav("Season");
@@ -120,6 +121,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
     if(!DONE.test(f.fixture.status.short)&&OURS) acts+='<a class="btn" href="/manutd/squad/">Pick your XI</a>';
     if(!OURS&&!DONE.test(f.fixture.status.short)) $("note").textContent="Not a United game: the score here updates around half-time and full-time, not minute by minute.";
     $("actions").innerHTML=acts;
+    if(OURS&&!DONE.test(f.fixture.status.short)&&window.MUMiles&&!render.miles){render.miles=1; MUMiles.render($("miles"),f,{hideEmpty:true})} else if(!OURS||DONE.test(f.fixture.status.short))$("miles").hidden=true;
     if(window.MUWatch&&!/FT|AET|PEN|CANC|ABD|AWD|WO/.test(f.fixture.status.short))MUWatch.render($("watch"),{comp:f.league.name,ko:ko}); else $("watch").hidden=true;
     var ev=(f.events||[]).filter(function(e){return e.time.elapsed>=0}), lu=f.lineups||[], stt=f.statistics||[];
     var has=ev.length||lu.length||stt.length; $("body").style.display=has?"":"none"; $("bodyWait").style.display="none";

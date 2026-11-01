@@ -15,5 +15,6 @@ python3 tools/build_finals.py
 python3 tools/build_players.py
 python3 tools/build_records.py
 python3 tools/build_pace.py
+python3 tools/build_milestones.py
 python3 tools/build_search.py
 echo "builds done — review git status, then commit and push"

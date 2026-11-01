@@ -26,10 +26,12 @@
       if(!a1)return;   // not played this season: leave him out
       if(p.apps0!=null){var A=p.apps0+a1;
         for(var k=1;k<=3;k++)if(APPS(A+k))out.push({need:k,unit:k>1?"apps":"app",score:A+k,href:pl(p.t),t:k===1?name+"’s next appearance will be his "+ord(A+k)+" for United":name+" is "+k+" appearances from "+(A+k)+" for United",s:A+" in all competitions, "+a1+" this season"});
-        D.apps.forEach(function(y){ if(y[0]===p.t||y[2]<250)return; var k=y[2]+1-A; if(k>=1&&k<=3)out.push({need:k,unit:k>1?"apps":"app",score:y[2]/4,href:pl(p.t),t:name+" is "+k+" appearance"+(k>1?"s":"")+" from passing "+esc(y[1])+" ("+y[2]+") for United games played",s:A+" in all competitions · counts from the squad lists, 1993/94 on"}) });
+        var pass={}; D.apps.forEach(function(y){ if(y[0]===p.t||y[2]<250)return; var k=y[2]+1-A; if(k>=1&&k<=3)(pass[y[2]]=pass[y[2]]||[]).push(esc(y[1])) });
+        Object.keys(pass).forEach(function(v){var k=+v+1-A, who=pass[v].length>1?pass[v].slice(0,-1).join(", ")+" and "+pass[v][pass[v].length-1]:pass[v][0];
+          out.push({need:k,unit:k>1?"apps":"app",score:v/4,href:pl(p.t),t:(k===1?name+"’s next appearance takes him past ":name+" is "+k+" appearances from passing ")+who+" ("+v+" games for United)",s:A+" in all competitions · players since 1993/94, from the squad lists"})});
       }
       if(!p.gaps){var G=p.g0+g1;
-        for(var k2=1;k2<=2;k2++)if(GOALS(G+k2))out.push({need:k2,unit:k2>1?"goals":"goal",score:(G+k2)*2,href:pl(p.t),t:name+" needs "+k2+" goal"+(k2>1?"s":"")+" for "+(G+k2)+" for United",s:G+" in all competitions, "+g1+" this season"});
+        for(var k2=1;k2<=2;k2++)if(GOALS(G+k2))out.push({need:k2,unit:k2>1?"goals":"goal",score:(G+k2)*2,href:pl(p.t),t:name+" is "+k2+" goal"+(k2>1?"s":"")+" from "+(G+k2)+" for United",s:G+" in all competitions, "+g1+" this season"});
         var L=D.goals, low=L.length?L[L.length-1][2]:1e9;
         for(var k3=1;k3<=2;k3++){var N=G+k3; if(N<low)continue;
           L.forEach(function(y){ if(y[0]===p.t||y[2]!==N-1||y[3])return;
@@ -114,7 +116,7 @@
   function render(el,next,opt){
     opt=opt||{}; if(!el)return;
     build(next).then(function(R){
-      var it=R.items, n=R.next, head=n?(n.home?"United v "+esc(n.o):esc(n.o)+" v United")+" · "+MU.fmtDate(n.ko):"";
+      var it=R.items, n=R.next, on=n&&(R.club?R.club.name:n.o), head=n?(n.home?"United v "+esc(on):esc(on)+" v United")+" · "+MU.fmtDate(n.ko):"";
       if(opt.hideEmpty&&!it.length){el.hidden=true;return}
       el.hidden=false; el.removeAttribute("aria-busy");
       var top=it.slice(0,5), rest=it.slice(5);

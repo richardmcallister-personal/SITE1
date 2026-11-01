@@ -52,7 +52,7 @@
   .hub .col{display:flex;flex-direction:column;min-width:0} .hub #alerts{grid-column:1/-1}
   .lastrow .d{white-space:nowrap}}
 @media (max-width:899px){.hub .col{display:contents} .hub{display:flex;flex-direction:column}
-  #matchSheet{order:1} #tableSheet{order:2} #otdSheet{order:3} #lastSheet{order:4} #upSheet{order:5} #secSheet{order:6} #alerts{order:7}}
+  #matchSheet{order:1} #msSheet{order:2} #tableSheet{order:3} #otdSheet{order:4} #lastSheet{order:5} #upSheet{order:6} #secSheet{order:7} #alerts{order:8}}
 /* match card */
 .mc .k{font-family:var(--display);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px}
 .mc .pill{font-family:var(--body);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);background:var(--tint);padding:3px 8px;border-radius:10px} .mc .pill.live{background:var(--red);color:#fff}
@@ -80,7 +80,7 @@ table.mini tr.rel td:first-child{box-shadow:inset 3px 0 0 var(--red)}
 h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;padding:0;width:100%;font-family:var(--display);font-weight:400;font-size:13px} h2.row a{font-family:var(--body);font-size:12px;color:var(--red-ink);text-decoration:none;letter-spacing:0;text-transform:none;font-weight:600}
 .lastrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--rule);font-size:14px} .lastrow .d{font-size:11px;color:var(--muted);min-width:56px} .lastrow .ha{font-size:10px;font-weight:700;color:var(--muted);background:var(--tint);padding:2px 5px;border-radius:3px} .lastrow .o{flex-grow:1;font-weight:600} .lastrow .o small{display:block;font-weight:400;color:var(--muted);font-size:11px} .lastrow .r{font-family:var(--display);font-size:18px;white-space:nowrap} .lastrow .r a{color:inherit;text-decoration:none} .lastrow .r small.tz{font-family:var(--body);font-size:10px} .lastrow .form{margin-left:2px}
 /* reserved space so cards fill in place instead of pushing the page down (CLS) */
-#matchSheet{min-height:228px} #tiles{min-height:178px} #miniSheet{min-height:320px} #otdSheet{min-height:340px} #lastSheet{min-height:330px} #upSheet{min-height:440px}
+#matchSheet{min-height:228px} #tiles{min-height:178px} #miniSheet{min-height:320px} #otdSheet{min-height:340px} #lastSheet{min-height:330px} #upSheet{min-height:440px} #msSheet{min-height:650px} @media (min-width:900px){#msSheet{min-height:675px}}
 </style><!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZZVNDNYN9"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'granted',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',region:'AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,IS,LI,NO,GB,CH'.split(',')});try{var c=localStorage.getItem('mu:consent');if(c)gtag('consent','update',{analytics_storage:c==='granted'?'granted':'denied'})}catch(e){}gtag('js',new Date());gtag('config','G-QZZVNDNYN9');</script>
@@ -94,6 +94,7 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
 <main class="hub" id="main-content" tabindex="-1">
   <div class="col">
   <div class="sheet mc" id="matchSheet"><div class="k">Next match</div><div class="line">Loading…</div></div>
+  <div class="sheet" id="msSheet" aria-busy="true"><h2 class="row">Milestone watch <a href="/manutd/history/records/">Records →</a></h2><div class="msbody"><p class="sub">Checking the numbers…</p></div></div>
   <div class="sheet" id="upSheet"><h2 class="row">Coming up <a href="/manutd/trips/">Trips →</a></h2><div id="upcoming"></div></div>
   </div>
   <div class="col">
@@ -143,7 +144,7 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
 
 <footer class="mu">Fixture dates from tickets.manutd.com (home) and the TV-selected lists (away) on 29 Oct 2026. Live table, results and form from API-Football via this site's own Worker; nothing is fetched from the user's browser except this site and flag images.</footer>
 </div>
-<script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script>
+<script src="/manutd/mu.js"></script><script src="/manutd/fixtures.js"></script><script src="/manutd/milestones.js"></script>
 <script>
 // Match alerts: service worker + Web Push. Needs the site installed to the Home Screen on iPhone (Safari rule); works straight away in Chrome/Edge/Firefox.
 (function(){
@@ -221,6 +222,7 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
     }).catch(function(){});
   }
   preview(next);
+  if(window.MUMiles)MUMiles.render($("msSheet"),null);
   // ---- On this day
   fetch("/manutd/history/onthisday.json").then(function(r){return r.json()}).then(function(O){
     var d=new Date(), md=d.toLocaleDateString("en-GB",{month:"2-digit",day:"2-digit",timeZone:MU.TZ}).split("/").reverse().join("-"), ms=O[md]||[], yr=d.getFullYear();
