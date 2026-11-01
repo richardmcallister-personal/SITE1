@@ -191,22 +191,23 @@ table.cmp .wait{color:var(--muted);font-size:13px}
     // feed: starts, minutes, assists, per 90
     var fs=ss.filter(function(s){return +s.slice(0,4)>=FEED_FROM}), pre=ss.length-fs.length, used=[], bad=[], loading=false, partial=[];
     fs.forEach(function(s){var f=o.feed[s]&&o.feed[s].v; if(!f){loading=true;return} var ap=sea(s).apps; if(!f.ok){bad.push(sp(s)+" ("+f.why+")");return}
-      if(ap>0&&f.apps<0.9*ap){bad.push(sp(s)+" (feed has "+f.apps+" of "+ap+" apps)");return} used.push([s,f]); if(ap>0&&f.apps<ap)partial.push(sp(s)+" "+f.apps+" of "+ap)});
+      if(ap>0&&f.apps<0.9*ap){bad.push(sp(s)+" "+f.apps+" of "+ap+" apps");return} used.push([s,f]); if(ap>0&&f.apps<ap)partial.push(sp(s)+" "+f.apps+" of "+ap)});
     R.loading=loading;
     var sum=function(k){return used.reduce(function(a,u){return a+u[1][k]},0)};
     var missing=pre+bad.length, fnote=[];
-    if(pre)fnote.push(fs.length?"Not recorded before 2010/11 ("+pre+" season"+(pre>1?"s":"")+")":"Starts and minutes not recorded before 2010/11");
-    if(bad.length)fnote.push("feed incomplete: "+bad.join(", "));
-    if(partial.length)fnote.push("feed a few games short: "+partial.join(", "));
-    var fmin=missing>0||partial.length>0, fn=fnote.join("; ")+(fnote.length?".":"");
-    if(!used.length){R.starts=R.min=R.ast=R.g90=R.a90={n:null,wait:loading,note:loading?"":fn}}
-    else{R.starts={n:sum("starts"),min:fmin,note:fn}; R.min={n:sum("min"),min:fmin,note:fn};
-      var ak=used.filter(function(u){return u[1].aKnown}); R.ast=ak.length?{n:ak.reduce(function(a,u){return a+u[1].a},0),min:fmin||ak.length<used.length,note:fn+(ak.length<used.length?" No assists in the feed for "+used.filter(function(u){return !u[1].aKnown}).map(function(u){return sp(u[0])}).join(", ")+".":"")}:{n:null,note:"No assists in the feed for these seasons."};
+    if(pre)fnote.push(fs.length?"Not in the feed before 2010/11 ("+pre+" season"+(pre>1?"s":"")+")":"The feed starts in 2010/11; starts and minutes not recorded before");
+    if(bad.length)fnote.push("left out, the feed has too few of his games: "+bad.join(", "));
+    if(partial.length)fnote.push("the feed is a game or two short in "+partial.join(", "));
+    var fmin=missing>0||partial.length>0, fn=fnote.join("; ")+(fnote.length?".":""); fn=fn.charAt(0).toUpperCase()+fn.slice(1);
+    if(!used.length){R.starts={n:null,wait:loading,note:loading?"":fn}; R.min=R.ast=R.g90=R.a90={n:null,wait:loading,note:loading?"":"As for starts."}}
+    else{R.starts={n:sum("starts"),min:fmin,note:fn}; R.min={n:sum("min"),min:fmin,note:fn&&"As for starts."};
+      var ak=used.filter(function(u){return u[1].aKnown}); R.ast=ak.length?{n:ak.reduce(function(a,u){return a+u[1].a},0),min:fmin||ak.length<used.length,note:((fn&&"As for starts.")+(ak.length<used.length?" No assists in the feed for "+used.filter(function(u){return !u[1].aKnown}).map(function(u){return sp(u[0])}).join(", ")+".":"")).trim()}:{n:null,note:"No assists in the feed for these seasons."};
       var m=sum("min"), span=used.length===ss.length?"":"Over "+(used.length===1?sp(used[0][0]):sp(used[0][0])+" to "+sp(used[used.length-1][0])+" ("+used.length+" seasons)")+", feed goals and minutes.";
-      R.g90=m?{n:sum("g")/m*90,d:2,note:span}:{n:null}; R.a90=m&&ak.length?{n:ak.reduce(function(a,u){return a+u[1].a},0)/ak.reduce(function(a,u){return a+u[1].min},0)*90,d:2,note:span}:{n:null};
+      R.g90=m?{n:sum("g")/m*90,d:2,note:span}:{n:null}; R.a90=m&&ak.length?{n:ak.reduce(function(a,u){return a+u[1].a},0)/ak.reduce(function(a,u){return a+u[1].min},0)*90,d:2,note:ak.length===ss.length?"":"Over the "+ak.length+" season"+(ak.length>1?"s":"")+" with feed assists."}:{n:null,note:"No assists in the feed."};
       R.fc=used.length===ss.length?used.reduce(function(acc,u){Object.keys(u[1].c).forEach(function(c){var t=acc[c]=acc[c]||{apps:0,starts:0}; t.apps+=u[1].c[c].apps; t.starts+=u[1].c[c].starts}); return acc},{}):null}
     // honours: trophies in seasons he was at the club, finals in the line-up (recorded to 1992/93)
-    R.won=ss.filter(function(s){return TROPHY[s]}).map(function(s){return [s,TROPHY[s]]});
+    var ev=function(s){var r=sea(s); return r.apps>0||r.goals>0||A.finals.some(function(f){return seasonOfDate(f.d)===s})};
+    R.won=ss.filter(function(s){return TROPHY[s]&&ev(s)}).map(function(s){return [s,TROPHY[s]]}); R.wonQ=ss.filter(function(s){return TROPHY[s]&&!ev(s)}).map(function(s){return [s,TROPHY[s]]});
     R.finals=A.finals.filter(function(f){return inS(seasonOfDate(f.d))});
     R.preFinals=ss.some(function(s){return +s.slice(0,4)<SQUAD_FROM});
     return R}
@@ -214,13 +215,14 @@ table.cmp .wait{color:var(--muted);font-size:13px}
   // ---- render
   function fmt(v){if(!v||v.n==null)return v&&v.wait?'<span class="wait">Loading…</span>':'<b>—</b>'; var t=v.d?v.n.toFixed(v.d):String(v.n); return (v.min?'<span class="m">at least</span>':'')+'<b>'+t+'</b>'+(v.sub?'<span class="s">'+MU.esc(v.sub)+'</span>':'')}
   function better(a,b,low){if(!a||!b||a.n==null||b.n==null)return [0,0]; var x=+(a.d?a.n.toFixed(a.d):a.n), y=+(b.d?b.n.toFixed(b.d):b.n); if(x===y)return [0,0]; var aw=low?x<y:x>y; if(aw&&b.min&&!low)return [0,0]; if(!aw&&a.min&&!low)return [0,0]; return aw?[1,0]:[0,1]}
-  function row(label,src,a,b,opt){opt=opt||{}; var w=opt.plain?[0,0]:better(a,b,opt.low), cov=(a&&a.note)||(b&&b.note);
-    return '<tr'+(cov?' class="has-cov"':'')+'><th scope="row">'+label+(src?'<small>'+src+'</small>':'')+'</th><td'+(w[0]?' class="best"':'')+'>'+fmt(a)+'</td><td'+(w[1]?' class="best"':'')+'>'+fmt(b)+'</td></tr>'+(cov?'<tr class="cov"><th></th><td>'+MU.esc(a&&a.note||"Full.")+'</td><td>'+MU.esc(b&&b.note||"Full.")+'</td></tr>':'')}
+  function row(label,src,a,b,opt){opt=opt||{}; if(opt.skip&&(!a||a.n==null&&!a.wait)&&(!b||b.n==null&&!b.wait))return ''; var w=opt.plain?[0,0]:better(a,b,opt.low), cov=(a&&a.note)||(b&&b.note);
+    return '<tr'+(cov?' class="has-cov"':'')+'><th scope="row">'+label+(src?'<small>'+src+'</small>':'')+'</th><td'+(w[0]?' class="best"':'')+'>'+fmt(a)+'</td><td'+(w[1]?' class="best"':'')+'>'+fmt(b)+'</td></tr>'+(cov?'<tr class="cov"><th></th><td>'+cv(a)+'</td><td>'+cv(b)+'</td></tr>':'')}
+  function cv(v){return v&&v.note?MU.esc(v.note):v&&v.n!=null?"Complete.":""}
   function sec(t){return '<tr class="sec"><th colspan="3" scope="colgroup">'+t+'</th></tr>'}
-  function scopeLabel(sd,R){return sd.scope==="career"?"United career · "+(R.ss.length?sp(R.ss[0]).slice(0,4)+"–"+String(+R.ss[R.ss.length-1].slice(0,4)+1):""):sp(sd.scope)}
+  function scopeLabel(sd,R){var l=R.ss.length&&R.ss[R.ss.length-1]; return sd.scope==="career"?"United career · "+(l?R.ss[0].slice(0,4)+"–"+(+l.slice(0,4)===CUR?"now":String(+l.slice(0,4)+1)):""):sp(sd.scope)}
   function head(sd,R){var o=R.o, th=o.W&&o.W.thumbnail, t=typeof th==="string"?th:th&&th.source; return '<th scope="col"><div class="who">'+(t?'<img src="'+MU.esc(t)+'" alt="" loading="lazy">':'<span class="ph"></span>')+'<div><a href="/manutd/player/?p='+encodeURIComponent(o.e.t)+'">'+MU.esc(o.e.n)+'</a><small>'+scopeLabel(sd,R)+'</small></div></div></th>'}
   function honours(R){var out='', ts={}, sh=0; R.won.forEach(function(w){w[1].forEach(function(t){if(/Shield/.test(t))sh++; else ts[t]=(ts[t]||0)+1})});
-    var k=Object.keys(ts); out+=k.length?'<ul>'+k.map(function(t){return '<li>'+(ts[t]>1?ts[t]+"× ":"")+MU.esc(t)+'</li>'}).join("")+'</ul>':'<span class="s">No major trophy</span>'; if(sh)out+='<span class="s">plus '+sh+' Shield'+(sh>1?"s":"")+'</span>'; return out}
+    var k=Object.keys(ts); out+=k.length?'<ul>'+k.map(function(t){return '<li>'+(ts[t]>1?ts[t]+"× ":"")+MU.esc(t)+'</li>'}).join("")+'</ul>':'<span class="s">No major trophy</span>'; if(sh)out+='<span class="s">plus '+sh+' Shield'+(sh>1?"s":"")+'</span>'; var q=R.wonQ.map(function(w){var t=w[1].filter(function(t){return !/Shield/.test(t)}); return t.length?t.join(", ")+" "+sp(w[0]):""}).filter(Boolean); if(q.length)out+='<span class="s">At the club, no appearance on record: '+MU.esc(q.join("; "))+'</span>'; return out}
   function finals(R){if(!R.finals.length)return R.preFinals?'<span class="s">None in the line-ups</span>':'<span class="s">Not recorded after 1992/93</span>';
     return '<ul>'+R.finals.map(function(f){var r=f.gf>f.ga?"won":f.gf<f.ga?"lost":"drew"; return '<li>'+MU.esc(f.t)+' · '+r+' '+f.gf+'–'+f.ga+(f.start?"":" (bench)")+'</li>'}).join("")+'</ul>'}
   function render(){var A=side.a, B=side.b, ready=A.p&&B.p&&P[A.p.slug]&&P[A.p.slug].A&&P[B.p.slug]&&P[B.p.slug].A;
@@ -233,25 +235,26 @@ table.cmp .wait{color:var(--muted);font-size:13px}
     var h='';
     if(A.scope==="career"||B.scope==="career")h+=row("Seasons","at the club",{n:a.ss.length},{n:b.ss.length},{plain:true});
     h+=row("Appearances","squad lists, all comps",a.apps,b.apps);
-    h+=row("Starts","feed, 2010/11 on",a.starts,b.starts);
-    h+=row("Minutes","feed, 2010/11 on",a.min,b.min);
+    var noFeed=a.min.n==null&&b.min.n==null&&!a.min.wait&&!b.min.wait;
+    h+=row(noFeed?"Starts, minutes, assists":"Starts","feed, 2010/11 on",a.starts,b.starts);
+    h+=row("Minutes","feed, 2010/11 on",a.min,b.min,{skip:1});
     h+=row("Goals","match scorers, all comps",a.goals,b.goals);
-    h+=row("Assists","feed, 2010/11 on",a.ast,b.ast);
-    h+=row("Goals per game","",a.gpg,b.gpg);
-    h+=row("Goals per 90","feed",a.g90,b.g90);
-    h+=row("Assists per 90","feed",a.a90,b.a90);
+    h+=row("Assists","feed, 2010/11 on",a.ast,b.ast,{skip:1});
+    h+=row("Goals per game","squad-list apps",a.gpg,b.gpg,{skip:1});
+    h+=row("Goals per 90","feed",a.g90,b.g90,{skip:1});
+    h+=row("Assists per 90","feed",a.a90,b.a90,{skip:1});
     h+=row("Hat-tricks","",a.ht,b.ht);
     if(a.wl||b.wl)h+=row("League apps","Wikipedia infobox",a.wl?{n:a.wl.apps}:{n:null,note:A.scope==="career"?"":"Career only."},b.wl?{n:b.wl.apps}:{n:null,note:B.scope==="career"?"":"Career only."})+row("League goals","Wikipedia infobox",a.wl?{n:a.wl.goals}:{n:null},b.wl?{n:b.wl.goals}:{n:null});
     // by competition
     var comps=ORD.filter(function(c){return a.cg[c]||b.cg[c]||(a.fc&&a.fc[c]&&a.fc[c].apps)||(b.fc&&b.fc[c]&&b.fc[c].apps)});
     if(comps.length){h+=sec("Goals by competition"+(a.fc||b.fc?' <small style="text-transform:none;letter-spacing:0;color:var(--muted);font-weight:400">· apps (starts) from the feed where it covers every season</small>':''));
-      comps.forEach(function(c){var mk=function(R){var g=R.cg[c]||0, f=R.fc&&R.fc[c]; return {n:g,sub:f?f.apps+" apps ("+f.starts+")":""}}; h+=row(CN[c]||c,"",mk(a),mk(b))})}
+      comps.forEach(function(c){var mk=function(R){var g=R.cg[c]||0, f=R.fc&&R.fc[c]; return {n:g,sub:f?f.apps+" app"+(f.apps===1?"":"s")+" ("+f.starts+")":""}}; h+=row(CN[c]||c,"",mk(a),mk(b))})}
     h+=sec("Honours");
-    h+='<tr><th scope="row">Trophies<small>won in a season he was at the club</small></th><td>'+honours(a)+'</td><td>'+honours(b)+'</td></tr>';
+    h+='<tr><th scope="row">Trophies<small>won in a season he played</small></th><td>'+honours(a)+'</td><td>'+honours(b)+'</td></tr>';
     h+='<tr><th scope="row">Finals<small>in the line-up, to 1992/93</small></th><td>'+finals(a)+'</td><td>'+finals(b)+'</td></tr>';
     if(a.nos.length||b.nos.length)h+='<tr><th scope="row">Shirt numbers<small>1993/94 on</small></th><td>'+(a.nos.join(", ")||"—")+'</td><td>'+(b.nos.join(", ")||"—")+'</td></tr>';
     $("cmpBody").innerHTML=h;
-    $("notes").innerHTML=['Appearances are season squad-list totals from the Wikipedia season articles (1993/94 on), all competitions including the Shield; per-match line-ups are not in the archive.','Goals come from the match-by-match scorers in the season articles; "at least" means some matches in those seasons have no scorers recorded.','Starts, minutes and assists come from API-Football, which covers United from 2010/11; a season counts only when the feed has at least 90% of his squad-list appearances. Per-90 rates use the feed\'s own goals and minutes.','Trophies are those United won in a season he was at the club (an appearance that season from 1993/94; before that, his Wikipedia career years). A loan spell away is not checked. Final line-ups are recorded to 1992/93.','The highlighted figure is the higher one, left plain when either side is a minimum that could overtake it.'].map(function(t){return '<li>'+MU.esc(t)+'</li>'}).join("");
+    $("notes").innerHTML=['Appearances are season squad-list totals from the Wikipedia season articles (1993/94 on), all competitions including the Shield; per-match line-ups are not in the archive.','Goals come from the match-by-match scorers in the season articles; "at least" means some matches in those seasons have no scorers recorded.','Starts, minutes and assists come from API-Football, which covers United from 2010/11; a season counts only when the feed has at least 90% of his squad-list appearances. Per-90 rates use the feed\'s own goals and minutes.','Trophies are those United won in a season he played for the club: an appearance in the squad list (1993/94 on), or a goal or a final before that. Seasons inside his Wikipedia career years with no appearance on record are listed apart. A loan spell away is not checked, and a player who left mid-season is still counted for that season. Final line-ups are recorded to 1992/93.','The highlighted figure is the higher one, left plain when either side is a minimum that could overtake it.'].map(function(t){return '<li>'+MU.esc(t)+'</li>'}).join("");
     // fetch whatever feed seasons are still missing, then redraw
     [[A,a],[B,b]].forEach(function(x){var o=x[1].o; x[1].ss.filter(function(s){return +s.slice(0,4)>=FEED_FROM&&!o.feed[s]}).forEach(function(s){var pr=feedSeason(o,s); pr.then(function(v){pr.v=v; later()})})});
   }
