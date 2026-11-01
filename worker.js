@@ -762,13 +762,14 @@ async function wikiTopic(env, ctx, q) {   // when the question names nothing the
   try {
     const STOPW = /\b(what|why|when|where|who|how|which|did|does|do|is|are|was|were|the|a|an|of|in|on|at|to|for|and|or|happened|called|about|tell|me|explain|get|got|their|its|our|we|us|united|utd|man|manchester|club|team)\b/gi;
     const terms = q.replace(/[?!.,'"]/g, " ").replace(STOPW, " ").replace(/\s+/g, " ").trim(); if (terms.length < 4) return "";
-    const k = "ask:ws:v4:" + (await sha(foldQ(terms))).slice(0, 24); let title = await env.MU_CACHE.get(k);
+    const k = "ask:ws:v5:" + (await sha(foldQ(terms))).slice(0, 24); let title = await env.MU_CACHE.get(k);
     if (title == null) {
       const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" }, words = foldQ(terms).split(" ").filter((w) => w.length >= 4);
       const search = async (qq) => { const r = await fetch("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srlimit=5&srsearch=" + encodeURIComponent(qq), { headers: UA }); const j = await r.json().catch(() => null); return j && j.query && j.query.search || []; };
       const good = (list) => list.find((h) => { const t = foldQ(h.title); return words.some((w) => t.includes(w)); });   // the title must share a word with the question
-      let hit = good(await search(terms + " Manchester United")) || good(await search(terms));
-      title = hit ? hit.title : (/red devil|nickname|founded|history of|old trafford|crest|badge|anthem|rival/i.test(q) ? "Manchester United F.C." : "");
+      if (/red devil|nickname|crest|badge|anthem|founded|history of (the )?club|club history|who owns|owner|glazer|ineos|ratcliffe/i.test(q)) title = "Manchester United F.C.";   // questions about the club itself
+      else if (/old trafford|theatre of dreams|stadium|ground/i.test(q) && !/away|ground guide/i.test(q)) title = "Old Trafford";
+      else { const hit = good(await search(terms + " Manchester United")) || good(await search(terms)); title = hit ? hit.title : ""; }
       ctx.waitUntil(env.MU_CACHE.put(k, title, { expirationTtl: 7 * 86400 }));
     }
     if (!title) return "";
