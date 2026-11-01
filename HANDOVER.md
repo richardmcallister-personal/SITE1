@@ -53,7 +53,7 @@ the live Worker). See `git log` for the latest commit on each branch.
 - Player archive goals for 2025/26 on come from the feed's goal events (`build_clubs.py`, cache
   `tools/data/feed_scorers.json`); before 1 Nov 2026 those seasons had no scorers at all.
 
-- 1 Nov 2026 evening (on `redesign` / dev, not yet on main):
+- 1 Nov 2026 evening (all live on main):
   - Trips: visitor setup (airport, adults, currency with ECB rates via Frankfurter, budget, nights, hotel choice; defaults =
     Richard's) and cheapest / shortest / most flexible options. Only CPH fares are cached; other airports get a live search.
   - Calendar: Worker `/calendar.ics` (all, `?comp=pl|europe|cups`, `?venue=home|away`, `?m=<uid>` one match) built from
@@ -67,6 +67,10 @@ the live Worker). See `git log` for the latest commit on each branch.
   - New pages: /find/ (build_find.py → find/index.json), /history/timeline/ (build_timeline.py + timeline-club.json),
     /compare/ (player comparison, feed for starts/minutes from 2010/11), Milestone watch (build_milestones.py →
     history/milestones.json + milestones.js) on the hub and match page.
+
+- Kit cards: 'memorable matches' removed (no per-match kit data exists anywhere reliable); 'who wore it' = that season's squad.
+- Scheduled tasks: weekly data refresh (Tue 05:31, also fills fixtures.js `sales` from the public ticket pages);
+  seat availability Mon/Wed/Fri 12:15 on Richard's Mac via his signed-in Chrome (reminder push at 11:45).
 
 ## Next task
 
