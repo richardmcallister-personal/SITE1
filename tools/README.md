@@ -11,6 +11,7 @@ Everything here talks to the live site's Worker (manutd.wiki), never to API-Foot
 | `build_season_api.py <year>` | `history/data/<season>.json`, `history/all.json` | one-off: fill a season the archive lacks from the live feed and Wikipedia's league table (used for 2022/23) |
 | `build_records.py` | `history/records.json` | biggest wins/defeats, runs, season extremes, opponent records, by decade — from the same match set |
 | `build_finals.py` | `numbers/finals.json` | United's XI with shirt numbers from every final to 1992/93 (Wikipedia match articles) — the 1–11 era on the numbers page |
+| `build_timeline.py` | `history/timeline.json` | the History timeline: manager tenures, trophies and lost finals, titles, promotions/relegations, records and defining matches generated from the files above, merged with the curated club history in `history/timeline-club.json` (founding, grounds, ownership, crest; each line with its Wikipedia source). Local files only; warns if the trophy count differs from the honours list |
 | `build_search.py` | `search.json` | site-wide search index (players, managers, clubs, seasons, kits, grounds, shelf, classics, sections) — run last |
 | `build_pace.py` | `history/pace.json` | cumulative league points (3 a win) after each game, every season — the Season page's 'this season against every other' |
 | `build_scorers.py` | `history/scorers.json`, `scorers_index.json`, plus `sc` on match rows in `history/data/*.json` and `tools/data/cups.json` | goalscorers for every match from the season articles' Scorers columns (incremental) |
