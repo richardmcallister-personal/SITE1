@@ -51,6 +51,7 @@
 .cmplogo{height:26px;width:auto;vertical-align:-7px;margin-right:8px} .gnote{font-weight:400;letter-spacing:0;text-transform:none}
 @media (max-width:640px){#usTiles>div:last-child{grid-column:1/-1}} .h2h.now a{color:inherit;text-decoration:none} .h2h.now a:hover b{color:var(--red-ink)}
 .comp .plrow .long{display:none} .comp .plrow .short{display:inline} table.mu td.tm{white-space:nowrap}
+.earlier{display:flex;align-items:center;gap:8px;width:100%;margin:10px 0 0;padding:10px 12px;border:1px dashed var(--rule);border-radius:8px;background:transparent;color:var(--muted);font:inherit;font-family:var(--head);font-weight:500;font-size:13px;letter-spacing:.12em;text-transform:uppercase;cursor:pointer} .earlier:hover{color:var(--ink);border-color:var(--muted)} .earlier small{margin-left:auto;font-family:var(--body);letter-spacing:0;font-weight:600} .earlier[aria-expanded="true"]{border-style:solid} .past .mw:last-child{border-bottom:2px solid var(--ink);padding-bottom:6px}
 .plrow.us{box-shadow:inset 3px 0 var(--red);padding-left:8px} .mw .rtag{font-size:11px;color:var(--muted)}
 .mw{margin-top:14px} .mw h3{margin:0 0 4px} .mw summary{cursor:pointer;list-style:none;font-family:var(--head);font-weight:500;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:10px 0;border-top:1px solid var(--rule)} .mw summary::-webkit-details-marker{display:none} .mw summary small{font-weight:400;letter-spacing:0;text-transform:none;margin-left:8px}
 .plrow{display:grid;grid-template-columns:76px 1fr auto 1fr;gap:8px;align-items:center;padding:7px 0;border-top:1px solid var(--rule);font-size:14px} .plrow:first-of-type{border-top:0}
@@ -182,8 +183,12 @@
       if(!keys.length){$(o.out).innerHTML='<p class="sub">No games yet.</p>';return}
       var ci=keys.findIndex(function(k){return by[k].some(function(m){return !OVER.test(m.st)})}); if(ci<0)ci=keys.length-1;
       var one=club!=="all", order=keys.map(function(k,i){return i});   // date order; one club: every week open, all clubs: the current week open
-      $(o.out).innerHTML=order.map(function(i){var k=keys[i], ms=by[k].slice().sort(function(a,b){return a.ts-b.ts}), played=ms.filter(function(m){return DONE.test(m.st)}).length;
-        return '<details class="mw"'+(one||i===ci?' open':'')+'><summary>'+MU.esc(lab[k])+'<small>'+(played===ms.length?"all played":played+" of "+ms.length+" played")+' · '+MU.fmtDate(ms[0].date)+(ms[ms.length-1].date.slice(0,10)!==ms[0].date.slice(0,10)?"–"+MU.fmtDate(ms[ms.length-1].date):"")+'</small></summary>'+ms.map(row).join("")+'</details>'}).join("");
+      var grp=function(i){var k=keys[i], ms=by[k].slice().sort(function(a,b){return a.ts-b.ts}), played=ms.filter(function(m){return DONE.test(m.st)}).length;
+        return '<details class="mw"'+(one||i===ci?' open':'')+'><summary>'+MU.esc(lab[k])+'<small>'+(played===ms.length?"all played":played+" of "+ms.length+" played")+' · '+MU.fmtDate(ms[0].date)+(ms[ms.length-1].date.slice(0,10)!==ms[0].date.slice(0,10)?"–"+MU.fmtDate(ms[ms.length-1].date):"")+'</small></summary>'+ms.map(row).join("")+'</details>'};
+      if(one||ci===0){$(o.out).innerHTML=order.map(grp).join("")}
+      else{var past=order.slice(0,ci), word=o.unit||"weeks", nn=function(k){var m=/^Match(?:week|day) (\d+)$/.exec(lab[k]); return m&&m[1]}, f0=nn(keys[0]), f1=nn(keys[ci-1]), rng=f0&&f1?" "+(f0===f1?f0:f0+"–"+f1):"";
+        $(o.out).innerHTML='<button type="button" class="earlier" aria-expanded="false">Earlier '+word+rng+' <small>'+past.length+'</small></button><div class="past" hidden>'+past.map(grp).join("")+'</div>'+order.slice(ci).map(grp).join("");
+        var bt=$(o.out).querySelector(".earlier"), pw=$(o.out).querySelector(".past"); bt.addEventListener("click",function(){var on=pw.hidden; pw.hidden=!on; bt.setAttribute("aria-expanded",on); bt.firstChild.textContent=(on?"Hide earlier ":"Earlier ")+word+rng+" "})}
       var live=list.filter(function(m){return LIVE.test(m.st)&&m.st!=="PST"}).length; $(o.note).textContent=(live?live+" in play · ":"")+"other clubs' scores update at half-time and full-time"}
     MU.api(o.api).then(function(j){DATA=j.response; var clubs={}; DATA.filter(function(m){return !o.hide||!o.hide(m)}).forEach(function(m){clubs[m.home.id]=m.home.name; clubs[m.away.id]=m.away.name});
       var ids=Object.keys(clubs).sort(function(a,b){return clubs[a].localeCompare(clubs[b])}), sel=$(o.sel);
@@ -191,9 +196,9 @@
       sel.addEventListener("change",function(){club=sel.value==="all"?"all":+sel.value; render()}); render();
     }).catch(function(e){MU.apiDown($(o.out),e)})}
   function mwNo(r){var m=String(r||"").match(/(\d+)$/); return m?+m[1]:0}
-  games({api:"pl",out:"plGames",sel:"plSel",note:"plNote",group:function(m){var n=mwNo(m.round); return {k:"m"+n,label:"Matchweek "+n}}});
+  games({api:"pl",unit:"matchweeks",out:"plGames",sel:"plSel",note:"plNote",group:function(m){var n=mwNo(m.round); return {k:"m"+n,label:"Matchweek "+n}}});
   var QUAL=/qualifying|^play-offs$/i;
-  games({api:"cl",out:"clGames",sel:"clSel",note:"clNote",hide:function(m){return QUAL.test(m.round)},
+  games({api:"cl",unit:"matchdays",out:"clGames",sel:"clSel",note:"clNote",hide:function(m){return QUAL.test(m.round)},
     group:function(m){var r=m.round||"", n=r.match(/League Stage - (\d+)/i); if(n)return {k:"ls"+n[1],label:"Matchday "+n[1]}; if(QUAL.test(r))return {k:r,label:"Qualifying · "+r.replace(/ Qualifying Round/i," round").replace(/^Play-offs$/i,"play-off round")}; return {k:r,label:r.replace(/^Knockout Round Play-offs$/i,"Knockout play-offs")}}});
 })();
 </script></body></html>
