@@ -792,7 +792,7 @@ async function collection(request, url, env) {
 async function cover(url, env, ctx) {
   const type = url.searchParams.get("type") || "book", q = (url.searchParams.get("q") || "").trim(), by = (url.searchParams.get("by") || "").trim();
   if (!q) return json({ error: "q required" }, 400);
-  const key = "cover:v3:" + type + ":" + (q + "|" + by).toLowerCase(), cached = await env.MU_CACHE.get(key);
+  const key = "cover:v4:" + type + ":" + (q + "|" + by).toLowerCase(), cached = await env.MU_CACHE.get(key);
   if (cached) return new Response(cached, { headers: headers("kv-hit") });
   const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
   let out = { url: "", src: "" };
@@ -818,7 +818,7 @@ async function cover(url, env, ctx) {
       const sj = sr.ok ? await sr.json() : {};
       for (const hit of (sj.query && sj.query.search || []).slice(0, 3)) {
         const pr = await fetch("https://en.wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(hit.title.replace(/ /g, "_")), { headers: UA }); const pj = pr.ok ? await pr.json() : {};
-        if (pj.type !== "disambiguation" && pj.thumbnail && fits(pj.title)) { out = { url: pj.originalimage && pj.originalimage.width < 1200 ? pj.originalimage.source : pj.thumbnail.source, src: "Wikipedia", title: pj.title, page: pj.content_urls ? pj.content_urls.desktop.page : "" }; break; }
+        if (pj.type !== "disambiguation" && pj.thumbnail && fits(pj.title, "all")) { out = { url: pj.originalimage && pj.originalimage.width < 1200 ? pj.originalimage.source : pj.thumbnail.source, src: "Wikipedia", title: pj.title, page: pj.content_urls ? pj.content_urls.desktop.page : "" }; break; }
       }
     }
   } catch (e) { out.error = String(e); }
