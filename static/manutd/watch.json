@@ -1,0 +1,217 @@
+{
+ "checked": "2026-11-01",
+ "sources": {
+  "pl": {
+   "t": "Premier League broadcast partners, 2025/26–2027/28",
+   "u": "https://www.premierleague.com/en/media/broadcasters"
+  },
+  "ucl": {
+   "t": "UEFA: where to watch the 2026/27 Champions League",
+   "u": "https://www.uefa.com/uefachampionsleague/news/0253-0d82037aaedd-f371c464f919-1000--how-to-watch-the-champions-league/"
+  }
+ },
+ "countries": {
+  "GB": {
+   "n": "United Kingdom",
+   "pl": [
+    "Sky Sports",
+    "TNT Sports"
+   ],
+   "plNote": "Highlights on BBC (Match of the Day).",
+   "ucl": [
+    "TNT Sports",
+    "Prime Video"
+   ],
+   "uclNote": "Prime Video has one Tuesday match a round; highlights on the BBC."
+  },
+  "IE": {
+   "n": "Ireland",
+   "pl": [
+    "Sky Sports",
+    "TNT Sports",
+    "Premier Sports"
+   ],
+   "ucl": [
+    "RTÉ",
+    "Premier Sports",
+    "Virgin Media"
+   ]
+  },
+  "SE": {
+   "n": "Sweden",
+   "pl": [
+    "Viaplay"
+   ],
+   "ucl": [
+    "Viaplay"
+   ]
+  },
+  "DK": {
+   "n": "Denmark",
+   "pl": [
+    "Viaplay"
+   ],
+   "ucl": [
+    "Viaplay"
+   ]
+  },
+  "NO": {
+   "n": "Norway",
+   "pl": [
+    "Viaplay"
+   ],
+   "ucl": [
+    "TV 2"
+   ]
+  },
+  "FI": {
+   "n": "Finland",
+   "pl": [
+    "Viaplay"
+   ],
+   "ucl": [
+    "MTV"
+   ]
+  },
+  "IS": {
+   "n": "Iceland",
+   "pl": [
+    "Sýn"
+   ],
+   "ucl": [
+    "Sýn",
+    "Viaplay"
+   ]
+  },
+  "DE": {
+   "n": "Germany",
+   "pl": [
+    "Sky"
+   ],
+   "ucl": [
+    "DAZN",
+    "Prime Video"
+   ],
+   "uclNote": "Highlights on ZDF."
+  },
+  "NL": {
+   "n": "Netherlands",
+   "pl": [
+    "Viaplay"
+   ],
+   "ucl": [
+    "Ziggo Sport"
+   ]
+  },
+  "BE": {
+   "n": "Belgium",
+   "pl": [
+    "Telenet"
+   ],
+   "ucl": [
+    "DPG Media",
+    "RTL Belgium",
+    "Proximus",
+    "Telenet"
+   ]
+  },
+  "FR": {
+   "n": "France",
+   "pl": [
+    "Canal+"
+   ],
+   "ucl": [
+    "Canal+"
+   ]
+  },
+  "ES": {
+   "n": "Spain",
+   "pl": [
+    "DAZN"
+   ],
+   "ucl": [
+    "Movistar Plus+"
+   ]
+  },
+  "IT": {
+   "n": "Italy",
+   "pl": [
+    "Sky"
+   ],
+   "ucl": [
+    "Sky",
+    "Prime Video"
+   ]
+  },
+  "PT": {
+   "n": "Portugal",
+   "pl": [
+    "DAZN"
+   ],
+   "ucl": [
+    "Sport TV",
+    "DAZN",
+    "LiveModeTV"
+   ]
+  },
+  "PL": {
+   "n": "Poland",
+   "pl": [
+    "Canal+"
+   ],
+   "ucl": [
+    "Canal+",
+    "TVP"
+   ]
+  },
+  "MT": {
+   "n": "Malta",
+   "pl": [
+    "TSN"
+   ],
+   "ucl": [
+    "PBS",
+    "Melita"
+   ]
+  },
+  "US": {
+   "n": "United States",
+   "pl": [
+    "NBC Sports"
+   ],
+   "ucl": [
+    "Paramount+",
+    "TUDN",
+    "DAZN"
+   ]
+  },
+  "CA": {
+   "n": "Canada",
+   "pl": [
+    "Fubo"
+   ],
+   "ucl": [
+    "DAZN",
+    "OneSoccer"
+   ]
+  },
+  "AU": {
+   "n": "Australia",
+   "pl": [
+    "Stan Sport"
+   ],
+   "ucl": [
+    "Stan Sport"
+   ]
+  },
+  "IN": {
+   "n": "India",
+   "pl": [
+    "JioStar"
+   ],
+   "ucl": [
+    "Sony Sports"
+   ]
+  }
+ }
+}
