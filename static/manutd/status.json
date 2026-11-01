@@ -53,7 +53,7 @@
 },
 "search": {
 "date": "2026-11-01",
-"note": "1776 entries"
+"note": "1777 entries"
 },
 "pace": {
 "date": "2026-11-01",
@@ -78,5 +78,9 @@
 "milestones": {
 "date": "2026-11-01",
 "note": "32 players, as of 2026-10-31"
+},
+"find": {
+"date": "2026-11-01",
+"note": "6095 matches"
 }
 }
