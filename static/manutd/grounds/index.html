@@ -53,6 +53,15 @@
 .fx{background:var(--tint);padding:12px 14px;margin-top:14px;font-size:14px} .fx b{font-weight:600}
 .src{font-size:12px;color:var(--muted);margin-top:16px} .src a{color:var(--muted)}
 .warn{font-size:12px;color:#7a5a00;background:#fff4c2;border:1px solid #e6c84a;padding:6px 10px;display:inline-block;margin-top:8px}
+
+/* ground photos: tiles in the picker, a wide photo on the guide */
+.pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:10px} .pick a{display:flex;flex-direction:column;align-items:stretch;gap:0;padding:0;border-radius:10px;overflow:hidden;background:var(--paper)}
+.pick a img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;display:block;background:var(--tint)}
+.pick a .nm{display:flex;align-items:center;gap:6px;padding:8px 10px 2px;font-weight:600;font-size:13px} .pick a .nm .crest{margin:0!important}
+.pick a .when{padding:0 10px 8px} .pick a[aria-current="true"]{outline:3px solid var(--red);outline-offset:-1px}
+@media (max-width:640px){.pick{grid-template-columns:repeat(2,1fr);gap:8px}}
+.hero{margin:0 0 14px} .hero img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:10px;display:block;background:var(--tint)}
+.hero figcaption{font-size:11px;color:var(--muted);margin-top:4px} .hero figcaption a{color:inherit}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZZVNDNYN9"></script>
@@ -83,7 +92,8 @@
     var g=G.filter(function(x){return key(x)===k})[0]; if(!g){$("guide").innerHTML='<p class="sub">No guide for that ground yet.</p>';return}
     var f=nextAt(g), age=Math.round((Date.now()-new Date(g.checked+"T12:00:00Z"))/864e5);
     var sec=function(t,v,wide){return '<div'+(wide?' class="wide"':'')+'><h3>'+t+'</h3><p>'+MU.esc(v||"Not stated by the sources.")+'</p></div>'};
-    $("guide").innerHTML='<h2>'+MU.crest(g.club,36)+MU.esc(g.ground)+' <small>'+MU.esc(g.club)+' · '+MU.esc(g.city)+'</small></h2>'+
+    var ph=g.photo;
+    $("guide").innerHTML=(ph?'<figure class="hero"><img src="'+ph.src+'" srcset="'+ph.thumb+' 480w, '+ph.src+' 1200w" sizes="(max-width:640px) calc(100vw - 64px), 1000px" alt="'+MU.esc(g.ground)+', '+MU.esc(g.city)+'" width="1200" height="675" decoding="async" fetchpriority="high"><figcaption>Photo: <a href="'+ph.page+'" target="_blank" rel="noopener">'+MU.esc(ph.credit||"Wikimedia Commons")+'</a>'+(ph.license?' · '+(ph.license_url?'<a href="'+ph.license_url+'" target="_blank" rel="noopener">'+MU.esc(ph.license)+'</a>':MU.esc(ph.license)):'')+', via Wikimedia Commons</figcaption></figure>':'')+'<h2>'+MU.crest(g.club,36)+MU.esc(g.ground)+' <small>'+MU.esc(g.club)+' · '+MU.esc(g.city)+'</small></h2>'+
       (f?'<div class="fx"><b>Next visit:</b> '+MU.fmtDate(f.ko,{year:"numeric"})+' · '+MU.fmtKO(f.ko,true)+MU.prov(f)+' · '+MU.esc(f.comp)+' · <a href="/manutd/trips/">plan the trip</a> · <a href="/manutd/club/?c='+encodeURIComponent(g.club)+'">head-to-head</a></div>':'')+
       '<span class="warn">Last checked '+MU.fmtDate(g.checked+"T12:00:00Z",{year:"numeric"})+(age>60?' · '+age+' days ago, re-check before travelling':'')+'</span>'+
       '<div class="g">'+sec("Getting there",g.arrival)+sec("From the airport",g.from_airport)+sec("The away end",g.away_end)+sec("Meeting spots",g.meeting)+sec("Bags and what you can bring",g.bags)+sec("Getting away afterwards",g.after)+sec("Tips",g.tips,true)+'</div>'+
@@ -91,7 +101,7 @@
   }
   fetch("/manutd/grounds/grounds.json").then(function(r){return r.json()}).then(function(j){G=j;
     var now=new Date(); G.forEach(function(g){var f=nextAt(g); g._next=f?new Date(f.ko).getTime():9e15}); G.sort(function(a,b){return a._next-b._next||a.club.localeCompare(b.club)});
-    $("pick").innerHTML=G.map(function(g){var f=nextAt(g); return '<a href="?g='+key(g)+'" data-k="'+key(g)+'">'+MU.crest(g.club,18)+MU.esc(g.ground)+(f?'<span class="when">'+MU.fmtDate(f.ko)+'</span>':'')+'</a>'}).join("");
+    $("pick").innerHTML=G.map(function(g){var f=nextAt(g), ph=g.photo; return '<a href="?g='+key(g)+'" data-k="'+key(g)+'">'+(ph?'<img src="'+ph.thumb+'" alt="" loading="lazy" decoding="async" width="240" height="135">':'')+'<span class="nm">'+MU.crest(g.club,18)+MU.esc(g.ground)+'</span>'+(f?'<span class="when">'+MU.fmtDate(f.ko)+'</span>':'')+'</a>'}).join("");
     $("pick").addEventListener("click",function(e){var a=e.target.closest("a"); if(!a)return; e.preventDefault(); show(a.dataset.k)});
     show(cur||key(G[0]));
   }).catch(function(){$("guide").innerHTML='<p class="sub">Guides are being written.</p>'});
