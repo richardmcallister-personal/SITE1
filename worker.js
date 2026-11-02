@@ -710,7 +710,7 @@ function fxSeason(iso) { const d = new Date(iso), y = d.getUTCMonth() >= 6 ? d.g
 function fxUid(f) { return [fxSeason(f.ko), fxSlug(f.comp), fxSlug(f.opp), f.home ? "h" : "a"].join("-"); }
 function fxTitle(f) { return f.home ? "Man Utd v " + f.opp : f.opp + " v Man Utd"; }
 function ukWhen(iso) { const d = new Date(iso); return d.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", timeZone: "Europe/London" }) + ", " + d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/London" }) + " UK"; }
-function icsEsc(t) { return String(t).replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n"); }
+function icsEsc(t) { return String(t).replace(/\\/g, "\\\\").replace(/;/g, "\\;").replace(/,/g, "\\,").replace(/\r?\n/g, "\\n"); }
 function icsFold(line) { const b = new TextEncoder().encode(line); if (b.length <= 74) return line; let out = "", cur = ""; for (const ch of line) { if (new TextEncoder().encode(cur + ch).length > 73) { out += (out ? "\r\n " : "") + cur; cur = ch; } else cur += ch; } return out + "\r\n " + cur; }
 const icsTime = (iso) => new Date(iso).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 async function calendar(url, env) {
