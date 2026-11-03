@@ -1,5 +1,5 @@
 // Single fixture source for every page (hub, season, trips, squad, match).
-// Dates/times from the club's official fixtures page, checked 30 Oct 2026, stored as UTC.
+// Dates/times from the club's official fixtures page, checked 3 Nov 2026, stored as UTC.
 // conf:true  = kick-off confirmed (Premier League TV picks announced, or a UEFA date).
 // conf:false = provisional: the original Premier League slot, which may move once that month's TV picks are announced
 //              (January picks are normally announced mid-November, and so on month by month).
@@ -65,7 +65,14 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "St. James' Park",
 "col": "#241F20",
-"conf": true
+"conf": true,
+"sales": [
+{
+"what": "Away ballot",
+"closes": "2026-11-04T08:00:00Z",
+"who": "Executive Club, Season Ticket Holders (Silver level and above who bought all home cup games)"
+}
+]
 },
 {
 "opp": "Coventry City",
@@ -90,7 +97,15 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "Selhurst Park",
 "col": "#1B458F",
-"conf": true
+"conf": true,
+"sales": [
+{
+"what": "Away ballot",
+"opens": "2026-11-13T08:00:00Z",
+"closes": "2026-11-18T08:00:00Z",
+"who": "Executive Club, Season Ticket Holders (Silver level and above who bought all home cup games)"
+}
+]
 },
 {
 "opp": "Arsenal",
@@ -99,7 +114,15 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "Emirates Stadium",
 "col": "#EF0107",
-"conf": true
+"conf": true,
+"sales": [
+{
+"what": "Away ballot",
+"opens": "2026-11-20T08:00:00Z",
+"closes": "2026-11-25T08:00:00Z",
+"who": "Executive Club, Season Ticket Holders (Silver level and above who bought all home cup games)"
+}
+]
 },
 {
 "opp": "Nottingham Forest",
@@ -124,7 +147,15 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "American Express Stadium",
 "col": "#0057B8",
-"conf": false
+"conf": true,
+"sales": [
+{
+"what": "Away ballot",
+"opens": "2026-12-04T08:00:00Z",
+"closes": "2026-12-09T08:00:00Z",
+"who": "Executive Club, Season Ticket Holders (Silver level and above who bought all home cup games)"
+}
+]
 },
 {
 "opp": "Newcastle United",
@@ -132,7 +163,7 @@ window.MU_FIXTURES=[
 "ko": "2027-01-07T20:00:00Z",
 "home": true,
 "venue": "Old Trafford",
-"conf": false
+"conf": true
 },
 {
 "opp": "Aston Villa",
@@ -141,7 +172,15 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "Villa Park",
 "col": "#670E36",
-"conf": false
+"conf": false,
+"sales": [
+{
+"what": "Away ballot",
+"opens": "2026-12-18T08:00:00Z",
+"closes": "2026-12-21T08:00:00Z",
+"who": "Executive Club, Season Ticket Holders (Silver level and above who bought all home cup games)"
+}
+]
 },
 {
 "opp": "Bayern München",
@@ -190,7 +229,15 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "Gtech Community Stadium",
 "col": "#E30613",
-"conf": false
+"conf": false,
+"sales": [
+{
+"what": "Away ballot",
+"opens": "2027-01-01T08:00:00Z",
+"closes": "2027-01-06T08:00:00Z",
+"who": "Executive Club, Season Ticket Holders (Silver level and above who bought all home cup games)"
+}
+]
 },
 {
 "opp": "Chelsea",
@@ -198,7 +245,14 @@ window.MU_FIXTURES=[
 "ko": "2027-02-06T15:00:00Z",
 "home": true,
 "venue": "Old Trafford",
-"conf": false
+"conf": false,
+"sales": [
+{
+"what": "Members' ballot",
+"closes": "2026-11-17T08:00:00Z",
+"who": "Official Members"
+}
+]
 },
 {
 "opp": "Brighton & Hove Albion",
@@ -215,7 +269,15 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "The City Ground",
 "col": "#DD0000",
-"conf": false
+"conf": false,
+"sales": [
+{
+"what": "Away ballot",
+"opens": "2027-01-22T08:00:00Z",
+"closes": "2027-01-27T08:00:00Z",
+"who": "Executive Club, Season Ticket Holders (Silver level and above who bought all home cup games)"
+}
+]
 },
 {
 "opp": "Arsenal",
@@ -223,7 +285,14 @@ window.MU_FIXTURES=[
 "ko": "2027-02-27T15:00:00Z",
 "home": true,
 "venue": "Old Trafford",
-"conf": false
+"conf": false,
+"sales": [
+{
+"what": "Members' ballot",
+"closes": "2026-11-24T08:00:00Z",
+"who": "Official Members"
+}
+]
 },
 {
 "opp": "Sunderland",
@@ -232,7 +301,15 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "Stadium of Light",
 "col": "#EB172B",
-"conf": false
+"conf": false,
+"sales": [
+{
+"what": "Away ballot",
+"opens": "2027-01-29T08:00:00Z",
+"closes": "2027-02-03T08:00:00Z",
+"who": "Executive Club, Season Ticket Holders (Silver level and above who bought all home cup games)"
+}
+]
 },
 {
 "opp": "Everton",
@@ -249,7 +326,15 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "Etihad Stadium",
 "col": "#6CABDD",
-"conf": false
+"conf": false,
+"sales": [
+{
+"what": "Away ballot",
+"opens": "2027-02-19T08:00:00Z",
+"closes": "2027-02-24T08:00:00Z",
+"who": "Executive Club, Season Ticket Holders (Silver level and above who bought all home cup games)"
+}
+]
 },
 {
 "opp": "Hull City",
@@ -266,7 +351,15 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "Portman Road",
 "col": "#0E00F7",
-"conf": false
+"conf": false,
+"sales": [
+{
+"what": "Away ballot",
+"opens": "2027-03-19T08:00:00Z",
+"closes": "2027-03-24T08:00:00Z",
+"who": "Executive Club, Season Ticket Holders (Silver level and above who bought all home cup games)"
+}
+]
 },
 {
 "opp": "Crystal Palace",
@@ -283,7 +376,15 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "Coventry Building Society Arena",
 "col": "#78D0F1",
-"conf": false
+"conf": false,
+"sales": [
+{
+"what": "Away ballot",
+"opens": "2027-04-02T07:00:00Z",
+"closes": "2027-04-07T07:00:00Z",
+"who": "Executive Club, Season Ticket Holders (Silver level and above who bought all home cup games)"
+}
+]
 },
 {
 "opp": "AFC Bournemouth",
@@ -292,7 +393,15 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "Vitality Stadium",
 "col": "#DA291C",
-"conf": false
+"conf": false,
+"sales": [
+{
+"what": "Away ballot",
+"opens": "2027-04-09T07:00:00Z",
+"closes": "2027-04-14T07:00:00Z",
+"who": "Executive Club, Season Ticket Holders (Silver level and above who bought all home cup games)"
+}
+]
 },
 {
 "opp": "Leeds United",
@@ -309,7 +418,15 @@ window.MU_FIXTURES=[
 "home": false,
 "venue": "Tottenham Hotspur Stadium",
 "col": "#132257",
-"conf": false
+"conf": false,
+"sales": [
+{
+"what": "Away ballot",
+"opens": "2027-04-23T07:00:00Z",
+"closes": "2027-04-28T07:00:00Z",
+"who": "Executive Club, Season Ticket Holders (Silver level and above who bought all home cup games)"
+}
+]
 },
 {
 "opp": "Fulham",
