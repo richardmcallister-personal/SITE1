@@ -1,4 +1,4 @@
-# manutd.wiki — handover for a new chat (1 Nov 2026)
+# manutd.wiki — handover for a new chat (4 Nov 2026)
 
 Paste this as the first message of a new conversation, with the GitHub repo
 `richardmcallister-personal/SITE1` attached. Read `CLAUDE.md` in the repo first; it
@@ -71,6 +71,15 @@ the live Worker). See `git log` for the latest commit on each branch.
 - Kit cards: 'memorable matches' removed (no per-match kit data exists anywhere reliable); 'who wore it' = that season's squad.
 - Scheduled tasks: weekly data refresh (Tue 05:31, also fills fixtures.js `sales` from the public ticket pages);
   seat availability Mon/Wed/Fri 12:15 on Richard's Mac via his signed-in Chrome (reminder push at 11:45).
+
+- Shirt numbers page redesigned (jersey hero, number groups, holder cards, pitch XI). Calendar `;` escape fixed in the Worker.
+- Images (live 4 Nov): every away ground in grounds.json has `photo` (Wikimedia Commons, credited + licence; self-hosted
+  webp in grounds/img, 1200 + 480 `-s`); Old Trafford lives in mu.js (`OT`). `MU.groundFor(f)` → ground photo on the match
+  page (`#venue`) and the hub report (`MU.report(f,{photo:true})` + `MU.fillReport`). `MU.face(player)` puts feed portraits
+  beside goals/cards/subs. `MU.highlightsBox` embeds the newest official "highlights" video from feeds yt-pl / yt-manutd
+  (tap to play, youtube.com embed) and falls back to a YouTube search link. Both YouTube channel feeds currently come back
+  empty (YouTube RSS 404/500 for those channels; yt-pl id corrected to UCG5qGWdu8nIRZqJ_GgDwQ-w) — the link shows meanwhile.
+  Commons downloads from the container get 429s; retry slowly with a site UA.
 
 ## Next task
 
