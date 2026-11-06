@@ -56,6 +56,45 @@ function num(u, k) { return String(parseInt(u.searchParams.get(k) || "0", 10) ||
 // Warmed every hour by the cron so pages never wait on the API.
 const WARM = ["/api/standings", "/api/ucl", "/api/fixtures", "/api/pl", "/api/cl", "/api/squad", "/api/injuries", "/api/players?page=1", "/api/players?page=2", "/api/players?page=3"];
 
+// Site languages: the visitor's saved choice (mu_lang cookie, set by the footer switch), else the first of their
+// browser languages that the site has (English counts), else English. Pages load /i18n/i18n.js + /i18n/<lang>.js.
+const LOCALES = { en: "en-GB", ga: "ga-IE", es: "es-ES", fr: "fr-FR", de: "de-DE", sv: "sv-SE", da: "da-DK" };
+const LANG_NAMES = { en: "English", ga: "Irish (Gaeilge)", es: "Spanish", fr: "French", de: "German", sv: "Swedish", da: "Danish" };
+function pickLang(request) {
+  const c = (request.headers.get("cookie") || "").match(/(?:^|;\s*)mu_lang=([a-z]{2})/);
+  if (c && LOCALES[c[1]]) return c[1];
+  const al = (request.headers.get("accept-language") || "").split(",").map((x, i) => { const [t, q] = x.trim().split(";q="); return { t: (t || "").slice(0, 2).toLowerCase(), q: q ? parseFloat(q) || 0 : 1, i }; }).sort((a, b) => b.q - a.q || a.i - b.i);
+  for (const x of al) if (LOCALES[x.t]) return x.t;
+  return "en";
+}
+// Wikipedia in the visitor's language: the English article's interlanguage link, then that wiki's lead. When the
+// language has no article the English one stands. The English title stays in `title` (pages match on it); KV a week.
+async function localWiki(res, url, env, ctx) {
+  const lang = url.searchParams.get("lang");
+  if (!lang || lang === "en" || !LOCALES[lang] || !res.ok) return res;
+  let j; try { j = await res.clone().json(); } catch (e) { return res; }
+  if (!j || !j.title || j.error) return res;
+  const key = "wiki:ll:v1:" + lang + ":" + j.title;
+  let loc = await env.MU_CACHE.get(key, "json");
+  if (!loc) {
+    loc = { none: 1 };
+    const UA = { "user-agent": "site1-manutd-hub/1.0 (richardmcallister@gmail.com)", "accept": "application/json" };
+    try {
+      const r = await fetch("https://en.wikipedia.org/w/api.php?action=query&format=json&redirects=1&prop=langlinks&lllang=" + lang + "&titles=" + encodeURIComponent(j.title), { headers: UA });
+      const q = r.ok ? await r.json() : {}, pg = Object.values((q.query && q.query.pages) || {})[0], lt = pg && pg.langlinks && pg.langlinks[0] && pg.langlinks[0]["*"];
+      if (lt) {
+        const sr = await fetch("https://" + lang + ".wikipedia.org/api/rest_v1/page/summary/" + encodeURIComponent(lt.replace(/ /g, "_")), { headers: UA });
+        const sj = sr.ok ? await sr.json() : {};
+        if (sj.extract && sj.type !== "disambiguation") loc = { title: sj.title, extract: sj.extract, description: sj.description || "", url: sj.content_urls ? sj.content_urls.desktop.page : "https://" + lang + ".wikipedia.org/wiki/" + encodeURIComponent(lt.replace(/ /g, "_")) };
+      }
+    } catch (e) {}
+    ctx.waitUntil(env.MU_CACHE.put(key, JSON.stringify(loc), { expirationTtl: 7 * 86400 }));
+  }
+  if (loc.none) return res;
+  const out = Object.assign({}, j, { extract: loc.extract, description: loc.description || j.description, url: loc.url, lang, localTitle: loc.title, enUrl: j.url });
+  return new Response(JSON.stringify(out), { headers: res.headers });
+}
+
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -75,7 +114,10 @@ export default {
         const ct = res.headers.get("content-type") || "";
         if (/text\/html|javascript|application\/json/.test(ct)) {
           let body = (await res.text()).replace(/(["'(])\/manutd\//g, "$1/");
-          if (/text\/html/.test(ct)) body = body.replace("<head>", '<head><meta name="mu-country" content="' + ((request.cf && request.cf.country) || "").replace(/[^A-Z]/g, "") + '">');
+          if (/text\/html/.test(ct)) {
+            const lang = pickLang(request);
+            body = body.replace('<html lang="en-GB">', '<html lang="' + LOCALES[lang] + '">').replace("<head>", '<head><meta name="mu-country" content="' + ((request.cf && request.cf.country) || "").replace(/[^A-Z]/g, "") + '"><script>window.MU_LANG="' + lang + '"</script><script src="/i18n/i18n.js"></script>' + (lang === "en" ? "" : '<script src="/i18n/' + lang + '.js"></script>'));
+          }
           const h = new Headers(res.headers); h.delete("content-length");
           if (/text\/html/.test(ct)) h.set("cache-control", "private, max-age=0, must-revalidate");   // carries the visitor's country, so never shared from the edge cache
           return new Response(body, { status: res.status, headers: h });
@@ -85,12 +127,12 @@ export default {
     }
     if (url.pathname.startsWith("/img/player/")) return portrait(url, ctx);
     if (url.pathname === "/feed") return feed(url, env, ctx);
-    if (url.pathname === "/wiki") return wiki(url, env, ctx);
-    if (url.pathname === "/wiki-season") return wikiSeason(url, env, ctx);
-    if (url.pathname === "/wiki-club") return wikiClub(url, env, ctx);
+    if (url.pathname === "/wiki") return localWiki(await wiki(url, env, ctx), url, env, ctx);
+    if (url.pathname === "/wiki-season") return localWiki(await wikiSeason(url, env, ctx), url, env, ctx);
+    if (url.pathname === "/wiki-club") return localWiki(await wikiClub(url, env, ctx), url, env, ctx);
     if (url.pathname === "/wiki-raw") return wikiRaw(url, env, ctx);
     if (url.pathname === "/wiki-rev") return wikiRev(url, env, ctx);
-    if (url.pathname === "/wiki-page") return wikiPage(url, env, ctx);
+    if (url.pathname === "/wiki-page") return localWiki(await wikiPage(url, env, ctx), url, env, ctx);
     if (url.pathname === "/cover") return cover(url, env, ctx);
     if (url.pathname === "/ask") { try { return await ask(request, url, env, ctx); } catch (e) { return json({ error: "ask: " + (e && e.message || e) }, 500); } }
     if (url.pathname.startsWith("/push/")) { try { return await push(request, url, env, ctx); } catch (e) { return json({ error: "push: " + (e && e.message || e) }, 500); } }
@@ -952,14 +994,16 @@ async function contextFor(env, ctx, ents, q) {
   return { context: parts.join("\n\n"), sources };
 }
 async function ask(request, url, env, ctx) {
-  const q = String((request.method === "POST" ? ((await request.json().catch(() => ({}))).q) : url.searchParams.get("q")) || "").trim().replace(/\s+/g, " ");
+  const rb = request.method === "POST" ? await request.json().catch(() => ({})) : {};
+  const q = String((request.method === "POST" ? rb.q : url.searchParams.get("q")) || "").trim().replace(/\s+/g, " ");
+  const lang = LOCALES[rb.lang || url.searchParams.get("lang")] ? (rb.lang || url.searchParams.get("lang")) : "en";
   if (q.length < 3 || q.length > 300) return json({ error: "Ask a question of 3 to 300 characters." }, 400);
   if (!env.ANTHROPIC_API_KEY) {   // not configured: show what would be sent (the site's own data) so the retrieval can be checked
     if (url.searchParams.get("debug") === "context") { const idx = await assetJSON(env, "/search.json") || [], ents = pickEntities(idx, q), c = await contextFor(env, ctx, ents, q); return json({ entities: ents.map((e) => e[1] + ": " + e[0]), chars: c.context.length, sources: c.sources, context: c.context }); }
     return json({ error: "Ask isn't switched on yet — the site owner needs to add the API key." }, 503);
   }
   if (url.searchParams.get("debug") === "topic") { const idx0 = await assetJSON(env, "/search.json") || [], e0 = pickEntities(idx0, q), wt = await wikiTopic(env, ctx, q); return json({ entities: e0.map((e) => e[1] + ": " + e[0]), best: e0.best || 0, topic: wt.slice(0, 300) }); }
-  const key = "ask:a:v9:" + (await sha(foldQ(q).replace(/[^a-z0-9]+/g, " ").trim()));
+  const key = "ask:a:v9:" + (lang === "en" ? "" : lang + ":") + (await sha(foldQ(q).replace(/[^a-z0-9]+/g, " ").trim()));
   const hit = await env.MU_CACHE.get(key, "json"); if (hit) return json(Object.assign({ cached: true }, hit));
   const now = new Date(), day = now.toISOString().slice(0, 10), hour = now.toISOString().slice(0, 13);
   const ip = request.headers.get("cf-connecting-ip") || "", ipk = "ask:ip:" + (await sha("ask:" + ip)).slice(0, 16) + ":" + hour, dayk = "ask:day:" + day;
@@ -967,7 +1011,7 @@ async function ask(request, url, env, ctx) {
   if (used >= ASK.perHour) return json({ error: "That's plenty for one hour — try again a bit later." }, 429);
   if (today >= cap) return json({ error: "The archive has answered its quota of questions for today. Back tomorrow." }, 429);
   const idx = await assetJSON(env, "/search.json") || [], ents = pickEntities(idx, q), { context, sources } = await contextFor(env, ctx, ents, q);
-  const system = `You answer questions about Manchester United for manutd.wiki, a fan-built club hub. Today is ${day}. Use ONLY the DATA below, which comes from the site's archive (Wikipedia-derived season tables and squad lists) and its live feed. Rules: answer in plain English in at most 110 words, as plain text — no markdown, no asterisks, no headings or bullet lists; give the figures the data supports and say which season or match they come from; if the data does not cover the question, say what the site does not hold rather than guessing or using outside knowledge; never invent players, scores or dates; archive goal totals are "in the archive" figures, and appearances exist only from 1993-94. Scores in the data are United-first unless shown as "Home X-Y Away".`;
+  const system = `You answer questions about Manchester United for manutd.wiki, a fan-built club hub. Today is ${day}. Use ONLY the DATA below, which comes from the site's archive (Wikipedia-derived season tables and squad lists) and its live feed. Rules: answer in plain ${LANG_NAMES[lang]} in at most 110 words${lang === "en" ? "" : " (the DATA is in English: translate it, but keep player, club and ground names as they are)"}, as plain text — no markdown, no asterisks, no headings or bullet lists; give the figures the data supports and say which season or match they come from; if the data does not cover the question, say what the site does not hold rather than guessing or using outside knowledge; never invent players, scores or dates; archive goal totals are "in the archive" figures, and appearances exist only from 1993-94. Scores in the data are United-first unless shown as "Home X-Y Away".`;
   const body = { model: env.ASK_MODEL || ASK.model, max_tokens: ASK.maxTokens, thinking: { type: "disabled" }, system, messages: [{ role: "user", content: `DATA:\n${context || "(no matching data on the site)"}\n\nQUESTION: ${q}` }] };
   const r = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "content-type": "application/json", "x-api-key": env.ANTHROPIC_API_KEY, "anthropic-version": "2023-06-01" }, body: JSON.stringify(body) });
   const j = await r.json().catch(() => ({}));

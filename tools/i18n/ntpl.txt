@@ -1,0 +1,149 @@
+{N}’s next appearance will be his {0}th for United
+{N} is {0} appearances from {1} for United
+{N}’s next appearance takes him past {M} ({0} games for United)
+{N} is {0} appearances from passing {M} ({1} games for United)
+{0} in all competitions, {1} this season
+{0} in all competitions · players since {1}, from the squad lists
+{N} is {0} goal from {1} for United
+{N} is {0} goals from {1} for United
+{N} is {0} goal from passing {M} ({1}) into {2}th on United’s all-time list
+{N} is {0} goals from passing {M} ({1}) into {2}th on United’s all-time list
+{N} is {0} goal from passing {M} ({1}) into joint {2}th on United’s all-time list
+{N} is {0} goals from passing {M} ({1}) into joint {2}th on United’s all-time list
+{N} is {0} goal from passing {M} ({1})
+{N} is {0} goals from passing {M} ({1})
+{0} in all competitions
+A clean sheet would be {N}’s {0}th for United
+{N} is {0} clean sheets from {1} for United
+{0} in {1} games, all competitions (started and finished, nothing conceded)
+{N}’s {0}th game in charge
+{N} is {0} games from {1} in charge
+{N}’s {0}th game in charge, counting earlier spells
+{N} is {0} games from {1} in charge, counting earlier spells
+{0} since {N}, all competitions
+{0} in this spell, {1} before
+A win would make it {0} in a row{N}: {M}
+Avoid defeat and it’s {0} unbeaten{N}: {M}
+Score and it’s {0} games in a row with a goal{N}: {M}
+Another clean sheet would be {0} in a row{N}: {M}
+{0} games without a win{N}. Another would be {M}
+{0} defeats in a row{N}. A {1}th defeat would be {M}
+{0} games without a goal{N}. Another blank would be {M}
+a club record
+a club record (the old one: {0}, {N})
+equalling the club record ({N})
+the longest since {0} ({1}, {N})
+in all competitions
+at home
+away from home
+in the league
+Run so far: {0} since {N}
+Run so far: {0} since {N} · Shields left out
+United’s {0}th meeting with {N}
+Every competitive meeting since {0}
+A win would be United’s {0}th over {N}
+{0} wins in {1} meetings (Shields left out)
+A win would be United’s first ever at home to {N}
+A win would be United’s first ever away to {N}
+{0} home meetings, no wins
+{0} away meetings, no wins
+United have won all {0} home games against {N}; a win makes it {1} from {2}
+United have won all {0} away games against {N}; a win makes it {1} from {2}
+A win would be United’s first at home to {N} since {M}
+A win would be United’s first away to {N} since {M}
+{0} home meetings since then without a win
+{0} away meetings since then without a win
+A win would end a run of {0} meetings without beating {N}
+Last win: {N}
+Before {N}
+Nothing within reach before {N}.
+All competitions unless stated. Totals to {N}; apps from the season squad lists (1993/94 on), goals from every scorer in the archive.
+{0} more
+A {0} win over {N}.
+A {0} win at {N}.
+A comfortable {0} win over {N}.
+A comfortable {0} win at {N}.
+A stoppage-time {0} win over {N}.
+A stoppage-time {0} win at {N}.
+A comeback {0} win over {N}.
+A comeback {0} win at {N}.
+{0} with {N}.
+{0} at {N}.
+{0} with {N}, rescued late.
+{0} at {N}, rescued late.
+A {0} defeat to {N}.
+A {0} defeat at {N}.
+A heavy {0} defeat to {N}.
+A heavy {0} defeat at {N}.
+{N} v {M}
+v {N}
+at {N}
+v {N} ({M})
+at {N} ({M})
+→ {N} (loan)
+winner {N} {0}′
+{0} after {1}′
+{N} sent off {0}′
+{N} ({0}) — OUT
+{N} wins
+{N} · United moments
+Ended by {N} (A) {0}, {M}
+Ended by {N} (H) {0}, {M}
+{0}th, {1} behind {N}
+{0}th, {1} clear of {N}
+{0}th, {1} pts, {2} clear of {N}
+{0}th, {1} pts, {2} behind {N}
+{0} v {N}
+{N} · unused
+{N} · on {0}'
+Caretaker manager · {N}
+{N}, rescued late.
+manager {N}
+Updated {N} ago · squad list as of {M}
+Updated {N} ago
+{0} goal
+{0} goals
+{0} assist
+{0} assists
+{0} saves
+rated {0}
+clean sheet
+Started
+Came on
+Unused sub
+Earlier matchweeks {0}
+Earlier matchdays {0}
+{N} Injury
+Hamstring Injury
+Knee Injury
+Ankle Injury
+Hip Injury
+Leg Injury
+Thigh Injury
+Calf Injury
+Groin Injury
+Foot Injury
+Back Injury
+Shoulder Injury
+Muscle Injury
+Head Injury
+Achilles Tendon Injury
+Missing Fixture
+Suspended
+Red Card
+Yellow Cards
+Illness
+Knock
+Inactive
+Coach's decision
+Lack of Fitness
+Personal Reasons
+Rest
+International duty
+Loan agreement
+Questionable
+Doubtful
+Final First Division table · {N}
+Final Premier League table · {N}
+Final Second Division table · {N}
+Final {N} table · {M}

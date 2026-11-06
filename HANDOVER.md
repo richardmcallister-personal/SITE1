@@ -1,4 +1,4 @@
-# manutd.wiki — handover for a new chat (4 Nov 2026)
+# manutd.wiki — handover for a new chat (6 Nov 2026)
 
 Paste this as the first message of a new conversation, with the GitHub repo
 `richardmcallister-personal/SITE1` attached. Read `CLAUDE.md` in the repo first; it
@@ -81,12 +81,28 @@ the live Worker). See `git log` for the latest commit on each branch.
   empty (YouTube RSS 404/500 for those channels; yt-pl id corrected to UCG5qGWdu8nIRZqJ_GgDwQ-w) — the link shows meanwhile.
   Commons downloads from the container get 429s; retry slowly with a site UA.
 
+- Languages (live 6 Nov): English, Irish, Spanish, French, German, Swedish, Danish on every page. Worker `pickLang`
+  (cookie `mu_lang`, else Accept-Language, else English) injects `window.MU_LANG`, `/i18n/i18n.js` and `/i18n/<lang>.js`
+  into `<head>` and sets `<html lang>`; footer has a Language select. `i18n.js` translates text nodes/attributes by their
+  English text (MutationObserver), numbers as `{0}`, ordinals as `{0}th`, names as `{N}`/`{M}`/`{P}`; dates with named
+  months/weekdays follow the language (Irish names built in, desktop Chrome has none). Dictionaries:
+  `tools/data/i18n/<lang>.json` → `tools/i18n/build.py` → `<lang>.js` (UI, ~230 KB, sync in head) + `<lang>-long.js`
+  (prose, async). Wikipedia leads via `localWiki` (interlanguage link, KV `wiki:ll:v1:<lang>:<title>`, English when the
+  language has no article). Ask: POST carries `lang`; answer in that language; cache `ask:a:v9:<lang>:…`.
+  Not translated by design: feed text (news headlines, venues, injury types outside the list), names, book/film titles.
+  Translations were machine-made by language; Richard reviews the Irish.
+
 ## Next task
 
 None in progress. Season page (competition tabs, CL, Earlier button) merged to `main` 1 Nov 2026.
 Pick from the open items below.
 
 ## Open items after that
+
+- Languages: Richard to review the Irish (`tools/data/i18n/ga.json`); any page text added from now on needs entries in
+  all six `<lang>.json` files (`build.py --missing`). Leftovers seen: club-page record sentence, Season-page pace
+  sentence, youth "First appearance this season…" line, player-page "{N} to {M}. Appearances from…" note.
+- Dictionary in `<head>` is ~230 KB raw (~60 KB gzip) for non-English visitors: split per page if LCP suffers.
 
 - Server-render the hub's match card in the Worker (homepage mobile LCP 3.9 s is the
   last red Lighthouse number).

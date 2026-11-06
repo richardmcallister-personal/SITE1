@@ -87,6 +87,7 @@ window.MU=(function(){
   // GET /api/<name>?..., cached in sessionStorage for 30 min so page hops don't re-hit the Worker.
   function api(name,params){
     params=Object.assign({},params||{},{v:"3"});   // bumps the URL so browsers drop copies cached by earlier Worker builds
+    if(/wiki/.test(name)&&window.MU_LANG&&MU_LANG!=="en")params.lang=MU_LANG;   // that language's Wikipedia lead where an article exists
     var q="?"+Object.keys(params).map(function(k){return k+"="+encodeURIComponent(params[k])}).join("&");
     var url="/api/"+name+q, key="mu:"+url;
     try{var c=JSON.parse(sessionStorage.getItem(key)||"null"); if(c&&Date.now()-c.t<18e5)return Promise.resolve(c.v)}catch(e){}
@@ -203,7 +204,7 @@ window.MU=(function(){
     var at=function(n){return t.replace(/\/\d+px-/,"/"+n+"px-")}, ws=w?[330,440,660].filter(function(n){return ow?n<=ow:n<=440}):[], ss=ws.map(function(n){return at(n)+" "+n+"w"}).join(", ");
     return '<img class="'+(cls||"photo")+'" src="'+(ws.length?at(ws[0]):t)+'"'+(ss?' srcset="'+ss+'" sizes="220px"':'')+' width="'+W+'" height="'+H+'" fetchpriority="high" decoding="async" alt="'+esc(alt||"")+'">'}
   // Ask the archive: POST the question to the Worker, render the answer with the pages it drew on.
-  function ask(q){return fetch("/manutd/ask",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({q:q})}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||("HTTP "+r.status)); return j})})}
+  function ask(q){return fetch("/manutd/ask",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({q:q,lang:window.MU_LANG||"en"})}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||("HTTP "+r.status)); return j})})}
   // Floating "Ask" on every page (not on /ask/ itself): opens a sheet with the question box; Escape or the backdrop closes it.
   function askFab(){if(/\/ask\/?$/.test(location.pathname.replace(/^\/manutd/,"")))return; if(document.getElementById("askFab"))return;
     var b=document.createElement("button"); b.type="button"; b.id="askFab"; b.className="askfab"; b.setAttribute("aria-haspopup","dialog"); b.innerHTML='<img src="/manutd/assets/crest-44.webp" srcset="/manutd/assets/crest-88.webp 2x, /manutd/assets/crest-132.webp 3x" alt="" width="22" height="22" decoding="async"><span>Ask</span>'; document.body.appendChild(b);

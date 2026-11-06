@@ -11,6 +11,7 @@ static/manutd/            the site: one index.html per page, shared mu.css + mu.
 static/manutd/history/    archive: data/<season>.json (1886-87 → now), clubs/, players/, *.json indexes
 static/manutd/assets/     crest, badge, iOS splash images (assets/splash/)
 static/manutd/sw.js       service worker: Web Push + notification clicks (scope "/")
+static/manutd/i18n/       site languages: i18n.js engine + built dictionaries (<lang>.js, <lang>-long.js); see tools/i18n/README.md
 worker.js                 the Worker: API-Football proxy + KV cache, Wikipedia proxies, push, collection, crons
 wrangler.jsonc            prod config + `env.dev` (site1-dev → dev.manutd.wiki)
 tools/                    Python builders that write the history JSON (see tools/README.md); tools/update.sh runs them in order
@@ -86,6 +87,15 @@ cards must stack edge to edge. Phone order is set with `order:` on the sheets.
 - Archive rows carry `sc` (scorers), `rep` (report URL) and `id` (feed fixture id from 2010-11).
 - Push: subscriptions in KV under `push:sub:<sha256(endpoint)>`; the minute cron only runs
   within ko−65 min … ko+3.5 h of the next fixture.
+
+## Languages
+
+English + Irish, Spanish, French, German, Swedish, Danish. The Worker picks one (`mu_lang` cookie from the footer
+switch, else browser language) and loads `/i18n/i18n.js` + `/i18n/<lang>.js` in `<head>`; the engine translates text
+nodes by their English text as the page renders. **New or changed English text on a page shows in English in every
+language until it is added to `tools/data/i18n/<lang>.json` and `python3 tools/i18n/build.py` is run.** Sentences built
+around names use `{N}` slots. Keep translated text out of logic: never compare `textContent` in code. Wikipedia leads
+come from that language's Wikipedia when an article exists; Ask answers in the visitor's language.
 
 ## Data refresh
 

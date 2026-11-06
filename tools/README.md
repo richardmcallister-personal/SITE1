@@ -21,6 +21,7 @@ Everything here talks to the live site's Worker (manutd.wiki), never to API-Foot
 | `build_players.py` | `history/players/<slug>.json`, `history/players_index.json` | one archive file per player: seasons, numbers, every goal, finals, managers played under |
 | `build_clubs.py` | `history/clubs/*.json`, `history/clubs.json` | match archive + cups.json + live feed from 2025/26; every competitive meeting. Feed-era matches get scorers from the feed's goal events (VAR-cancelled goals dropped, count checked against the score, names matched via numbers.json), cached in `tools/data/feed_scorers.json` |
 | `build_numbers.py` | `numbers/numbers.json` | Wikipedia season articles via `/wiki-raw` |
+| `i18n/build.py` | `static/manutd/i18n/<lang>.js`, `<lang>-long.js` | site languages from `tools/data/i18n/<lang>.json`; `--missing` lists untranslated strings. See `i18n/README.md` |
 | `update.sh` | all of the above | |
 
 Each script stamps `static/manutd/status.json` with the date it last ran; pages show that as "last checked".
