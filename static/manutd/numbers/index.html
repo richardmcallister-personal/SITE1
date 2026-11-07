@@ -67,9 +67,9 @@
 @media (max-width:640px){.numgrid{grid-template-columns:repeat(4,1fr);gap:6px} .numgrid button{font-size:26px}}
 /* holders: a band across the seasons, then a card per holder */
 .band{display:flex;height:34px;border-radius:8px;overflow:hidden;background:var(--tint);margin:4px 0 4px}
-.band a{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;text-decoration:none;white-space:nowrap;overflow:hidden;border-right:1px solid var(--paper)}
-.band a.h0{background:var(--red)} .band a.h1{background:var(--ink);color:var(--paper)} .band a.h2{background:var(--draw)} .band a.h3{background:var(--gold,#ffe500);color:#151515} .band a.none{background:transparent;pointer-events:none}
-.band a.on{outline:3px solid var(--gold,#ffe500);outline-offset:-3px}
+.band span{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;text-decoration:none;white-space:nowrap;overflow:hidden;border-right:1px solid var(--paper)}
+.band span.h0{background:var(--red)} .band span.h1{background:var(--ink);color:var(--paper)} .band span.h2{background:var(--draw)} .band span.h3{background:var(--gold,#ffe500);color:#151515} .band span.none{background:transparent;pointer-events:none}
+.band span.on{outline:3px solid var(--gold,#ffe500);outline-offset:-3px}
 .bandscale{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:14px}
 .holders{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin:0 0 14px}
 .holders a{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;align-items:center;padding:12px;border:1px solid var(--rule);border-radius:10px;color:var(--ink);text-decoration:none;background:var(--paper)}
@@ -90,13 +90,15 @@
 .fin .s{font-family:var(--head);font-weight:600;font-size:12px;letter-spacing:0;color:var(--muted)} .fin .n{min-width:0} .fin .n a{color:inherit;text-decoration:none;font-weight:600} .fin .n small{display:block;color:var(--muted);font-size:12px} .fin .r{white-space:nowrap}
 .pick{margin:0 0 8px} .pick select{font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--rule);border-radius:8px;background:var(--paper);color:var(--ink);max-width:100%}
 .era-note{font-size:13px;color:var(--muted);margin:0 0 10px}
-.pitch{position:relative;border-radius:12px;padding:14px 8px;background:var(--win);background-image:linear-gradient(transparent 49.6%,rgba(255,255,255,.35) 49.6%,rgba(255,255,255,.35) 50.4%,transparent 50.4%);display:flex;flex-direction:column;gap:12px}
+.pitch{position:relative;border-radius:12px;padding:16px 8px 12px;background:var(--win-bg,var(--win));background-image:linear-gradient(to top,rgba(255,255,255,.28) 1px,transparent 1px);background-size:100% 100%;display:flex;flex-direction:column;justify-content:space-between;gap:14px;min-height:330px}
+.pitch::after{content:"";position:absolute;left:30%;right:30%;bottom:0;height:46px;border:1px solid rgba(255,255,255,.3);border-bottom:0;pointer-events:none}
 .pitch .line{display:flex;justify-content:space-around;gap:4px}
 .pitch .p{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;text-align:center}
 .pitch .p i{width:30px;height:30px;border-radius:50%;background:var(--red);color:#fff;font-style:normal;font-family:var(--display);font-size:16px;display:grid;place-items:center;border:2px solid #fff}
 .pitch .p.gk i{background:var(--muted)} .pitch .p.on i{background:var(--gold,#ffe500);color:#151515}
 .pitch .p a,.pitch .p span{font-size:11px;font-weight:600;color:#fff;text-decoration:none;line-height:1.2;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.5)}
 .bench{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;font-size:12px;color:var(--muted)} .bench span{border:1px solid var(--rule);border-radius:999px;padding:3px 9px}
+.band span[data-h]{cursor:pointer}
 </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZZVNDNYN9"></script>
@@ -186,7 +188,7 @@
     $("stat").innerHTML=[[used+" of "+seasons().length,"seasons worn",""],[H.length,H.length===1?"player":"players",""],[scorer&&scorer.goals?scorer.goals:"0","most goals",scorer&&scorer.goals?scorer.name:"—"],[longest?longest.seasons:"0","longest spell",longest?longest.name:"—"]].map(function(f){return '<div><b>'+MU.esc(String(f[0]))+'</b><span>'+f[1]+'</span>'+(f[2]?'<small>'+MU.esc(f[2])+'</small>':'')+'</div>'}).join("");
     // band: one cell per season since 1993-94, coloured by holder (first holder of that season if it changed hands)
     var S=seasons(), seq=X.seq, runs=[]; seq.forEach(function(nm,i){var last=runs[runs.length-1]; if(last&&last.nm===nm)last.to=i; else runs.push({nm:nm,from:i,to:i})});
-    $("band").innerHTML=runs.map(function(r){var h=r.nm&&H.filter(function(x){return x.name===r.nm})[0], len=r.to-r.from+1, span=sea(S[r.from])+(len>1?" to "+sea(S[r.to]):""); return h?'<a class="'+h.c+'" style="flex-grow:'+len+'" href="'+href(h)+'" data-h="'+MU.esc(h.name)+'" data-len="'+len+'" title="'+span+': '+MU.esc(h.name)+'"></a>':'<a class="none" style="flex-grow:'+len+'" title="'+span+': not used"></a>'}).join("");
+    $("band").innerHTML=runs.map(function(r){var h=r.nm&&H.filter(function(x){return x.name===r.nm})[0], len=r.to-r.from+1, span=sea(S[r.from])+(len>1?" to "+sea(S[r.to]):""); return h?'<span class="'+h.c+'" style="flex-grow:'+len+'" data-h="'+MU.esc(h.name)+'" data-len="'+len+'" title="'+span+': '+MU.esc(h.name)+'"></span>':'<span class="none" style="flex-grow:'+len+'" title="'+span+': not used"></span>'}).join("");
     $("band").setAttribute("aria-label","Holders of number "+n+" season by season, "+sea(S[0])+" to "+sea(S[S.length-1]));
     // label the longest runs inside the band where there's room
     [].forEach.call($("band").children,function(c){if(!c.dataset.h)return; var w=c.getBoundingClientRect().width, last=c.dataset.h.split(" ").pop(); if(w>=last.length*7+10)c.textContent=last});
@@ -198,6 +200,7 @@
   }
   // hovering a holder lights up their seasons in the band, and the other way round
   function hl(name){[].forEach.call($("band").children,function(c){c.classList.toggle("on",!!name&&c.dataset.h===name)}); [].forEach.call($("holders").children,function(c){c.classList.toggle("on",!!name&&c.dataset.h===name)})}
+  $("band").addEventListener("click",function(e){var a=e.target.closest("[data-h]"); if(!a)return; var c=[].filter.call($("holders").children,function(x){return x.dataset.h===a.dataset.h})[0]; if(c){c.scrollIntoView({behavior:"smooth",block:"center"}); hl(a.dataset.h)}});
   ["band","holders"].forEach(function(id){$(id).addEventListener("mouseover",function(e){var a=e.target.closest("[data-h]"); hl(a&&a.dataset.h)}); $(id).addEventListener("mouseleave",function(){hl(null)})});
   function setGroup(label){group=label; var g=GROUPS.filter(function(x){return x[0]===label})[0];
     [].forEach.call($("groups").children,function(b){b.setAttribute("aria-selected",b.dataset.g===label)});
@@ -223,9 +226,14 @@
   }
   function finShow(i){var f=FIN[i]; if(!f)return; var res=f.gf>f.ga?"won":f.gf<f.ga?"lost":"drew";
     $("finNote").innerHTML=MU.esc(f.comp)+', '+MU.fmtDate(f.d+"T12:00:00Z",{year:"numeric",weekday:undefined})+(f.venue?' at '+MU.esc(f.venue):'')+': United '+res+' '+f.gf+'–'+f.ga+(f.aet?' after extra time':'')+(f.pens?' ('+MU.esc(f.pens)+' on penalties)':'')+' against '+MU.club(f.o)+(f.mgr?'. Manager: '+MU.esc(f.mgr):'')+'. <a href="'+f.url+'" target="_blank" rel="noopener">Match article</a>.';
-    // the XI by shirt number, laid out as the classic 2-3-5 the numbers came from (forwards at the top)
+    // the XI laid out by each player's position in that final (attack at the top, left wing on the left):
+    // 2-3-5 before the 1925 offside change, the WM (3-2-2-3) after it, and back four / midfield / forwards from the 1960s
     var by={}; f.xi.forEach(function(p){if(p.no)by[p.no]=p});
-    var lines=[[7,8,9,10,11],[4,5,6],[2,3],[1]], placed={};
+    var X={OL:-3,LF:-2,LM:-2,LB:-2,IL:-1,LH:-1,CF:0,FW:0,CM:0,MF:0,CB:0,CH:0,DF:0,GK:0,IR:1,RH:1,RF:2,RM:2,RB:2,OR:3}, early=+f.d.slice(0,4)<1926;
+    function row(pos){return pos==="GK"?4:/^(LB|RB|CB|DF)$/.test(pos)||(pos==="CH"&&!early)?3:/^(LH|RH|LM|RM|CM|MF)$/.test(pos)||(pos==="CH"&&early)?2:/^(IL|IR)$/.test(pos)&&!early?1:0}
+    var R=[[],[],[],[],[]]; f.xi.forEach(function(p){if(p.no&&p.pos&&X[p.pos]!=null)R[row(p.pos)].push(p)});
+    var lines=R.map(function(r){return r.sort(function(a,b){return X[a.pos]-X[b.pos]||a.no-b.no}).map(function(p){return p.no})}).filter(function(r){return r.length}), placed={};
+    if(!lines.length)lines=[[11,10,9,8,7],[6,5,4],[3,2],[1]];
     function dot(no){var p=by[no]; placed[no]=1; return '<div class="p'+(no===1?' gk':'')+(no===cur?' on':'')+'"><i>'+no+'</i>'+(p?(p.title||p.name?'<a href="'+href(p)+'" title="'+MU.esc(p.name)+(p.pos?' · '+MU.esc(p.pos):'')+'">'+MU.esc(p.name.split(" ").slice(-1)[0])+(p.cap?' (c)':'')+'</a>':''):'<span>—</span>')+'</div>'}
     var html=lines.map(function(l){return '<div class="line">'+l.map(dot).join("")+'</div>'}).join("");
     var odd=f.xi.filter(function(p){return !p.no||!placed[p.no]});

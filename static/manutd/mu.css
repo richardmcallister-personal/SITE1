@@ -448,3 +448,5 @@ footer.mu.big .themesw button{background:transparent;color:#fff;border:0} footer
 mark{background:#fff0a8;color:#151515}
 .themesw button{min-height:28px;min-width:40px}
 .form b.W,.report .rs.W{background:var(--win-bg)}
+footer.mu .themesw button,footer.mu.big .themesw button{min-height:28px;min-width:44px}
+footer.mu.big{display:block}
