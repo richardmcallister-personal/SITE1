@@ -67,8 +67,12 @@ Tokens in `mu.css` `:root`: `--bg --paper --ink --muted --rule --red --red-ink -
 --on-black --tint --us --win --draw --radius`. Dark variants under
 `@media (prefers-color-scheme: dark)` and `:root[data-theme="dark"]` (footer switch).
 **Never hard-code a colour in a page** — every one goes through a token, or dark mode breaks.
-Display face Anton (`--display`/`--head`), text Archivo (`--body`). Red band header, warm grey
-ground, white cards radius 12, phone tab bar ≤640px (Match · Season · History · Shirts · More).
+Redesign branch (Nov 2026): Apple-style quiet UI with United red as the only accent: red masthead (header + section
+bar) with the condensed site name in Anton (`--brand`), system text (SF Pro / Inter, `--head` `--body`), Anton for scores
+and kick-off times only (`--score`), white cards radius 18 on `#f5f5f7`, sentence case everywhere. Actions: `.btn` red
+solid (one main action), `.btn.ghost` neutral outline, `.tlink`/plain links for the rest; 44px tap areas. Calendar
+actions go through `MU.calMenu(fx,{icon})` (one-off download + subscriptions). Phone tab bar ≤640px
+(Match · Season · History · Shirts · More); the section links hide on phones, search stays.
 Shared components live in `mu.css` (`.sheet .h2h .facts .filters .bar .two .res .fxlist .sea
 .prof .pct .stat .grid .lastrow`); page-local CSS is for that page only.
 
