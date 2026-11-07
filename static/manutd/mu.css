@@ -420,3 +420,24 @@ table.mu tr.us td{background:var(--us)} table.mu tr.us td:first-child{box-shadow
   nav.mutabs a[aria-current="page"]{color:#fff;box-shadow:inset 0 3px 0 var(--red);border-radius:0}
 }
 .tile{border:1px solid var(--rule);border-radius:var(--radius)}
+/* site footer: a dark full-width band — brand, sections, official links, sister sites, then the page's own notes */
+footer.mu.big{position:relative;isolation:isolate;max-width:none;margin-top:40px;padding:40px 0 28px;color:var(--muted-on-black);font-size:13px}
+footer.mu.big::before{content:"";position:absolute;z-index:-1;top:0;bottom:0;left:calc(50% - 50vw);right:calc(50% - 50vw);background:var(--nav)}
+footer.mu.big a{color:#fff}
+footer.mu.big .stamp{background:transparent;color:var(--muted-on-black);border-color:rgba(255,255,255,.25)}
+footer.mu.big .cookies{color:#fff}
+footer.mu.big .langsw,footer.mu.big .themesw{background:transparent;color:#fff;border-color:rgba(255,255,255,.3)}
+footer.mu.big .themesw button{color:#fff}
+.sitefoot{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,3fr) minmax(0,1.3fr);gap:32px;padding-bottom:28px;margin-bottom:20px;border-bottom:1px solid rgba(255,255,255,.14)}
+.sitefoot h2{font-family:var(--head);font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;margin:0 0 12px;padding:0;background:none}
+.sitefoot ul{list-style:none;margin:0;padding:0}
+.sitefoot li a{display:inline-flex;align-items:center;min-height:32px;text-decoration:none;color:rgba(255,255,255,.82)} .sitefoot li a:hover{color:#fff;text-decoration:underline}
+.fbrand .fname{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:#fff} .fbrand .fname span{font-family:var(--brand);font-size:22px;text-transform:uppercase;letter-spacing:.01em}
+.fbrand p{margin:12px 0 0;max-width:34ch;line-height:1.5} .fbrand .fdata{font-size:12px}
+.fcols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px}
+.fsis li a{gap:12px;min-height:52px;padding:4px 0} .fsis img{width:40px;height:40px;border-radius:9px;flex:0 0 auto}
+.fsis b{display:block;color:#fff;font-weight:600;font-size:14px} .fsis small{display:block;font-size:12px;color:var(--muted-on-black)}
+@media (max-width:1099px){.sitefoot{grid-template-columns:1fr 1fr} .fcols{grid-column:1/-1;order:3}}
+@media (max-width:640px){footer.mu.big{padding-top:28px} .sitefoot{grid-template-columns:1fr;gap:22px} .fcols{display:none}}
+body:has(footer.mu.big){padding-bottom:0} footer.mu.big{padding-bottom:96px} @media (max-width:640px){footer.mu.big{padding-bottom:150px}}
+footer.mu.big .themesw button{background:transparent;color:#fff;border:0} footer.mu.big .themesw button[aria-pressed="true"]{background:#fff;color:#181818} footer.mu.big .langsw option{color:#181818}

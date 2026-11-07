@@ -18,6 +18,21 @@ window.MU=(function(){
   function themeSwitch(){var f=document.querySelector("footer.mu"); if(!f||f.querySelector(".themesw"))return; var cur="auto"; try{cur=localStorage.getItem("mu:theme")||"auto"}catch(e){}
     var d=document.createElement("span"); d.className="themesw"; d.setAttribute("role","group"); d.setAttribute("aria-label","Appearance"); d.innerHTML=["auto","light","dark"].map(function(m){return '<button type="button" data-m="'+m+'" aria-pressed="'+(m===cur)+'">'+m+'</button>'}).join("");
     d.addEventListener("click",function(e){var b=e.target.closest("button"); if(b)theme(b.dataset.m)}); f.appendChild(document.createTextNode(" Appearance:")); f.appendChild(d)}
+  // Site footer: who we are, the main sections, official links and Richard's other sites; the page's own source note,
+  // appearance, language and cookie controls follow underneath as before.
+  function siteFooter(){var f=document.querySelector("footer.mu"); if(!f||f.querySelector(".sitefoot"))return;
+    function col(h,links){return '<div class="fcol"><h2>'+h+'</h2><ul>'+links.map(function(l){return '<li><a href="'+l[0]+'"'+(/^https?:/.test(l[0])?' target="_blank" rel="noopener"':'')+'>'+l[1]+'</a></li>'}).join("")+'</ul></div>'}
+    var cal=calFeed("").webcal;
+    var sis=[["https://irelandfootball.wiki/","Ireland Football","irelandfootball.wiki","irelandfootball"],["https://irelandrugby.wiki/","Ireland Rugby","irelandrugby.wiki","irelandrugby"],["https://limerickhurling.wiki/","Limerick Hurling","limerickhurling.wiki","limerickhurling"]];
+    var d=document.createElement("div"); d.className="sitefoot";
+    d.innerHTML='<div class="fbrand"><a class="fname" href="/manutd/"><img src="/manutd/assets/crest-44.webp" alt="" width="36" height="36"><span>Manchester United</span></a><p>An independent supporters’ hub. Not affiliated with Manchester United Football Club.</p><p class="fdata">Data: API-Football, Wikipedia (CC BY-SA), Wikimedia Commons.</p></div>'+
+      '<div class="fcols">'+col("Matchday",[["/manutd/","Hub"],["/manutd/season/","Season and fixtures"],["/manutd/trips/","Trips"],["/manutd/grounds/","Away ground guides"],[cal,"Fixtures in your calendar"]])+
+      col("Club",[["/manutd/squad/","Squad and availability"],["/manutd/youth/","Academy and loans"],["/manutd/kits/","Shirt museum"],["/manutd/numbers/","Who wore this number?"]])+
+      col("History",[["/manutd/history/","Seasons and records"],["/manutd/find/","Find that match"],["/manutd/rivalry/","Rivalries"],["/manutd/ask/","Ask the archive"]])+
+      col("Official",[["https://www.manutd.com/","manutd.com"],["https://tickets.manutd.com/","Tickets"],["/manutd/links/","More links"]])+'</div>'+
+      '<div class="fsis"><h2>Other sites</h2><ul>'+sis.map(function(x){return '<li><a href="'+x[0]+'" target="_blank" rel="noopener"><img src="/manutd/assets/sites/'+x[3]+'.png" alt="" width="40" height="40" loading="lazy" decoding="async"><span><b translate="no">'+x[1]+'</b><small translate="no">'+x[2]+'</small></span></a></li>'}).join("")+'</ul></div>';
+    f.insertBefore(d,f.firstChild); f.classList.add("big")}
+  document.addEventListener("DOMContentLoaded",siteFooter);
   document.addEventListener("DOMContentLoaded",themeSwitch);
   // Cookie consent for analytics (Consent Mode v2). Nothing is stored or sent to Google until "Accept"; "No thanks" keeps
   // the denied default and remembers that. A "Cookies" control in the footer reopens the choice.
