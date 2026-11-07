@@ -23,7 +23,7 @@ window.MU=(function(){
   function siteFooter(){var f=document.querySelector("footer.mu"); if(!f||f.querySelector(".sitefoot"))return;
     function col(h,links){return '<div class="fcol"><h2>'+h+'</h2><ul>'+links.map(function(l){return '<li><a href="'+l[0]+'"'+(/^https?:/.test(l[0])?' target="_blank" rel="noopener"':'')+'>'+l[1]+'</a></li>'}).join("")+'</ul></div>'}
     var cal=calFeed("").webcal;
-    var sis=[["https://footballclub.wiki/","Football Club Wiki","footballclub.wiki","footballclub"],["https://irelandfootball.wiki/","Ireland Football","irelandfootball.wiki","irelandfootball"],["https://irelandrugby.wiki/","Ireland Rugby","irelandrugby.wiki","irelandrugby"],["https://limerickhurling.wiki/","Limerick Hurling","limerickhurling.wiki","limerickhurling"]];
+    var sis=[["https://irelandfootball.wiki/","Ireland Football","irelandfootball.wiki","irelandfootball"],["https://irelandrugby.wiki/","Ireland Rugby","irelandrugby.wiki","irelandrugby"],["https://limerickhurling.wiki/","Limerick Hurling","limerickhurling.wiki","limerickhurling"],["https://footballclub.wiki/","Football Club Wiki","footballclub.wiki","footballclub"]];
     var d=document.createElement("div"); d.className="sitefoot";
     d.innerHTML='<div class="fbrand"><a class="fname" href="/manutd/"><img src="/manutd/assets/crest-44.webp" alt="" width="36" height="36"><span>Manchester United</span></a><p class="fdata">Data: API-Football, Wikipedia (CC BY-SA), Wikimedia Commons.</p></div>'+
       '<div class="fcols">'+col("Matchday",[["/manutd/","Hub"],["/manutd/season/","Season and fixtures"],["/manutd/trips/","Trips"],["/manutd/grounds/","Away ground guides"],[cal,"Fixtures in your calendar"]])+
