@@ -80,7 +80,8 @@ table.mini tr.rel td:first-child{box-shadow:inset 3px 0 0 var(--red)}
 h2.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border:0;padding:0;width:100%} h2.row a{font-family:var(--body);font-size:12px;color:var(--red-ink);text-decoration:none;letter-spacing:0;text-transform:none;font-weight:600}
 .lastrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--rule);font-size:14px} .lastrow .d{font-size:11px;color:var(--muted);min-width:56px} .lastrow .ha{font-size:10px;font-weight:700;color:var(--muted);background:var(--tint);padding:2px 5px;border-radius:3px} .lastrow .o{flex-grow:1;font-weight:600} .lastrow .o small{display:block;font-weight:400;color:var(--muted);font-size:11px} .lastrow .r{font-family:var(--display);font-size:18px;white-space:nowrap} .lastrow .r a{color:inherit;text-decoration:none} .lastrow .r small.tz{font-family:var(--body);font-size:10px} .lastrow .form{margin-left:2px}
 /* reserved space so cards fill in place instead of pushing the page down (CLS) */
-#matchSheet{min-height:228px} #tiles{min-height:150px;margin-top:12px} #miniSheet{min-height:320px} #otdSheet{min-height:340px} #lastSheet{min-height:420px} #upSheet{min-height:300px} #msSheet{min-height:380px}
+#matchSheet{min-height:280px} #tiles{min-height:180px;margin-top:12px} #miniSheet{min-height:350px} #otdSheet{min-height:380px} #lastSheet{min-height:730px} #upSheet{min-height:310px} #msSheet{min-height:480px} #secSheet{min-height:1240px}
+@media (min-width:900px){#matchSheet{min-height:290px} #upSheet{min-height:575px} #lastSheet{min-height:1500px} #msSheet{min-height:505px} #otdSheet{min-height:390px} #miniSheet{min-height:360px} #secSheet{min-height:1290px}}
 
 /* fixture rows: date + kick-off together, competition crest with its label, calendar always on the right */
 .uprow{display:grid;grid-template-columns:78px 20px minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--rule)}
@@ -97,7 +98,7 @@ details.msnote{margin-top:6px} details.msnote summary{cursor:pointer;font-size:1
 /* Explore United */
 .xgroup{margin:4px 0 0} .xgroup h3{font-size:13px;color:var(--muted);font-weight:600;margin:16px 0 2px}
 .secs .th{width:44px;height:44px;border-radius:10px;object-fit:cover;background:var(--tint);flex:0 0 auto}
-.secs a{min-height:44px} .secs img.th[src*="kits"]{object-fit:contain;padding:3px}
+.secs a{min-height:44px}
 /* last five: the same row as fixtures, score and result on the right */
 .uprow.done .dt{font-size:13px;font-weight:600;color:var(--muted)}
 .uprow .o .on{display:inline-flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none} .uprow .o .on img.crest{width:22px!important;height:22px!important;margin:0!important;flex:none}
@@ -133,7 +134,7 @@ details.msnote{margin-top:6px} details.msnote summary{cursor:pointer;font-size:1
   <div class="sheet" id="secSheet"><a id="more"></a><h2 class="row">Explore United</h2>
     <div class="xgroup"><h3>Matchday</h3><ul class="secs">
       <li><a href="/manutd/trips/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><span><b>Plan a trip</b><small>Flights, hotels and prices for every fixture</small></span><span class="ch">›</span></a></li>
-      <li><a href="/manutd/grounds/"><img class="th" src="/manutd/grounds/img/anfield-s.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><span><b>Away ground guides</b><small>17 away days: getting there, the away end, getting home</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/grounds/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span><b>Away ground guides</b><small>17 away days: getting there, the away end, getting home</small></span><span class="ch">›</span></a></li>
       <li><a href="/manutd/links/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></span><span><b>Official sites and tickets</b><small>Club, tickets, travel and fan links</small></span><span class="ch">›</span></a></li>
     </ul></div>
     <div class="xgroup"><h3>Players</h3><ul class="secs">
@@ -142,9 +143,9 @@ details.msnote{margin-top:6px} details.msnote summary{cursor:pointer;font-size:1
       <li><a href="/manutd/numbers/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14M7 4v16M17 4v16"/></svg></span><span><b>Who wore this number?</b><small>Every holder since 1993, and 1–11 at the finals</small></span><span class="ch">›</span></a></li>
     </ul></div>
     <div class="xgroup"><h3>History</h3><ul class="secs">
-      <li><a href="/manutd/history/"><img class="th" src="/manutd/grounds/img/old-trafford-s.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><span><b>Seasons, players and records</b><small>140 seasons, 770 players, 33 managers</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/history/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span><b>Seasons, players and records</b><small>140 seasons, 770 players, 33 managers</small></span><span class="ch">›</span></a></li>
       <li><a href="/manutd/find/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5M8.5 11h5M11 8.5v5"/></svg></span><span><b>Find that match from what you remember</b><small>Any game since 1886: a scorer, the opponent, roughly when</small></span><span class="ch">›</span></a></li>
-      <li><a href="/manutd/kits/"><img class="th" src="/manutd/assets/kits/1999-00-home.png" alt="" width="44" height="44" loading="lazy" decoding="async"><span><b>Shirt museum: every kit since 1878</b><small>445 shirts, and your own collection</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/kits/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4 4 7l2 4 2-1v10h8V10l2 1 2-4-4-3a4 4 0 0 1-8 0Z"/></svg></span><span><b>Shirt museum: every kit since 1878</b><small>445 shirts, and your own collection</small></span><span class="ch">›</span></a></li>
       <li><a href="/manutd/rivalry/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l16 16M20 4 4 20"/></svg></span><span><b>Rivalries: the record against each</b><small>Liverpool, City, Leeds, Arsenal, Chelsea</small></span><span class="ch">›</span></a></li>
       <li><a href="/manutd/comebacks/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14a8 8 0 1 0 2-5.3M4 4v5h5"/></svg></span><span><b>Comeback collection</b><small>Something to watch after a bad day</small></span><span class="ch">›</span></a></li>
       <li><a href="/manutd/shelf/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v14H4zM9 5v14M4 10h16"/></svg></span><span><b>Bookshelf and watchlist</b><small>Books, documentaries, films and podcasts by era</small></span><span class="ch">›</span></a></li>
