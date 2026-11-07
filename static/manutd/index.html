@@ -83,8 +83,8 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
 #matchSheet{min-height:228px} #tiles{min-height:150px;margin-top:12px} #miniSheet{min-height:320px} #otdSheet{min-height:340px} #lastSheet{min-height:420px} #upSheet{min-height:300px} #msSheet{min-height:380px}
 
 /* fixture rows: date + kick-off together, competition crest with its label, calendar always on the right */
-.uprow{display:grid;grid-template-columns:84px 24px minmax(0,1fr) 44px;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--rule)}
-.uprow .when{display:flex;flex-direction:column;line-height:1.15} .uprow .dt{font-size:13px;color:var(--muted)} .uprow .upko{font-size:22px;line-height:1.1;font-weight:400;color:var(--ink)} .uprow .tz{font-size:12px;color:var(--muted)}
+.uprow{display:grid;grid-template-columns:78px 20px minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--rule)}
+.uprow .when{display:flex;flex-direction:column;line-height:1.15} .uprow .dt{font-size:13px;color:var(--muted);white-space:nowrap} .uprow .upko{font-size:22px;line-height:1.1;font-weight:400;color:var(--ink)} .uprow .tz{font-size:12px;color:var(--muted)}
 .uprow .ha{font-size:11px;font-weight:700;color:var(--muted);background:var(--tint);border-radius:4px;text-align:center;padding:2px 0}
 .uprow .o{font-weight:600;font-size:15px;min-width:0} .uprow .o a.on{color:var(--ink);text-decoration:none} .uprow .o a.on:hover{text-decoration:underline}
 .uprow .o small{display:block;font-weight:400;font-size:13px;color:var(--muted);margin-top:2px} .uprow .cm{display:inline-flex;align-items:center;gap:5px;vertical-align:middle} .uprow .cm img.comp{margin:0!important;display:inline-block!important}
@@ -98,6 +98,11 @@ details.msnote{margin-top:6px} details.msnote summary{cursor:pointer;font-size:1
 .xgroup{margin:4px 0 0} .xgroup h3{font-size:13px;color:var(--muted);font-weight:600;margin:16px 0 2px}
 .secs .th{width:44px;height:44px;border-radius:10px;object-fit:cover;background:var(--tint);flex:0 0 auto}
 .secs a{min-height:44px} .secs img.th[src*="kits"]{object-fit:contain;padding:3px}
+/* last five: the same row as fixtures, score and result on the right */
+.uprow.done .dt{font-size:13px;font-weight:600;color:var(--muted)}
+.uprow .o .on{display:inline-flex;align-items:center;gap:8px;color:var(--ink);text-decoration:none} .uprow .o .on img.crest{width:22px!important;height:22px!important;margin:0!important;flex:none}
+.uprow .o small{padding-left:0} .uprow .cm{gap:8px!important} .uprow .cm img.comp{margin:0 4px!important} .uprow .res{display:flex;align-items:center;gap:8px}
+.uprow .res a.sc{font-family:var(--score);font-size:22px;color:var(--ink);text-decoration:none;min-width:44px;text-align:right}
 </style><!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZZVNDNYN9"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'granted',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',region:'AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,IS,LI,NO,GB,CH'.split(',')});try{var c=localStorage.getItem('mu:consent');if(c)gtag('consent','update',{analytics_storage:c==='granted'?'granted':'denied'})}catch(e){}gtag('js',new Date());gtag('config','G-QZZVNDNYN9');</script>
@@ -251,9 +256,9 @@ details.msnote{margin-top:6px} details.msnote summary{cursor:pointer;font-size:1
       return '<div class="lastrow"><span class="d otdy">'+y+'</span><span class="ha">'+(m.h?"H":"A")+'</span><span class="o">'+MU.club(m.o)+'<small>'+MU.esc(m.comp||m.div)+(m.r?' · '+MU.esc(m.r):'')+(m.scorers?' · '+MU.esc(m.scorers):'')+'</small></span><span class="r">'+(m.id?'<a href="/manutd/match/?id='+m.id+'">':'<a href="/manutd/history/season/?s='+m.s+'">')+m.gf+'–'+m.ga+'</a></span>'+MU.form(res)+'</div>'}).join("");
   }).catch(function(){});
   // fixture row: date and kick-off together on the left, opponent with competition crest + label, calendar on the right
-  function upRow(home,opp,ko,comp,venue,prov,id,fx){var meta=['<span class="cm">'+(MU.comp(comp,14)||"")+MU.esc(comp||"")+'</span>']; if(!home&&venue)meta.push(MU.esc(venue));
+  function upRow(home,opp,ko,comp,venue,prov,id,fx){var meta=['<span class="cm">'+(MU.comp(comp,14)||"")+MU.esc(String(comp||"").replace(/^UEFA /,""))+'</span>']; if(!home&&venue)meta.push(MU.esc(venue));
     var when='<span class="when"><span class="dt">'+MU.fmtDate(ko)+'</span><b class="upko">'+MU.fmtLocal(ko)+'</b>'+(MU.IN_UK?'':'<small class="tz">'+MU.fmtUK(ko)+' UK</small>')+(prov?MU.prov(prov):'')+'</span>';
-    var nm=id?'<a class="on" href="/manutd/match/?id='+id+'">'+MU.club(opp)+'</a>':MU.club(opp);
+    var nm=(id?'<a class="on" href="/manutd/match/?id='+id+'">':'<span class="on">')+MU.crest(opp)+MU.esc(opp)+(id?'</a>':'</span>');
     var cal=fx?MU.calMenu(fx,{icon:true,what:opp}):'<span></span>';
     return '<div class="uprow">'+when+'<span class="ha">'+(home?"H":"A")+'</span><span class="o">'+nm+'<small>'+meta.filter(Boolean).join(' · ')+'</small></span>'+cal+'</div>'}
   $("upcoming").innerHTML=fx.filter(function(f){return new Date(f.ko)>now}).slice(0,6).map(function(f){return upRow(f.home,f.opp,f.ko,f.comp,f.venue,f,null,f)}).join("");
@@ -275,7 +280,7 @@ details.msnote{margin-top:6px} details.msnote summary{cursor:pointer;font-size:1
     var all=j.response.filter(function(m){return !/riendl/.test(m.league.name)}).sort(function(a,b){return b.fixture.timestamp-a.fixture.timestamp});
     var played=all.filter(function(m){return /FT|AET|PEN/.test(m.fixture.status.short)}).slice(0,5);
     $("last").innerHTML=played.map(function(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home, res=gf>ga?"W":gf<ga?"L":"D";
-      return '<div class="lastrow"><span class="d">'+MU.fmtDate(m.fixture.date)+'</span><span class="ha">'+(home?"H":"A")+'</span><span class="o">'+MU.club(opp.name)+'<small>'+MU.esc(m.league.name)+'</small></span><span class="r"><a href="/manutd/match/?id='+m.fixture.id+'">'+gf+'–'+ga+'</a></span>'+MU.form(res)+'</div>'}).join("");
+      return '<div class="uprow done"><span class="when"><span class="dt">'+MU.fmtDate(m.fixture.date)+'</span></span><span class="ha">'+(home?"H":"A")+'</span><span class="o"><a class="on" href="/manutd/match/?id='+m.fixture.id+'">'+(MU.crest(opp.name,1)?MU.crest(opp.name):'<img class="crest" src="'+opp.logo+'" alt="" width="22" height="22">')+MU.esc(opp.name)+'</a><small><span class="cm">'+(MU.comp(m.league.name,14)||"")+MU.esc(m.league.name.replace(/^UEFA /,""))+'</span></small></span><span class="res"><a class="sc" href="/manutd/match/?id='+m.fixture.id+'">'+gf+'–'+ga+'</a>'+MU.form(res)+'</span></div>'}).join("");
     // live or recently finished match takes over the card
     var live=all.filter(function(m){return /1H|HT|2H|ET|P|BT|LIVE/.test(m.fixture.status.short)})[0], recent=played[0]&&(Date.now()-played[0].fixture.timestamp*1000<6*3600000)?played[0]:null, take=live||recent;
     if(take){cardLive(take,null); MU.api("match",{fixture:take.fixture.id}).then(function(k){var f=k.response&&k.response[0]; lastDetailResolve(f&&/FT|AET|PEN/.test(f.fixture.status.short)?f:null); if(f){cardLive(f,f); if(!live){$("report").innerHTML=MU.report(f,{label:"Match report",photo:true}); MU.fillReport($("report"),f); $("reportWrap").hidden=false}}}).catch(function(){lastDetailResolve(null)}); if(live)setTimeout(function(){location.reload()},60000)}
