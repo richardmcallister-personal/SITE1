@@ -107,6 +107,11 @@ the live Worker). See `git log` for the latest commit on each branch.
   Full table → /season/#premier-league. Ask has a microphone (Web Speech) and Read aloud; Permissions-Policy allows
   microphone=(self).
 
+- 7 Nov evening (live): site footer (dark band, sections, Official, Other sites with icons in assets/sites/);
+  Match alerts fold (localStorage mu:alertsHidden); /accessibility/ statement (contact postmaster@manutd.wiki) after an
+  axe-core 4.10 WCAG 2.2 A/AA scan of 20 pages × light/dark × 1280/390 — now 0 violations. Re-run that scan after big
+  design changes and keep the statement's "Known issues" honest. Finals XI on /numbers/ laid out by recorded position.
+
 ## Next task
 
 None in progress. Season page (competition tabs, CL, Earlier button) merged to `main` 1 Nov 2026.
