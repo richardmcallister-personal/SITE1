@@ -3661,5 +3661,14 @@
 "{N} is one clean sheet away from {0}": "{N} är en hållen nolla från {0}",
 "{N} is two clean sheets away from {0}": "{N} är två hållna nollor från {0}",
 "{N}: {0} games in all competitions, {1} this season": "{N}: {0} matcher i alla tävlingar, {1} denna säsong",
-"{N}: {0} in all competitions, {1} this season": "{N}: {0} i alla tävlingar, {1} denna säsong"
+"{N}: {0} in all competitions, {1} this season": "{N}: {0} i alla tävlingar, {1} denna säsong",
+"Speak your question": "Säg din fråga",
+"Listening… tap to stop": "Lyssnar … tryck för att stoppa",
+"Listening…": "Lyssnar …",
+"Read aloud": "Läs upp",
+"Stop reading": "Sluta läsa",
+"The microphone uses your browser’s speech recognition: Chrome sends the recording to Google, Safari to Apple.": "Mikrofonen använder webbläsarens taligenkänning: Chrome skickar inspelningen till Google, Safari till Apple.",
+"Microphone access is blocked for this site. Allow it in your browser settings, or type the question.": "Mikrofonen är blockerad för den här sidan. Tillåt den i webbläsarens inställningar eller skriv frågan.",
+"Didn’t catch that. Tap the microphone and try again.": "Uppfattade inte det. Tryck på mikrofonen och försök igen.",
+"Voice input stopped. Type the question instead.": "Röstinmatningen stoppades. Skriv frågan i stället."
 }

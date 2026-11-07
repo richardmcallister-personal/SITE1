@@ -370,3 +370,11 @@ nav.munav{position:relative;top:auto}
   main p{max-width:80ch} main p[style*="center"],.mc p,.score p,.hub .tile p{max-width:none}
 }
 @media (min-width:1440px){.venue .gph figcaption{max-width:1320px}}
+/* Ask: speak the question, hear the answer */
+.askmic{flex:0 0 44px;width:44px;height:44px;border:1px solid var(--rule);border-radius:50%;background:var(--paper);color:var(--ink);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.askmic:hover{color:var(--red-ink);border-color:var(--red-ink)}
+.askmic.on{background:var(--red);border-color:var(--red);color:#fff;animation:askpulse 1.2s ease-in-out infinite}
+@keyframes askpulse{0%,100%{box-shadow:0 0 0 0 color-mix(in srgb,var(--red) 45%,transparent)}50%{box-shadow:0 0 0 8px transparent}}
+@media (prefers-reduced-motion:reduce){.askmic.on{animation:none}}
+.askread{display:inline-flex;align-items:center;gap:6px;min-height:44px}
+.askvoice{font-size:12px;margin:6px 0 0}

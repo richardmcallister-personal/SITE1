@@ -3661,5 +3661,14 @@
 "{N} is one clean sheet away from {0}": "Tá {N} cluiche gan chúl amháin ó {0}",
 "{N} is two clean sheets away from {0}": "Tá {N} dhá chluiche gan chúl ó {0}",
 "{N}: {0} games in all competitions, {1} this season": "{N}: {0} cluiche i ngach comórtas, {1} an séasúr seo",
-"{N}: {0} in all competitions, {1} this season": "{N}: {0} i ngach comórtas, {1} an séasúr seo"
+"{N}: {0} in all competitions, {1} this season": "{N}: {0} i ngach comórtas, {1} an séasúr seo",
+"Speak your question": "Abair do cheist",
+"Listening… tap to stop": "Ag éisteacht… tapáil chun stopadh",
+"Listening…": "Ag éisteacht…",
+"Read aloud": "Léigh os ard",
+"Stop reading": "Stop ag léamh",
+"The microphone uses your browser’s speech recognition: Chrome sends the recording to Google, Safari to Apple.": "Úsáideann an micreafón aithint cainte do bhrabhsálaí: seolann Chrome an taifeadadh chuig Google, Safari chuig Apple.",
+"Microphone access is blocked for this site. Allow it in your browser settings, or type the question.": "Tá rochtain ar an micreafón blocáilte don suíomh seo. Ceadaigh i socruithe an bhrabhsálaí í, nó clóscríobh an cheist.",
+"Didn’t catch that. Tap the microphone and try again.": "Níor chuala mé é sin. Tapáil an micreafón agus bain triail eile as.",
+"Voice input stopped. Type the question instead.": "Stop an t-ionchur gutha. Clóscríobh an cheist ina ionad sin."
 }

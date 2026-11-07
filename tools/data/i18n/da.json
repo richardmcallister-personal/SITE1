@@ -3661,5 +3661,14 @@
 "{N} is one clean sheet away from {0}": "{N} er ét clean sheet fra {0}",
 "{N} is two clean sheets away from {0}": "{N} er to clean sheets fra {0}",
 "{N}: {0} games in all competitions, {1} this season": "{N}: {0} kampe i alle turneringer, {1} denne sæson",
-"{N}: {0} in all competitions, {1} this season": "{N}: {0} i alle turneringer, {1} denne sæson"
+"{N}: {0} in all competitions, {1} this season": "{N}: {0} i alle turneringer, {1} denne sæson",
+"Speak your question": "Sig dit spørgsmål",
+"Listening… tap to stop": "Lytter … tryk for at stoppe",
+"Listening…": "Lytter …",
+"Read aloud": "Læs højt",
+"Stop reading": "Stop oplæsning",
+"The microphone uses your browser’s speech recognition: Chrome sends the recording to Google, Safari to Apple.": "Mikrofonen bruger browserens talegenkendelse: Chrome sender optagelsen til Google, Safari til Apple.",
+"Microphone access is blocked for this site. Allow it in your browser settings, or type the question.": "Adgang til mikrofonen er blokeret for denne side. Tillad den i browserens indstillinger, eller skriv spørgsmålet.",
+"Didn’t catch that. Tap the microphone and try again.": "Det fangede jeg ikke. Tryk på mikrofonen og prøv igen.",
+"Voice input stopped. Type the question instead.": "Taleinput stoppede. Skriv spørgsmålet i stedet."
 }

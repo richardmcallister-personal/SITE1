@@ -3651,5 +3651,14 @@
 "{N} is one clean sheet away from {0}",
 "{N} is two clean sheets away from {0}",
 "{N}: {0} games in all competitions, {1} this season",
-"{N}: {0} in all competitions, {1} this season"
+"{N}: {0} in all competitions, {1} this season",
+"Speak your question",
+"Listening… tap to stop",
+"Listening…",
+"Read aloud",
+"Stop reading",
+"The microphone uses your browser’s speech recognition: Chrome sends the recording to Google, Safari to Apple.",
+"Microphone access is blocked for this site. Allow it in your browser settings, or type the question.",
+"Didn’t catch that. Tap the microphone and try again.",
+"Voice input stopped. Type the question instead."
 ]

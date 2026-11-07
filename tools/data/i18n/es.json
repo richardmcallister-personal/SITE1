@@ -3661,5 +3661,14 @@
 "{N} is one clean sheet away from {0}": "A {N} le falta una portería a cero para las {0}",
 "{N} is two clean sheets away from {0}": "A {N} le faltan dos porterías a cero para las {0}",
 "{N}: {0} games in all competitions, {1} this season": "{N}: {0} partidos en todas las competiciones, {1} esta temporada",
-"{N}: {0} in all competitions, {1} this season": "{N}: {0} en todas las competiciones, {1} esta temporada"
+"{N}: {0} in all competitions, {1} this season": "{N}: {0} en todas las competiciones, {1} esta temporada",
+"Speak your question": "Di tu pregunta",
+"Listening… tap to stop": "Escuchando… toca para parar",
+"Listening…": "Escuchando…",
+"Read aloud": "Leer en voz alta",
+"Stop reading": "Dejar de leer",
+"The microphone uses your browser’s speech recognition: Chrome sends the recording to Google, Safari to Apple.": "El micrófono usa el reconocimiento de voz del navegador: Chrome envía la grabación a Google, Safari a Apple.",
+"Microphone access is blocked for this site. Allow it in your browser settings, or type the question.": "El acceso al micrófono está bloqueado para este sitio. Permítelo en los ajustes del navegador o escribe la pregunta.",
+"Didn’t catch that. Tap the microphone and try again.": "No te he entendido. Toca el micrófono e inténtalo de nuevo.",
+"Voice input stopped. Type the question instead.": "La entrada de voz se ha detenido. Escribe la pregunta."
 }
