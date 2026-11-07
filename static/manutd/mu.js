@@ -188,15 +188,21 @@ window.MU=(function(){
   // Team news from the injuries feed, reconciled. The feed lists a player once per fixture he was flagged for and the order is
   // not by date, so the newest flag per player wins; a player who then started or came on in a match played on or after his
   // flag is "back" (with the minute), not injured. Returns {list, out, doubts, back, asOf, fetched}.
+  // Absences the feed hasn't picked up yet, from the club or the manager. Each one lapses on `until`, or as soon as he
+  // plays again (the same "back" check as feed entries). Update here when news changes.
+  var MANUAL_OUT=[{id:356041,name:"C. Baleba",type:"Missing Fixture",reason:"Hamstring Injury",from:"2026-11-04",until:"2026-11-30"}];
   function injuries(j,matches){var rows=(j&&j.response||[]).filter(function(x){return x.player&&x.fixture&&x.fixture.date}).sort(function(a,b){return b.fixture.date.localeCompare(a.fixture.date)});
+    var today=new Date().toISOString().slice(0,10);
+    MANUAL_OUT.forEach(function(m){if(today>m.until||rows.some(function(x){return x.player.id===m.id&&x.fixture.date.slice(0,10)>=m.from}))return;
+      rows.unshift({manual:true,player:{id:m.id,name:m.name,type:m.type,reason:m.reason},fixture:{date:m.from+"T00:00:00+00:00"}})});
     var seen={}, list=[]; rows.forEach(function(x){if(seen[x.player.id])return; seen[x.player.id]=1; list.push(x)});
-    var cut=Date.now()-7*864e5; list=list.filter(function(x){return new Date(x.fixture.date)>cut});
+    var cut=Date.now()-7*864e5; list=list.filter(function(x){return x.manual||new Date(x.fixture.date)>cut});
     (matches||[]).forEach(function(f){if(!f||!f.fixture)return; var d=f.fixture.date, on={};
       (f.lineups||[]).forEach(function(l){if(l.team.id!==TEAM)return; (l.startXI||[]).forEach(function(p){on[p.player.id]="started"})});
       (f.events||[]).forEach(function(e){if(e.type==="subst"&&e.team.id===TEAM&&e.assist&&e.assist.id)on[e.assist.id]="came on "+e.time.elapsed+"'"});
       list.forEach(function(x){if(on[x.player.id]&&d>=x.fixture.date.slice(0,10)){var opp=f.teams.home.id===TEAM?f.teams.away.name:f.teams.home.name; x.back={what:on[x.player.id],opp:opp,date:d}}})});
     var out=list.filter(function(x){return !x.back&&/Missing/i.test(x.player.type||"")}), doubts=list.filter(function(x){return !x.back&&!/Missing/i.test(x.player.type||"")}), back=list.filter(function(x){return x.back});
-    return {list:list.filter(function(x){return !x.back}),out:out,doubts:doubts,back:back,asOf:list.length?list[0].fixture.date:null,fetched:j&&j._fetched||null}}
+    return {list:list.filter(function(x){return !x.back}),out:out,doubts:doubts,back:back,asOf:(list.filter(function(x){return !x.manual})[0]||{fixture:{}}).fixture.date||null,fetched:j&&j._fetched||null}}
   function ago(t){if(!t)return ""; var m=Math.round((Date.now()-t)/60000); if(m<1)return "just now"; if(m<60)return m+" min ago"; var h=Math.round(m/60); if(h<48)return h+" h ago"; return Math.round(h/24)+" days ago"}
   // Lead portrait from a Wikipedia REST summary: the 330px thumbnail with 2x/3x variants (Wikimedia renders any width),
   // intrinsic size set so the box is reserved, high fetch priority since it is the largest thing above the fold.
