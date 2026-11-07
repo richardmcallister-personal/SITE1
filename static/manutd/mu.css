@@ -441,3 +441,10 @@ footer.mu.big .themesw button{color:#fff}
 @media (max-width:640px){footer.mu.big{padding-top:28px} .sitefoot{grid-template-columns:1fr;gap:22px} .fcols{display:none}}
 body:has(footer.mu.big){padding-bottom:0} footer.mu.big{padding-bottom:96px} @media (max-width:640px){footer.mu.big{padding-bottom:150px}}
 footer.mu.big .themesw button{background:transparent;color:#fff;border:0} footer.mu.big .themesw button[aria-pressed="true"]{background:#fff;color:#181818} footer.mu.big .langsw option{color:#181818}
+/* contrast fixes from the automated WCAG scan (7 Nov 2026) */
+:root{--draw:#6e6e73;--win-bg:#0a7a2f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--muted:#a3a3a3;--red-ink:#ff6b72;--win-bg:#1f7a35;--draw:#6e6e73;--muted-on-black:#a3a3a3}}
+:root[data-theme="dark"]{--muted:#a3a3a3;--red-ink:#ff6b72;--win-bg:#1f7a35;--draw:#6e6e73;--muted-on-black:#a3a3a3}
+mark{background:#fff0a8;color:#151515}
+.themesw button{min-height:28px;min-width:40px}
+.form b.W,.report .rs.W{background:var(--win-bg)}

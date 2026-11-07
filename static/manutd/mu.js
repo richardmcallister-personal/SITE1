@@ -29,7 +29,7 @@ window.MU=(function(){
       '<div class="fcols">'+col("Matchday",[["/manutd/","Hub"],["/manutd/season/","Season and fixtures"],["/manutd/trips/","Trips"],["/manutd/grounds/","Away ground guides"],[cal,"Fixtures in your calendar"]])+
       col("Club",[["/manutd/squad/","Squad and availability"],["/manutd/youth/","Academy and loans"],["/manutd/kits/","Shirt museum"],["/manutd/numbers/","Who wore this number?"]])+
       col("History",[["/manutd/history/","Seasons and records"],["/manutd/find/","Find that match"],["/manutd/rivalry/","Rivalries"],["/manutd/ask/","Ask the archive"]])+
-      col("Official",[["https://www.manutd.com/","manutd.com"],["https://tickets.manutd.com/","Tickets"],["/manutd/links/","More links"]])+'</div>'+
+      col("Official",[["https://www.manutd.com/","manutd.com"],["https://tickets.manutd.com/","Tickets"],["/manutd/links/","More links"],["/manutd/accessibility/","Accessibility"]])+'</div>'+
       '<div class="fsis"><h2>Other sites</h2><ul>'+sis.map(function(x){return '<li><a href="'+x[0]+'" target="_blank" rel="noopener"><img src="/manutd/assets/sites/'+x[3]+'.png" alt="" width="40" height="40" loading="lazy" decoding="async"><span><b translate="no">'+x[1]+'</b><small translate="no">'+x[2]+'</small></span></a></li>'}).join("")+'</ul></div>';
     f.insertBefore(d,f.firstChild); f.classList.add("big")}
   document.addEventListener("DOMContentLoaded",siteFooter);

@@ -59,11 +59,11 @@
 /* picker */
 .ngroups{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 12px}
 .ngroups button{font:inherit;font-size:13px;font-weight:600;padding:6px 12px;border-radius:999px;border:1px solid var(--rule);background:var(--paper);color:var(--ink);cursor:pointer} .ngroups button[aria-selected="true"]{background:var(--black);color:var(--on-black);border-color:var(--black)}
-.ngroups button small{font-weight:400;opacity:.7;margin-left:4px}
+.ngroups button small{font-weight:400;margin-left:4px}
 .numgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(68px,1fr));gap:8px}
 .numgrid button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:10px 4px 8px;border:1px solid var(--rule);border-radius:10px;background:var(--paper);color:var(--ink);cursor:pointer;font-family:var(--display);font-size:28px;line-height:1}
 .numgrid button small{font-family:var(--body);font-size:11px;font-weight:600;color:var(--muted);letter-spacing:0;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:0 4px}
-.numgrid button:hover{border-color:var(--muted)} .numgrid button[aria-pressed="true"]{background:var(--red);color:#fff;border-color:var(--red)} .numgrid button[aria-pressed="true"] small{color:#fff;opacity:.85}
+.numgrid button:hover{border-color:var(--muted)} .numgrid button[aria-pressed="true"]{background:var(--red);color:#fff;border-color:var(--red)} .numgrid button[aria-pressed="true"] small{color:#fff;opacity:1}
 @media (max-width:640px){.numgrid{grid-template-columns:repeat(4,1fr);gap:6px} .numgrid button{font-size:26px}}
 /* holders: a band across the seasons, then a card per holder */
 .band{display:flex;height:34px;border-radius:8px;overflow:hidden;background:var(--tint);margin:4px 0 4px}

@@ -262,8 +262,8 @@
   function li(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, st=m.fixture.status.short, done=st==="FT"||st==="AET"||st==="PEN";
     var gf=home?m.goals.home:m.goals.away, ga=home?m.goals.away:m.goals.home, res=done?(gf>ga?"W":gf<ga?"L":"D"):"";
     var k=done?{ko:m.fixture.date,conf:true}:MU.ko(m);
-    var nm=MU.crest(opp.name,1)?MU.club(opp.name):'<img class="logo" src="'+opp.logo+'" alt="">'+MU.esc(opp.name);
-    return fxRow(home,k,done,'<a class="on" href="/manutd/match/?id='+m.fixture.id+'">'+nm+'</a>',m.league.name,home?"":m.fixture.venue.name,done?'<b class="sc">'+gf+'–'+ga+'</b>'+MU.form(res):MU.calMenu(MU.fixFor(opp.name,home,m.fixture.date),{icon:true,what:opp.name}))}
+    var nm='<a class="on" href="/manutd/match/?id='+m.fixture.id+'">'+(MU.crest(opp.name)||'<img class="logo" src="'+opp.logo+'" alt="">')+MU.esc(opp.name)+'</a>';
+    return fxRow(home,k,done,nm,m.league.name,home?"":m.fixture.venue.name,done?'<b class="sc">'+gf+'–'+ga+'</b>'+MU.form(res):MU.calMenu(MU.fixFor(opp.name,home,m.fixture.date),{icon:true,what:opp.name}))}
   // one row grammar for results and fixtures: date and kick-off together, opponent, competition crest with its label, score or calendar on the right
   function fxRow(home,k,done,name,comp,venue,right){var meta=['<span class="cm">'+MU.comp(comp,14)+MU.esc(comp)+'</span>']; if(venue)meta.push(MU.esc(venue));
     return '<li class="'+(home?"home":"away")+'"><span class="d"><span>'+MU.fmtDate(k.ko)+'</span>'+(done?'':MU.fmtKO(k.ko)+MU.prov(k)+MU.confTag(k))+'</span><span class="o">'+name+'<small>'+meta.join(' · ')+'</small></span><span class="r">'+right+'</span></li>'}
