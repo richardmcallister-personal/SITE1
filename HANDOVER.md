@@ -101,6 +101,12 @@ the live Worker). See `git log` for the latest commit on each branch.
 - 7 Nov: redesign merged to main (live). Baleba is in MANUAL_OUT in mu.js (lapses 30 Nov or when he plays).
   Remove and re-add the Home Screen icon to pick up launch images.
 
+- 7 Nov pm (live): second design review — hub top row = next match (2/3) + latest score/recap (1/3); timeline etc. only
+  on the match page; Last five its own card; red masthead + light search ("Search players, matches, shirts…"); bordered
+  8px cards; uppercase section labels with a red marker; sentence-case actions; black phone tab bar, first tab "Hub";
+  Full table → /season/#premier-league. Ask has a microphone (Web Speech) and Read aloud; Permissions-Policy allows
+  microphone=(self).
+
 ## Next task
 
 None in progress. Season page (competition tabs, CL, Earlier button) merged to `main` 1 Nov 2026.
