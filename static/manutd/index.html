@@ -116,6 +116,7 @@ details.msnote{margin-top:6px} details.msnote summary{cursor:pointer;font-size:1
 }
 /* the hub keeps the score and recap; the timeline, ratings, photo and highlights live in the match centre */
 #lastSheet .report .rph,#lastSheet .report .rg,#lastSheet .report .rhl{display:none}
+#alerts.folded{padding-top:16px;padding-bottom:16px} #alerts.folded h2{margin:0}
 </style><!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZZVNDNYN9"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'granted',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',region:'AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,IS,LI,NO,GB,CH'.split(',')});try{var c=localStorage.getItem('mu:consent');if(c)gtag('consent','update',{analytics_storage:c==='granted'?'granted':'denied'})}catch(e){}gtag('js',new Date());gtag('config','G-QZZVNDNYN9');</script>
@@ -168,7 +169,8 @@ details.msnote{margin-top:6px} details.msnote summary{cursor:pointer;font-size:1
   </div>
   </div>
   <div class="sheet" id="alerts">
-    <h2>Match alerts</h2>
+    <h2 class="row">Match alerts <button class="tlink" id="alertFold" type="button" aria-expanded="true" aria-controls="alertBody">Hide</button></h2>
+    <div id="alertBody">
     <p class="sub" id="alertNote" style="margin:0 0 10px">Team news an hour before kick-off, every goal as it goes in, half-time and the final score; kick-off changes and ticket deadlines between games — pushed to this device. Prefer a calendar? <a href="/manutd/season/#united">Subscribe on the Season page</a>.</p>
     <div class="alertRow"><button class="btn red" id="alertBtn" type="button">Turn on alerts</button><button class="btn ghost" id="alertTest" type="button" hidden>Send a test</button><span id="alertStatus" class="sub"></span></div>
     <div class="prefs" id="alertPrefs" hidden>
@@ -180,6 +182,7 @@ details.msnote{margin-top:6px} details.msnote summary{cursor:pointer;font-size:1
       <label><input type="checkbox" data-p="tickets" checked> Ticket sales and ballots: when they open, and a day before they close</label>
     </div>
     <p class="sub" id="alertHint" style="margin:8px 0 0" hidden></p>
+    </div>
   </div>
 </main>
 
@@ -307,5 +310,11 @@ details.msnote{margin-top:6px} details.msnote summary{cursor:pointer;font-size:1
     var up=all.filter(function(m){return m.fixture.status.short==="NS"||m.fixture.status.short==="TBD"}).sort(function(a,b){return new Date(MU.ko(a).ko)-new Date(MU.ko(b).ko)}).slice(0,6);
     if(up.length)$("upcoming").innerHTML=up.map(function(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, k=MU.ko(m); return upRow(home,opp.name,k.ko,m.league.name,m.fixture.venue&&m.fixture.venue.name,k,m.fixture.id,MU.fixFor(opp.name,home,m.fixture.date))}).join("");
   }).catch(function(e){MU.apiDown($("last"),e)});
+
+  // Match alerts can be folded away; the choice is remembered on this device
+  (function(){var b=$("alertFold"), body=$("alertBody"), k="mu:alertsHidden";
+    function set(h,save){body.hidden=h; b.setAttribute("aria-expanded",!h); b.textContent=h?"Show":"Hide"; $("alerts").classList.toggle("folded",h); if(save)try{localStorage.setItem(k,h?"1":"0")}catch(e){}}
+    var h=false; try{h=localStorage.getItem(k)==="1"}catch(e){} set(h);
+    b.addEventListener("click",function(){set(!body.hidden,true)})})();
 })();
 </script></body></html>
