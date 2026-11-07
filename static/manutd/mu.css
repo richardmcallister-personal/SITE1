@@ -361,3 +361,12 @@ details.calmenu:not(.ic) .calpop{left:0;right:auto}
 nav.munav{position:relative;top:auto}
 .pills,.pills[class]{top:var(--mast,0px);background:var(--bg)}
 [id]{scroll-margin-top:calc(var(--mast,64px) + 12px)} main#main-content{scroll-margin-top:calc(var(--mast,64px) + 12px)}
+/* wide screens: more room for the content, colour bands and photos edge to edge, reading text at a comfortable width */
+@media (min-width:1440px){.wrap{max-width:1320px}}
+@media (min-width:1100px){
+  .venue{margin:0 calc(50% - 50vw) 18px}
+  .venue .gph img{border-radius:0;aspect-ratio:24/5;max-height:340px}
+  .venue .gph figcaption{max-width:1100px;margin:6px auto 0;padding:0 24px;box-sizing:border-box}
+  main p{max-width:80ch} main p[style*="center"],.mc p,.score p,.hub .tile p{max-width:none}
+}
+@media (min-width:1440px){.venue .gph figcaption{max-width:1320px}}
