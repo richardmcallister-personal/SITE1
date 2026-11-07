@@ -379,49 +379,36 @@ nav.munav{position:relative;top:auto}
 .askread{display:inline-flex;align-items:center;gap:6px;min-height:44px}
 .askvoice{font-size:12px;margin:6px 0 0}
 
-/* ===== Ferrari-inspired skin (trial on redesign, 7 Nov 2026) — reference: getdesign.md "ferrari" DESIGN.md.
-   Cinematic near-black masthead, United red used sparingly (main action, active state, our row), square corners,
-   uppercase tracked labels, medium-weight display type. Tokens only, so light and dark both follow. ===== */
-:root{--bg:#f7f7f7;--paper:#fff;--ink:#181818;--muted:#666;--rule:#d2d2d2;--red:#da020e;--red-ink:#c4000b;--black:#181818;--on-black:#fff;--tint:#ebebeb;--us:#fbe9ea;--muted-on-black:#969696;--radius:0px;--nav:#181818;--frost:rgba(24,24,24,.94)}
+/* ===== Combined skin (7 Nov 2026 design review): live's red masthead, condensed title and light search; bordered cards
+   with 8px corners; tracked uppercase section labels with a short red marker; sentence-case pill actions (one red);
+   black phone tab bar with a red marker on the current tab. Tokens only, so light and dark both follow. ===== */
+:root{--bg:#f7f7f7;--paper:#fff;--ink:#181818;--muted:#666;--rule:#d2d2d2;--red:#da020e;--red-ink:#c4000b;--black:#181818;--on-black:#fff;--tint:#ebebeb;--us:#fbe9ea;--muted-on-black:#969696;--radius:8px;--nav:#181818;--frost:rgba(24,24,24,.94)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#181818;--paper:#232323;--ink:#fff;--muted:#969696;--rule:#303030;--red:#da020e;--red-ink:#ff4d55;--black:#0e0e0e;--on-black:#fff;--tint:#303030;--us:#3a1214;--muted-on-black:#969696;--nav:#0e0e0e;--frost:rgba(14,14,14,.94)}}
 :root[data-theme="dark"]{--bg:#181818;--paper:#232323;--ink:#fff;--muted:#969696;--rule:#303030;--red:#da020e;--red-ink:#ff4d55;--black:#0e0e0e;--on-black:#fff;--tint:#303030;--us:#3a1214;--muted-on-black:#969696;--nav:#0e0e0e;--frost:rgba(14,14,14,.94)}
 
-/* masthead: black band with a thin red rule underneath — red stops being the background and becomes the signal */
-header.mu::before,nav.munav::before{background:var(--nav)}
-nav.munav::before{box-shadow:inset 0 1px 0 rgba(255,255,255,.08),inset 0 -3px 0 var(--red)}
-h1{font-family:var(--head);font-weight:600;font-size:20px;letter-spacing:.16em;text-transform:uppercase}
-h1 small{letter-spacing:.12em;text-transform:uppercase;font-size:11px;color:rgba(255,255,255,.62)}
-nav.munav>a{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.78)}
-nav.munav>a:hover{color:#fff;text-decoration:none}
-nav.munav>a[aria-current="page"]{color:#fff;text-decoration:none;box-shadow:inset 0 -2px 0 var(--red)}
-nav.munav .musearch input{background-color:#303030;color:#fff;border-radius:0;box-shadow:none}
-nav.munav .musearch input::placeholder{color:#969696}
-nav.munav .musearch input:focus{background-color:#3a3a3a;outline:1px solid #fff;outline-offset:0}
-nav.munav .hits{border-radius:0} nav.munav a{border-radius:0}
+/* masthead: live's red band, condensed title and a light search field (design review, 7 Nov pm) */
+nav.munav .musearch input{box-shadow:0 0 0 1px rgba(0,0,0,.18),0 1px 3px rgba(0,0,0,.18)}
+.mast :focus-visible,nav.mutabs :focus-visible{outline:2px solid #fff;outline-offset:2px}
 
 /* type: section heads as tracked uppercase captions with a short red bar; body unchanged */
 h2,h2.row{font-size:13px;font-weight:700;letter-spacing:.11em;text-transform:uppercase}
 .sheet>h2,.sheet>h2.row,main>h2,main>h2.row{background:linear-gradient(var(--red),var(--red)) 0 .55em/14px 3px no-repeat;padding-left:24px}
-h2.row a{font-size:12px;letter-spacing:.08em}
+h2.row a{font-size:13px;letter-spacing:0;text-transform:none}
 h3{font-weight:600;letter-spacing:-.005em}
 
 /* big numbers: the condensed face stays, set bigger and bolder like a spec cell */
 .report .sbs b{font-size:52px}
 
 /* cards and blocks: square, flat, hairline-separated */
-.sheet{border-radius:0;box-shadow:none;border:1px solid var(--rule)}
-.stat,.h2h div,.facts div,.ticker,.watch,.miles,.calpop,.calpop a,.consent,.askmodal .asksheet,.prof img.photo,.gph img,.hlv,iframe.hlf,.ms .mn{border-radius:0}
+.sheet{border-radius:var(--radius);box-shadow:none;border:1px solid var(--rule)}
+.stat,.h2h div,.facts div,.ticker,.watch,.miles,.calpop,.calpop a,.consent,.askmodal .asksheet,.prof img.photo,.gph img,.hlv,iframe.hlf,.ms .mn{border-radius:6px}
 
-/* actions: square, uppercase, tracked — one red solid, outline for the rest */
-.btn{border-radius:0;min-height:48px;padding:12px 28px;font-size:13px;font-weight:700;letter-spacing:.11em;text-transform:uppercase}
-.btn:hover{background:#b0010b}
+/* actions: live's sentence-case pills; one red solid, neutral outline for the rest */
+.btn{min-height:44px;padding:10px 22px;font-size:15px;font-weight:600}
+.btn:hover{filter:brightness(.92)}
 .btn.ghost,.btn.alt,.btn.sec{box-shadow:inset 0 0 0 1px var(--ink)}
-.btn.ghost:hover,.btn.alt:hover,.btn.sec:hover{background:var(--ink);color:var(--paper)}
-.tlink,button.tlink{text-transform:uppercase;font-size:13px;letter-spacing:.08em}
-.chip,.filters button,.pills a,.prov,.stamp,.calbtn,.watch .bc,.report .rs,.askex button,.themesw{border-radius:0}
-.filters input,.pick select,.askf input,.langsw,.calbar select,.watch select{border-radius:0}
-.filters button,.pills a{text-transform:uppercase;font-size:12px;letter-spacing:.07em;font-weight:600}
-.filters button[aria-pressed="true"],.pills a.on{background:var(--ink);color:var(--paper)}
+.btn.ghost:hover,.btn.alt:hover,.btn.sec:hover{background:var(--ink);color:var(--paper);filter:none}
+.chip,.prov,.stamp,.calbtn,.watch .bc,.report .rs,.themesw{border-radius:4px}
 
 /* our row in tables: red edge rather than a pink wash */
 table.mu tr.us td{background:var(--us)} table.mu tr.us td:first-child{box-shadow:inset 3px 0 0 var(--red)}
@@ -429,6 +416,7 @@ table.mu tr.us td{background:var(--us)} table.mu tr.us td:first-child{box-shadow
 /* phone tab bar: black, red marker on the current tab */
 @media (max-width:640px){
   nav.mutabs{background:var(--nav);border-radius:0}
-  nav.mutabs a{color:rgba(255,255,255,.7);text-transform:uppercase;font-size:10px;letter-spacing:.06em}
+  nav.mutabs a{color:rgba(255,255,255,.72);font-size:11px;letter-spacing:0}
   nav.mutabs a[aria-current="page"]{color:#fff;box-shadow:inset 0 3px 0 var(--red);border-radius:0}
 }
+.tile{border:1px solid var(--rule);border-radius:var(--radius)}

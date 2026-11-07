@@ -3670,5 +3670,6 @@
 "The microphone uses your browser’s speech recognition: Chrome sends the recording to Google, Safari to Apple.": "Mikrofonen bruger browserens talegenkendelse: Chrome sender optagelsen til Google, Safari til Apple.",
 "Microphone access is blocked for this site. Allow it in your browser settings, or type the question.": "Adgang til mikrofonen er blokeret for denne side. Tillad den i browserens indstillinger, eller skriv spørgsmålet.",
 "Didn’t catch that. Tap the microphone and try again.": "Det fangede jeg ikke. Tryk på mikrofonen og prøv igen.",
-"Voice input stopped. Type the question instead.": "Taleinput stoppede. Skriv spørgsmålet i stedet."
+"Voice input stopped. Type the question instead.": "Taleinput stoppede. Skriv spørgsmålet i stedet.",
+"Search players, matches, shirts…": "Søg spillere, kampe, trøjer …"
 }

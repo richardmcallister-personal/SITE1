@@ -3670,5 +3670,6 @@
 "The microphone uses your browser’s speech recognition: Chrome sends the recording to Google, Safari to Apple.": "Das Mikrofon nutzt die Spracherkennung des Browsers: Chrome schickt die Aufnahme an Google, Safari an Apple.",
 "Microphone access is blocked for this site. Allow it in your browser settings, or type the question.": "Der Mikrofonzugriff ist für diese Seite gesperrt. Erlaube ihn in den Browsereinstellungen oder tippe die Frage.",
 "Didn’t catch that. Tap the microphone and try again.": "Nicht verstanden. Tippe aufs Mikrofon und versuche es noch einmal.",
-"Voice input stopped. Type the question instead.": "Spracheingabe beendet. Tippe die Frage stattdessen ein."
+"Voice input stopped. Type the question instead.": "Spracheingabe beendet. Tippe die Frage stattdessen ein.",
+"Search players, matches, shirts…": "Spieler, Spiele, Trikots suchen …"
 }
