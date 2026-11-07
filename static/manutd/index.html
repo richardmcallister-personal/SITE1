@@ -41,7 +41,7 @@
 <link rel="apple-touch-startup-image" media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/manutd/assets/splash/1488x2266.png">
 <link rel="apple-touch-startup-image" media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="/manutd/assets/splash/2266x1488.png">
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700&display=swap">
 <link rel="stylesheet" href="/manutd/mu.css">
 <style>
 .alertRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap} .prefs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:6px 18px;margin:12px 0 0;font-size:14px} .prefs label{display:flex;gap:8px;align-items:center} .prefs input{width:16px;height:16px;accent-color:var(--red-ink)} #alertStatus{font-size:13px}
@@ -52,7 +52,7 @@
   .hub .col{display:flex;flex-direction:column;min-width:0} .hub #alerts{grid-column:1/-1}
   .lastrow .d{white-space:nowrap}}
 @media (max-width:899px){.hub .col{display:contents} .hub{display:flex;flex-direction:column}
-  #matchSheet{order:1} #msSheet{order:2} #tableSheet{order:3} #otdSheet{order:4} #lastSheet{order:5} #upSheet{order:6} #secSheet{order:7} #alerts{order:8}}
+  #matchSheet{order:1} #lastSheet{order:2} #tiles{order:3} #upSheet{order:4} #miniSheet{order:5} #msSheet{order:6} #otdSheet{order:7} #secSheet{order:8} #alerts{order:9}}
 /* match card */
 .mc .k{font-family:var(--display);font-size:12px;letter-spacing:0;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:8px}
 .mc .pill{font-family:var(--body);font-size:11px;font-weight:600;letter-spacing:0;color:var(--muted);background:var(--tint);padding:3px 8px;border-radius:10px} .mc .pill.live{background:var(--red);color:#fff}
@@ -77,10 +77,27 @@ table.mini tr.rel td:first-child{box-shadow:inset 3px 0 0 var(--red)}
 /* on this day + sections */
 .lastrow .d.otdy{font-family:var(--display);font-size:20px;color:var(--red-ink);min-width:56px}
 .secs{list-style:none;margin:0;padding:0} .secs li{border-top:1px solid var(--rule)} .secs li:first-child{border-top:0} .secs a{display:flex;align-items:center;gap:12px;padding:12px 0;color:var(--ink);text-decoration:none} .secs .ic{width:34px;height:34px;border-radius:8px;background:var(--us);color:var(--red-ink);display:flex;align-items:center;justify-content:center;flex:0 0 auto} .secs .ic svg{width:18px;height:18px} .secs b{display:block;font-size:15px} .secs small{font-size:12px;color:var(--muted)} .secs .ch{margin-left:auto;color:var(--muted)}
-h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;padding:0;width:100%;font-family:var(--display);font-weight:400;font-size:13px} h2.row a{font-family:var(--body);font-size:12px;color:var(--red-ink);text-decoration:none;letter-spacing:0;text-transform:none;font-weight:600}
+h2.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;border:0;padding:0;width:100%} h2.row a{font-family:var(--body);font-size:12px;color:var(--red-ink);text-decoration:none;letter-spacing:0;text-transform:none;font-weight:600}
 .lastrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--rule);font-size:14px} .lastrow .d{font-size:11px;color:var(--muted);min-width:56px} .lastrow .ha{font-size:10px;font-weight:700;color:var(--muted);background:var(--tint);padding:2px 5px;border-radius:3px} .lastrow .o{flex-grow:1;font-weight:600} .lastrow .o small{display:block;font-weight:400;color:var(--muted);font-size:11px} .lastrow .r{font-family:var(--display);font-size:18px;white-space:nowrap} .lastrow .r a{color:inherit;text-decoration:none} .lastrow .r small.tz{font-family:var(--body);font-size:10px} .lastrow .form{margin-left:2px}
 /* reserved space so cards fill in place instead of pushing the page down (CLS) */
-#matchSheet{min-height:228px} #tiles{min-height:178px} #miniSheet{min-height:320px} #otdSheet{min-height:340px} #lastSheet{min-height:330px} #upSheet{min-height:440px} #msSheet{min-height:650px} @media (min-width:900px){#msSheet{min-height:675px}}
+#matchSheet{min-height:228px} #tiles{min-height:150px;margin-top:12px} #miniSheet{min-height:320px} #otdSheet{min-height:340px} #lastSheet{min-height:420px} #upSheet{min-height:300px} #msSheet{min-height:380px}
+
+/* fixture rows: date + kick-off together, competition crest with its label, calendar always on the right */
+.uprow{display:grid;grid-template-columns:84px 24px minmax(0,1fr) 44px;align-items:center;gap:8px;padding:10px 0;border-top:1px solid var(--rule)}
+.uprow .when{display:flex;flex-direction:column;line-height:1.15} .uprow .dt{font-size:13px;color:var(--muted)} .uprow .upko{font-size:22px;line-height:1.1;font-weight:400;color:var(--ink)} .uprow .tz{font-size:12px;color:var(--muted)}
+.uprow .ha{font-size:11px;font-weight:700;color:var(--muted);background:var(--tint);border-radius:4px;text-align:center;padding:2px 0}
+.uprow .o{font-weight:600;font-size:15px;min-width:0} .uprow .o a.on{color:var(--ink);text-decoration:none} .uprow .o a.on:hover{text-decoration:underline}
+.uprow .o small{display:block;font-weight:400;font-size:13px;color:var(--muted);margin-top:2px} .uprow .cm{display:inline-flex;align-items:center;gap:5px;vertical-align:middle} .uprow .cm img.comp{margin:0!important;display:inline-block!important}
+.calic{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:var(--ink);background:var(--tint)} .calic:hover{color:var(--red-ink)}
+@media (max-width:640px){#upcoming .uprow:nth-child(n+4){display:none} #lastSheet .report .rph,#lastSheet .report .rg,#lastSheet .report .rhl{display:none}}
+#lastSheet h3.lf{font-size:15px;margin:18px 0 4px} #reportWrap{margin-bottom:4px}
+/* milestones: three headlines, the rest on request */
+.msmore{background:none;border:0;padding:0;font:inherit;font-size:15px;cursor:pointer}
+details.msnote{margin-top:6px} details.msnote summary{cursor:pointer;font-size:13px;color:var(--muted);min-height:32px;display:flex;align-items:center} details.msnote p{margin:4px 0 0}
+/* Explore United */
+.xgroup{margin:4px 0 0} .xgroup h3{font-size:13px;color:var(--muted);font-weight:600;margin:16px 0 2px}
+.secs .th{width:44px;height:44px;border-radius:10px;object-fit:cover;background:var(--tint);flex:0 0 auto}
+.secs a{min-height:44px} .secs img.th[src*="kits"]{object-fit:contain;padding:3px}
 </style><!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZZVNDNYN9"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'granted',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',region:'AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,IS,LI,NO,GB,CH'.split(',')});try{var c=localStorage.getItem('mu:consent');if(c)gtag('consent','update',{analytics_storage:c==='granted'?'granted':'denied'})}catch(e){}gtag('js',new Date());gtag('config','G-QZZVNDNYN9');</script>
@@ -94,43 +111,45 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
 <main class="hub" id="main-content" tabindex="-1">
   <div class="col">
   <div class="sheet mc" id="matchSheet"><div class="k">Next match</div><div class="line">Loading…</div></div>
-  <div class="sheet" id="msSheet" aria-busy="true"><h2 class="row">Milestone watch <a href="/manutd/history/records/">Records →</a></h2><div class="msbody"><p class="sub">Checking the numbers…</p></div></div>
-  <div class="sheet" id="upSheet"><h2 class="row">Coming up <a href="/manutd/trips/">Trips →</a></h2><div id="upcoming"></div></div>
-  </div>
-  <div class="col">
-  <div class="sheet" id="tableSheet" style="padding:0;background:transparent;box-shadow:none">
-    <div class="tiles" id="tiles">
-      <div class="tile" id="tileTable"><span class="k">Table</span><span class="v">—</span><span class="s"></span><span class="t"></span></div>
+  <div class="tiles" id="tiles">
       <div class="tile" id="tileNews"><span class="k">Team news</span><span class="v">—</span><span class="s"></span><span class="t"></span></div>
+      <div class="tile" id="tileTable"><span class="k">Table</span><span class="v">—</span><span class="s"></span><span class="t"></span></div>
     </div>
-    <div class="sheet" id="miniSheet" aria-busy="true"><h2 class="row">Premier League <a href="/manutd/season/">Full table →</a></h2><div id="mini"><p class="sub">Loading the table…</p></div><p class="sub" id="pace" style="margin:8px 0 0"></p></div>
-  </div>
-  <div class="sheet" id="lastSheet"><h2 class="row">Last five <a href="/manutd/season/">Results →</a></h2><div id="last"></div><div id="reportWrap" hidden style="margin-top:14px"><div id="report"></div></div></div>
+  <div class="sheet" id="upSheet"><h2 class="row">Coming up <a href="/manutd/season/#fixtures">All fixtures →</a></h2><div id="upcoming"></div></div>
   </div>
   <div class="col">
+  <div class="sheet" id="lastSheet"><h2 class="row">Latest result <a href="/manutd/season/">All results →</a></h2><div id="reportWrap" hidden><div id="report"></div></div><h3 class="lf">Last five</h3><div id="last"></div></div>
+  <div class="sheet" id="miniSheet" aria-busy="true"><h2 class="row">Premier League <a href="/manutd/season/">Full table →</a></h2><div id="mini"><p class="sub">Loading the table…</p></div><p class="sub" id="pace" style="margin:8px 0 0"></p></div>
+  </div>
+  <div class="col">
+  <div class="sheet" id="msSheet" aria-busy="true"><h2 class="row">Milestone watch <a href="/manutd/history/records/">Records →</a></h2><div class="msbody"><p class="sub">Checking the numbers…</p></div></div>
   <div class="sheet" id="otdSheet"><h2 class="row">On this day <a href="/manutd/history/">History →</a></h2><p class="sub" id="otdNote" style="margin:0 0 6px"></p><div id="otd"></div></div>
-  <div class="sheet" id="secSheet"><a id="more"></a><h2 class="row">Everything else</h2>
-    <ul class="secs">
-      <li><a href="/manutd/ask/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H9l-5 4V5Z"/><path d="M9 9h6M9 12h4"/></svg></span><span><b>Ask the archive</b><small>A question, answered from 140 seasons of data here</small></span><span class="ch">›</span></a></li>
-      <li><a href="/manutd/trips/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><span><b>Trips</b><small>Flights, hotels and prices for every fixture</small></span><span class="ch">›</span></a></li>
-      <li><a href="/manutd/grounds/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-5.5-7-11a7 7 0 0 1 14 0c0 5.5-7 11-7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg></span><span><b>Ground guides</b><small>17 away days: getting there, the away end, getting home</small></span><span class="ch">›</span></a></li>
-      <li><a href="/manutd/squad/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span><b>Squad &amp; team picker</b><small>Who's fit, who's out, this season's numbers</small></span><span class="ch">›</span></a></li>
-      <li><a href="/manutd/youth/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 9l7-6 7 6M5 15l7 6 7-6"/></svg></span><span><b>Academy &amp; loans</b><small>Loan watch and the route to a debut</small></span><span class="ch">›</span></a></li>
-      <li><a href="/manutd/find/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5M8.5 11h5M11 8.5v5"/></svg></span><span><b>Find that match</b><small>Any game since 1886, from what you remember</small></span><span class="ch">›</span></a></li>
-      <li><a href="/manutd/history/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><span><b>History</b><small>140 seasons, 770 players, 33 managers, records</small></span><span class="ch">›</span></a></li>
-      <li><a href="/manutd/rivalry/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l16 16M20 4 4 20"/></svg></span><span><b>Rivalries</b><small>Liverpool, City, Leeds, Arsenal, Chelsea</small></span><span class="ch">›</span></a></li>
-      <li><a href="/manutd/kits/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 4 4 7l2 4 2-1v10h8V10l2 1 2-4-4-3a4 4 0 0 1-8 0Z"/></svg></span><span><b>Shirt museum</b><small>445 kits since 1878, your collection</small></span><span class="ch">›</span></a></li>
+  <div class="sheet" id="secSheet"><a id="more"></a><h2 class="row">Explore United</h2>
+    <div class="xgroup"><h3>Matchday</h3><ul class="secs">
+      <li><a href="/manutd/trips/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg></span><span><b>Plan a trip</b><small>Flights, hotels and prices for every fixture</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/grounds/"><img class="th" src="/manutd/grounds/img/anfield-s.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><span><b>Away ground guides</b><small>17 away days: getting there, the away end, getting home</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/links/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></span><span><b>Official sites and tickets</b><small>Club, tickets, travel and fan links</small></span><span class="ch">›</span></a></li>
+    </ul></div>
+    <div class="xgroup"><h3>Players</h3><ul class="secs">
+      <li><a href="/manutd/squad/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg></span><span><b>Squad, availability and team picker</b><small>Who's fit, who's out, this season's numbers</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/youth/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v18M5 9l7-6 7 6M5 15l7 6 7-6"/></svg></span><span><b>Academy and loans</b><small>Loan watch and the route to a debut</small></span><span class="ch">›</span></a></li>
       <li><a href="/manutd/numbers/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h14M7 4v16M17 4v16"/></svg></span><span><b>Who wore this number?</b><small>Every holder since 1993, and 1–11 at the finals</small></span><span class="ch">›</span></a></li>
+    </ul></div>
+    <div class="xgroup"><h3>History</h3><ul class="secs">
+      <li><a href="/manutd/history/"><img class="th" src="/manutd/grounds/img/old-trafford-s.webp" alt="" width="44" height="44" loading="lazy" decoding="async"><span><b>Seasons, players and records</b><small>140 seasons, 770 players, 33 managers</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/find/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5M8.5 11h5M11 8.5v5"/></svg></span><span><b>Find that match from what you remember</b><small>Any game since 1886: a scorer, the opponent, roughly when</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/kits/"><img class="th" src="/manutd/assets/kits/1999-00-home.png" alt="" width="44" height="44" loading="lazy" decoding="async"><span><b>Shirt museum: every kit since 1878</b><small>445 shirts, and your own collection</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/rivalry/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4l16 16M20 4 4 20"/></svg></span><span><b>Rivalries: the record against each</b><small>Liverpool, City, Leeds, Arsenal, Chelsea</small></span><span class="ch">›</span></a></li>
       <li><a href="/manutd/comebacks/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 14a8 8 0 1 0 2-5.3M4 4v5h5"/></svg></span><span><b>Comeback collection</b><small>Something to watch after a bad day</small></span><span class="ch">›</span></a></li>
-      <li><a href="/manutd/shelf/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v14H4zM9 5v14M4 10h16"/></svg></span><span><b>Bookshelf &amp; watchlist</b><small>Books, documentaries, films and podcasts by era</small></span><span class="ch">›</span></a></li>
-      <li><a href="/manutd/links/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></span><span><b>Links</b><small>Official sites, tickets, travel</small></span><span class="ch">›</span></a></li>
-    </ul>
+      <li><a href="/manutd/shelf/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v14H4zM9 5v14M4 10h16"/></svg></span><span><b>Bookshelf and watchlist</b><small>Books, documentaries, films and podcasts by era</small></span><span class="ch">›</span></a></li>
+      <li><a href="/manutd/ask/"><span class="ic"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h16v11H9l-5 4V5Z"/><path d="M9 9h6M9 12h4"/></svg></span><span><b>Ask the archive</b><small>A question, answered from 140 seasons of data</small></span><span class="ch">›</span></a></li>
+    </ul></div>
   </div>
   </div>
   <div class="sheet" id="alerts">
     <h2>Match alerts</h2>
     <p class="sub" id="alertNote" style="margin:0 0 10px">Team news an hour before kick-off, every goal as it goes in, half-time and the final score; kick-off changes and ticket deadlines between games — pushed to this device. Prefer a calendar? <a href="/manutd/season/#united">Subscribe on the Season page</a>.</p>
-    <div class="alertRow"><button class="btn red" id="alertBtn" type="button">Turn on alerts</button><button class="btn" id="alertTest" type="button" hidden>Send a test</button><span id="alertStatus" class="sub"></span></div>
+    <div class="alertRow"><button class="btn red" id="alertBtn" type="button">Turn on alerts</button><button class="btn ghost" id="alertTest" type="button" hidden>Send a test</button><span id="alertStatus" class="sub"></span></div>
     <div class="prefs" id="alertPrefs" hidden>
       <label><input type="checkbox" data-p="kickoff" checked> Kick-off reminder, an hour before</label>
       <label><input type="checkbox" data-p="lineups" checked> Team news when the line-ups are out</label>
@@ -231,8 +250,13 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
     $("otd").innerHTML=ms.slice(0,5).map(function(m){var res=m.gf>m.ga?"W":m.gf<m.ga?"L":"D", y=parseInt(m.d,10);
       return '<div class="lastrow"><span class="d otdy">'+y+'</span><span class="ha">'+(m.h?"H":"A")+'</span><span class="o">'+MU.club(m.o)+'<small>'+MU.esc(m.comp||m.div)+(m.r?' · '+MU.esc(m.r):'')+(m.scorers?' · '+MU.esc(m.scorers):'')+'</small></span><span class="r">'+(m.id?'<a href="/manutd/match/?id='+m.id+'">':'<a href="/manutd/history/season/?s='+m.s+'">')+m.gf+'–'+m.ga+'</a></span>'+MU.form(res)+'</div>'}).join("");
   }).catch(function(){});
-  function upRow(home,opp,ko,comp,venue,prov,id){return '<div class="lastrow"><span class="d">'+MU.fmtDate(ko)+'</span><span class="ha">'+(home?"H":"A")+'</span><span class="o">'+MU.club(opp)+'<small>'+MU.esc(comp)+(home?'':' · '+MU.esc(venue||""))+(id?' · <a href="/manutd/match/?id='+id+'">Match centre</a>':'')+'</small></span><span class="r" style="font-size:15px;text-align:right">'+MU.fmtLocal(ko)+(prov?MU.prov(prov):'')+(MU.IN_UK?'':'<small class="tz">'+MU.fmtUK(ko)+' UK</small>')+'</span></div>'}
-  $("upcoming").innerHTML=fx.filter(function(f){return new Date(f.ko)>now}).slice(0,6).map(function(f){return upRow(f.home,f.opp,f.ko,f.comp,f.venue,f)}).join("");
+  // fixture row: date and kick-off together on the left, opponent with competition crest + label, calendar on the right
+  function upRow(home,opp,ko,comp,venue,prov,id,fx){var meta=['<span class="cm">'+(MU.comp(comp,14)||"")+MU.esc(comp||"")+'</span>']; if(!home&&venue)meta.push(MU.esc(venue));
+    var when='<span class="when"><span class="dt">'+MU.fmtDate(ko)+'</span><b class="upko">'+MU.fmtLocal(ko)+'</b>'+(MU.IN_UK?'':'<small class="tz">'+MU.fmtUK(ko)+' UK</small>')+(prov?MU.prov(prov):'')+'</span>';
+    var nm=id?'<a class="on" href="/manutd/match/?id='+id+'">'+MU.club(opp)+'</a>':MU.club(opp);
+    var cal=fx?MU.calMenu(fx,{icon:true,what:opp}):'<span></span>';
+    return '<div class="uprow">'+when+'<span class="ha">'+(home?"H":"A")+'</span><span class="o">'+nm+'<small>'+meta.filter(Boolean).join(' · ')+'</small></span>'+cal+'</div>'}
+  $("upcoming").innerHTML=fx.filter(function(f){return new Date(f.ko)>now}).slice(0,6).map(function(f){return upRow(f.home,f.opp,f.ko,f.comp,f.venue,f,null,f)}).join("");
   // ---- Live bits: table tile + compact table + pace, team news, last five, live/finished match card
   MU.api("standings").then(function(j){
     var rows=j.response[0].league.standings[0], me=rows.filter(function(r){return r.team.id===MU.TEAM})[0]; if(!me)return;
@@ -245,7 +269,7 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
   Promise.all([MU.api("injuries"),lastDetail]).then(function(r){var N=MU.injuries(r[0],r[1]?[r[1]]:[]), inj=N.list, t=$("tileNews");
     t.querySelector(".v").textContent=inj.length?N.out.length+" out"+(N.doubts.length?", "+N.doubts.length+" doubt"+(N.doubts.length>1?"s":""):""):"No absentees reported";
     t.querySelector(".s").textContent=N.out.concat(N.doubts).slice(0,3).map(function(x){return x.player.name.split(" ").pop()+(x.player.reason?" ("+x.player.reason.toLowerCase()+")":"")}).join(", ")+(N.back.length?(inj.length?" · ":"")+"back: "+N.back.map(function(x){return x.player.name.split(" ").pop()+" ("+x.back.what+" v "+x.back.opp+")"}).join(", "):"");
-    t.querySelector(".t").innerHTML='<a href="/manutd/squad/">Squad →</a>'+(N.fetched?' · <span title="When this site last pulled the list from the feed">updated '+MU.ago(N.fetched)+'</span>':'')+(N.asOf?' · <span title="The squad list this is based on">as of '+MU.fmtDate(N.asOf)+'</span>':'');
+    t.querySelector(".t").innerHTML='<a href="/manutd/squad/#availability">Availability →</a>'+(N.fetched?' · <span title="When this site last pulled the list from the feed">updated '+MU.ago(N.fetched)+'</span>':'')+(N.asOf?' · <span title="The squad list this is based on">as of '+MU.fmtDate(N.asOf)+'</span>':'');
   }).catch(function(){});
   MU.api("fixtures").then(function(j){
     var all=j.response.filter(function(m){return !/riendl/.test(m.league.name)}).sort(function(a,b){return b.fixture.timestamp-a.fixture.timestamp});
@@ -260,7 +284,7 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;border:0;
     var nxt=all.filter(function(m){return !/FT|AET|PEN|CANC/.test(m.fixture.status.short)}).sort(function(a,b){return a.fixture.timestamp-b.fixture.timestamp})[0];
     if(nxt&&$("mcBtn"))$("mcBtn").href="/manutd/match/?id="+nxt.fixture.id;
     var up=all.filter(function(m){return m.fixture.status.short==="NS"||m.fixture.status.short==="TBD"}).sort(function(a,b){return new Date(MU.ko(a).ko)-new Date(MU.ko(b).ko)}).slice(0,6);
-    if(up.length)$("upcoming").innerHTML=up.map(function(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, k=MU.ko(m); return upRow(home,opp.name,k.ko,m.league.name,m.fixture.venue&&m.fixture.venue.name,k,m.fixture.id)}).join("");
+    if(up.length)$("upcoming").innerHTML=up.map(function(m){var home=m.teams.home.id===MU.TEAM, opp=home?m.teams.away:m.teams.home, k=MU.ko(m); return upRow(home,opp.name,k.ko,m.league.name,m.fixture.venue&&m.fixture.venue.name,k,m.fixture.id,MU.fixFor(opp.name,home,m.fixture.date))}).join("");
   }).catch(function(e){MU.apiDown($("last"),e)});
 })();
 </script></body></html>

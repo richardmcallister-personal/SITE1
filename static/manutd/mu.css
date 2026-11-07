@@ -292,3 +292,58 @@ footer.mu{font-size:12px;line-height:1.6;letter-spacing:-.01em;color:var(--muted
 header.mu::before,nav.munav::before{left:calc(50% - 50vw);right:calc(50% - 50vw)}
 /* match report in a narrow hub column: one column, so ratings and the timeline don't squeeze */
 .hub .report .rg{grid-template-columns:1fr}
+
+/* ===== Design review (7 Nov 2026): United red masthead with condensed name, 15–16px body, 18–20px section heads,
+   condensed figures only for scores and kick-off times, one action hierarchy (red solid · neutral outline · text link) ===== */
+:root{--score:Anton,"Arial Narrow","Helvetica Neue Condensed",Impact,sans-serif;--brand:Anton,"Arial Narrow","Helvetica Neue Condensed",Impact,sans-serif}
+body{font-size:16px;line-height:1.5;letter-spacing:-.011em}
+/* masthead: header + section bar form one red band; search sits white on the red */
+header.mu::before,nav.munav::before{background:var(--red)}
+nav.munav::before{-webkit-backdrop-filter:none;backdrop-filter:none;border-bottom:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+header.mu{min-height:64px;padding:12px 0 8px}
+.brand img{width:40px} h1{font-family:var(--brand);font-weight:400;font-size:28px;line-height:1;letter-spacing:.01em;text-transform:uppercase;color:#fff}
+h1 small{font-family:var(--body);font-weight:600;font-size:12px;letter-spacing:0;text-transform:none;color:rgba(255,255,255,.82);margin-bottom:3px}
+.from{color:rgba(255,255,255,.82)} .from span{color:#fff}
+nav.munav{min-height:56px;padding:8px 0}
+nav.munav>a{color:#fff;font-size:14px;font-weight:600;padding:10px 12px;min-height:44px;display:inline-flex;align-items:center}
+nav.munav>a:hover{color:#fff;text-decoration:underline;text-underline-offset:5px}
+nav.munav>a[aria-current="page"]{color:#fff;text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:6px}
+nav.munav .musearch input{background-color:#fff;color:#1d1d1f;border:0;height:42px;font-size:15px;box-shadow:0 1px 3px rgba(0,0,0,.18)}
+nav.munav .musearch input::placeholder{color:#6e6e73} nav.munav .musearch input:focus{background-color:#fff;outline:2px solid #fff;outline-offset:2px}
+@media (min-width:641px){nav.munav .musearch{min-width:320px}}
+/* type scale */
+h2,h2.row{font-family:var(--head);font-weight:600;font-size:19px;line-height:1.25;letter-spacing:-.015em;text-transform:none}
+h2.row{align-items:baseline;margin-bottom:10px} h2.row a{font-size:14px;font-weight:600}
+h3{font-size:16px}
+.sub{font-size:14px} small{font-size:13px}
+/* condensed figures: scores and kick-off times only */
+.mc .score,.mc .time,.score .big,.fxlist .r,.res .fxlist .r,.lastrow .sc,.upko b,.report .line b{font-family:var(--score);font-weight:400;letter-spacing:.01em}
+/* actions */
+.btn{min-height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:600;font-size:15px;padding:10px 20px;border-radius:999px;background:var(--red);color:#fff;box-shadow:none}
+.btn.ghost,.btn.alt,.btn.sec{background:transparent;color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--rule);border:0}
+.btn.ghost:hover,.btn.alt:hover,.btn.sec:hover{box-shadow:inset 0 0 0 1.5px var(--ink);filter:none}
+.tlink{font-weight:600;color:var(--red-ink);text-decoration:none;display:inline-flex;align-items:center;min-height:44px} .tlink:hover{text-decoration:underline}
+/* Ask: above the tab bar, out of the way of the keyboard and of the last actions on the page */
+body{padding-bottom:84px} body.kbd .askfab{display:none}
+@media (max-width:640px){body{padding-bottom:150px}}
+@media (max-width:640px){nav.munav>a{display:none}}
+button.tlink{background:none;border:0;padding:0;font:inherit;font-weight:600;color:var(--red-ink);cursor:pointer}
+button.calic{border:0;font:inherit;cursor:pointer}
+/* Add to calendar menu */
+details.calmenu{position:relative;display:inline-block} details.calmenu>summary{list-style:none;cursor:pointer} details.calmenu>summary::-webkit-details-marker{display:none}
+details.calmenu>summary.btn{gap:8px}
+.calpop{position:absolute;right:0;top:calc(100% + 6px);z-index:35;width:max-content;min-width:250px;max-width:min(320px,calc(100vw - 32px));background:var(--paper);color:var(--ink);border:1px solid var(--rule);border-radius:14px;box-shadow:0 12px 40px rgba(0,0,0,.18);padding:6px;text-align:left}
+details.calmenu:not(.ic) .calpop{left:0;right:auto}
+.calpop a{display:block;padding:10px 12px;border-radius:10px;color:var(--ink);text-decoration:none;font-weight:600;font-size:15px;line-height:1.3}
+.calpop a:hover,.calpop a:focus-visible{background:var(--tint)} .calpop small{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+/* fixture and result rows (season page and friends) */
+.fxlist li{grid-template-columns:96px minmax(0,1fr) auto;gap:12px;padding:10px 0;align-items:center}
+.fxlist .d{display:flex;flex-direction:column;gap:1px;font-size:13px;font-weight:600;line-height:1.25} .fxlist .d small.tz{font-weight:400}
+.fxlist .o{min-width:0;font-size:15px} .fxlist .o a.on{color:var(--ink);text-decoration:none} .fxlist .o a.on:hover{text-decoration:underline}
+.fxlist .o small{display:block;margin-top:2px;font-size:13px} .fxlist .cm{display:inline-flex;align-items:center;gap:5px;vertical-align:middle} .fxlist .cm img.comp{display:inline-block!important;margin:0!important}
+.fxlist .r{display:flex;align-items:center;justify-content:flex-end;gap:8px;min-width:0} .fxlist .r b.sc{font-family:var(--score);font-weight:400;font-size:22px;letter-spacing:.01em;min-width:44px;text-align:right}
+@media (max-width:640px){.fxlist li{grid-template-columns:78px minmax(0,1fr) auto;gap:10px}}
+nav.munav:not(:has(.musearch)){min-height:0;padding:0} @media (max-width:640px){nav.munav:not(:has(.musearch)){display:none}}
+.fxlist .d .conftag,.fxlist .d .prov,.uprow .when .prov{align-self:flex-start;margin-top:3px}
+/* touch: small links get a 44px tap area */
+@media (pointer:coarse){h2.row a,a.chip,.calbtn,.lastrow .d a,.lastrow .o a,.hmore a,.mc summary,.tile .t a{display:inline-flex;align-items:center;min-height:44px}}

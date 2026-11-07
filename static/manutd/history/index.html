@@ -41,7 +41,7 @@
 <link rel="apple-touch-startup-image" media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/manutd/assets/splash/1488x2266.png">
 <link rel="apple-touch-startup-image" media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="/manutd/assets/splash/2266x1488.png">
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700&display=swap">
 <link rel="stylesheet" href="/manutd/mu.css">
 <style>
 .honours{display:grid;grid-template-columns:repeat(auto-fit,minmax(124px,1fr));grid-auto-rows:1fr;gap:12px;margin-top:12px}
@@ -56,6 +56,7 @@
 .match .score{font-family:var(--head);font-weight:300;font-size:34px;line-height:1} .match .score small{display:block;font-size:11px;font-weight:600;letter-spacing:0;color:var(--muted);margin-top:4px}
 .match h3{margin:0 0 2px;font-size:15px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--ink)} .match p{margin:2px 0;font-size:14px} .match .sub a{color:var(--ink)}
 @media (max-width:520px){.match{grid-template-columns:1fr}}
+.hacts{display:flex;gap:8px;flex-wrap:wrap} .hmore{list-style:none;margin:10px 0 0;padding:0;display:flex;flex-wrap:wrap;gap:0 18px} .hmore a{display:inline-flex;align-items:center;min-height:44px;font-weight:600;color:var(--red-ink);text-decoration:none} .hmore a:after{content:" →";white-space:pre} .hmore a:hover{text-decoration:underline}
 </style><!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZZVNDNYN9"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'granted',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',region:'AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,IS,LI,NO,GB,CH'.split(',')});try{var c=localStorage.getItem('mu:consent');if(c)gtag('consent','update',{analytics_storage:c==='granted'?'granted':'denied'})}catch(e){}gtag('js',new Date());gtag('config','G-QZZVNDNYN9');</script>
@@ -73,7 +74,7 @@
 
 <div class="sheet" style="padding:14px 22px;display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between">
   <div><b style="font-size:16px">Every season since 1892</b><br><span class="sub">Final tables, every league and FA Cup result, and a write-up for all 130-odd seasons — not only the ones with silverware.</span></div>
-  <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn red" href="/manutd/history/seasons/">All seasons →</a><a class="btn red" href="/manutd/history/timeline/">Timeline →</a><a class="btn" href="/manutd/history/opponents/">Every opponent →</a><a class="btn" href="/manutd/history/managers/">Every manager →</a><a class="btn" href="/manutd/history/records/">Records →</a><a class="btn" href="/manutd/rivalry/">Rivalries →</a><a class="btn" href="/manutd/numbers/">Who wore this number? →</a></div>
+  <div class="hacts"><a class="btn" href="/manutd/history/seasons/">All seasons</a><a class="btn ghost" href="/manutd/history/timeline/">Timeline</a></div><ul class="hmore"><li><a href="/manutd/history/opponents/">Every opponent</a></li><li><a href="/manutd/history/managers/">Every manager</a></li><li><a href="/manutd/history/records/">Records</a></li><li><a href="/manutd/rivalry/">Rivalries</a></li><li><a href="/manutd/numbers/">Who wore this number?</a></li></ul>
 </div>
 <div class="sheet">
   <h2>League titles · 20</h2>
