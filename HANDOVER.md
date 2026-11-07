@@ -98,6 +98,9 @@ the live Worker). See `git log` for the latest commit on each branch.
   Squad page tabs Squad / Availability (#availability) / Pick your XI (#pick) with a tap-a-position player dialog.
   New strings are in tools/data/i18n (+ ntpl.txt templates for milestone headlines). Checked at 375/390/430 + 1280.
 
+- 7 Nov: redesign merged to main (live). Baleba is in MANUAL_OUT in mu.js (lapses 30 Nov or when he plays).
+  Remove and re-add the Home Screen icon to pick up launch images.
+
 ## Next task
 
 None in progress. Season page (competition tabs, CL, Earlier button) merged to `main` 1 Nov 2026.
