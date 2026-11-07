@@ -41,20 +41,20 @@
 <link rel="apple-touch-startup-image" media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/manutd/assets/splash/1488x2266.png">
 <link rel="apple-touch-startup-image" media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="/manutd/assets/splash/2266x1488.png">
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700&display=swap">
 <link rel="stylesheet" href="/manutd/mu.css">
 <style>
-.score{background:var(--black);color:var(--on-black);padding:26px 26px 22px;display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}
+.score{background:var(--black);color:var(--on-black);border-radius:var(--radius);padding:30px 26px 26px;display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center}
 .score .team{display:flex;align-items:center;gap:14px;font-size:clamp(18px,2.6vw,26px);font-weight:600} .score .team.r{justify-content:flex-end;text-align:right}
 .score .team img.crest{width:56px;height:56px;margin:0;background:var(--paper);border-radius:50%;padding:4px;box-sizing:border-box}
 .score .mid{text-align:center;min-width:150px} .score .big{font-weight:300;font-size:clamp(44px,7vw,72px);line-height:1;letter-spacing:-.02em;white-space:nowrap}
-.score .st{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:500;color:var(--muted-on-black);margin-top:6px} .score .st.live{color:#fff} .score .st.live:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:8px;vertical-align:1px;animation:blink 1.2s infinite}
+.score .st{font-size:12px;letter-spacing:0;font-weight:600;color:var(--muted-on-black);margin-top:6px} .score .st.live{color:#fff} .score .st.live:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:8px;vertical-align:1px;animation:blink 1.2s infinite}
 @keyframes blink{50%{opacity:.2}}
 .score .meta{font-size:13px;color:var(--muted-on-black);margin-top:6px} .score small.tz{color:var(--muted-on-black)}
 .score .goals{font-size:13px;color:#ddd;margin-top:8px;line-height:1.5} .score .team.r .goals{text-align:right}
 .cols{display:grid;grid-template-columns:1fr 1fr;gap:26px}@media (max-width:820px){.cols{grid-template-columns:1fr}}
-.ev{list-style:none;margin:0;padding:0;font-size:14px} .ev li{display:grid;grid-template-columns:48px 1fr;gap:10px;padding:6px 0;border-bottom:1px solid var(--rule)} .ev .min{color:var(--muted);font-weight:500} .ev li.us{background:var(--tint)} .ev .who{font-weight:600} .ev small{color:var(--muted)}
-.bars{list-style:none;margin:0;padding:0;font-size:13px} .bars li{padding:7px 0;border-bottom:1px solid var(--rule)} .bars .lab{display:flex;justify-content:space-between;font-weight:500;margin-bottom:4px} .bars .lab span:nth-child(2){color:var(--muted);font-size:11px;letter-spacing:.1em;text-transform:uppercase}
+.ev{list-style:none;margin:0;padding:0;font-size:14px} .ev li{display:grid;grid-template-columns:48px 1fr;gap:10px;padding:6px 0;border-bottom:1px solid var(--rule)} .ev .min{color:var(--muted);font-weight:600} .ev li.us{background:var(--tint)} .ev .who{font-weight:600} .ev small{color:var(--muted)}
+.bars{list-style:none;margin:0;padding:0;font-size:13px} .bars li{padding:7px 0;border-bottom:1px solid var(--rule)} .bars .lab{display:flex;justify-content:space-between;font-weight:600;margin-bottom:4px} .bars .lab span:nth-child(2){color:var(--muted);font-size:11px;letter-spacing:0}
 .bars .bar{display:flex;height:8px;background:var(--tint)} .bars .bar i{display:block;height:100%} .bars .bar i.h{background:var(--ink)} .bars .bar i.a{background:var(--red)}
 .xi{font-size:14px;line-height:1.6} .xi b{display:block;font-weight:600;margin:10px 0 2px} .xi small{color:var(--muted)}
 a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule)} a.pl:hover{color:var(--red-ink)}
@@ -119,8 +119,8 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule)} 
     $("score").innerHTML='<div><div class="team">'+MU.crest(h.name,56)+'<span>'+MU.esc(h.name)+'</span></div><div class="goals">'+goals(h)+'</div></div>'+
       '<div class="mid"><div class="big">'+scoreTxt+'</div><div class="st '+st.cls+'">'+st.txt+'</div><div class="meta">'+MU.fmtDate(ko,{year:"numeric"})+' · '+MU.fmtKO(ko,true)+MU.prov(kk)+'<br>'+MU.esc(f.fixture.venue.name||"")+(f.fixture.venue.city?', '+MU.esc(f.fixture.venue.city):'')+(f.score&&f.score.penalty&&f.score.penalty.home!=null?'<br>Penalties '+f.score.penalty.home+'–'+f.score.penalty.away:'')+(f.score&&f.score.halftime&&f.score.halftime.home!=null?'<br>HT '+f.score.halftime.home+'–'+f.score.halftime.away:'')+'</div></div>'+
       '<div><div class="team r"><span>'+MU.esc(a.name)+'</span>'+MU.crest(a.name,56)+'</div><div class="goals" style="text-align:right">'+goals(a)+'</div></div>';
-    var day=ko.slice(0,10), FXE=OURS&&!/FT|AET|PEN/.test(f.fixture.status.short)?MU.fixFor(isUs(h)?a.name:h.name,isUs(h),f.fixture.date):null, acts=OURS?'<a class="btn" href="/manutd/trips/">Plan the trip</a>'+(FXE?'<a class="btn" href="/manutd/calendar.ics?m='+MU.fxUid(FXE)+'" download>Add to calendar</a>':'')+'<a class="btn" href="/manutd/season/">Season</a>':'<a class="btn" href="/manutd/season/#'+(CL?"champions-league":"premier-league")+'">Every game</a><a class="btn ghost" href="/manutd/club/?c='+encodeURIComponent(h.name)+'">'+MU.esc(h.name)+'</a><a class="btn ghost" href="/manutd/club/?c='+encodeURIComponent(a.name)+'">'+MU.esc(a.name)+'</a>';
-    if(!DONE.test(f.fixture.status.short)&&OURS) acts+='<a class="btn" href="/manutd/squad/">Pick your XI</a>';
+    var day=ko.slice(0,10), FXE=OURS&&!/FT|AET|PEN/.test(f.fixture.status.short)?MU.fixFor(isUs(h)?a.name:h.name,isUs(h),f.fixture.date):null, acts=OURS?'<a class="btn ghost" href="/manutd/trips/">Plan the trip</a>'+(FXE?MU.calMenu(FXE):'')+'<a class="btn ghost" href="/manutd/season/">Season</a>':'<a class="btn ghost" href="/manutd/season/#'+(CL?"champions-league":"premier-league")+'">Every game</a><a class="btn ghost" href="/manutd/club/?c='+encodeURIComponent(h.name)+'">'+MU.esc(h.name)+'</a><a class="btn ghost" href="/manutd/club/?c='+encodeURIComponent(a.name)+'">'+MU.esc(a.name)+'</a>';
+    if(!DONE.test(f.fixture.status.short)&&OURS) acts+='<a class="btn ghost" href="/manutd/squad/#pick">Pick your XI</a>';
     if(!OURS&&!DONE.test(f.fixture.status.short)) $("note").textContent="Not a United game: the score here updates around half-time and full-time, not minute by minute.";
     $("actions").innerHTML=acts;
     if(OURS&&!DONE.test(f.fixture.status.short)&&window.MUMiles&&!render.miles){render.miles=1; MUMiles.render($("miles"),f,{hideEmpty:true})} else if(!OURS||DONE.test(f.fixture.status.short))$("miles").hidden=true;

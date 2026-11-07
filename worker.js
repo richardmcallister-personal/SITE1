@@ -110,6 +110,8 @@ export default {
       if (url.pathname.startsWith("/manutd/")) return Response.redirect(url.origin + url.pathname.slice(7) + url.search, 301);
       if (!SERVICE.test(url.pathname)) {
         const inner = new URL(url.toString()); inner.pathname = "/manutd" + (url.pathname === "/" ? "/" : url.pathname);
+        // dev.manutd.wiki wears a different icon (red devil on black) so it can't be mistaken for the live site on a Home Screen or tab.
+        if (env.UPSTREAM && /^\/assets\/(favicon-32|apple-touch-icon|icon-192|icon-512|icon-512-maskable)\.png$/.test(url.pathname)) inner.pathname = "/manutd/assets/dev/" + url.pathname.split("/").pop();
         const res = await env.ASSETS.fetch(new Request(inner.toString(), request));
         const ct = res.headers.get("content-type") || "";
         if (/text\/html|javascript|application\/json/.test(ct)) {

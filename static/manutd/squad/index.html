@@ -41,7 +41,7 @@
 <link rel="apple-touch-startup-image" media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/manutd/assets/splash/1488x2266.png">
 <link rel="apple-touch-startup-image" media="screen and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)" href="/manutd/assets/splash/2266x1488.png">
 
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Archivo:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;700&display=swap">
 <link rel="stylesheet" href="/manutd/mu.css">
 <style>
 .pitch{background:#1f6b3a;background-image:repeating-linear-gradient(0deg,#1f6b3a 0 40px,#23753f 40px 80px);border:3px solid rgba(255,255,255,.8);position:relative;padding:18px 10px;display:flex;flex-direction:column-reverse;gap:14px;min-height:520px}
@@ -50,19 +50,43 @@
 .row{display:flex;justify-content:space-evenly;gap:6px;position:relative;z-index:1}
 .slot{width:clamp(84px,18vw,130px);text-align:center}
 .slot select{width:100%;font:inherit;font-size:12px;padding:4px;border:0;background:var(--paper)}
-.slot .pos{font-family:var(--head);font-weight:600;font-size:10px;letter-spacing:.14em;color:#fff;opacity:.85;margin-bottom:3px}
+.slot .pos{font-family:var(--head);font-weight:600;font-size:10px;letter-spacing:0;color:#fff;opacity:.85;margin-bottom:3px}
 .slot img.face{width:44px;height:44px;border-radius:50%;object-fit:cover;background:var(--paper);display:block;margin:0 auto 4px;border:2px solid #fff}
 .slot .nm{color:#fff;font-weight:600;font-size:13px;text-shadow:0 1px 2px #000;line-height:1.1;min-height:16px}
 .controls{display:flex;flex-wrap:wrap;gap:14px;align-items:end;margin-bottom:12px}
-.controls label{display:flex;flex-direction:column;font-size:12px;color:var(--muted)} .controls select,.controls button{font:inherit;padding:7px 10px;border:2px solid var(--ink);background:var(--paper)}
-.controls button{background:var(--black);color:var(--on-black);cursor:pointer;font-family:var(--head);font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase}
-table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;font-weight:600;border-bottom:1px solid #c9c9c9} a.pl:hover{color:var(--red-ink);border-bottom-color:var(--red-ink)}
-.out{color:var(--red-ink);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.controls label{display:flex;flex-direction:column;font-size:12px;color:var(--muted)} .controls select{font:inherit;min-height:44px;padding:7px 12px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);color:var(--ink)}
+
+table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;font-weight:600;border-bottom:1px solid var(--rule)} a.pl:hover{color:var(--red-ink);border-bottom-color:var(--red-ink)}
+.out{color:var(--red-ink);font-weight:600;font-size:12px;letter-spacing:0}
 .bio{background:var(--tint);padding:16px 18px;display:none} .bio.on{display:block}
 .bio img{float:right;width:120px;margin:0 0 10px 14px}
 .bio h3{margin-top:0}
 .saves{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:8px} .saves li{background:var(--tint);padding:6px 10px;display:flex;gap:8px;align-items:center} .saves button{all:unset;cursor:pointer;font-weight:600} .saves button[data-del]{color:var(--red-ink);font-weight:700;padding:0 4px}
 .face.sm{width:28px;height:28px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:8px;background:var(--tint)}
+
+/* tabs */
+.sqtabs-wrap{padding:6px} .sqtabs{display:flex;gap:4px}
+.sqtabs button{flex:1;min-height:44px;border:0;border-radius:12px;background:transparent;font:inherit;font-size:15px;font-weight:600;color:var(--muted);cursor:pointer}
+.sqtabs button[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+/* squad table: name, apps, goals, assists by default on phones; the rest on request */
+.colsw{display:none}
+@media (max-width:640px){.colsw{display:block} #squad table.mu td.name{white-space:normal} #squad table.mu th,#squad table.mu td{padding-left:6px;padding-right:6px} #injuries table.mu td{white-space:normal} #squad table.mu .x{display:none} #squad.all table.mu .x{display:table-cell} #squad.all{overflow-x:auto}}
+/* pitch: tap a position to pick */
+.slot{position:relative} .slot select{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.slot button.tap{all:unset;cursor:pointer;display:block;width:100%;min-height:72px;border-radius:12px;padding:4px 0}
+.slot button.tap:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.slot .add{display:inline-block;margin-top:2px;font-size:12px;font-weight:600;color:#fff;background:rgba(0,0,0,.35);border-radius:999px;padding:3px 10px}
+.pickdlg{border:0;border-radius:var(--radius);padding:0;width:min(520px,calc(100vw - 24px));max-height:min(80vh,680px);background:var(--paper);color:var(--ink)}
+.pickdlg::backdrop{background:rgba(0,0,0,.45)}
+.pdhd .pp{font-size:14px;font-weight:600;color:var(--muted);margin-left:6px} .pdhd{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 6px} .pdhd h2{margin:0}
+#pickQ{display:block;width:calc(100% - 32px);margin:0 16px 8px;box-sizing:border-box;font:inherit;font-size:16px;padding:10px 14px;border:1px solid var(--rule);border-radius:999px;background:var(--paper);color:var(--ink)}
+.pdlist{list-style:none;margin:0;padding:0 8px 12px;overflow:auto;max-height:calc(min(80vh,680px) - 120px)}
+.pdlist button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:36px 1fr auto;gap:10px;align-items:center;width:100%;min-height:48px;padding:6px 8px;border-radius:10px}
+.pdlist button:hover,.pdlist button:focus-visible{background:var(--tint)}
+.pdlist img{width:36px;height:36px;border-radius:50%;object-fit:cover;background:var(--tint)} .pdlist small{display:block;color:var(--muted);font-size:13px}
+.pdlist .av{font-size:12px;font-weight:600;border-radius:999px;padding:2px 8px;background:var(--tint);color:var(--muted)} .pdlist .av.out{background:var(--us);color:var(--red-ink)} .pdlist .av.dbt{color:var(--ink)}
+.pdlist h3{font-size:13px;color:var(--muted);margin:10px 8px 2px}
+.controls .btn{min-height:44px} .controls button.tlink{background:none;border:0;padding:0 6px;font:inherit;font-weight:600;cursor:pointer}
 </style><!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZZVNDNYN9"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'granted',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',region:'AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,IS,LI,NO,GB,CH'.split(',')});try{var c=localStorage.getItem('mu:consent');if(c)gtag('consent','update',{analytics_storage:c==='granted'?'granted':'denied'})}catch(e){}gtag('js',new Date());gtag('config','G-QZZVNDNYN9');</script>
@@ -73,14 +97,35 @@ table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;
 </header>
 <nav class="munav" aria-label="Sections"></nav>
 <main id="main-content" tabindex="-1">
+<div class="sheet sqtabs-wrap">
+  <div class="sqtabs" role="tablist" aria-label="Squad sections">
+    <button role="tab" id="tab-squad" aria-controls="p-squad" aria-selected="true" data-t="squad">Squad</button>
+    <button role="tab" id="tab-availability" aria-controls="p-availability" aria-selected="false" data-t="availability">Availability</button>
+    <button role="tab" id="tab-pick" aria-controls="p-pick" aria-selected="false" data-t="pick">Pick your XI</button>
+  </div>
+</div>
 
-<div class="sheet">
-  <h2>Team picker</h2>
+<div class="sheet" role="tabpanel" id="p-squad" aria-labelledby="tab-squad">
+  <h2>Squad</h2>
+  <p class="sub" id="squadNote" style="margin:0 0 8px"></p>
+  <div class="colsw"><button class="tlink" type="button" id="moreCols" aria-pressed="false">Show all columns</button></div>
+  <div id="squad"></div>
+  <div class="bio" id="bio"></div>
+</div>
+
+<div class="sheet" role="tabpanel" id="p-availability" aria-labelledby="tab-availability" hidden>
+  <h2>Availability</h2>
+  <p class="sub" style="margin:0 0 8px">Injured, suspended or doubtful · live from API-Football.</p>
+  <div id="injuries"></div>
+</div>
+
+<div class="sheet" role="tabpanel" id="p-pick" aria-labelledby="tab-pick" hidden>
+  <h2>Pick your XI</h2>
   <p class="sub" style="margin:0 0 12px">Pick a fixture and a shape. The whole first-team squad is offered (players out on loan are not listed); anyone injured, suspended or doubtful is marked in the list and sorted to the bottom. Each player can be used once. Your XI is saved in this browser per fixture.</p>
   <div class="controls">
     <label>Fixture<select id="fix"></select></label>
     <label>Formation<select id="form"><option>4-3-3</option><option>4-2-3-1</option><option>3-4-3</option><option>4-4-2</option><option>3-5-2</option><option>4-1-4-1</option></select></label>
-    <button id="save">Save XI</button><button id="png">Download PNG</button><button id="copy">Copy text</button><button id="clear">Clear</button>
+    <button class="btn" id="save" type="button">Save XI</button><button class="btn ghost" id="png" type="button">Download PNG</button><button class="btn ghost" id="copy" type="button">Copy text</button><button class="tlink" id="clear" type="button">Clear</button>
   </div>
   <div class="pitch" id="pitch"></div>
   <p class="sub" id="pickNote"></p>
@@ -88,21 +133,11 @@ table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;
   <ul class="saves" id="saves"></ul>
 </div>
 
-<div class="sheet">
-  <div class="two">
-    <div>
-      <h2>Squad</h2>
-      <p class="sub" id="squadNote" style="margin:0 0 8px"></p>
-      <div id="squad"></div>
-    </div>
-    <div>
-      <h2>Unavailable</h2>
-      <p class="sub" style="margin:0 0 8px">Injured, suspended or doubtful · live from API-Football.</p>
-      <div id="injuries"></div>
-      <div class="bio" id="bio"></div>
-    </div>
-  </div>
-</div>
+<dialog class="pickdlg" id="pickDlg" aria-labelledby="pickTitle">
+  <div class="pdhd"><h2 id="pickTitle">Pick a player</h2><button class="calic" type="button" id="pickClose" aria-label="Close">✕</button></div>
+  <input type="search" id="pickQ" placeholder="Search the squad" autocomplete="off" aria-label="Search the squad">
+  <ul class="pdlist" id="pickList"></ul>
+</dialog>
 </main>
 <footer class="mu">Squad from the club's first-team list (1 Sept 2026); portraits and bios from Wikipedia (Creative Commons); injuries, suspensions and season statistics from API-Football. United-career totals are being compiled and will appear next to the season figures.</footer>
 </div>
@@ -134,12 +169,13 @@ table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;
         var cur=picks[i]||"", p=squad.filter(function(x){return String(x.id)===String(cur)})[0];
         var opts=available().filter(function(x){return String(x.id)===String(cur)||picks.indexOf(String(x.id))<0});
         opts.sort(function(a,b){var ga=(a.position===GROUP[pos]?0:1)+(out[a.id]?2:0), gb=(b.position===GROUP[pos]?0:1)+(out[b.id]?2:0); return ga-gb||(a.number||99)-(b.number||99)});
-        slot.innerHTML='<div class="pos">'+pos+'</div>'+(p&&p.photo?'<img class="face" src="'+p.photo+'" alt="" onerror="this.onerror=null;this.src=\''+(p.wikiPhoto||'/manutd/assets/devil.png')+'\'">':'<img class="face" src="/manutd/assets/devil.png" alt="" style="object-fit:contain;padding:8px">')+'<div class="nm">'+(p?MU.esc(short(p.name)):"")+'</div><select data-i="'+i+'"><option value="">— pick —</option>'+opts.map(function(x){return '<option value="'+x.id+'"'+(String(x.id)===String(cur)?' selected':'')+'>'+(x.position===GROUP[pos]?"":"· ")+MU.esc(x.name)+(x.number?" ("+x.number+")":"")+(out[x.id]?(/questionable|doubt/i.test(out[x.id].type)?" — doubtful":" — OUT"):"")+'</option>'}).join("")+'</select>';
-        row.appendChild(slot);
+        slot.innerHTML='<div class="pos">'+pos+'</div><button class="tap" type="button" data-i="'+i+'" aria-label="'+pos+': '+(p?MU.esc(p.name)+', change':'pick a player')+'">'+(p&&p.photo?'<img class="face" src="'+p.photo+'" alt="" onerror="this.onerror=null;this.src=\''+(p.wikiPhoto||'/manutd/assets/devil.png')+'\'">':'<img class="face" src="/manutd/assets/devil.png" alt="" style="object-fit:contain;padding:8px">')+'<div class="nm">'+(p?MU.esc(short(p.name)):"")+'</div>'+(p?'':'<span class="add">Pick</span>')+'</button><select tabindex="-1" aria-hidden="true" data-i="'+i+'"><option value="">— pick —</option>'+opts.map(function(x){return '<option value="'+x.id+'"'+(String(x.id)===String(cur)?' selected':'')+'>'+(x.position===GROUP[pos]?"":"· ")+MU.esc(x.name)+(x.number?" ("+x.number+")":"")+(out[x.id]?(/questionable|doubt/i.test(out[x.id].type)?" — doubtful":" — OUT"):"")+'</option>'}).join("")+'</select>';
+        slot._opts=opts; slot._cur=cur; slot._pos=pos; row.appendChild(slot);
       });
       pitch.appendChild(row);
     });
     pitch.querySelectorAll("select").forEach(function(s){s.addEventListener("change",function(){var arr=saved(); arr[+s.dataset.i]=s.value; store(arr); renderPitch()})});
+    pitch.querySelectorAll("button.tap").forEach(function(b){b.addEventListener("click",function(){openPicker(b.closest(".slot"),+b.dataset.i)})});
     var n=picks.filter(Boolean).length, f=window.MU_FIXTURES.filter(function(x){return x.ko===$("fix").value})[0];
     $("pickNote").textContent=n+" of 11 picked for "+(f?(f.home?"United v "+f.opp:f.opp+" v United")+" ("+MU.fmtDate(f.ko)+")":"")+". Players listed with a dot are out of their natural position; OUT / doubtful follows the club's injury list.";
   }
@@ -149,8 +185,8 @@ table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;
   function renderSquad(){
     var order={Goalkeeper:0,Defender:1,Midfielder:2,Attacker:3};
     var rows=squad.slice().sort(function(a,b){return order[a.position]-order[b.position]||(a.number||99)-(b.number||99)});
-    $("squad").innerHTML='<table class="mu"><thead><tr><th>#</th><th>Player</th><th>Pos</th><th>Age</th><th class="n">Apps</th><th class="n">G</th><th class="n">A</th><th class="n">Min</th><th class="n">Rating</th></tr></thead><tbody>'+
-      rows.map(function(p){var s=stats[p.id]||{}; return '<tr'+(out[p.id]?' style="opacity:.55"':'')+'><td>'+(p.number||"")+'</td><td class="name">'+(p.photo?'<img class="face sm" src="'+p.photo+'" alt="" onerror="this.onerror=null;this.src=\''+(p.wikiPhoto||'/manutd/assets/devil.png')+'\'">':'')+MU.flag(p.nationality)+'<a class="pl" href="/manutd/player/?'+(p.wiki?'p='+encodeURIComponent(p.wiki):'q='+encodeURIComponent(p.name))+'">'+MU.esc(p.name)+'</a>'+(out[p.id]?' <span class="out">· out</span>':'')+'</td><td>'+({Goalkeeper:"GK",Defender:"DEF",Midfielder:"MID",Attacker:"ATT"}[p.position]||p.position)+'</td><td>'+(p.age||"")+'</td><td class="n">'+(s.apps==null?"":s.apps)+'</td><td class="n">'+(s.goals==null?"":s.goals)+'</td><td class="n">'+(s.assists==null?"":s.assists)+'</td><td class="n">'+(s.minutes==null?"":s.minutes)+'</td><td class="n">'+(s.rating?Number(s.rating).toFixed(2):"")+'</td></tr>'}).join("")+'</tbody></table>';
+    $("squad").innerHTML='<table class="mu"><thead><tr><th class="x">#</th><th>Player</th><th class="x">Pos</th><th class="x">Age</th><th class="n">Apps</th><th class="n">Goals</th><th class="n">Assists</th><th class="n x">Min</th><th class="n x">Rating</th></tr></thead><tbody>'+
+      rows.map(function(p){var s=stats[p.id]||{}; return '<tr'+(out[p.id]?' style="opacity:.55"':'')+'><td class="x">'+(p.number||"")+'</td><td class="name">'+(p.photo?'<img class="face sm" src="'+p.photo+'" alt="" onerror="this.onerror=null;this.src=\''+(p.wikiPhoto||'/manutd/assets/devil.png')+'\'">':'')+MU.flag(p.nationality)+'<a class="pl" href="/manutd/player/?'+(p.wiki?'p='+encodeURIComponent(p.wiki):'q='+encodeURIComponent(p.name))+'">'+MU.esc(p.name)+'</a>'+(out[p.id]?' <span class="out">· out</span>':'')+'</td><td class="x">'+({Goalkeeper:"GK",Defender:"DEF",Midfielder:"MID",Attacker:"ATT"}[p.position]||p.position)+'</td><td class="x">'+(p.age||"")+'</td><td class="n">'+(s.apps==null?"":s.apps)+'</td><td class="n">'+(s.goals==null?"":s.goals)+'</td><td class="n">'+(s.assists==null?"":s.assists)+'</td><td class="n x">'+(s.minutes==null?"":s.minutes)+'</td><td class="n x">'+(s.rating?Number(s.rating).toFixed(2):"")+'</td></tr>'}).join("")+'</tbody></table>';
   }
   function renderOut(){
     var list=Object.keys(out).filter(function(id){return id!=="_meta"}).map(function(id){return out[id]}), meta=out._meta||{};
@@ -214,5 +250,32 @@ table.mu td.name{white-space:nowrap} a.pl{color:var(--ink);text-decoration:none;
   $("fix").addEventListener("change",renderPitch); $("form").addEventListener("change",renderPitch);
   $("clear").addEventListener("click",function(){store([]);renderPitch()});
   $("copy").addEventListener("click",function(){var rows=FORMS[$("form").value],picks=saved(),i=0,txt=[]; rows.forEach(function(r){txt.push(r.map(function(pos){var p=squad.filter(function(x){return String(x.id)===String(picks[i++])})[0]; return pos+": "+(p?p.name:"—")}).join(" · "))}); var f=$("fix").selectedOptions[0].textContent; navigator.clipboard&&navigator.clipboard.writeText("United XI "+f+" ("+$("form").value+")\n"+txt.reverse().join("\n")).then(function(){$("pickNote").textContent="Copied."})});
+  // ---- tabs: Squad (default) · Availability · Pick your XI; #availability and #pick open straight onto a tab
+  function showTab(t,push){if(["squad","availability","pick"].indexOf(t)<0)t="squad";
+    document.querySelectorAll(".sqtabs [role=tab]").forEach(function(b){var on=b.dataset.t===t; b.setAttribute("aria-selected",on); b.tabIndex=on?0:-1});
+    ["squad","availability","pick"].forEach(function(x){$("p-"+x).hidden=x!==t});
+    if(push)history.replaceState(null,"",t==="squad"?location.pathname+location.search:"#"+t)}
+  document.querySelectorAll(".sqtabs [role=tab]").forEach(function(b,k,all){b.addEventListener("click",function(){showTab(b.dataset.t,true)});
+    b.addEventListener("keydown",function(e){var d=e.key==="ArrowRight"?1:e.key==="ArrowLeft"?-1:0; if(!d)return; var n=all[(k+d+all.length)%all.length]; n.focus(); showTab(n.dataset.t,true)})});
+  showTab(location.hash.slice(1)); window.addEventListener("hashchange",function(){showTab(location.hash.slice(1))});
+  $("moreCols").addEventListener("click",function(){var on=$("squad").classList.toggle("all"); this.setAttribute("aria-pressed",on); this.textContent=on?"Fewer columns":"Show all columns"});
+  // ---- pick a player: tap a position, search the squad (availability shown), back to the same formation
+  var PK={};
+  function openPicker(slot,i){var d=$("pickDlg"); PK={slot:slot,i:i}; $("pickTitle").innerHTML='Pick a player <span class="pp" translate="no">'+slot._pos+'</span>'; $("pickQ").value=""; fillPicker("");
+    if(d.showModal)d.showModal(); else d.setAttribute("open",""); setTimeout(function(){$("pickQ").focus()},30)}
+  function fold(t){return String(t||"").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"")}
+  function fillPicker(q){var s=PK.slot; if(!s)return; q=fold(q);
+    var L=s._opts.filter(function(x){return !q||fold(x.name).indexOf(q)>=0});
+    var nat=L.filter(function(x){return x.position===GROUP[s._pos]}), oth=L.filter(function(x){return x.position!==GROUP[s._pos]});
+    function item(x){var o=out[x.id], st=o?(/questionable|doubt/i.test(o.type)?'<span class="av dbt">Doubtful</span>':'<span class="av out">Out</span>'):'<span class="av">Available</span>';
+      return '<li><button type="button" data-id="'+x.id+'"><img src="'+(x.photo||"/manutd/assets/devil.png")+'" alt="" loading="lazy" onerror="this.onerror=null;this.src=\'/manutd/assets/devil.png\'"><span>'+MU.esc(x.name)+'<small>'+(x.number?"#"+x.number+" · ":"")+({Goalkeeper:"Goalkeeper",Defender:"Defender",Midfielder:"Midfielder",Attacker:"Forward"}[x.position]||x.position||"")+(o&&o.reason?" · "+MU.esc(o.reason):"")+'</small></span>'+st+'</button></li>'}
+    $("pickList").innerHTML=(s._cur&&!q?'<li><button type="button" data-id=""><span></span><span>Leave this position empty</span><span></span></button></li>':'')+
+      (nat.length?'<li><h3>Natural position</h3></li>'+nat.map(item).join(""):'')+(oth.length?'<li><h3>Other positions</h3></li>'+oth.map(item).join(""):'')+(L.length?'':'<li class="sub" style="padding:8px">No one in the squad matches.</li>')}
+  $("pickQ").addEventListener("input",function(){fillPicker(this.value)});
+  $("pickList").addEventListener("click",function(e){var b=e.target.closest("button[data-id]"); if(!b)return; var arr=saved(); arr[PK.i]=b.dataset.id; store(arr); closePicker(); renderPitch();
+    var t=document.querySelector('#pitch button.tap[data-i="'+PK.i+'"]'); if(t)t.focus()});
+  function closePicker(){var d=$("pickDlg"); if(d.close)d.close(); else d.removeAttribute("open")}
+  $("pickClose").addEventListener("click",closePicker);
+  $("pickDlg").addEventListener("click",function(e){if(e.target===this)closePicker()});
 })();
 </script></body></html>

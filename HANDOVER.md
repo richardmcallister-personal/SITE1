@@ -92,6 +92,12 @@ the live Worker). See `git log` for the latest commit on each branch.
   Not translated by design: feed text (news headlines, venues, injury types outside the list), names, book/film titles.
   Translations were machine-made by language; Richard reviews the Irish.
 
+- Design review (7 Nov, dev only): red masthead + Anton site name; hub = next match → latest result → team news →
+  three fixtures (phone) → table → milestones (3, short headlines, "View all") → on this day → Explore United (Matchday /
+  Players / History). One row style for fixtures/results (date + KO left, crest + competition, score or calendar right).
+  Squad page tabs Squad / Availability (#availability) / Pick your XI (#pick) with a tap-a-position player dialog.
+  New strings are in tools/data/i18n (+ ntpl.txt templates for milestone headlines). Checked at 375/390/430 + 1280.
+
 ## Next task
 
 None in progress. Season page (competition tabs, CL, Earlier button) merged to `main` 1 Nov 2026.

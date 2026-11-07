@@ -4,6 +4,7 @@
 // Shown only where the underlying total is solid; apps are skipped for a player the builder flagged. All competitions unless stated.
 (function(){
   var P=null, FINISHED=/FT|AET|PEN/;
+  function NUM(k){return ["no","one","two","three"][k]||String(k)}
   function esc(t){return String(t==null?"":t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
   function ord(n){return n+(["th","st","nd","rd"][n%10>3||Math.floor(n%100/10)===1?0:n%10])}
   function yr(d){return d.slice(0,4)}
@@ -22,25 +23,25 @@
   function playerItems(D,T,newCS){
     var out=[];
     D.players.forEach(function(p){
-      var f=T[p.fid]||{a:0,g:0}, a1=Math.max(p.apps1,f.a), g1=Math.max(p.g1,f.g), name=esc(p.n);
+      var f=T[p.fid]||{a:0,g:0}, a1=Math.max(p.apps1,f.a), g1=Math.max(p.g1,f.g), name=esc(String(p.n).split(" ").pop()), full=esc(p.n);
       if(!a1)return;   // not played this season: leave him out
       if(p.apps0!=null){var A=p.apps0+a1;
-        for(var k=1;k<=3;k++)if(APPS(A+k))out.push({need:k,unit:k>1?"apps":"app",score:A+k,href:pl(p.t),t:k===1?name+"’s next appearance will be his "+ord(A+k)+" for United":name+" is "+k+" appearances from "+(A+k)+" for United",s:A+" in all competitions, "+a1+" this season"});
+        for(var k=1;k<=3;k++)if(APPS(A+k))out.push({need:k,unit:k>1?"apps":"app",score:A+k,href:pl(p.t),t:name+" is "+NUM(k)+" appearance"+(k>1?"s":"")+" away from "+(A+k),s:full+": "+A+" games in all competitions, "+a1+" this season"});
         var pass={}; D.apps.forEach(function(y){ if(y[0]===p.t||y[2]<250)return; var k=y[2]+1-A; if(k>=1&&k<=3)(pass[y[2]]=pass[y[2]]||[]).push(esc(y[1])) });
         Object.keys(pass).forEach(function(v){var k=+v+1-A, who=pass[v].length>1?pass[v].slice(0,-1).join(", ")+" and "+pass[v][pass[v].length-1]:pass[v][0];
-          out.push({need:k,unit:k>1?"apps":"app",score:v/4,href:pl(p.t),t:(k===1?name+"’s next appearance takes him past ":name+" is "+k+" appearances from passing ")+who+" ("+v+" games for United)",s:A+" in all competitions · players since 1993/94, from the squad lists"})});
+          out.push({need:k,unit:k>1?"apps":"app",score:v/4,href:pl(p.t),t:name+" is "+NUM(k)+" appearance"+(k>1?"s":"")+" from passing "+who,s:who+": "+v+" games for United · "+full+": "+A+" (players since 1993/94)"})});
       }
       if(!p.gaps){var G=p.g0+g1;
-        for(var k2=1;k2<=2;k2++)if(GOALS(G+k2))out.push({need:k2,unit:k2>1?"goals":"goal",score:(G+k2)*2,href:pl(p.t),t:name+" is "+k2+" goal"+(k2>1?"s":"")+" from "+(G+k2)+" for United",s:G+" in all competitions, "+g1+" this season"});
+        for(var k2=1;k2<=2;k2++)if(GOALS(G+k2))out.push({need:k2,unit:k2>1?"goals":"goal",score:(G+k2)*2,href:pl(p.t),t:name+" is "+NUM(k2)+" goal"+(k2>1?"s":"")+" away from "+(G+k2),s:full+": "+G+" in all competitions, "+g1+" this season"});
         var L=D.goals, low=L.length?L[L.length-1][2]:1e9;
         for(var k3=1;k3<=2;k3++){var N=G+k3; if(N<low)continue;
           L.forEach(function(y){ if(y[0]===p.t||y[2]!==N-1||y[3])return;
             var above=L.filter(function(z){return z[0]!==p.t&&z[2]>N}).length, shaky=L.some(function(z){return z[0]!==p.t&&z[3]&&z[2]<N&&z[2]+z[3]>=N}), rank=above+1, tie=L.some(function(z){return z[0]!==p.t&&z[2]===N});
             if(rank>30)return;
-            out.push({need:k3,unit:k3>1?"goals":"goal",score:120-rank,href:"/manutd/history/records/#scorers",t:name+" is "+k3+" goal"+(k3>1?"s":"")+" from passing "+esc(y[1])+" ("+y[2]+")"+(shaky?"":" into "+(tie?"joint ":"")+ord(rank)+" on United’s all-time list"),s:G+" in all competitions"});
+            out.push({need:k3,unit:k3>1?"goals":"goal",score:120-rank,href:"/manutd/history/records/#scorers",t:name+" is "+NUM(k3)+" goal"+(k3>1?"s":"")+" from passing "+esc(y[1]),s:esc(y[1])+": "+y[2]+" · "+full+": "+G+(shaky?"":" · would be "+(tie?"joint ":"")+ord(rank)+" on United’s all-time list")});
           });}
       }
-      if(p.cs!=null){var C=p.cs+(newCS[p.fid]||0); for(var k4=1;k4<=2;k4++)if(CS(C+k4))out.push({need:k4,unit:k4>1?"clean sheets":"clean sheet",score:C+k4,href:pl(p.t),t:k4===1?"A clean sheet would be "+name+"’s "+ord(C+k4)+" for United":name+" is "+k4+" clean sheets from "+(C+k4)+" for United",s:C+" in "+(p.apps0+a1)+" games, all competitions (started and finished, nothing conceded)"});}
+      if(p.cs!=null){var C=p.cs+(newCS[p.fid]||0); for(var k4=1;k4<=2;k4++)if(CS(C+k4))out.push({need:k4,unit:k4>1?"clean sheets":"clean sheet",score:C+k4,href:pl(p.t),t:name+" is "+NUM(k4)+" clean sheet"+(k4>1?"s":"")+" away from "+(C+k4),s:C+" in "+(p.apps0+a1)+" games, all competitions (started and finished, nothing conceded)"});}
     });
     return out;
   }
@@ -119,11 +120,11 @@
       var it=R.items, n=R.next, on=n&&(R.club?R.club.name:n.o), head=n?(n.home?"United v "+esc(on):esc(on)+" v United")+" · "+MU.fmtDate(n.ko):"";
       if(opt.hideEmpty&&!it.length){el.hidden=true;return}
       el.hidden=false; el.removeAttribute("aria-busy");
-      var top=it.slice(0,5), rest=it.slice(5);
+      var top=it.slice(0,opt.all?99:3), rest=it.slice(opt.all?99:3);
       el.querySelector(".msbody").innerHTML=(n?'<p class="sub msfor">Before '+head+'</p>':'')+
-        (it.length?'<ul class="ms">'+top.map(row).join("")+'</ul>'+(rest.length?'<ul class="ms" hidden>'+rest.map(row).join("")+'</ul><button class="btn ghost msmore" type="button" aria-expanded="false">'+rest.length+' more</button>':''):'<p class="sub">Nothing within reach'+(n?' before '+head:'')+'.</p>')+
-        '<p class="sub msnote">All competitions unless stated. Totals to '+MU.fmtDate(R.asof+"T12:00:00Z",{weekday:undefined})+'; apps from the season squad lists (1993/94 on), goals from every scorer in the archive.</p>';
-      var b=el.querySelector(".msmore"); if(b)b.addEventListener("click",function(){var u=el.querySelectorAll("ul.ms")[1], open=u.hidden; u.hidden=!open; b.setAttribute("aria-expanded",open); b.textContent=open?"Fewer":rest.length+" more"});
+        (it.length?'<ul class="ms">'+top.map(row).join("")+'</ul>'+(rest.length?'<ul class="ms" hidden>'+rest.map(row).join("")+'</ul><button class="tlink msmore" type="button" aria-expanded="false">View all milestones ('+it.length+')</button>':''):'<p class="sub">Nothing within reach'+(n?' before '+head:'')+'.</p>')+
+        '<details class="msnote"><summary>How these are counted</summary><p class="sub">All competitions unless stated. Totals to '+MU.fmtDate(R.asof+"T12:00:00Z",{weekday:undefined})+'; apps from the season squad lists (1993/94 on), goals from every scorer in the archive.</p></details>';
+      var b=el.querySelector(".msmore"); if(b)b.addEventListener("click",function(){var u=el.querySelectorAll("ul.ms")[1], open=u.hidden; u.hidden=!open; b.setAttribute("aria-expanded",open); b.textContent=open?"Show fewer":"View all milestones ("+it.length+")"});
     }).catch(function(){ if(opt.hideEmpty){el.hidden=true;return} el.querySelector(".msbody").innerHTML='<p class="sub">Milestones unavailable right now.</p>' });
   }
   window.MUMiles={build:build,render:render};
