@@ -91,7 +91,7 @@ h2.row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;
 .uprow .o small{display:block;font-weight:400;font-size:13px;color:var(--muted);margin-top:2px} .uprow .cm{display:inline-flex;align-items:center;gap:5px;vertical-align:middle} .uprow .cm img.comp{margin:0!important;display:inline-block!important}
 .calic{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:var(--ink);background:var(--tint)} .calic:hover{color:var(--red-ink)}
 @media (max-width:640px){#upcoming .uprow:nth-child(n+4){display:none} #lastSheet .report .rph,#lastSheet .report .rg,#lastSheet .report .rhl{display:none}}
-#lastSheet h3.lf{font-size:15px;margin:18px 0 4px} #reportWrap{margin-bottom:4px}
+#lastSheet h3.lf{font-size:15px;margin:18px 0 4px} #reportWrap{margin-bottom:4px;min-height:220px} @media (min-width:900px){#reportWrap{min-height:940px}}
 /* milestones: three headlines, the rest on request */
 .msmore{background:none;border:0;padding:0;font:inherit;font-size:15px;cursor:pointer}
 details.msnote{margin-top:6px} details.msnote summary{cursor:pointer;font-size:13px;color:var(--muted);min-height:32px;display:flex;align-items:center} details.msnote p{margin:4px 0 0}
@@ -125,7 +125,7 @@ details.msnote{margin-top:6px} details.msnote summary{cursor:pointer;font-size:1
   <div class="sheet" id="msSheet" aria-busy="true"><h2 class="row">Milestone watch <a href="/manutd/history/records/">Records →</a></h2><div class="msbody"><p class="sub">Checking the numbers…</p></div></div>
   </div>
   <div class="col">
-  <div class="sheet" id="lastSheet"><h2 class="row">Latest result <a href="/manutd/season/">All results →</a></h2><div id="reportWrap" hidden><div id="report"></div></div><h3 class="lf">Last five</h3><div id="last"></div></div>
+  <div class="sheet" id="lastSheet"><h2 class="row">Latest result <a href="/manutd/season/">All results →</a></h2><div id="reportWrap"><div id="report"></div></div><h3 class="lf">Last five</h3><div id="last"></div></div>
   <div class="sheet" id="otdSheet"><h2 class="row">On this day <a href="/manutd/history/">History →</a></h2><p class="sub" id="otdNote" style="margin:0 0 6px"></p><div id="otd"></div></div>
   </div>
   <div class="col">
