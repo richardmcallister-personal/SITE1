@@ -25,7 +25,7 @@ window.MU=(function(){
     var cal=calFeed("").webcal;
     var sis=[["https://irelandfootball.wiki/","Ireland Football","irelandfootball.wiki","irelandfootball"],["https://irelandrugby.wiki/","Ireland Rugby","irelandrugby.wiki","irelandrugby"],["https://limerickhurling.wiki/","Limerick Hurling","limerickhurling.wiki","limerickhurling"]];
     var d=document.createElement("div"); d.className="sitefoot";
-    d.innerHTML='<div class="fbrand"><a class="fname" href="/manutd/"><img src="/manutd/assets/crest-44.webp" alt="" width="36" height="36"><span>Manchester United</span></a><p>An independent supporters’ hub. Not affiliated with Manchester United Football Club.</p><p class="fdata">Data: API-Football, Wikipedia (CC BY-SA), Wikimedia Commons.</p></div>'+
+    d.innerHTML='<div class="fbrand"><a class="fname" href="/manutd/"><img src="/manutd/assets/crest-44.webp" alt="" width="36" height="36"><span>Manchester United</span></a><p class="fdata">Data: API-Football, Wikipedia (CC BY-SA), Wikimedia Commons.</p></div>'+
       '<div class="fcols">'+col("Matchday",[["/manutd/","Hub"],["/manutd/season/","Season and fixtures"],["/manutd/trips/","Trips"],["/manutd/grounds/","Away ground guides"],[cal,"Fixtures in your calendar"]])+
       col("Club",[["/manutd/squad/","Squad and availability"],["/manutd/youth/","Academy and loans"],["/manutd/kits/","Shirt museum"],["/manutd/numbers/","Who wore this number?"]])+
       col("History",[["/manutd/history/","Seasons and records"],["/manutd/find/","Find that match"],["/manutd/rivalry/","Rivalries"],["/manutd/ask/","Ask the archive"]])+
