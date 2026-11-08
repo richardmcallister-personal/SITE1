@@ -209,7 +209,8 @@ window.MU=(function(){
   // flag is "back" (with the minute), not injured. Returns {list, out, doubts, back, asOf, fetched}.
   // Absences the feed hasn't picked up yet, from the club or the manager. Each one lapses on `until`, or as soon as he
   // plays again (the same "back" check as feed entries). Update here when news changes.
-  var MANUAL_OUT=[{id:356041,name:"C. Baleba",type:"Missing Fixture",reason:"Hamstring Injury",from:"2026-11-04",until:"2026-11-30"}];
+  var MANUAL_OUT=[{id:356041,name:"C. Baleba",type:"Missing Fixture",reason:"Hamstring Injury",from:"2026-11-04",until:"2026-11-30"},
+    {id:2467,name:"L. Martínez",type:"Missing Fixture",reason:"Suspended",from:"2026-11-04",until:"2026-11-08"}];   // red card v Chelsea, 31 Oct: one Premier League game (Villa)
   function injuries(j,matches){var rows=(j&&j.response||[]).filter(function(x){return x.player&&x.fixture&&x.fixture.date}).sort(function(a,b){return b.fixture.date.localeCompare(a.fixture.date)});
     var today=new Date().toISOString().slice(0,10);
     MANUAL_OUT.forEach(function(m){if(today>m.until||rows.some(function(x){return x.player.id===m.id&&x.fixture.date.slice(0,10)>=m.from}))return;
