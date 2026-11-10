@@ -1,5 +1,5 @@
 // Single fixture source for every page (hub, season, trips, squad, match).
-// Dates/times from the club's official fixtures page, checked 3 Nov 2026, stored as UTC.
+// Dates/times from the club's official fixtures page, checked 10 Nov 2026, stored as UTC.
 // conf:true  = kick-off confirmed (Premier League TV picks announced, or a UEFA date).
 // conf:false = provisional: the original Premier League slot, which may move once that month's TV picks are announced
 //              (January picks are normally announced mid-November, and so on month by month).
