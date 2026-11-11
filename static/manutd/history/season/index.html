@@ -52,7 +52,7 @@
 .intro.vid .summary{margin-top:0}
 @media (max-width:900px){.intro.vid{grid-template-columns:1fr}}
 .vframe{margin:0}.vframe .box{position:relative;width:100%;background:var(--black);border-radius:8px;overflow:hidden}
-.vframe .box{display:block}.vframe img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.vframe .box{display:block}.vframe iframe{position:absolute;inset:0;width:100%;height:100%;border:0}.vframe img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .vframe .play{position:absolute;left:50%;top:50%;width:72px;height:72px;margin:-36px 0 0 -36px;border-radius:50%;background:var(--red)}
 .vframe .play::after{content:"";position:absolute;left:29px;top:22px;border-left:20px solid var(--on-black);border-top:14px solid transparent;border-bottom:14px solid transparent}
 .vframe .box:hover .play{transform:scale(1.06)}
@@ -171,7 +171,11 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
     if(S){
       $("facts").innerHTML=[["Manager",S.manager],["Captain",S.captain],["League",S.league],["Top scorer",S.scorer]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+linkNames(f[1],S.id)+'</div></div>'}).join(""); mgrLinks();
       $("summary").textContent=S.summary;
-      if(S.video&&S.video.provider==="dailymotion"){var v=S.video, url="https://www.dailymotion.com/video/"+encodeURIComponent(v.id);
+      if(S.video&&S.video.provider==="youtube"){var v=S.video;
+        $("video").innerHTML='<div class="box" style="aspect-ratio:'+(v.ratio||"16/9")+'"><iframe src="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.id)+'?rel=0" title="'+MU.esc(v.title)+'" loading="lazy" allow="encrypted-media; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><figcaption>'+MU.esc(v.title)+' · <a href="https://www.youtube.com/watch?v='+encodeURIComponent(v.id)+'" target="_blank" rel="noopener">Watch on YouTube</a></figcaption>';
+        $("video").hidden=false; $("intro").classList.add("vid")}
+      else if(S.video&&S.video.provider==="dailymotion"){
+var v=S.video, url="https://www.dailymotion.com/video/"+encodeURIComponent(v.id);
         $("video").innerHTML='<a class="box" style="aspect-ratio:'+(v.ratio||"16/9")+'" href="'+url+'" target="_blank" rel="noopener" aria-label="'+MU.esc(v.title)+' (opens Dailymotion)"><img src="https://www.dailymotion.com/thumbnail/video/'+encodeURIComponent(v.id)+'" alt="" loading="lazy"><span class="play" aria-hidden="true"></span></a><figcaption>'+MU.esc(v.title)+' · <a href="'+url+'" target="_blank" rel="noopener">Watch on Dailymotion</a></figcaption>';
         $("video").hidden=false; $("intro").classList.add("vid")}
       $("matches").innerHTML=S.matches.map(function(m,k){return '<div class="match" id="m'+k+'"><div class="head"><div class="team r">'+(m.home==="Manchester United"?MU.esc(m.home):'<a class="cl" href="/manutd/club/?c='+encodeURIComponent(m.home)+'">'+MU.esc(m.home)+'</a>')+crest(m.home)+'</div><div><div class="score">'+m.score+'</div><div class="meta">'+MU.esc(m.comp)+' · '+MU.fmtDate(m.date+"T12:00:00Z",{year:"numeric"})+' · '+MU.esc(m.venue)+'</div></div><div class="team">'+crest(m.away)+(m.away==="Manchester United"?MU.esc(m.away):'<a class="cl" href="/manutd/club/?c='+encodeURIComponent(m.away)+'">'+MU.esc(m.away)+'</a>')+'</div></div>'+
