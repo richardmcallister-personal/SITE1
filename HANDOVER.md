@@ -125,6 +125,18 @@ the live Worker). See `git log` for the latest commit on each branch.
   stop at 1992-93 (numbers/finals.json), so later players show no finals — needs a source if wanted.
 - Workers Builds once missed a push to redesign (no check run on GitHub); an empty commit re-triggered it.
 
+- 12 Nov evening (live): 29 trophy seasons have a key-match video (`video` in seasons.json: provider youtube, id, title,
+  by = channel; 1999 is now Amazon Prime's inline piece, Dailymotion dropped). Picked official channels first (club, FA
+  Cup, EFL, NBC, FIFA, Pathé/Movietone), fan uploads only where nothing official embeds — those can be taken down; check
+  with YouTube oEmbed (401 = embedding off) before adding. No video yet: 1907-08, 1908-09, 1910-11, 1951-52, 1955-56,
+  1956-57, 1964-65, 1966-67. /highlights/ (top nav, before Links) lists them all, era filters, plays in place.
+- /where/ "Where did they go?": tools/build_departures.py (in update.sh, incremental via wiki_revs_departures.json) →
+  history/departures.json. Players who left from 1990/91 with 10+ apps or 2+ seasons, plus all former managers; next club
+  = first spell listed after the last United spell; honours = winners only from the Honours section, dated ≥ year left;
+  players with an open United spell (out on loan) are skipped. Linked from hub Explore and footer, not the top nav.
+- Carrick sacked 12 Nov 2026: managers.json `to` set, pinned in build_managers.py END so Wikipedia lag can't reopen it;
+  season ticker says "Vacant". When a successor is confirmed: update the ticker and let the weekly refresh add him.
+
 ## Next task
 
 None in progress. Season page (competition tabs, CL, Earlier button) merged to `main` 1 Nov 2026.
