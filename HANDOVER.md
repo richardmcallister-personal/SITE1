@@ -115,7 +115,8 @@ the live Worker). See `git log` for the latest commit on each branch.
 - 8–11 Nov (live): Martínez in MANUAL_OUT for Villa (lapsed 8 Nov). Comeback filter counts in brackets; thriller tag now
   shows the real total ("8-goal thriller"), filter "Seven goals or more". Seasons can carry a `video` field in
   seasons.json (1998-99 has the Dailymotion review x2ypgs0): it shows as a thumbnail linking out, because that upload
-  blocks embedding. For a playable embed use an embeddable source (YouTube is already in frame-src).
+  blocks embedding. `provider: "youtube"` plays inline via youtube-nocookie (2007-08 has g77BHn0vlmg, live 12 Nov);
+  check a new clip actually plays in a browser before shipping.
 
 ## Next task
 
