@@ -124,6 +124,8 @@ def main():
         if not isinstance(w, str): print('no text', t); continue
         B = infobox(w)
         clubs = spells(B, 'years', 'clubs', (('caps', 'a'), ('goals', 'gl')))
+        if e['kind'] == ['player'] and any(UTD.search(r['c']) and re.search(r'[–-]\s*$', r['y']) for r in clubs):
+            done.append(t); continue   # United spell still open: out on loan, not gone
         mgr = spells(B, 'manageryears', 'managerclubs')
         nat = [r for r in spells(B, 'nationalyears', 'nationalteam', (('nationalcaps', 'a'), ('nationalgoals', 'gl'))) if not re.search(r'U-?\d|under|youth|B$|olympic', r['c'], re.I)]
         # when he left United: last United playing or managing spell
