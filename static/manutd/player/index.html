@@ -68,8 +68,9 @@ table.mu td.yrs{white-space:nowrap;color:var(--muted)}
 .jtl .hd a.s{font-weight:700;font-size:16px;color:var(--ink)}
 .jtl .meta{color:var(--muted);font-size:13px}
 .jtl .tr{font-size:12px;font-weight:600;color:var(--red-ink)}
-.jtl .bars{display:grid;grid-template-columns:44px minmax(0,1fr) 34px;gap:3px 8px;align-items:center;font-size:12px;color:var(--muted);max-width:440px;margin:6px 0 2px}
-.jtl .bars .n{text-align:right;color:var(--ink);font-weight:600}
+.jtl .bars{display:grid;grid-template-columns:repeat(2,minmax(0,220px));gap:4px 18px;margin:6px 0 2px;font-size:12px;color:var(--muted)}
+.jtl .bars>div{display:grid;grid-template-columns:auto 28px minmax(0,1fr);gap:6px;align-items:center}
+.jtl .bars .n{text-align:right;color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
 .jtl .bar{height:6px;border-radius:3px;background:var(--rule)}
 .jtl .bar i{display:block;height:100%;border-radius:3px;background:var(--muted)}
 .jtl .bar.g i{background:var(--red)}
@@ -155,13 +156,13 @@ table.mu td.yrs{white-space:nowrap;color:var(--muted)}
       if((g.g||1)>=3) add(g.s,'<li><span class="k">'+(g.g>3?g.g+' goals':'Hat-trick')+'</span>'+(g.h?'v ':'at ')+MU.club(g.o)+' '+score(g)+'</li>');
     });
     A.finals.forEach(function(f){var k=seasonOf(f.d), o={d:f.d,s:k,c:/FA Cup/.test(f.comp)?"FAC":"F",gf:f.gf,ga:f.ga,id:f.id};
-      add(k,'<li><span class="k">'+MU.esc(f.comp)+' final</span>v '+MU.club(f.o)+' '+score(o)+' <small class="meta">'+(f.start?(f.cap?'captain':'started'):'bench'+(f.sub?', on '+f.sub+"'":''))+'</small></li>')});
+      add(k,'<li><span class="k">'+MU.esc(f.comp)+(/Shield/.test(f.comp)?'':' final')+'</span>v '+MU.club(f.o)+' '+score(o)+' <small class="meta">'+(f.start?(f.cap?'captain':'started'):'bench'+(f.sub?', on '+f.sub+"'":''))+'</small></li>')});
     var maxA=0,maxG=0; keys.forEach(function(k){var r=A.seasons[k]||{}; maxA=Math.max(maxA,r.apps||0); maxG=Math.max(maxG,r.goals||0)});
     fetch("/manutd/history/seasons.json").then(function(r){return r.json()}).catch(function(){return []}).then(function(S){
       var tro={}; S.forEach(function(x){tro[x.id]=x.trophies});
       $("jTl").innerHTML=keys.map(function(k){var r=A.seasons[k]||{}, g=r.goals!=null?r.goals:A.goals.filter(function(x){return x.s===k}).reduce(function(a,x){return a+(x.g||1)},0), t=tro[k]||[];
         return '<li'+(t.length?' class="tro"':'')+'><div class="hd"><a class="s" href="/manutd/history/season/?s='+k+'">'+sp(k)+'</a><span class="meta">'+[(r.no||[]).length?'No. '+r.no.join(", "):'',r.pos||''].filter(Boolean).join(' · ')+'</span>'+(t.length?'<span class="tr">'+t.map(MU.esc).join(' · ')+'</span>':'')+'</div>'+
-          '<div class="bars">'+(r.apps!=null?'<span>Apps</span><div class="bar"><i style="width:'+(maxA?Math.round(100*r.apps/maxA):0)+'%"></i></div><span class="n">'+r.apps+'</span>':'')+'<span>Goals</span><div class="bar g"><i style="width:'+(maxG?Math.round(100*g/maxG):0)+'%"></i></div><span class="n">'+g+'</span></div>'+
+          '<div class="bars">'+(r.apps!=null?'<div><span>Apps</span><span class="n">'+r.apps+'</span><div class="bar"><i style="width:'+(maxA?Math.round(100*r.apps/maxA):0)+'%"></i></div></div>':'')+'<div><span>Goals</span><span class="n">'+g+'</span><div class="bar g"><i style="width:'+(maxG?Math.round(100*g/maxG):0)+'%"></i></div></div></div>'+
           (mo[k]?'<ul class="mo">'+mo[k].join("")+'</ul>':'')+'</li>'}).join("");
       $("jPath").innerHTML=path;
       $("jNote").textContent=(clubs.length?"Club path from Wikipedia (league apps). ":"")+"One stop per United season: appearances, all-competition goals, trophies won that season, and the big moments. Each score opens the match.";
