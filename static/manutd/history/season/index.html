@@ -74,6 +74,7 @@
 a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl.opp{border-bottom-style:dotted} a.pl:hover{border-bottom-color:var(--red-ink);color:var(--red-ink)}
 .pager{display:flex;justify-content:space-between;gap:12px;margin-top:22px;font-size:14px} .pager a{color:var(--ink)}
 .res h3{margin-top:0}
+.fxlist li.hit{background:var(--tint);box-shadow:inset 3px 0 0 var(--red)}
 </style><!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-QZZVNDNYN9"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'granted',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied'});gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',region:'AT,BE,BG,HR,CY,CZ,DK,EE,FI,FR,DE,GR,HU,IE,IT,LV,LT,LU,MT,NL,PL,PT,RO,SK,SI,ES,SE,IS,LI,NO,GB,CH'.split(',')});try{var c=localStorage.getItem('mu:consent');if(c)gtag('consent','update',{analytics_storage:c==='granted'?'granted':'denied'})}catch(e){}gtag('js',new Date());gtag('config','G-QZZVNDNYN9');</script>
@@ -144,7 +145,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
   function searchLink(name,team){return team&&/Manchester United/.test(team)?'<a class="pl" href="/manutd/player/?q='+encodeURIComponent(name)+'">'+MU.esc(name)+'</a>':MU.esc(name)}
   function ordinal(n){var o=["th","st","nd","rd"][n%10>3||Math.floor(n%100/10)===1?0:n%10]; return n+o}
   function resRow(m){var res=m.gf>m.ga?"W":m.gf<m.ga?"L":"D", note=[m.r?m.r+(m.tie?' ('+m.tie+')':''):'',m.round||'',m.n||''].filter(Boolean).join(' · ');
-    return '<li class="'+(m.h?"home":"away")+'"><span class="d">'+MU.fmtDate(m.d+"T12:00:00Z")+'</span><span class="o">'+MU.club(m.o,20)+(note?'<small class="rn">'+MU.esc(note)+'</small>':'')+(m.sc?'<span class="sc">'+MU.scorers(m.sc)+'</span>':'')+'<span class="links">'+(m.href?'<a class="chip" href="'+m.href+'">Match centre</a>':'')+MU.mlinks(Object.assign({},m,{id:m.href?null:m.id}))+'</span>'+'</span><span class="r">'+m.gf+'–'+m.ga+(m.aet?'<small> aet</small>':'')+(m.pens?'<small> p '+m.pens+'</small>':'')+' '+MU.form(res)+'</span></li>'}
+    return '<li id="d'+m.d+'" class="'+(m.h?"home":"away")+'"><span class="d">'+MU.fmtDate(m.d+"T12:00:00Z")+'</span><span class="o">'+MU.club(m.o,20)+(note?'<small class="rn">'+MU.esc(note)+'</small>':'')+(m.sc?'<span class="sc">'+MU.scorers(m.sc)+'</span>':'')+'<span class="links">'+(m.href?'<a class="chip" href="'+m.href+'">Match centre</a>':'')+MU.mlinks(Object.assign({},m,{id:m.href?null:m.id}))+'</span>'+'</span><span class="r">'+m.gf+'–'+m.ga+(m.aet?'<small> aet</small>':'')+(m.pens?'<small> p '+m.pens+'</small>':'')+' '+MU.form(res)+'</span></li>'}
   function renderResults(A,D){
     var box=$("results"), y=parseInt(A.id,10);
     function fromData(){ if(!D||!D.results)return; var L=D.results.filter(function(m){return m.c==="L"}).map(function(m){m.div=A.div;return m}), C=D.results.filter(function(m){return m.c!=="L"});
@@ -157,6 +158,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
         box.innerHTML='<p class="sub" style="margin:0 0 8px">'+ms.length+' matches in all competitions, each linking to its match centre.</p><div class="two">'+Object.keys(comps).map(function(k){return '<div><h3>'+MU.comp(k,18)+MU.esc(k)+'</h3><ul class="fxlist">'+comps[k].map(resRow).join("")+'</ul></div>'}).join("")+'</div>';
       }).catch(fromData);
     } else fromData();
+    (function wait(t){var h=location.hash.slice(1), el=h&&document.getElementById(h); if(el){el.classList.add("hit"); el.scrollIntoView({block:"center"})} else if(h&&t<40)setTimeout(function(){wait(t+1)},150)})(0);
   }
   Promise.all([fetch("/manutd/history/seasons.json").then(function(r){return r.json()}),fetch("/manutd/history/players.json").then(function(r){return r.json()}).catch(function(){return {}}),fetch("/manutd/history/all.json").then(function(r){return r.json()}).catch(function(){return []})]).then(function(res){var all=res[0]; P=res[1]||{}; var ALL=res[2];
     var cur=new Date().getUTCFullYear()-(new Date().getUTCMonth()>=6?0:1); if(ALL.length&&parseInt(ALL[ALL.length-1].id,10)<cur-1){for(var y=parseInt(ALL[ALL.length-1].id,10)+1;y<cur;y++)ALL.push({id:y+"-"+String(y+1).slice(2),title:y+"–"+String(y+1).slice(2),tier:1,div:"Premier League",api:true})}
