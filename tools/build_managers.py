@@ -42,6 +42,10 @@ for row in tbl.split('\n|-')[1:]:
 FIX = {'Jimmy Murphy': ('1958-02-07', '1958-06-30')}
 for m in mgrs:
     if m['name'] in FIX: m['fr'], m['to'] = FIX[m['name']]
+# Departures confirmed by the club before Wikipedia's list catches up (name, start year) -> end date
+END = {('Michael Carrick', '2026'): '2026-11-12'}
+for m in mgrs:
+    if m['to'] is None and m['fr'] and (m['name'], m['fr'][:4]) in END: m['to'] = END[(m['name'], m['fr'][:4])]
 # Same person twice (Carrick caretaker 2021 then head coach 2026) keeps one slug per spell
 seen = collections.Counter(m['slug'] for m in mgrs); cnt = collections.Counter()
 for m in mgrs:
