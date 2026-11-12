@@ -118,6 +118,13 @@ the live Worker). See `git log` for the latest commit on each branch.
   blocks embedding. `provider: "youtube"` plays inline via youtube-nocookie (2007-08 has g77BHn0vlmg, live 12 Nov);
   check a new clip actually plays in a browser before shipping.
 
+- 12 Nov (live): player pages have a United journey (`#journey` in player/index.html, `journey(A,b)`): Wikipedia club
+  path, one stop per United season (apps/goals bars, trophies from seasons.json, moments: first goal, goal no. 50/100/…,
+  hat-tricks, finals). Score links: match centre when the goal has a feed id, else season page `#d<YYYY-MM-DD>` (season
+  results rows now carry those ids and highlight on arrival; only league/FA Cup rows exist before 2010). Finals line-ups
+  stop at 1992-93 (numbers/finals.json), so later players show no finals — needs a source if wanted.
+- Workers Builds once missed a push to redesign (no check run on GitHub); an empty commit re-triggered it.
+
 ## Next task
 
 None in progress. Season page (competition tabs, CL, Earlier button) merged to `main` 1 Nov 2026.
