@@ -13,6 +13,7 @@ python3 tools/build_onthisday.py
 python3 tools/build_managers.py
 python3 tools/build_finals.py
 python3 tools/build_players.py
+python3 tools/build_departures.py
 python3 tools/build_records.py
 python3 tools/build_pace.py
 python3 tools/build_timeline.py

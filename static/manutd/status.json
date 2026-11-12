@@ -86,5 +86,9 @@
 "seats": {
 "date": "2026-11-09",
 "note": "16 fixtures read"
+},
+"departures": {
+"date": "2026-11-12",
+"note": "273 people, 257 with a next club, 138 with later honours"
 }
 }

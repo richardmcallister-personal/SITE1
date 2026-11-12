@@ -174,7 +174,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid #c9c9c9} a.pl
       $("facts").innerHTML=[["Manager",S.manager],["Captain",S.captain],["League",S.league],["Top scorer",S.scorer]].map(function(f){return '<div><div class="k">'+f[0]+'</div><div class="v">'+linkNames(f[1],S.id)+'</div></div>'}).join(""); mgrLinks();
       $("summary").textContent=S.summary;
       if(S.video&&S.video.provider==="youtube"){var v=S.video;
-        $("video").innerHTML='<div class="box" style="aspect-ratio:'+(v.ratio||"16/9")+'"><iframe src="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.id)+'?rel=0" title="'+MU.esc(v.title)+'" loading="lazy" allow="encrypted-media; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><figcaption>'+MU.esc(v.title)+' · <a href="https://www.youtube.com/watch?v='+encodeURIComponent(v.id)+'" target="_blank" rel="noopener">Watch on YouTube</a></figcaption>';
+        $("video").innerHTML='<div class="box" style="aspect-ratio:'+(v.ratio||"16/9")+'"><iframe src="https://www.youtube-nocookie.com/embed/'+encodeURIComponent(v.id)+'?rel=0" title="'+MU.esc(v.title)+'" loading="lazy" allow="encrypted-media; picture-in-picture; web-share; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe></div><figcaption>'+MU.esc(v.title)+(v.by?' · <span>'+MU.esc(v.by)+'</span>':'')+' · <a href="https://www.youtube.com/watch?v='+encodeURIComponent(v.id)+'" target="_blank" rel="noopener">Watch on YouTube</a></figcaption>';
         $("video").hidden=false; $("intro").classList.add("vid")}
       else if(S.video&&S.video.provider==="dailymotion"){
 var v=S.video, url="https://www.dailymotion.com/video/"+encodeURIComponent(v.id);

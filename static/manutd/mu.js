@@ -1,7 +1,7 @@
 // Shared bits for the Manchester United hub pages.
 window.MU=(function(){
   var TEAM=33;
-  var NAV=[["/manutd/","Hub"],["/manutd/trips/","Trips"],["/manutd/season/","Season"],["/manutd/squad/","Squad"],["/manutd/youth/","Academy"],["/manutd/kits/","Shirts"],["/manutd/history/","History"],["/manutd/links/","Links"]];
+  var NAV=[["/manutd/","Hub"],["/manutd/trips/","Trips"],["/manutd/season/","Season"],["/manutd/squad/","Squad"],["/manutd/youth/","Academy"],["/manutd/kits/","Shirts"],["/manutd/history/","History"],["/manutd/highlights/","Highlights"],["/manutd/links/","Links"]];
   // Wide tables scroll sideways on narrow screens instead of being clipped: every table.mu gets a scroll wrapper, including ones rendered later.
   function wrapTables(root){(root||document).querySelectorAll("table.mu").forEach(function(t){if(t.parentElement&&t.parentElement.classList.contains("tw"))return; var w=document.createElement("div"); w.className="tw"; t.parentNode.insertBefore(w,t); w.appendChild(t)})}
   if(window.MutationObserver){new MutationObserver(function(ms){var hit=false; ms.forEach(function(m){if(m.addedNodes.length)hit=true}); if(hit)wrapTables()}).observe(document.documentElement,{childList:true,subtree:true})}
@@ -28,7 +28,7 @@ window.MU=(function(){
     d.innerHTML='<div class="fbrand"><a class="fname" href="/manutd/"><img src="/manutd/assets/crest-44.webp" alt="" width="36" height="36"><span>Manchester United</span></a><p class="fdata">Data: API-Football, Wikipedia (CC BY-SA), Wikimedia Commons.</p></div>'+
       '<div class="fcols">'+col("Matchday",[["/manutd/","Hub"],["/manutd/season/","Season and fixtures"],["/manutd/trips/","Trips"],["/manutd/grounds/","Away ground guides"],[cal,"Fixtures in your calendar"]])+
       col("Club",[["/manutd/squad/","Squad and availability"],["/manutd/youth/","Academy and loans"],["/manutd/kits/","Shirt museum"],["/manutd/numbers/","Who wore this number?"]])+
-      col("History",[["/manutd/history/","Seasons and records"],["/manutd/find/","Find that match"],["/manutd/rivalry/","Rivalries"],["/manutd/ask/","Ask the archive"]])+
+      col("History",[["/manutd/history/","Seasons and records"],["/manutd/find/","Find that match"],["/manutd/highlights/","Match highlights"],["/manutd/where/","Where did they go?"],["/manutd/rivalry/","Rivalries"],["/manutd/ask/","Ask the archive"]])+
       col("Official",[["https://www.manutd.com/","manutd.com"],["https://tickets.manutd.com/","Tickets"],["/manutd/links/","More links"],["/manutd/accessibility/","Accessibility"]])+'</div>'+
       '<div class="fsis"><h2>Other sites</h2><ul>'+sis.map(function(x){return '<li><a href="'+x[0]+'" target="_blank" rel="noopener"><img src="/manutd/assets/sites/'+x[3]+'.png" alt="" width="40" height="40" loading="lazy" decoding="async"><span><b translate="no">'+x[1]+'</b><small translate="no">'+x[2]+'</small></span></a></li>'}).join("")+'</ul></div>';
     f.insertBefore(d,f.firstChild); f.classList.add("big")}
@@ -51,7 +51,7 @@ window.MU=(function(){
     el.innerHTML=NAV.map(function(n){return '<a href="'+n[0]+'"'+(n[1]===active?' aria-current="page"':'')+'>'+n[1]+'</a>'}).join("")+'<form class="musearch" role="search" action="/manutd/search/"><input type="search" name="q" placeholder="Search players, matches, shirts…" aria-label="Search the site" autocomplete="off"><div class="hits" hidden></div></form>';
     searchBox(el.querySelector(".musearch"));
     // phone tab bar: five destinations, the current one lit
-    var TABS=[["/manutd/","Hub",'<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/>',["Hub"]],["/manutd/season/","Season",'<path d="M4 6h16M4 12h16M4 18h10"/>',["Season"]],["/manutd/history/","History",'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',["History"]],["/manutd/kits/","Shirts",'<path d="M8 4 4 7l2 4 2-1v10h8V10l2 1 2-4-4-3a4 4 0 0 1-8 0Z"/>',["Shirts"]],["/manutd/#more","More",'<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>',["Trips","Squad","Academy","Links"]]];
+    var TABS=[["/manutd/","Hub",'<circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/>',["Hub"]],["/manutd/season/","Season",'<path d="M4 6h16M4 12h16M4 18h10"/>',["Season"]],["/manutd/history/","History",'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',["History"]],["/manutd/kits/","Shirts",'<path d="M8 4 4 7l2 4 2-1v10h8V10l2 1 2-4-4-3a4 4 0 0 1-8 0Z"/>',["Shirts"]],["/manutd/#more","More",'<circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/>',["Trips","Squad","Academy","Highlights","Links"]]];
     // sticky masthead: the red header and section bar travel together; --mast tells sticky tabs and anchors how tall it is
     (function(){var h=document.querySelector("header.mu"), n=document.querySelector("nav.munav"); if(!h||h.parentNode.classList.contains("mast"))return;
       var m=document.createElement("div"); m.className="mast"; h.parentNode.insertBefore(m,h); m.appendChild(h); if(n)m.appendChild(n);
