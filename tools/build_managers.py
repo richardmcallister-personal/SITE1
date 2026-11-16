@@ -46,6 +46,11 @@ for m in mgrs:
 END = {('Michael Carrick', '2026'): '2026-11-12'}
 for m in mgrs:
     if m['to'] is None and m['fr'] and (m['name'], m['fr'][:4]) in END: m['to'] = END[(m['name'], m['fr'][:4])]
+# Appointments confirmed by the club before Wikipedia's table has a row for them (dropped once the table has the name)
+ADD = [dict(name='Mauricio Pochettino', slug='mauricio-pochettino', role=None, nat='Argentina', fr='2026-11-18', to=None, wiki=None, honours=[],
+            notes='Appointed head coach on 13 November 2026, starting 18 November after his release by the United States.')]
+for a in ADD:
+    if not any(m['name'] == a['name'] and m['fr'] and m['fr'][:4] == a['fr'][:4] for m in mgrs): mgrs.append(a)
 # Same person twice (Carrick caretaker 2021 then head coach 2026) keeps one slug per spell
 seen = collections.Counter(m['slug'] for m in mgrs); cnt = collections.Counter()
 for m in mgrs:
