@@ -224,11 +224,11 @@ window.MU=(function(){
     var out=list.filter(function(x){return !x.back&&/Missing/i.test(x.player.type||"")}), doubts=list.filter(function(x){return !x.back&&!/Missing/i.test(x.player.type||"")}), back=list.filter(function(x){return x.back});
     return {list:list.filter(function(x){return !x.back}),out:out,doubts:doubts,back:back,asOf:(list.filter(function(x){return !x.manual})[0]||{fixture:{}}).fixture.date||null,fetched:j&&j._fetched||null}}
   function ago(t){if(!t)return ""; var m=Math.round((Date.now()-t)/60000); if(m<1)return "just now"; if(m<60)return m+" min ago"; var h=Math.round(m/60); if(h<48)return h+" h ago"; return Math.round(h/24)+" days ago"}
-  // Lead portrait from a Wikipedia REST summary: the 330px thumbnail with 2x/3x variants (Wikimedia renders any width),
+  // Lead portrait from a Wikipedia REST summary: the 330px thumbnail with 2x/3x variants at Wikimedia's standard widths (330/500/960 — it no longer renders other widths on demand, so 440/660 broke new photos on retina screens); falls back to 330 if a variant fails,
   // intrinsic size set so the box is reserved, high fetch priority since it is the largest thing above the fold.
   function portrait(j,alt,cls){var th=j&&j.thumbnail, t=typeof th==="string"?th:th&&th.source; if(!t)return ""; var tb=j.thumb||th||{}, m=t.match(/\/(\d+)px-/), w=m?+m[1]:0, W=tb.w||tb.width||w||330, H=tb.h||tb.height||Math.round(W*1.25), ow=tb.ow||0;
-    var at=function(n){return t.replace(/\/\d+px-/,"/"+n+"px-")}, ws=w?[330,440,660].filter(function(n){return ow?n<=ow:n<=440}):[], ss=ws.map(function(n){return at(n)+" "+n+"w"}).join(", ");
-    return '<img class="'+(cls||"photo")+'" src="'+(ws.length?at(ws[0]):t)+'"'+(ss?' srcset="'+ss+'" sizes="220px"':'')+' width="'+W+'" height="'+H+'" fetchpriority="high" decoding="async" alt="'+esc(alt||"")+'">'}
+    var at=function(n){return t.replace(/\/\d+px-/,"/"+n+"px-")}, ws=w?[330,500,960].filter(function(n){return ow?n<=ow:n<=500}):[], ss=ws.map(function(n){return at(n)+" "+n+"w"}).join(", ");
+    return '<img class="'+(cls||"photo")+'" src="'+(ws.length?at(ws[0]):t)+'"'+(ss?' srcset="'+ss+'" sizes="220px"':'')+' width="'+W+'" height="'+H+'" fetchpriority="high" decoding="async"'+(ss?' onerror="if(this.srcset){this.removeAttribute(\'srcset\');this.src=\''+(ws.length?at(ws[0]):t)+'\'}"':'')+' alt="'+esc(alt||"")+'">'}
   // Ask the archive: POST the question to the Worker, render the answer with the pages it drew on.
   function ask(q){return fetch("/manutd/ask",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({q:q,lang:window.MU_LANG||"en"})}).then(function(r){return r.json().then(function(j){if(!r.ok)throw new Error(j.error||("HTTP "+r.status)); return j})})}
   // Floating "Ask" on every page (not on /ask/ itself): opens a sheet with the question box; Escape or the backdrop closes it.
