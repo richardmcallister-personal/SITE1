@@ -1,0 +1,51 @@
+# manutd.wiki
+
+> An independent Manchester United supporters' hub, not affiliated with the club. It covers the current season (fixtures, live scores, team news, tables) and 140 seasons of club history from Newton Heath in 1878: every season, result, scorer, manager, kit and record, plus where former players went. The site is in English, Irish, Spanish, French, German, Swedish and Danish.
+
+Notes for language models:
+
+- Live and current-season data (fixtures, scores, line-ups, injuries) comes from a licensed football data feed and changes quickly. Check the page rather than relying on a cached copy.
+- Kick-off times on pages are shown in the reader's time zone with UK time alongside. The data files use ISO dates.
+- Head-to-head records count United first. Community/Charity Shields and Super Cups are left out of win/defeat records, and friendlies are left out of fixtures.
+- Text drawn from Wikipedia (player and manager introductions, careers, honours) is CC BY-SA 4.0. Please attribute it.
+- Official club information belongs to Manchester United at https://www.manutd.com/.
+
+## Current season
+
+- [Hub](https://manutd.wiki/): next match, latest result, team news, table, upcoming fixtures
+- [Season](https://manutd.wiki/season/): every fixture and result this season, tables, scorers
+- [Squad](https://manutd.wiki/squad/): current squad, availability and injuries, season stats
+- [Match centre](https://manutd.wiki/match/?id=1035546): one match: line-ups, events, stats, report (`?id=` is the feed fixture id)
+- [Academy & loans](https://manutd.wiki/youth/): academy and loan players' minutes and form
+
+## History
+
+- [History](https://manutd.wiki/history/): overview from Newton Heath to now
+- [Every season](https://manutd.wiki/history/seasons/): one row per season since 1886–87
+- [A season](https://manutd.wiki/history/season/?s=1998-99): final table, all results, scorers, manager, key match on video (`?s=YYYY-YY`)
+- [Managers](https://manutd.wiki/history/managers/): every manager and caretaker, record in charge, trophies
+- [Records](https://manutd.wiki/history/records/): biggest wins, appearances, goals, streaks
+- [Opponents](https://manutd.wiki/history/opponents/): head-to-head against every club
+- [Player](https://manutd.wiki/player/?p=Wayne%20Rooney): a player's United career season by season (`?p=` is the English Wikipedia title)
+- [Where did they go?](https://manutd.wiki/where/): former players and managers after United, with next club and later honours
+- [Highlights](https://manutd.wiki/highlights/): video of the key match of every trophy season
+- [Who wore this number?](https://manutd.wiki/numbers/): squad numbers since 1993–94
+
+## Data files (JSON)
+
+- [seasons.json](https://manutd.wiki/history/seasons.json): trophy seasons with manager, captain, league summary, top scorer, key matches and video
+- [all.json](https://manutd.wiki/history/all.json): every season's league record (division, position, P W D L, goals)
+- [Season detail](https://manutd.wiki/history/data/1998-99.json): one season's table and every result with scorers (`data/YYYY-YY.json`)
+- [managers.json](https://manutd.wiki/history/managers.json): managers with dates, role, nationality, record and honours
+- [players_index.json](https://manutd.wiki/history/players_index.json): every player with first/last season, appearances and goals
+- [Player detail](https://manutd.wiki/history/players/wayne-rooney.json): one player's seasons, goals, finals and squad numbers (`players/<slug>.json`)
+- [records.json](https://manutd.wiki/history/records.json): club records
+- [departures.json](https://manutd.wiki/history/departures.json): careers after United (from Wikipedia, CC BY-SA 4.0)
+
+## Optional
+
+- [Ask the archive](https://manutd.wiki/ask/): questions answered from the site's own data
+- [Shirt museum](https://manutd.wiki/kits/): every kit since 1878
+- [Ground guides](https://manutd.wiki/grounds/): away-day guides for travelling fans
+- [Links](https://manutd.wiki/links/): official channels, fan sites, podcasts and news
+- [Accessibility](https://manutd.wiki/accessibility/)
