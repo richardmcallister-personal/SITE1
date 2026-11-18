@@ -137,6 +137,17 @@ the live Worker). See `git log` for the latest commit on each branch.
 - Carrick sacked 12 Nov 2026: managers.json `to` set, pinned in build_managers.py END so Wikipedia lag can't reopen it;
   season ticker says "Vacant". When a successor is confirmed: update the ticker and let the weekly refresh add him.
 
+- 16–18 Nov (live): Pochettino head coach from 18 Nov (manual ADD in build_managers.py, now also in Wikipedia's table;
+  dedupes by name + start year). Portrait srcset uses Wikimedia's standard widths 330/500/960 only — 440/660 fail for
+  new images (Wikimedia no longer renders arbitrary widths); img falls back to 330 on error.
+- 18 Nov (live): structured data + llms.txt. tools/build_ld.py writes a static block into every page <head> between
+  <!--ld--> markers (meta description + JSON-LD: WebSite with SearchAction → /search/?q=, SportsTeam #team, WebPage,
+  BreadcrumbList); re-run it after adding a page (add the page to PAGES). Template pages add their entity at runtime via
+  MU.ld()/MU.desc() in mu.js: player + manager → ProfilePage/Person, match → SportsEvent, highlights → ItemList of
+  VideoObject. dev.* gets <meta name="robots" content="noindex, nofollow"> from mu.js. static/manutd/llms.txt (served at
+  /llms.txt): summary, notes for LLMs, key pages, JSON data files. No sitemap.xml yet (offered); robots.txt is
+  Cloudflare-managed.
+
 ## Next task
 
 None in progress. Season page (competition tabs, CL, Earlier button) merged to `main` 1 Nov 2026.
