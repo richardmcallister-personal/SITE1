@@ -4,48 +4,68 @@
 
 Notes for language models:
 
-- Live and current-season data (fixtures, scores, line-ups, injuries) comes from a licensed football data feed and changes quickly. Check the page rather than relying on a cached copy.
+- Live and current-season data (fixtures, scores, line-ups, injuries) comes from a licensed football data feed and changes quickly. Read the page rather than relying on a cached copy. [status.json](https://manutd.wiki/status.json) says when each data set was last rebuilt.
 - Kick-off times on pages are shown in the reader's time zone with UK time alongside. The data files use ISO dates.
 - Head-to-head records count United first. Community/Charity Shields and Super Cups are left out of win/defeat records, and friendlies are left out of fixtures.
+- Season ids are written YYYY-YY, for example 1998-99.
 - Text drawn from Wikipedia (player and manager introductions, careers, honours) is CC BY-SA 4.0. Please attribute it.
 - Official club information belongs to Manchester United at https://www.manutd.com/.
 
 ## Current season
 
 - [Hub](https://manutd.wiki/): next match, latest result, team news, table, upcoming fixtures
-- [Season](https://manutd.wiki/season/): every fixture and result this season, tables, scorers
+- [Season](https://manutd.wiki/season/): every fixture and result this season, Premier League and Champions League tables, top scorers
 - [Squad](https://manutd.wiki/squad/): current squad, availability and injuries, season stats
-- [Match centre](https://manutd.wiki/match/?id=1035546): one match: line-ups, events, stats, report (`?id=` is the feed fixture id)
+- [Match centre](https://manutd.wiki/match/?id=1035546): one match: line-ups, events, stats, report (`?id=` is the feed fixture id; works for any Premier League game)
 - [Academy & loans](https://manutd.wiki/youth/): academy and loan players' minutes and form
+- [Trips](https://manutd.wiki/trips/): planning a trip to a match: flights, hotels, timings
+- [Ground guides](https://manutd.wiki/grounds/): away grounds for travelling fans
+- [Calendar feed](https://manutd.wiki/calendar.ics): every fixture as iCalendar (`?comp=pl|europe|cups`, `?venue=home|away`)
 
 ## History
 
 - [History](https://manutd.wiki/history/): overview from Newton Heath to now
+- [Timeline](https://manutd.wiki/history/timeline/): the club year by year
 - [Every season](https://manutd.wiki/history/seasons/): one row per season since 1886-87
 - [A season](https://manutd.wiki/history/season/?s=1998-99): final table, all results, scorers, manager, key match on video (`?s=YYYY-YY`)
 - [Managers](https://manutd.wiki/history/managers/): every manager and caretaker, record in charge, trophies
+- [A manager](https://manutd.wiki/manager/?m=alex-ferguson): record in charge, trophies and every spell (`?m=` is the slug in managers.json)
 - [Records](https://manutd.wiki/history/records/): biggest wins, appearances, goals, streaks
 - [Opponents](https://manutd.wiki/history/opponents/): head-to-head against every club
-- [Player](https://manutd.wiki/player/?p=Wayne%20Rooney): a player's United career season by season (`?p=` is the English Wikipedia title)
+- [One club](https://manutd.wiki/club/?c=liverpool): every meeting with one club (`?c=` is the slug in clubs.json)
+- [Rivalries](https://manutd.wiki/rivalry/): Liverpool, City, Leeds, Arsenal, Chelsea and more in numbers
+- [Player](https://manutd.wiki/player/?p=Wayne%20Rooney): a player's United career season by season, with his clubs before and after (`?p=` is the English Wikipedia title)
+- [Compare players](https://manutd.wiki/compare/): two players side by side
 - [Where did they go?](https://manutd.wiki/where/): former players and managers after United, with next club and later honours
+- [Find that match](https://manutd.wiki/find/): find any competitive game since 1886 by opponent, score, scorer or year
+- [Comebacks](https://manutd.wiki/comebacks/): games won or saved from behind, late winners, high-scoring games
 - [Highlights](https://manutd.wiki/highlights/): video of the key match of every trophy season
 - [Who wore this number?](https://manutd.wiki/numbers/): squad numbers since 1993-94
+- [Shirt museum](https://manutd.wiki/kits/): every kit since 1878
 
 ## Data files (JSON)
 
+- [search.json](https://manutd.wiki/search.json): index of the site's players, managers, seasons, clubs, kits, grounds, key matches, books and pages, with URLs
 - [seasons.json](https://manutd.wiki/history/seasons.json): trophy seasons with manager, captain, league summary, top scorer, key matches and video
 - [all.json](https://manutd.wiki/history/all.json): every season's league record (division, position, P W D L, goals)
-- [Season detail](https://manutd.wiki/history/data/1998-99.json): one season's table and every result with scorers (`data/YYYY-YY.json`)
+- [Season detail](https://manutd.wiki/history/data/1998-99.json): one season's table and every result with scorers (`data/YYYY-YY.json`, 1886-87 to 2024-25; later seasons are on the Season page)
+- [tables.json](https://manutd.wiki/history/tables.json): final league tables of title-winning seasons
+- [cups.json](https://manutd.wiki/history/cups.json): every cup and European tie (FA Cup, League Cup, European competitions, shields) with opponent, score and scorers, to 2024-25
+- [clubs.json](https://manutd.wiki/history/clubs.json): head-to-head record against every club
 - [managers.json](https://manutd.wiki/history/managers.json): managers with dates, role, nationality, record and honours
 - [players_index.json](https://manutd.wiki/history/players_index.json): every player with first/last season, appearances and goals
 - [Player detail](https://manutd.wiki/history/players/wayne-rooney.json): one player's seasons, goals, finals and squad numbers (`players/<slug>.json`)
+- [scorers_index.json](https://manutd.wiki/history/scorers_index.json): every goalscorer with goals by season and competition
 - [records.json](https://manutd.wiki/history/records.json): club records
+- [onthisday.json](https://manutd.wiki/history/onthisday.json): matches and events by calendar day (`MM-DD`)
+- [timeline.json](https://manutd.wiki/history/timeline.json): dated events and managerial eras
 - [departures.json](https://manutd.wiki/history/departures.json): careers after United (from Wikipedia, CC BY-SA 4.0)
+- [squad.json](https://manutd.wiki/squad.json): current first-team squad with numbers, positions and nationalities
+- [milestones.json](https://manutd.wiki/history/milestones.json): current players' appearance and goal totals, for milestone tracking
 
 ## Optional
 
 - [Ask the archive](https://manutd.wiki/ask/): questions answered from the site's own data
-- [Shirt museum](https://manutd.wiki/kits/): every kit since 1878
-- [Ground guides](https://manutd.wiki/grounds/): away-day guides for travelling fans
+- [Bookshelf & watchlist](https://manutd.wiki/shelf/): books, documentaries, films and podcasts by era
 - [Links](https://manutd.wiki/links/): official channels, fan sites, podcasts and news
 - [Accessibility](https://manutd.wiki/accessibility/)
