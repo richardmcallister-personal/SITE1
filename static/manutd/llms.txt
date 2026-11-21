@@ -21,7 +21,7 @@ Notes for language models:
 ## History
 
 - [History](https://manutd.wiki/history/): overview from Newton Heath to now
-- [Every season](https://manutd.wiki/history/seasons/): one row per season since 1886–87
+- [Every season](https://manutd.wiki/history/seasons/): one row per season since 1886-87
 - [A season](https://manutd.wiki/history/season/?s=1998-99): final table, all results, scorers, manager, key match on video (`?s=YYYY-YY`)
 - [Managers](https://manutd.wiki/history/managers/): every manager and caretaker, record in charge, trophies
 - [Records](https://manutd.wiki/history/records/): biggest wins, appearances, goals, streaks
@@ -29,7 +29,7 @@ Notes for language models:
 - [Player](https://manutd.wiki/player/?p=Wayne%20Rooney): a player's United career season by season (`?p=` is the English Wikipedia title)
 - [Where did they go?](https://manutd.wiki/where/): former players and managers after United, with next club and later honours
 - [Highlights](https://manutd.wiki/highlights/): video of the key match of every trophy season
-- [Who wore this number?](https://manutd.wiki/numbers/): squad numbers since 1993–94
+- [Who wore this number?](https://manutd.wiki/numbers/): squad numbers since 1993-94
 
 ## Data files (JSON)
 

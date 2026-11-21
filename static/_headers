@@ -18,3 +18,12 @@
 /should-i-go/*
   ! Content-Security-Policy
   Content-Security-Policy: default-src 'self'
+
+# Plain-text files: declare UTF-8 so browsers don't fall back to Windows-1252 (which shows "1886â€“87")
+/manutd/llms.txt
+  ! Content-Type
+  Content-Type: text/plain; charset=utf-8
+
+/manutd/fixtures.txt
+  ! Content-Type
+  Content-Type: text/plain; charset=utf-8
