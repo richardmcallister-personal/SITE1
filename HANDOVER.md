@@ -147,6 +147,9 @@ the live Worker). See `git log` for the latest commit on each branch.
   VideoObject. dev.* gets <meta name="robots" content="noindex, nofollow"> from mu.js. static/manutd/llms.txt (served at
   /llms.txt): summary, notes for LLMs, key pages, JSON data files. No sitemap.xml yet (offered); robots.txt is
   Cloudflare-managed.
+- 21 Nov (live): llms.txt and fixtures.txt now sent as UTF-8 via _headers (dashes showed as "â€“"); llms.txt kept ASCII
+  and expanded to every page plus the main data files. When adding a page or data file, add it to llms.txt and to
+  PAGES in tools/build_ld.py. Note fixtures.txt says "Checked 30 October 2026" - nothing rebuilds it.
 
 ## Next task
 
