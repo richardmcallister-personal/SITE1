@@ -1,0 +1,377 @@
+{
+"built": "2026-11-22T01:49:48.146390+00:00",
+"edition": "Evening",
+"window_hours": 36,
+"items": 101,
+"outlets": [
+"BBC Sport",
+"Sky Sports",
+"The Athletic",
+"ESPN",
+"Manchester Evening News",
+"Evening Standard",
+"Football365",
+"90min",
+"Daily Mail",
+"Daily Mirror",
+"Stretty News",
+"The Peoples Person",
+"United In Focus"
+],
+"stories": [
+{
+"title": "Antonio Conte suggests Manchester United are 'frightened of winning' after manager snub",
+"summary": "Conte was interested in the United job but Mauricio Pochettino landed the role.",
+"via": "The Athletic",
+"label": "Reported",
+"score": 4.6,
+"time": "2026-11-21T12:30:44+00:00",
+"sources": [
+{
+"name": "The Athletic",
+"title": "Antonio Conte suggests Manchester United are 'frightened of winning' after manager snub",
+"url": "https://www.nytimes.com/athletic/7798866/2026/11/20/antonio-conte-manchester-united-frightened-of-winning/",
+"time": "2026-11-20T21:52:03+00:00"
+},
+{
+"name": "Daily Mirror",
+"title": "Antonio Conte fires back after Man Utd snub with 'frightened of winning' jibe",
+"url": "https://www.mirror.co.uk/sport/football/news/antonio-conte-manchester-united-ferguson-37901799",
+"time": "2026-11-21T12:30:44+00:00"
+},
+{
+"name": "Daily Mail",
+"title": "Antonio Conte hits back after missing out on Man United job: Ex-Chelsea boss warns clubs they are 'frightened of winning' if they don't hire him in cryptic interview after Mauricio Pochettino landed Old Trafford gig",
+"url": "https://www.dailymail.com/sport/football/article-16309997/Antonio-Conte-Man-United-clubs-frightened-winning-cryptic-interview-Mauricio-Pochettino-landed-Old-Trafford-gig.html?ns_mchannel=rss&ns_campaign=1490&ito=1490",
+"time": "2026-11-20T20:50:20+00:00"
+}
+]
+},
+{
+"title": "Filming training by drones should be illegal - Iraola",
+"summary": "Liverpool head coach Andoni Iraola says filming with drones around training grounds should be illegal.",
+"via": "BBC Sport",
+"label": "Reported",
+"score": 2.65,
+"time": "2026-11-21T11:06:29+00:00",
+"sources": [
+{
+"name": "BBC Sport",
+"title": "Filming training by drones should be illegal - Iraola",
+"url": "https://www.bbc.co.uk/sport/football/articles/cqdr1xmekmg5o?at_medium=RSS&at_campaign=rss",
+"time": "2026-11-20T15:08:51+00:00"
+},
+{
+"name": "United In Focus",
+"title": "Iraola outlines what Liverpool should expect from Pochettino’s Man Utd",
+"url": "https://www.unitedinfocus.com/news/iraola-outlines-what-liverpool-should-expect-from-pochettinos-man-utd/",
+"time": "2026-11-21T11:06:29+00:00"
+}
+]
+},
+{
+"title": "Inside JJ Gabriel’s Man United exit: Cost to Real Madrid revealed with Jose Mourinho unhappy",
+"summary": "JJ Gabriel is tipped to join Real Madrid having left Manchester United, with Jose Mourinho breaking his silence on the teenager's controversial transfer saga",
+"via": "Manchester Evening News",
+"label": "Reported",
+"score": 2.53,
+"time": "2026-11-21T11:29:55+00:00",
+"sources": [
+{
+"name": "Manchester Evening News",
+"title": "Inside JJ Gabriel’s Man United exit: Cost to Real Madrid revealed with Jose Mourinho unhappy",
+"url": "https://www.manchestereveningnews.co.uk/sport/football/football-news/jj-gabriel-real-madrid-transfer-34942681",
+"time": "2026-11-20T13:55:46+00:00"
+},
+{
+"name": "Daily Mirror",
+"title": "Jose Mourinho's anger at JJ Gabriel question after breaking his rule three times",
+"url": "https://www.mirror.co.uk/sport/football/news/jose-mourinhos-anger-jj-gabriel-37901558",
+"time": "2026-11-21T11:29:55+00:00"
+}
+]
+},
+{
+"title": "Benjamin Sesko future decided as Man Utd prepare sacrifice for new No.9 – Fabrizio Romano",
+"summary": "",
+"via": "Football365",
+"label": "Reported",
+"score": 2.26,
+"time": "2026-11-21T21:00:46+00:00",
+"sources": [
+{
+"name": "Football365",
+"title": "Benjamin Sesko future decided as Man Utd prepare sacrifice for new No.9 – Fabrizio Romano",
+"url": "https://www.football365.com/news/benjamin-sesko-future-man-utd-prepare-sacrifice-no-9",
+"time": "2026-11-21T13:34:07+00:00"
+},
+{
+"name": "The Peoples Person",
+"title": "\"I expect...\": Fabrizio Romano confirms Man United's January striker transfer plans",
+"url": "https://thepeoplesperson.com/2026/11/21/fabrizio-romano-man-united-want-new-striker-in-january-322931/",
+"time": "2026-11-21T21:00:46+00:00"
+}
+]
+},
+{
+"title": "Man United sale update as unhappy Glazers ‘set £7.5bn plan’ after two INEOS agreements",
+"summary": "The Glazer family have owned Manchester United for more than two decades, but have their eye on a sale, provided the correct valuation is met for the Premier League giants",
+"via": "Manchester Evening News",
+"label": "Reported",
+"score": 2.1,
+"time": "2026-11-21T22:21:10+00:00",
+"sources": [
+{
+"name": "Manchester Evening News",
+"title": "Man United sale update as unhappy Glazers ‘set £7.5bn plan’ after two INEOS agreements",
+"url": "https://www.manchestereveningnews.co.uk/sport/football/football-news/man-united-sale-glazer-family-34948998",
+"time": "2026-11-21T22:21:10+00:00"
+}
+]
+},
+{
+"title": "Eric Bailly on Manchester United's hiring of Pochettino and the Crew's MLS Cup quest",
+"summary": "Bailly was coached by Mauricio Pochettino early in his career and has high hopes for the manager in his new role",
+"via": "The Athletic",
+"label": "Reported",
+"score": 2.08,
+"time": "2026-11-21T17:48:36+00:00",
+"sources": [
+{
+"name": "The Athletic",
+"title": "Eric Bailly on Manchester United's hiring of Pochettino and the Crew's MLS Cup quest",
+"url": "https://www.nytimes.com/athletic/7800647/2026/11/21/eric-bailly-columbus-crew-manchester-united-pochettino-mls-playoffs/",
+"time": "2026-11-21T17:48:36+00:00"
+}
+]
+},
+{
+"title": "Rio Ferdinand: Anfield is a cauldron for United",
+"summary": "Rio Ferdinand: Anfield is a cauldron for United",
+"via": "BBC Sport",
+"label": "Reported",
+"score": 1.89,
+"time": "2026-11-21T15:15:10+00:00",
+"sources": [
+{
+"name": "BBC Sport",
+"title": "Rio Ferdinand: Anfield is a cauldron for United",
+"url": "https://www.bbc.co.uk/sport/football/videos/cwp80vv6y23mo?at_medium=RSS&at_campaign=rss",
+"time": "2026-11-21T15:15:10+00:00"
+}
+]
+},
+{
+"title": "Manchester United's Mauricio Pochettino payment to U.S. Soccer detailed in financial update",
+"summary": "The club's Stock Market filing also covers the appointments of Jesus Perez, Miguel D’Agostino, Toni Jimenez and Sebastiano Pochettino.",
+"via": "The Athletic",
+"label": "Reported",
+"score": 1.86,
+"time": "2026-11-21T14:50:37+00:00",
+"sources": [
+{
+"name": "The Athletic",
+"title": "Manchester United's Mauricio Pochettino payment to U.S. Soccer detailed in financial update",
+"url": "https://www.nytimes.com/athletic/7800317/2026/11/21/mauricio-pochettino-cost-manchester-united/",
+"time": "2026-11-21T14:50:37+00:00"
+}
+]
+},
+{
+"title": "Man United news: Mauricio Pochettino calls for ‘ban’ as January transfer target speaks out",
+"summary": "Mauricio Pochettino's first game in charge of Manchester United is swiftly approaching as the new manager prepares for a trip to Liverpool",
+"via": "Manchester Evening News",
+"label": "Reported",
+"score": 1.8,
+"time": "2026-11-21T18:48:28+00:00",
+"sources": [
+{
+"name": "Manchester Evening News",
+"title": "Man United news: Mauricio Pochettino calls for ‘ban’ as January transfer target speaks out",
+"url": "https://www.manchestereveningnews.co.uk/sport/football/football-news/man-united-live-mauricio-pochettino-34946608",
+"time": "2026-11-21T18:48:28+00:00"
+}
+]
+},
+{
+"title": "Pochettino's Man United moment has finally arrived. Is he up to the task?",
+"summary": "Mauricio Pochettino faces the sizable challenge of restoring Man United to their former glory. Can he succeed where Michael Carrick, Ruben Amorim and others failed?",
+"via": "ESPN",
+"label": "Reported",
+"score": 1.75,
+"time": "2026-11-21T08:02:36-05:00",
+"sources": [
+{
+"name": "ESPN",
+"title": "Pochettino's Man United moment has finally arrived. Is he up to the task?",
+"url": "https://www.espn.com/soccer/story/_/id/50543478/pochettino-manchester-united-debut-liverpool",
+"time": "2026-11-21T08:02:36-05:00"
+}
+]
+},
+{
+"title": "Liverpool are terrible at Anfield this season, but will it matter vs. Man United?",
+"summary": "Anfield has a power to propel Liverpool to greatness, but the team are struggling for form there this season.",
+"via": "ESPN",
+"label": "Reported",
+"score": 1.75,
+"time": "2026-11-21T08:02:36-05:00",
+"sources": [
+{
+"name": "ESPN",
+"title": "Liverpool are terrible at Anfield this season, but will it matter vs. Man United?",
+"url": "https://www.espn.com/soccer/story/_/id/50520411/liverpool-manchester-united-anfield-premier-league",
+"time": "2026-11-21T08:02:36-05:00"
+}
+]
+},
+{
+"title": "How would Liverpool feel about a Manchester relegation (or two)?",
+"summary": "United travel to Anfield this weekend in the bottom three, while City remain under threat of hefty punishment for breaking financial rules",
+"via": "The Athletic",
+"label": "Reported",
+"score": 1.7,
+"time": "2026-11-21T12:00:00+00:00",
+"sources": [
+{
+"name": "The Athletic",
+"title": "How would Liverpool feel about a Manchester relegation (or two)?",
+"url": "https://www.nytimes.com/athletic/7787116/2026/11/21/man-utd-man-city-relegation-liverpool/",
+"time": "2026-11-21T12:00:00+00:00"
+}
+]
+},
+{
+"title": "Mauricio Pochettino confirms Bruno Fernandes decision at Manchester United",
+"summary": "Mauricio Pochettino has made a decision on whether Bruno Fernandes will remain as Man Utd captain.",
+"via": "Manchester Evening News",
+"label": "Reported",
+"score": 1.65,
+"time": "2026-11-20T18:06:14+00:00",
+"sources": [
+{
+"name": "Manchester Evening News",
+"title": "Mauricio Pochettino confirms Bruno Fernandes decision at Manchester United",
+"url": "https://www.manchestereveningnews.co.uk/sport/football/mauricio-pochettino-confirms-bruno-fernandes-34942584",
+"time": "2026-11-20T15:11:11+00:00"
+},
+{
+"name": "Daily Mail",
+"title": "Mauricio Pochettino warns Man United cannot be stuck in the past as he sets out his vision for the club - and confirms Bruno Fernandes WILL remain captain amid contract stand-off",
+"url": "https://www.dailymail.com/sport/football/article-16308325/Mauricio-Pochettino-Man-United-press-conference-LIVE.html?ns_mchannel=rss&ns_campaign=1490&ito=1490",
+"time": "2026-11-20T18:06:14+00:00"
+}
+]
+},
+{
+"title": "Omar Berrada accepts criticism for Manchester United's failings",
+"summary": "Man Utd's CEO Omar Berrada has spoken publicly for the first time since June following Mauricio Pochettino's appointment.",
+"via": "Manchester Evening News",
+"label": "Reported",
+"score": 1.6,
+"time": "2026-11-20T16:32:56+00:00",
+"sources": [
+{
+"name": "Manchester Evening News",
+"title": "Omar Berrada accepts criticism for Manchester United's failings",
+"url": "https://www.manchestereveningnews.co.uk/sport/football/omar-berrada-accepts-criticism-manchester-34941642",
+"time": "2026-11-20T15:23:04+00:00"
+},
+{
+"name": "Daily Mail",
+"title": "Man United CEO Omar Berrada insists the team have IMPROVED since the transfer window in his first interview in five months - but does accept criticism of leadership has been fair",
+"url": "https://www.dailymail.com/sport/football/article-16309273/Man-United-CEO-Omar-Berrada-insists-team-IMPROVED-transfer-window-interview-five-months-does-accept-criticism-leadership-fair.html?ns_mchannel=rss&ns_campaign=1490&ito=1490",
+"time": "2026-11-20T16:32:56+00:00"
+}
+]
+},
+{
+"title": "Manchester United CEO Omar Berrada breaks silence on Man City charges guilty verdict",
+"summary": "Man United's CEO Omar Berrada made the switch from the Etihad to Old Trafford two-and-a-half years ago.",
+"via": "Manchester Evening News",
+"label": "Reported",
+"score": 1.58,
+"time": "2026-11-20T15:56:40+00:00",
+"sources": [
+{
+"name": "Manchester Evening News",
+"title": "Manchester United CEO Omar Berrada breaks silence on Man City charges guilty verdict",
+"url": "https://www.manchestereveningnews.co.uk/sport/football/manchester-united-ceo-omar-berrada-34941893",
+"time": "2026-11-20T15:49:07+00:00"
+},
+{
+"name": "Daily Mirror",
+"title": "Man Utd CEO Omar Berrada breaks silence on Man City charges with firm message",
+"url": "https://www.mirror.co.uk/sport/football/news/manchester-united-omar-berrada-city-37899925",
+"time": "2026-11-20T15:56:40+00:00"
+}
+]
+}
+],
+"rumours": [
+{
+"title": "Transfer rumors, news: Could McTominay make sensational Man United return?",
+"summary": "A trio of Premier League giants are eyeing Atalanta defender Giorgio Scalvini. Transfer Talk has the latest.",
+"via": "ESPN",
+"label": "Rumour",
+"score": 2.05,
+"time": "2026-11-21T12:30:49-05:00",
+"sources": [
+{
+"name": "ESPN",
+"title": "Transfer rumors, news: Could McTominay make sensational Man United return?",
+"url": "https://www.espn.com/soccer/story/_/id/50548678/transfer-rumors-news-scott-mctominay-man-united-return",
+"time": "2026-11-21T12:30:49-05:00"
+}
+]
+},
+{
+"title": "Monstrous striker among four named Man Utd targets as Pochettino refresh revealed",
+"summary": "",
+"via": "Football365",
+"label": "Rumour",
+"score": 0.58,
+"time": "2026-11-20T21:00:18+00:00",
+"sources": [
+{
+"name": "Football365",
+"title": "Monstrous striker among four named Man Utd targets as Pochettino refresh revealed",
+"url": "https://www.football365.com/news/igor-matanovic-named-man-utd-target-mauricio-pochettino-refresh",
+"time": "2026-11-20T21:00:18+00:00"
+}
+]
+},
+{
+"title": "Two obstacles killed Man United's aggressive move for their priority midfield target - Fabrizio Romano",
+"summary": "Manchester United made an aggressive attempt to sign Aurelien Tchouameni, but his salary and desire to remain at Real Madrid prevented a transfer. The post Manchester United’s aggressive Aurelien Tchouameni move collapsed for two reasons appeared first on Man ",
+"via": "The Peoples Person",
+"label": "Rumour",
+"score": 0.51,
+"time": "2026-11-21T19:00:23+00:00",
+"sources": [
+{
+"name": "The Peoples Person",
+"title": "Two obstacles killed Man United's aggressive move for their priority midfield target - Fabrizio Romano",
+"url": "https://thepeoplesperson.com/2026/11/21/man-uniteds-aurelien-tchouameni-move-failed-over-real-madrid-323042/",
+"time": "2026-11-21T19:00:23+00:00"
+}
+]
+},
+{
+"title": "Pochettino must swoop for England’s next Harry Kane with 15 goals already this season",
+"summary": "Manchester United head coach Mauricio Pochettino will need to sign another striker. A solution may lie in the Championship. Benjamin Sesko’s injury leaves new head ...",
+"via": "United In Focus",
+"label": "Rumour",
+"score": 0.34,
+"time": "2026-11-21T07:00:00+00:00",
+"sources": [
+{
+"name": "United In Focus",
+"title": "Pochettino must swoop for England’s next Harry Kane with 15 goals already this season",
+"url": "https://www.unitedinfocus.com/transfer-news/pochettino-must-swoop-for-englands-next-harry-kane-with-15-goals-already-this-season/",
+"time": "2026-11-21T07:00:00+00:00"
+}
+]
+}
+]
+}

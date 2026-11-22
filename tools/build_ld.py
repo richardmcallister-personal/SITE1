@@ -16,6 +16,7 @@ PAGES = {
     "grounds/": ("Ground guides", "Away ground guides for Manchester United fans: arrival, meeting spots, the away end, bag rules and getting home.", None),
     "kits/": ("Shirt museum", "Every Manchester United kit since 1878, with your own collection and wishlist.", None),
     "highlights/": ("Highlights", "Video of the key match from every Manchester United trophy season, from the 1948 FA Cup final to today.", None),
+    "news/": ("News briefing", "Manchester United news twice a day: each story once, with every outlet that covered it, labelled confirmed, reported or rumour.", None),
     "links/": ("Links", "Manchester United links: official channels first, then the fan sites, podcasts and news worth your time.", None),
     "history/": ("History", "Manchester United history from Newton Heath in 1878: every season, manager, record and opponent.", "self"),
     "history/seasons/": ("Every season", "Every Manchester United season since 1886–87: league position, cup runs, manager and top scorer.", "history"),
