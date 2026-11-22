@@ -101,7 +101,7 @@ export default {
     const WIKI = /(^|\.)manutd\.wiki$/.test(url.hostname);
     if (url.hostname === "www.manutd.wiki") return Response.redirect("https://manutd.wiki" + url.pathname + url.search, 301);
     if (url.pathname.startsWith("/should-i-go")) return Response.redirect(url.origin + (WIKI ? "/trips/" : "/manutd/trips/"), 301);
-    const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|wiki-rev|wiki-page|collection|cover|push)(\/|$)|^\/ask$/;   // /ask is the question route; /ask/ is the page
+    const SERVICE = /^\/(api|img|feed|wiki|wiki-season|wiki-club|wiki-raw|wiki-rev|wiki-page|collection|cover|push)(\/|$)|^\/ask$|^\/news\.json$/;   // /ask is the question route; /ask/ is the page
     // Preview deployments (dev.manutd.wiki) carry no key, KV or crons: every data call goes to the live Worker.
     if (env.UPSTREAM && SERVICE.test(url.pathname)) return fetch(new Request(env.UPSTREAM + url.pathname + url.search, request));
     if (url.pathname === "/calendar.ics" || url.pathname === "/manutd/calendar.ics") { try { return await calendar(url, env); } catch (e) { return json({ error: "calendar: " + (e && e.message || e) }, 500); } }
@@ -136,6 +136,7 @@ export default {
     if (url.pathname === "/wiki-rev") return wikiRev(url, env, ctx);
     if (url.pathname === "/wiki-page") return localWiki(await wikiPage(url, env, ctx), url, env, ctx);
     if (url.pathname === "/cover") return cover(url, env, ctx);
+    if (url.pathname === "/news.json") { try { return await newsRoute(env); } catch (e) { return json({ error: "news: " + (e && e.message || e) }, 500); } }
     if (url.pathname === "/ask") { try { return await ask(request, url, env, ctx); } catch (e) { return json({ error: "ask: " + (e && e.message || e) }, 500); } }
     if (url.pathname.startsWith("/push/")) { try { return await push(request, url, env, ctx); } catch (e) { return json({ error: "push: " + (e && e.message || e) }, 500); } }
     if (url.pathname === "/collection") { try { return await collection(request, url, env); } catch (e) { return json({ error: "collection: " + (e && e.message || e) }, 500); } }
@@ -167,6 +168,8 @@ export default {
   async scheduled(event, env, ctx) {
     if (event.cron === "* * * * *") { ctx.waitUntil(pushTick(env).catch((e) => console.log("pushTick", e && e.message))); return; }
     ctx.waitUntil(fixtureWatch(env).catch((e) => console.log("fixtureWatch", e && e.message)));
+    // News briefing: rebuilt by this hourly run at 07 and 18 UK time (see buildNews).
+    try { const h = ukHourNow(); if (h === 7 || h === 18) ctx.waitUntil(buildNews(env).catch((e) => console.log("news", e && e.message))); } catch (e) {}
     ctx.waitUntil((async () => {
       for (const p of WARM) {
         const url = new URL("https://site1.local" + p);
@@ -216,6 +219,118 @@ function headers(src, age) {
   return { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=120", "access-control-allow-origin": "*", "x-source": src, "x-age": String(age || 0) };
 }
 function answer(body, src, age) { return new Response(body, { status: 200, headers: headers(src, age) }); }
+// ---------- News briefing (/news.json) ----------
+// Twice a day (07:00 and 18:00 UK, from the hourly cron) read United feeds from outlets that publish RSS and answer an
+// honest request, keep 36 hours, group articles about the same story so each appears once with every outlet that ran
+// it, label (Confirmed / Reported / Rumour) and rank. Headlines, links and short standfirsts only. Same logic as
+// tools/build_news.py. Stored in KV news:v1; /news.json serves it and builds once if it is missing. `report` in the
+// output says how many items each outlet gave (or why it failed).
+const NEWS_UA = "manutd.wiki news briefing (+https://manutd.wiki/news/)";
+const NEWS_FEEDS = [
+  ["BBC Sport", "https://feeds.bbci.co.uk/sport/football/teams/manchester-united/rss.xml", "major", false],
+  ["Sky Sports", "https://www.skysports.com/rss/11667", "major", false],
+  ["The Athletic", "https://www.nytimes.com/athletic/rss/football/manchester-united/", "major", false],
+  ["ESPN", "https://www.espn.com/espn/rss/soccer/news", "major", true],
+  ["Manchester Evening News", "https://www.manchestereveningnews.co.uk/all-about/manchester-united-fc?service=rss", "local", false],
+  ["Evening Standard", "https://www.standard.co.uk/sport/football/rss", "national", true],
+  ["Football365", "https://www.football365.com/manchester-united/feed", "national", false],
+  ["90min", "https://www.90min.com/posts.rss", "national", true],
+  ["Daily Mail", "https://www.dailymail.co.uk/sport/manchester-united/index.rss", "tabloid", false],
+  ["Daily Mirror", "https://www.mirror.co.uk/all-about/manchester-united-fc?service=rss", "tabloid", false],
+  ["Stretty News", "https://strettynews.com/feed/", "fan", false],
+  ["The Peoples Person", "https://thepeoplesperson.com/feed/", "fan", false],
+  ["United In Focus", "https://unitedinfocus.com/feed/", "fan", false],
+];
+const NEWS_W = { major: 3, local: 2.5, national: 1.5, tabloid: 1, fan: 0.7 };
+const NEWS_SOLID = new Set(["major", "local", "national"]);
+const NEWS_UTD = /\b(Man(chester)? (United|Utd)|Man U\b|Old Trafford|Red Devils|Pochettino)/i;
+const NEWS_RUMOUR = /\b(transfer (news|rumou?rs?|gossip|latest)|swoop|linked|eye(s|ing)?|keen on|interest in|monitor(s|ing)?|plot(s|ting)?|bid for|in talks|shortlist|race for|battle for|move for|want(s)? to sign|could (sign|join|return|leave)|rumou?rs?|targets?(?= (as|for|in|from)\b)|named .* targets?)\b/i;
+const NEWS_SKIP = /\blive\b.*\b(updates|blog|reaction)\b|^live:|\bLIVE\b|quiz|\bodds\b|\bbetting\b|\btips\b|predicted (line-?up|xi)|player ratings|last time .* released/i;
+const NEWS_STOP = new Set(("a an the and or of to in on at for from by with as is are was were be been it its this that these those his her their he she they them we you i not no but if than then so up out over into after before about new man manchester united utd mufc says said say will would can could has have had do does did how why what who when where which vs v amid ahead set").split(" "));
+const NEWS_NOTNAME = new Set(["premier league", "champions league", "old trafford", "red devils", "fa cup"]);
+function newsText(x) {
+  x = String(x || "").replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1").replace(/<[^>]+>/g, " ");
+  const E = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " ", rsquo: "’", lsquo: "‘", rdquo: "”", ldquo: "“", ndash: "–", mdash: "—", hellip: "…", pound: "£" };
+  for (let k = 0; k < 2; k++) x = x.replace(/&(#x?[0-9a-f]+|amp|lt|gt|quot|apos|nbsp|rsquo|lsquo|rdquo|ldquo|ndash|mdash|hellip|pound);/gi, (m, e) => {
+    if (e[0] === "#") { const n = e[1] === "x" || e[1] === "X" ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10); return isFinite(n) ? String.fromCodePoint(n) : m; }
+    const v = E[e.toLowerCase()]; return v === undefined ? m : v; });
+  return x.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+function newsItems(xml) {
+  const out = [];
+  for (const m of xml.matchAll(/<item\b[\s\S]*?<\/item>/g)) {
+    const b = m[0], g = (t) => { const r = b.match(new RegExp("<" + t + "\\b[^>]*>([\\s\\S]*?)</" + t + ">")); return r ? r[1] : ""; };
+    const link = newsText(g("link")) || newsText(g("guid"));
+    let when = null; for (const t of ["pubDate", "dc:date", "updated"]) { const v = newsText(g(t)); if (v) { const d = new Date(v); if (!isNaN(d)) { when = d; break; } } }
+    out.push({ title: newsText(g("title")), url: link, desc: newsText(g("description")).slice(0, 400), when });
+  }
+  return out;
+}
+function newsWords(t) { const s = new Set(); for (let x of t.match(/[A-Za-zÀ-ÿ'][A-Za-zÀ-ÿ'-]+/g) || []) { x = x.toLowerCase().replace(/'s$/, ""); if (!NEWS_STOP.has(x) && x.length > 2) s.add(x.slice(0, 7)); } return s; }
+function newsNames(t) { const s = new Set(); for (const c of t.match(/\b[A-ZÀ-Þ][a-zà-ÿ]+(?:[- ][A-ZÀ-Þ][a-zà-ÿ]+)*/g) || []) { const l = c.toLowerCase(); if (!NEWS_STOP.has(l) && !NEWS_NOTNAME.has(l)) s.add(l); } return s; }
+function newsInter(a, b) { let n = 0; for (const x of a) if (b.has(x)) n++; return n; }
+function ukHourNow(t) { return +new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/London", hour: "2-digit", hour12: false }).format(t ? new Date(t) : new Date()); }
+async function buildNews(env) {
+  const now = Date.now(), cutoff = now - 36 * 3600e3, rows = [], report = {};
+  const got = await Promise.all(NEWS_FEEDS.map(async ([name, url, group, need]) => {
+    try { const r = await fetch(url, { headers: { "user-agent": NEWS_UA, accept: "application/rss+xml, application/xml, text/xml" }, cf: { cacheTtl: 300 } });
+      if (!r.ok) return [name, group, need, null, "HTTP " + r.status]; return [name, group, need, await r.text(), null]; }
+    catch (e) { return [name, group, need, null, "failed"]; }
+  }));
+  for (const [name, group, need, xml, err] of got) {
+    if (!xml) { report[name] = err || "empty"; continue; }
+    let n = 0;
+    for (const it of newsItems(xml)) {
+      if (!it.title || !it.url || !it.when || it.when < cutoff) continue;
+      if (need && !NEWS_UTD.test(it.title + " " + it.desc)) continue;
+      if (NEWS_SKIP.test(it.title)) continue;
+      Object.assign(it, { source: name, group, w: newsWords(it.title + " " + it.desc.slice(0, 160)), n: newsNames(it.title) }); rows.push(it); n++;
+    }
+    report[name] = n;
+  }
+  rows.sort((a, b) => b.when - a.when);
+  const dfn = new Map(), dfw = new Map(), lim = Math.max(3, 0.07 * rows.length);
+  for (const r of rows) { for (const x of r.n) dfn.set(x, (dfn.get(x) || 0) + 1); for (const x of r.w) dfw.set(x, (dfw.get(x) || 0) + 1); }
+  for (const r of rows) { r.n2 = new Set([...r.n].filter((x) => dfn.get(x) <= lim)); r.w2 = new Set([...r.w].filter((x) => dfw.get(x) <= lim)); }
+  const clusters = [];
+  for (const r of rows) {
+    let best = null, bs = 0;
+    for (const c of clusters) { const seed = c[0], nn = newsInter(r.n2, seed.n2), ww = newsInter(r.w2, seed.w2) / Math.max(1, Math.min(r.w2.size, seed.w2.size)), sc = ww + 0.25 * nn;
+      if (((nn >= 2 && ww >= 0.2) || (nn >= 1 && ww >= 0.3) || ww >= 0.5) && sc > bs) { best = c; bs = sc; } }
+    if (best) best.push(r); else clusters.push([r]);
+  }
+  const stories = [];
+  for (const its of clusters) {
+    const srcs = new Map(); for (const i of its) if (!srcs.has(i.source)) srcs.set(i.source, i);
+    const list = [...srcs.values()], groups = new Set(list.map((i) => i.group));
+    const lead = list.slice().sort((a, b) => NEWS_W[b.group] - NEWS_W[a.group] || b.when - a.when)[0];
+    const latest = Math.max(...its.map((i) => +i.when)), major = list.filter((i) => i.group === "major" || i.group === "local").length;
+    const rumourish = NEWS_RUMOUR.test(lead.title) && list.filter((i) => NEWS_RUMOUR.test(i.title)).length * 2 >= list.length;
+    if (groups.size === 1 && groups.has("fan") && list.length === 1 && !rumourish) continue;   // a lone fan-site piece is opinion, not news
+    let label;
+    if (![...groups].some((g) => NEWS_SOLID.has(g))) label = rumourish ? "Rumour" : "Reported";
+    else if (major >= 2 && !rumourish) label = "Confirmed";
+    else if (rumourish && major < 2) label = "Rumour";
+    else label = "Reported";
+    const ageH = (now - latest) / 3600e3;
+    const score = list.reduce((a, i) => a + NEWS_W[i.group], 0) * (1 + 0.3 * (list.length - 1)) / (1 + ageH / 18);
+    stories.push({ title: lead.title, summary: lead.desc.slice(0, 260), via: lead.source, label, score: Math.round(score * 100) / 100, time: new Date(latest).toISOString(),
+      sources: list.sort((a, b) => NEWS_W[b.group] - NEWS_W[a.group]).map((i) => ({ name: i.source, title: i.title, url: i.url, time: i.when.toISOString() })) });
+  }
+  stories.sort((a, b) => b.score - a.score);
+  const h = ukHourNow(now);
+  const out = { built: new Date(now).toISOString(), edition: h >= 3 && h < 13 ? "Morning" : "Evening", window_hours: 36, items: rows.length,
+    outlets: NEWS_FEEDS.map((f) => f[0]), report, stories: stories.filter((s) => s.label !== "Rumour").slice(0, 15), rumours: stories.filter((s) => s.label === "Rumour").slice(0, 10) };
+  const body = JSON.stringify(out);
+  if (rows.length) await env.MU_CACHE.put("news:v1", body, { expirationTtl: 3 * 86400 });
+  return body;
+}
+async function newsRoute(env) {
+  let body = await env.MU_CACHE.get("news:v1");
+  if (!body) body = await buildNews(env);   // first request after deploy (or after a long outage) builds it once
+  return new Response(body, { headers: { "content-type": "application/json; charset=utf-8", "cache-control": "public, max-age=300", "access-control-allow-origin": "*" } });
+}
+
 function json(obj, status = 200) { return new Response(JSON.stringify(obj), { status, headers: headers("worker") }); }
 function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
