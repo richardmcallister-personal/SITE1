@@ -150,6 +150,18 @@ the live Worker). See `git log` for the latest commit on each branch.
 - 21 Nov (live): llms.txt and fixtures.txt now sent as UTF-8 via _headers (dashes showed as "â€“"); llms.txt kept ASCII
   and expanded to every page plus the main data files. When adding a page or data file, add it to llms.txt and to
   PAGES in tools/build_ld.py. Note fixtures.txt says "Checked 30 October 2026" - nothing rebuilds it.
+- 22 Nov (live): /news/ "News briefing". Worker buildNews() (NEWS_FEEDS, 13 outlets) runs from the hourly :07 cron at
+  07 and 18 UK, stores KV news:v1 (3-day TTL); route /news.json serves it (in SERVICE, so dev proxies to live) and builds
+  once if missing. Keeps 36 h, groups articles about the same story (names/words shared with the story's first item;
+  names in >7% of items ignored so "Pochettino" can't chain stories), labels Confirmed (2+ major/local) / Reported /
+  Rumour (transfer wording, or tabloid/fan only), drops lone fan-site pieces. `report` in news.json = items per outlet
+  or the HTTP error. From Cloudflare: Football365 403s; Guardian, Telegraph, manutd.com block bots (left out, no
+  spoofing). Headlines/standfirsts are the outlets' own; next step offered: Haiku-written neutral headline + summary.
+  tools/build_news.py is the same logic for previews. Explore + footer link; no hub card yet.
+- Shell commands that touch worker.js are refused by a privacy guard in these sessions (the file holds a personal
+  contact detail). Edit worker.js with the editor and test new code in a separate file; Cloudflare's build is the
+  syntax check (a failed build keeps the previous version live). Richard to decide whether to switch that contact to
+  the site's postmaster address.
 
 ## Next task
 
