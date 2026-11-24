@@ -1,5 +1,5 @@
 // Single fixture source for every page (hub, season, trips, squad, match).
-// Dates/times from the club's official fixtures page, checked 17 Nov 2026, stored as UTC.
+// Dates/times from the club's official fixtures page, checked 24 Nov 2026, stored as UTC.
 // conf:true  = kick-off confirmed (Premier League TV picks announced, or a UEFA date).
 // conf:false = provisional: the original Premier League slot, which may move once that month's TV picks are announced
 //              (January picks are normally announced mid-November, and so on month by month).
@@ -168,11 +168,11 @@ window.MU_FIXTURES=[
 {
 "opp": "Aston Villa",
 "comp": "Premier League",
-"ko": "2027-01-16T15:00:00Z",
+"ko": "2027-01-16T17:30:00Z",
 "home": false,
 "venue": "Villa Park",
 "col": "#670E36",
-"conf": false,
+"conf": true,
 "sales": [
 {
 "what": "Away ballot",
@@ -193,10 +193,10 @@ window.MU_FIXTURES=[
 {
 "opp": "Liverpool",
 "comp": "Premier League",
-"ko": "2027-01-23T15:00:00Z",
+"ko": "2027-01-24T16:30:00Z",
 "home": true,
 "venue": "Old Trafford",
-"conf": false,
+"conf": true,
 "sales": [
 {
 "what": "Members' ballot",
@@ -225,11 +225,11 @@ window.MU_FIXTURES=[
 {
 "opp": "Brentford",
 "comp": "Premier League",
-"ko": "2027-01-30T15:00:00Z",
+"ko": "2027-02-01T20:00:00Z",
 "home": false,
 "venue": "Gtech Community Stadium",
 "col": "#E30613",
-"conf": false,
+"conf": true,
 "sales": [
 {
 "what": "Away ballot",
