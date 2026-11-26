@@ -162,6 +162,18 @@ the live Worker). See `git log` for the latest commit on each branch.
   contact detail). Edit worker.js with the editor and test new code in a separate file; Cloudflare's build is the
   syntax check (a failed build keeps the previous version live). Richard to decide whether to switch that contact to
   the site's postmaster address.
+- 26 Nov (dev, awaiting approval): Richard's own photographs. static/manutd/photos/ holds <name>.webp (1200 on the long
+  side) + <name>-s.webp (480), EXIF stripped, and photos.json: `credit`, `matches` keyed by feed fixture id, `timeline`
+  keyed by "<event date>|<event type>". mu.js: `MU.photos()`, `MU.shot(p,credit,sizes)`, `MU.stands(el,fixtureId)` =
+  the "From the stands" strip on the match page (#standsSheet; four across on desktop, sideways swipe on phones).
+  Timeline cards show a photo when photos.json has their key. Old Trafford (`OT` in mu.js) now uses Richard's pitch-side
+  photo (`own:true`, `pos` = object-position); the Wikimedia one is still at grounds/img/old-trafford*.webp. First set:
+  United 5-4 Lyon 17 Apr 2025 (id 1361283, four photos) and timeline 1910 (OT100 plaque), 1958 (Munich clock), 1968
+  (Trinity statue), 1986 (Ferguson statue). Captions are in all six language files. Source: his Mac's Photos library
+  (albums "Manchester - April 2025", "Manchester - April 2026", "MUFC x FCK", "Stadia"); originals exported with
+  AppleScript to Pictures/Claude outputs/match-photo-review/originals, converted there with ImageMagick. Not placed yet:
+  trophy room and tunnel (no matching timeline event), Copenhagen 8 Nov 2023, the home game of 27 Apr 2026 (opponent
+  not confirmed). Photos showing children or close-ups of bystanders are left out.
 
 ## Next task
 

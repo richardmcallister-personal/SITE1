@@ -59,6 +59,7 @@ Notes for language models:
 - [records.json](https://manutd.wiki/history/records.json): club records
 - [onthisday.json](https://manutd.wiki/history/onthisday.json): matches and events by calendar day (`MM-DD`)
 - [timeline.json](https://manutd.wiki/history/timeline.json): dated events and managerial eras
+- [photos.json](https://manutd.wiki/photos/photos.json): the site owner's own photographs, by match (feed fixture id) and by timeline event
 - [departures.json](https://manutd.wiki/history/departures.json): careers after United (from Wikipedia, CC BY-SA 4.0)
 - [squad.json](https://manutd.wiki/squad.json): current first-team squad with numbers, positions and nationalities
 - [milestones.json](https://manutd.wiki/history/milestones.json): current players' appearance and goal totals, for milestone tracking

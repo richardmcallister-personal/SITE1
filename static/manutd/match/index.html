@@ -85,6 +85,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule)} 
   <div class="miles" id="miles" hidden><h2>Milestone watch</h2><div class="msbody"></div></div>
 </div>
 <div class="sheet" id="reportSheet" style="display:none"><div id="report"></div><div class="rhl" id="hl" hidden></div></div>
+<div class="sheet" id="standsSheet" style="display:none"><div id="stands"></div></div>
 <div class="sheet" id="bodyWait" aria-hidden="true" style="min-height:70vh"></div>
 <div class="sheet" id="body" style="display:none">
   <div class="cols">
@@ -122,6 +123,7 @@ a.pl{color:var(--ink);text-decoration:none;border-bottom:1px solid var(--rule)} 
       description:done?h.name+" "+gl.home+"–"+gl.away+" "+a.name+(f.league&&f.league.round?", "+f.league.round:""):undefined});
     MU.desc(h.name+" v "+a.name+(done?" "+gl.home+"–"+gl.away:"")+" · "+(f.league&&f.league.name||"")+" · "+new Date(f.fixture.date).toUTCString().slice(5,16)+": line-ups, events, stats and report.");
     if(/FT|AET|PEN/.test(f.fixture.status.short)&&OURS){$("report").innerHTML=MU.report(f,{link:false,highlights:false}); if(!render.hl){render.hl=1; MU.highlightsBox($("hl"),f)} $("reportSheet").style.display=""}
+    if(!render.st){render.st=1; MU.stands($("stands"),f.fixture.id).then(function(ok){if(ok)$("standsSheet").style.display=""})}
     if(!render.ground){render.ground=1; MU.groundFor(f).then(function(g){if(g){$("venue").innerHTML=MU.groundPhoto(g,"wide"); $("venue").hidden=false}}).catch(function(){})}
     $("from").innerHTML="Match centre<span>"+MU.esc(f.league.name)+(f.league.round?" · "+MU.esc(f.league.round.replace("Regular Season - ","Matchweek ")):"")+"</span>";
     var GE=MU.goalEvents(f), ruled=function(e){return e.type==="Goal"&&GE.indexOf(e)>=0&&e.ok===false}; var goals=function(team){return GE.filter(function(e){return e.ok&&e.team.id===team.id}).map(function(e){return MU.esc(e.player.name)+" "+e.time.elapsed+(e.time.extra?"+"+e.time.extra:"")+"′"+(e.detail==="Penalty"?" (pen)":e.detail==="Own Goal"?" (og)":"")}).join("<br>")};

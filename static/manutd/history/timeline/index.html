@@ -70,6 +70,9 @@
 .tl .yr.e{color:var(--muted);font-size:15px;padding-top:9px}
 .tl .evs{border-top:1px solid var(--rule);padding:8px 0;min-width:0}
 .tl .evs.e{padding:6px 0;font-size:12px;color:var(--muted)}
+.tl .evph{margin:8px 0 2px;max-width:220px} .tl .evph figure{margin:0}
+.tl .evph img{display:block;width:100%;height:auto;background:var(--tint);border-radius:6px}
+.tl .evph figcaption{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.4}
 .tl .band{margin:0 2px;border-radius:6px;background:var(--black);color:var(--on-black);text-decoration:none;writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--head);font-weight:600;font-size:11px;letter-spacing:0;padding:8px 0;display:flex;align-items:center;justify-content:flex-end;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-height:24px;position:relative;z-index:1}
 .tl .band.alt{background:var(--muted);color:var(--paper)}
 .tl .band.cur{background:var(--red);color:var(--tl-on-red)}
@@ -178,7 +181,8 @@
   function types(){var vt=VIEWT[st.v]; var sel=st.t.filter(function(x){return vt.indexOf(x)>=0}); return sel.length?sel:vt}
   function url(o){o=Object.assign({},st,o||{}); var q=new URLSearchParams(); q.set("d",o.d+"s"); if(o.v!=="all")q.set("v",o.v); var vt=VIEWT[o.v], sel=o.t.filter(function(x){return vt.indexOf(x)>=0}); if(sel.length&&sel.length<vt.length)q.set("t",sel.join(",")); return location.pathname+"?"+q.toString()}
 
-  var DATA=null;
+  var DATA=null, PH={}, CREDIT="";
+  MU.photos().then(function(j){PH=j.timeline||{}; CREDIT=j.credit||""; if(DATA)render()});
   fetch("/manutd/history/timeline.json").then(function(r){if(!r.ok)throw new Error("HTTP "+r.status); return r.json()}).then(function(j){
     j.events.forEach(function(e){e.y=parseInt(e.d,10); e.dec=Math.floor(e.y/10)*10});
     DATA=j; render(); jump();
@@ -231,7 +235,7 @@
     var k=fmtD(e.d)+' · '+(e.comp&&e.t!=="match"?esc(e.comp):KLABEL[e.t]);
     var lk=(e.l||[]).map(function(l){var ext=/^https?:/.test(l[1]); return '<a class="chip" href="'+esc(l[1])+'"'+(ext?' target="_blank" rel="noopener"':'')+'>'+esc(l[0])+'</a>'});
     if(e.src)lk.push('<a class="chip" href="'+esc(e.src)+'" target="_blank" rel="noopener" title="Source">Wikipedia ↗</a>');
-    return '<div class="ev '+e.t+'"'+id+'>'+icon(e)+'<div><div class="k">'+k+'</div><h3>'+title+'</h3>'+(e.tx?'<p>'+esc(e.tx)+'</p>':'')+(lk.length?'<div class="lk">'+lk.join("")+'</div>':'')+'</div></div>';
+    return '<div class="ev '+e.t+'"'+id+'>'+icon(e)+'<div><div class="k">'+k+'</div><h3>'+title+'</h3>'+(e.tx?'<p>'+esc(e.tx)+'</p>':'')+(PH[e.d+'|'+e.t]?'<div class="evph">'+MU.shot(PH[e.d+'|'+e.t],CREDIT,'220px')+'</div>':'')+(lk.length?'<div class="lk">'+lk.join("")+'</div>':'')+'</div></div>';
   }
   function go(o,push){Object.assign(st,o); history[push?"pushState":"replaceState"](null,"",url()); render()}
   function jump(){var h=location.hash&&document.getElementById(decodeURIComponent(location.hash.slice(1))); if(!h)return; h.classList.add("hl"); setTimeout(function(){h.scrollIntoView({block:"center"})},50)}

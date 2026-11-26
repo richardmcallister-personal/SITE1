@@ -1,0 +1,58 @@
+{
+ "note": "Richard's own photographs. Files are photos/<f>.webp (1200 on the long side) and photos/<f>-s.webp (480). matches is keyed by feed fixture id; timeline by '<event date>|<event type>' from history/timeline.json.",
+ "credit": "Richard McAllister",
+ "matches": {
+  "1361283": [
+   {
+    "f": "lyon-2025-tifo",
+    "w": 900,
+    "h": 1200,
+    "cap": "The pre-match banner in front of the Sir Alex Ferguson Stand"
+   },
+   {
+    "f": "lyon-2025-free-kick",
+    "w": 900,
+    "h": 1200,
+    "cap": "United players wait over the ball"
+   },
+   {
+    "f": "lyon-2025-scoreboard",
+    "w": 900,
+    "h": 1200,
+    "cap": "The scoreboard at the end: 5–4 after 120 minutes"
+   },
+   {
+    "f": "lyon-2025-floodlights",
+    "w": 970,
+    "h": 1200,
+    "cap": "Evening sky over Old Trafford during the game"
+   }
+  ]
+ },
+ "timeline": {
+  "1910-02-19|ground": {
+   "f": "ot100-plaque",
+   "w": 1200,
+   "h": 1101,
+   "cap": "The OT100 plaque, laid for the ground's centenary in 2010"
+  },
+  "1958-02-06|club": {
+   "f": "munich-clock",
+   "w": 900,
+   "h": 1200,
+   "cap": "The Munich clock at Old Trafford"
+  },
+  "1968-05-29|trophy": {
+   "f": "united-trinity",
+   "w": 900,
+   "h": 1200,
+   "cap": "The United Trinity statue: Best, Law and Charlton"
+  },
+  "1986-11-06|manager": {
+   "f": "ferguson-statue",
+   "w": 900,
+   "h": 1200,
+   "cap": "Sir Alex Ferguson's statue outside the stand that carries his name"
+  }
+ }
+}
