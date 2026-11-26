@@ -162,7 +162,7 @@ the live Worker). See `git log` for the latest commit on each branch.
   contact detail). Edit worker.js with the editor and test new code in a separate file; Cloudflare's build is the
   syntax check (a failed build keeps the previous version live). Richard to decide whether to switch that contact to
   the site's postmaster address.
-- 26 Nov (dev, awaiting approval): Richard's own photographs. static/manutd/photos/ holds <name>.webp (1200 on the long
+- 26 Nov (live): Richard's own photographs. static/manutd/photos/ holds <name>.webp (1200 on the long
   side) + <name>-s.webp (480), EXIF stripped, and photos.json: `credit`, `matches` keyed by feed fixture id, `timeline`
   keyed by "<event date>|<event type>". mu.js: `MU.photos()`, `MU.shot(p,credit,sizes)`, `MU.stands(el,fixtureId)` =
   the "From the stands" strip on the match page (#standsSheet; four across on desktop, sideways swipe on phones).
