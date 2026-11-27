@@ -27,6 +27,32 @@
     "h": 1200,
     "cap": "Evening sky over Old Trafford during the game"
    }
+  ],
+  "1379305": [
+   {
+    "f": "brentford-2026-stretford-end",
+    "w": 1200,
+    "h": 900,
+    "cap": "The Stretford End before kick-off"
+   },
+   {
+    "f": "brentford-2026-corner",
+    "w": 754,
+    "h": 1200,
+    "cap": "Bruno Fernandes over a corner"
+   },
+   {
+    "f": "brentford-2026-dusk",
+    "w": 1200,
+    "h": 871,
+    "cap": "Old Trafford at dusk"
+   },
+   {
+    "f": "brentford-2026-scoreboard",
+    "w": 1200,
+    "h": 1200,
+    "cap": "Full time: Manchester United 2, Brentford 1"
+   }
   ]
  },
  "timeline": {
