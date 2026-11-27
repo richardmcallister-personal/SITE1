@@ -174,7 +174,7 @@ the live Worker). See `git log` for the latest commit on each branch.
   AppleScript to Pictures/Claude outputs/match-photo-review/originals, converted there with ImageMagick. Not placed yet:
   trophy room and tunnel (no matching timeline event), Copenhagen 8 Nov 2023, the home game of 27 Apr 2026 (opponent
   not confirmed). Photos showing children or close-ups of bystanders are left out.
-- 27 Nov (dev, awaiting Richard's feedback): four photos on United 2-1 Brentford, 27 Apr 2026 (id 1379305). The
+- 27 Nov (live): four photos on United 2-1 Brentford, 27 Apr 2026 (id 1379305). The
   scoreboard shot is cropped to keep fans' faces out. Contact sheets of all 78 photos from that night are in
   Pictures/Claude outputs/match-photo-review (sheet_Brentford_2026_1/2); alternates he may swap in: nos. 40, 62, 68.
 
